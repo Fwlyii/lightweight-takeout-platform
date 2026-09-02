@@ -1,37 +1,8 @@
-# tju_course_design_report_template
+# SRS 报告源码
 
-#### 项目介绍
-天津大学软件学院专业课程设计2结课报告模板
+- `tjumain.tex`：LaTeX 入口。
+- `body/srs/`：SRS 正文。
+- `figures/srs/`：待补图片清单和后续正式图片。
+- `archive/`：旧稿，仅供查阅，不参与编译。
 
-#### 环境配置
-
-推荐使用 VS Code + Latex Workshop（VsCode插件） + Texlive进行撰写。
-
-当前报告使用 `ctexbook` 与 Fandol 中文字体方案，请选择 XeLaTeX 或 Tectonic 编译。
-
-#### 使用说明
-
-tjumain.tex                     主模板文件
-
-body/                           在此文件夹下编写论文各章节内容
-
-body文件夹下的文件需要在tjumain.tex的相应位置添加引用
-```
-	\include{body/intros}
-	\include{body/figures}
-	\include{body/tables}
-	\include{body/equations}
-	\include{body/others}
-	\include{body/conclusion}
-```
-
-figure/*                        文中所使用的图片
-
-setup/info.tex                  封面和页眉的基本信息
-
-#### 如何参与贡献
-
-1. Fork 本项目
-2. 新建分支
-3. 提交代码
-4. 创建 Pull Request
+在本目录运行 `make pdf`，生成的 PDF 位于 `../report/tjumain.pdf`。
