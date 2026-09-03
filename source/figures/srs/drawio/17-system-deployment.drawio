@@ -1,0 +1,36 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="deployment" name="Page-1">
+    <mxGraphModel dx="1900" dy="1150" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="1150" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="browser" value="«device»&#10;用户浏览器" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontSize=15;strokeWidth=1.3;" vertex="1" parent="1"><mxGeometry x="100" y="160" width="320" height="210" as="geometry" /></mxCell>
+        <mxCell id="vue" value="«artifact» Vue 3 前端" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="150" y="230" width="220" height="60" as="geometry" /></mxCell>
+        <mxCell id="server" value="«executionEnvironment»&#10;Spring Boot 后端" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontSize=15;strokeWidth=1.3;" vertex="1" parent="1"><mxGeometry x="650" y="130" width="540" height="500" as="geometry" /></mxCell>
+        <mxCell id="auth" value="身份认证 / 权限校验" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="720" y="230" width="190" height="60" as="geometry" /></mxCell>
+        <mxCell id="biz" value="业务服务" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="940" y="230" width="180" height="60" as="geometry" /></mxCell>
+        <mxCell id="adapter" value="外部服务适配层" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="820" y="360" width="260" height="65" as="geometry" /></mxCell>
+        <mxCell id="audit" value="事务 / 幂等 / 状态与审计" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="780" y="480" width="340" height="65" as="geometry" /></mxCell>
+        <mxCell id="db" value="«database»&#10;MySQL" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontSize=15;strokeWidth=1.3;" vertex="1" parent="1"><mxGeometry x="720" y="760" width="330" height="180" as="geometry" /></mxCell>
+        <mxCell id="ai" value="AI 服务" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="1370" y="100" width="220" height="75" as="geometry" /></mxCell>
+        <mxCell id="img" value="图片识别" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="1370" y="230" width="220" height="75" as="geometry" /></mxCell>
+        <mxCell id="voice" value="语音识别" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="1370" y="360" width="220" height="75" as="geometry" /></mxCell>
+        <mxCell id="map" value="地图服务" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="1370" y="490" width="220" height="75" as="geometry" /></mxCell>
+        <mxCell id="storage" value="对象存储" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="1370" y="620" width="220" height="75" as="geometry" /></mxCell>
+        <mxCell id="mock" value="«test» Mock / Stub" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="1370" y="780" width="250" height="75" as="geometry" /></mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="browser" target="server" style="html=1;endArrow=block;endFill=1;startArrow=none;strokeWidth=1.1;" value="HTTPS / REST"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="server" target="db" style="html=1;endArrow=block;endFill=1;startArrow=none;strokeWidth=1.1;" value="JDBC"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="adapter" target="ai" style="html=1;endArrow=block;endFill=1;startArrow=none;strokeWidth=1.1;" value="受控接口"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="adapter" target="img" style="html=1;endArrow=block;endFill=1;startArrow=none;strokeWidth=1.1;" value="受控接口"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="adapter" target="voice" style="html=1;endArrow=block;endFill=1;startArrow=none;strokeWidth=1.1;" value="受控接口"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="adapter" target="map" style="html=1;endArrow=block;endFill=1;startArrow=none;strokeWidth=1.1;" value="受控接口"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="adapter" target="storage" style="html=1;endArrow=block;endFill=1;startArrow=none;strokeWidth=1.1;" value="受控接口"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="mock" target="adapter" style="html=1;endArrow=block;endFill=1;startArrow=none;strokeWidth=1.1;dashed=1;" value="自动化测试"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="n1" value="前端不得直接连接数据库或持有外部服务密钥；核心业务写操作均经后端业务服务。" style="shape=note;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1"><mxGeometry x="90" y="470" width="430" height="110" as="geometry" /></mxCell>
+        <mxCell id="n2" value="外部服务不可用时，普通登录、搜索、购物车、订单、文本地址和状态管理仍应可用。" style="shape=note;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1"><mxGeometry x="90" y="650" width="430" height="110" as="geometry" /></mxCell>
+        <mxCell id="n3" value="关键一致性要求：事务或可恢复方案；幂等/条件更新/版本号防重复副作用；核心变更保留原状态、新状态、执行者、时间和原因。" style="shape=note;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1"><mxGeometry x="1160" y="900" width="600" height="140" as="geometry" /></mxCell>
+        <mxCell id="n4" value="订单、库存、资产和配送状态由各自业务服务统一维护，页面不得绕过业务服务直接改变状态。订单创建、库存预占、优惠券锁定与资产变更采用事务或可恢复方案，失败不得留下半完成订单。" style="shape=note;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1"><mxGeometry x="590" y="900" width="520" height="140" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
