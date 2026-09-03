@@ -1,0 +1,40 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="wireframes" name="Page-1">
+    <mxGraphModel dx="2100" dy="1650" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2100" pageHeight="1650" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="f1" value="顾客 AI 点餐页" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeWidth=1.4;fontSize=16;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1"><mxGeometry x="60" y="80" width="620" height="500" as="geometry" /></mxCell>
+        <mxCell id="f2" value="订单履约详情页" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeWidth=1.4;fontSize=16;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1"><mxGeometry x="740" y="80" width="620" height="500" as="geometry" /></mxCell>
+        <mxCell id="f3" value="商家订单工作台" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeWidth=1.4;fontSize=16;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1"><mxGeometry x="1420" y="80" width="620" height="500" as="geometry" /></mxCell>
+        <mxCell id="f4" value="骑手当前任务页" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeWidth=1.4;fontSize=16;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1"><mxGeometry x="380" y="650" width="620" height="500" as="geometry" /></mxCell>
+        <mxCell id="f5" value="管理员审核 / 看板页" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeWidth=1.4;fontSize=16;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1"><mxGeometry x="1100" y="650" width="620" height="500" as="geometry" /></mxCell>
+        <mxCell id="f1_head" value="页面标题 / 导航" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="90" y="135" width="560" height="45" as="geometry" /></mxCell>
+        <mxCell id="f1_main" value="AI 点餐主要交互区" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="100" y="210" width="530" height="220" as="geometry" /></mxCell>
+        <mxCell id="f1_state" value="状态反馈区" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="100" y="455" width="530" height="70" as="geometry" /></mxCell>
+        <mxCell id="f2_head" value="页面标题 / 导航" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="770" y="135" width="560" height="45" as="geometry" /></mxCell>
+        <mxCell id="f2_main" value="订单履约详情信息区" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="780" y="210" width="530" height="220" as="geometry" /></mxCell>
+        <mxCell id="f2_state" value="状态反馈区" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="780" y="455" width="530" height="70" as="geometry" /></mxCell>
+        <mxCell id="f3_head" value="页面标题 / 导航" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="1450" y="135" width="560" height="45" as="geometry" /></mxCell>
+        <mxCell id="f3_main" value="商家订单工作区" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="1460" y="210" width="530" height="220" as="geometry" /></mxCell>
+        <mxCell id="f3_state" value="状态反馈区" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="1460" y="455" width="530" height="70" as="geometry" /></mxCell>
+        <mxCell id="f4_head" value="页面标题 / 导航" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="410" y="705" width="560" height="45" as="geometry" /></mxCell>
+        <mxCell id="f4_main" value="当前任务信息区" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="420" y="780" width="530" height="220" as="geometry" /></mxCell>
+        <mxCell id="f4_state" value="状态反馈区" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="420" y="1025" width="530" height="70" as="geometry" /></mxCell>
+        <mxCell id="f5_head" value="页面标题 / 导航" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="1130" y="705" width="560" height="45" as="geometry" /></mxCell>
+        <mxCell id="f5_audit" value="审核信息区" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="1140" y="780" width="250" height="220" as="geometry" /></mxCell>
+        <mxCell id="f5_dash" value="看板信息区" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1"><mxGeometry x="1410" y="780" width="250" height="220" as="geometry" /></mxCell>
+        <mxCell id="f5_state" value="状态反馈区" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="1140" y="1025" width="520" height="70" as="geometry" /></mxCell>
+        <mxCell id="states" value="页面通用状态" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeWidth=1.2;fontSize=15;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1"><mxGeometry x="100" y="1180" width="1900" height="390" as="geometry" /></mxCell>
+        <mxCell id="s0" value="加载中&#10;骨架屏 / 加载指示；防止重复副作用操作" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="140" y="1240" width="560" height="90" as="geometry" /></mxCell>
+        <mxCell id="s1" value="空数据&#10;说明原因；在适当场景提供创建 / 搜索 / 返回入口" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="770" y="1240" width="560" height="90" as="geometry" /></mxCell>
+        <mxCell id="s2" value="表单错误&#10;定位到具体字段并给出可理解提示；保留其他合法输入" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="1400" y="1240" width="560" height="90" as="geometry" /></mxCell>
+        <mxCell id="s3" value="权限不足&#10;提示无权访问，不展示敏感数据；返回当前角色首页" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="140" y="1360" width="560" height="90" as="geometry" /></mxCell>
+        <mxCell id="s4" value="状态冲突&#10;提示数据已变化 / 操作已完成；刷新最新状态，不覆盖成功结果" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="770" y="1360" width="560" height="90" as="geometry" /></mxCell>
+        <mxCell id="s5" value="服务失败&#10;简洁错误提示并提供重试；写操作仅在具备幂等性时自动重试" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="1400" y="1360" width="560" height="90" as="geometry" /></mxCell>
+        <mxCell id="buttons" value="关键按钮状态：默认 / 禁用 / 处理中 / 成功 / 失败" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;dashed=1;" vertex="1" parent="1"><mxGeometry x="140" y="1490" width="820" height="55" as="geometry" /></mxCell>
+        <mxCell id="ui_note" value="状态同时使用文字和视觉标记，不只依赖颜色；顾客和骑手核心流程 ≥375 px；桌面端 ≥1366×768；支持验收日前 Chrome / Edge 最新两个主版本。" style="shape=note;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1"><mxGeometry x="1030" y="1480" width="900" height="70" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
