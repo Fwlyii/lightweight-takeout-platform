@@ -1,0 +1,43 @@
+<mxfile host="app.diagrams.net" agent="Codex" version="24.7.17">
+  <diagram id="rider-use-case" name="第 1 页">
+    <mxGraphModel dx="1050" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1050" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="main" value="骑手" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
+          <mxGeometry x="150" y="410" width="110" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="secondary" value="顾客" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
+          <mxGeometry x="150" y="105" width="110" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="u1" value="UC-RID-01 骑手申请与工作状态" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="500" y="125" width="390" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="main" target="u1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="u2" value="UC-RID-02 查看可接任务与并发接单" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="500" y="315" width="390" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="main" target="u2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="u3" value="UC-RID-03 到店、取餐与送达" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="500" y="505" width="390" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="main" target="u3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="u4" value="UC-RID-04 配送异常、历史与导航" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="500" y="695" width="390" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="main" target="u4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="secondary" target="u1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

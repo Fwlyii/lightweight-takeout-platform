@@ -1,0 +1,91 @@
+<mxfile host="app.diagrams.net" agent="Codex" version="24.7.17">
+  <diagram id="customer-use-case" name="第 1 页">
+    <mxGraphModel dx="1600" dy="1020" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1020" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="customer" value="顾客" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
+          <mxGeometry x="170" y="505" width="110" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="visitor" value="游客" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
+          <mxGeometry x="170" y="105" width="110" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" value="UC-CUS-01 浏览与搜索店铺商品" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="470" y="115" width="360" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="ec1" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="customer" target="c1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="UC-CUS-02 管理购物车" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="470" y="270" width="360" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="ec2" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="customer" target="c2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="UC-CUS-03 订单试算与创建" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="470" y="425" width="360" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="ec3" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="customer" target="c3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="UC-CUS-04 支付与取消订单" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="470" y="580" width="360" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="ec4" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="customer" target="c4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" value="UC-CUS-05 查看履约进度与确认收货" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="470" y="735" width="360" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="ec5" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="customer" target="c5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c6" value="UC-CUS-06 评价与个人消费分析" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="470" y="890" width="360" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="ec6" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="customer" target="c6" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x1" value="UC-COM-02 个人资料与配送地址" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="1080" y="150" width="380" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="ex1" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="customer" target="x1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x2" value="UC-AI-01 AI 客服与结构化智能点餐" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="1080" y="330" width="380" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="ex2" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="customer" target="x2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x3" value="UC-AI-02 图片识菜与语音输入" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="1080" y="510" width="380" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="ex3" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="customer" target="x3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x4" value="UC-MKT-01 钱包、积分、优惠券与会员" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="1080" y="690" width="380" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="ex4" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="customer" target="x4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x5" value="UC-PER-01 个性化偏好与主题" style="ellipse;whiteSpace=wrap;html=1;fontSize=15;strokeWidth=1.2;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="1080" y="870" width="380" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="ex5" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="customer" target="x5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="v1" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="visitor" target="c1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="v2" style="endArrow=none;html=1;strokeWidth=1.2;exitX=0.75;exitY=0.4;exitPerimeter=0;" parent="1" source="visitor" target="x2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aiinclude" style="dashed=1;endArrow=open;endFill=0;html=0;fontSize=13;strokeWidth=1.1;labelBackgroundColor=#ffffff;" parent="1" source="x3" target="x2" edge="1" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

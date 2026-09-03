@@ -1,41 +1,50 @@
 <mxfile host="65bd71144e">
-    <diagram id="srs09-actor-analysis" name="Page-1">
-        <mxGraphModel dx="1680" dy="807" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+    <diagram id="actor-analysis" name="第 1 页">
+        <mxGraphModel dx="1207" dy="802" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="760" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="actor_logged" value="已登录用户" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
-                    <mxGeometry x="755" y="430" width="90" height="110" as="geometry"/>
+                <mxCell id="actor_visitor" value="游客&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="275" width="120" height="125" as="geometry"/>
+                </mxCell>
+                <mxCell id="actor_logged" value="已登录用户&#xa;（通用执行者）" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
+                    <mxGeometry x="695" y="80" width="110" height="125" as="geometry"/>
                 </mxCell>
                 <mxCell id="actor_customer" value="顾客" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
-                    <mxGeometry x="470" y="170" width="80" height="110" as="geometry"/>
+                    <mxGeometry x="390" y="455" width="80" height="110" as="geometry"/>
                 </mxCell>
                 <mxCell id="actor_merchant" value="商家" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
-                    <mxGeometry x="1050" y="170" width="80" height="110" as="geometry"/>
+                    <mxGeometry x="600" y="455" width="80" height="110" as="geometry"/>
                 </mxCell>
                 <mxCell id="actor_rider" value="骑手" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
-                    <mxGeometry x="470" y="700" width="80" height="110" as="geometry"/>
+                    <mxGeometry x="820" y="455" width="80" height="110" as="geometry"/>
                 </mxCell>
                 <mxCell id="actor_admin" value="管理员" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
-                    <mxGeometry x="1045" y="700" width="90" height="110" as="geometry"/>
+                    <mxGeometry x="1030" y="455" width="90" height="110" as="geometry"/>
                 </mxCell>
-                <mxCell id="actor_visitor" value="游客" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
-                    <mxGeometry x="100" y="430" width="80" height="110" as="geometry"/>
+                <mxCell id="actor_external" value="外部服务&#xa;（AI／地图／对象存储）" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
+                    <mxGeometry x="1285" y="275" width="115" height="125" as="geometry"/>
                 </mxCell>
-                <mxCell id="actor_external" value="外部服务" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" parent="1" vertex="1">
-                    <mxGeometry x="1420" y="430" width="90" height="110" as="geometry"/>
+                <mxCell id="gen_customer" style="endArrow=block;endFill=0;endSize=14;html=1;strokeWidth=1.2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="actor_customer" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="680" y="230" as="targetPoint"/>
+                    </mxGeometry>
                 </mxCell>
-                <mxCell id="gen_customer" style="html=1;rounded=0;endArrow=block;endFill=0;endSize=14;strokeWidth=1.2;exitX=0.75;exitY=0.6;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.25;entryY=0.3;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="actor_customer" target="actor_logged" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="gen_merchant" style="endArrow=block;endFill=0;endSize=14;html=1;strokeWidth=1.2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="actor_merchant" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="640" y="470" as="sourcePoint"/>
+                        <mxPoint x="720" y="260" as="targetPoint"/>
+                    </mxGeometry>
                 </mxCell>
-                <mxCell id="gen_merchant" style="html=1;rounded=0;endArrow=block;endFill=0;endSize=14;strokeWidth=1.2;exitX=0.25;exitY=0.6;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.75;entryY=0.3;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="actor_merchant" target="actor_logged" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="gen_rider" style="endArrow=block;endFill=0;endSize=14;html=1;strokeWidth=1.2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="actor_rider" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="790" y="270" as="targetPoint"/>
+                    </mxGeometry>
                 </mxCell>
-                <mxCell id="gen_rider" style="html=1;rounded=0;endArrow=block;endFill=0;endSize=14;strokeWidth=1.2;exitX=0.75;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.25;entryY=0.7;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="actor_rider" target="actor_logged" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="gen_admin" style="html=1;rounded=0;endArrow=block;endFill=0;endSize=14;strokeWidth=1.2;exitX=0.25;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.75;entryY=0.7;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="actor_admin" target="actor_logged" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="gen_admin" style="endArrow=block;endFill=0;endSize=14;html=1;strokeWidth=1.2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="actor_admin" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="830" y="230" as="targetPoint"/>
+                    </mxGeometry>
                 </mxCell>
             </root>
         </mxGraphModel>
