@@ -1,4 +1,14 @@
-# 待补图片
+# SRS 图片
+
+`01–08` 为既有业务分析图，`09–17` 已统一重构为黑白风格。`09–17` 的可编辑源为
+`src/render_diagrams.py`，使用 Python 3、Pillow 和微软雅黑字体生成：
+
+```bash
+cd source/figures/srs/src
+./render.sh
+```
+
+可通过 `SRS_FONT_REGULAR` 和 `SRS_FONT_BOLD` 指定其他支持中文的字体文件。
 
 | 小节 | 文件 | 图类型 | 内容 |
 | --- | --- | --- | --- |
