@@ -29,8 +29,8 @@
           <mxGeometry x="1190" y="270" width="80" height="110" as="geometry" />
         </mxCell>
 
-        <mxCell id="actor_external" value="外部服务" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" vertex="1" parent="1">
-          <mxGeometry x="1180" y="650" width="100" height="110" as="geometry" />
+        <mxCell id="actor_external" value="&lt;&lt;external system&gt;&gt;&#10;外部服务" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;strokeWidth=1.2;align=center;verticalAlign=middle;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="670" width="200" height="85" as="geometry" />
         </mxCell>
 
         <mxCell id="gen_customer" edge="1" parent="1" source="actor_customer" target="actor_logged" style="html=1;rounded=0;endArrow=block;endFill=0;endSize=14;strokeWidth=1.2;">
