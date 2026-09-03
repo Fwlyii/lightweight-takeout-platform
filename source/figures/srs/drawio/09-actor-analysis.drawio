@@ -184,13 +184,13 @@
         <mxCell id="ex1" edge="1" parent="1" source="ai" target="x1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="map" value="地图服务" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1">
+        <mxCell id="mapService" value="地图服务" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1">
           <mxGeometry x="1810" y="610" width="130" height="55" as="geometry" />
         </mxCell>
         <mxCell id="x2" value="25. 导航能力" style="ellipse;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1">
           <mxGeometry x="1970" y="605" width="160" height="65" as="geometry" />
         </mxCell>
-        <mxCell id="ex2" edge="1" parent="1" source="map" target="x2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+        <mxCell id="ex2" edge="1" parent="1" source="mapService" target="x2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="storage" value="对象存储" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;strokeWidth=1.2;" vertex="1" parent="1">
