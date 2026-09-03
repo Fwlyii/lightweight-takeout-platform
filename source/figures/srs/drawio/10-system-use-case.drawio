@@ -1,0 +1,229 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="system-use-case" name="Page-1">
+    <mxGraphModel dx="2700" dy="1750" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2700" pageHeight="1750" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="visitor" value="游客" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="80" y="180" width="85" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="customer" value="顾客" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="80" y="650" width="85" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="merchant" value="商家" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1120" width="85" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="rider" value="骑手" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="2470" y="280" width="85" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="admin" value="管理员" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="2470" y="850" width="85" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="external" value="外部服务" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=16;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="2470" y="1340" width="95" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="gcom" value="公共功能用例" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeWidth=1.1;fontSize=15;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="300" y="80" width="650" height="470" as="geometry" />
+        </mxCell>
+        <mxCell id="gcus" value="顾客用例" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeWidth=1.1;fontSize=15;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="300" y="620" width="650" height="960" as="geometry" />
+        </mxCell>
+        <mxCell id="gmer" value="商家用例" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeWidth=1.1;fontSize=15;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="80" width="650" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="grid" value="骑手用例" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeWidth=1.1;fontSize=15;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="830" width="650" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="gadm" value="管理员用例" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeWidth=1.1;fontSize=15;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="80" width="650" height="540" as="geometry" />
+        </mxCell>
+        <mxCell id="gai" value="智能服务、营销资产与个性化用例" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeWidth=1.1;fontSize=15;verticalAlign=top;align=center;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="700" width="650" height="700" as="geometry" />
+        </mxCell>
+        <mxCell id="com1" value="UC-COM-01&#10;注册与登录" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="160" width="270" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="com2" value="UC-COM-02&#10;个人资料与配送地址" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="660" y="160" width="270" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="com3" value="UC-COM-03&#10;角色切换与状态通知" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="290" width="270" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="cus1" value="UC-CUS-01&#10;浏览与搜索店铺商品" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="710" width="270" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="cus2" value="UC-CUS-02&#10;管理购物车" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="660" y="710" width="270" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="cus3" value="UC-CUS-03&#10;订单试算与创建" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="845" width="270" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="cus4" value="UC-CUS-04&#10;支付与取消订单" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="660" y="845" width="270" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="cus5" value="UC-CUS-05&#10;查看履约进度与确认收货" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="980" width="270" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="cus6" value="UC-CUS-06&#10;评价与个人消费分析" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="660" y="980" width="270" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="mer1" value="UC-MER-01&#10;商家申请与店铺状态" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="170" width="270" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="mer2" value="UC-MER-02&#10;分类、商品与库存管理" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="170" width="270" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="mer3" value="UC-MER-03&#10;商家处理订单" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="315" width="270" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="mer4" value="UC-MER-04&#10;评价回复与经营看板" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="315" width="270" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="rid1" value="UC-RID-01&#10;骑手申请与工作状态" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="920" width="270" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="rid2" value="UC-RID-02&#10;查看可接任务与并发接单" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="920" width="270" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="rid3" value="UC-RID-03&#10;到店、取餐与送达" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="1065" width="270" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="rid4" value="UC-RID-04&#10;配送异常、历史与导航" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="1065" width="270" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="adm1" value="UC-ADM-01&#10;商家、店铺与骑手准入审核" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1750" y="170" width="270" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="adm2" value="UC-ADM-02&#10;账号、评价与配送异常治理" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="2060" y="170" width="270" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="adm3" value="UC-ADM-03&#10;平台数据看板" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1750" y="325" width="270" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ai1" value="UC-AI-01&#10;AI 客服与结构化智能点餐" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1750" y="800" width="270" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ai2" value="UC-AI-02&#10;图片识菜与语音输入" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="2060" y="800" width="270" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="mkt1" value="UC-MKT-01&#10;钱包、积分、优惠券与会员" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="1750" y="960" width="270" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="per1" value="UC-PER-01&#10;个性化偏好与主题" style="ellipse;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="2060" y="960" width="270" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="visitor" target="com1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="visitor" target="cus1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="visitor" target="ai1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="customer" target="com2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="customer" target="com3" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="customer" target="cus1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="customer" target="cus2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="customer" target="cus3" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="customer" target="cus4" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="customer" target="cus5" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="customer" target="cus6" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="customer" target="mer1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="1" source="customer" target="rid1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="customer" target="ai1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="customer" target="ai2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="customer" target="mkt1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="customer" target="per1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e18" edge="1" parent="1" source="merchant" target="com2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e19" edge="1" parent="1" source="merchant" target="com3" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e20" edge="1" parent="1" source="merchant" target="mer1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e21" edge="1" parent="1" source="merchant" target="mer2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e22" edge="1" parent="1" source="merchant" target="mer3" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e23" edge="1" parent="1" source="merchant" target="mer4" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e24" edge="1" parent="1" source="rider" target="com2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e25" edge="1" parent="1" source="rider" target="com3" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e26" edge="1" parent="1" source="rider" target="rid1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e27" edge="1" parent="1" source="rider" target="rid2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e28" edge="1" parent="1" source="rider" target="rid3" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e29" edge="1" parent="1" source="rider" target="rid4" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e30" edge="1" parent="1" source="admin" target="com2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e31" edge="1" parent="1" source="admin" target="com3" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e32" edge="1" parent="1" source="admin" target="adm1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e33" edge="1" parent="1" source="admin" target="adm2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e34" edge="1" parent="1" source="admin" target="adm3" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e35" edge="1" parent="1" source="external" target="ai1" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e36" edge="1" parent="1" source="external" target="ai2" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e37" edge="1" parent="1" source="external" target="rid4" style="html=1;endArrow=none;startArrow=none;strokeWidth=1.1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
