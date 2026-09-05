@@ -47,6 +47,23 @@
   \end{figure}%
 }
 
+\newcommand{\srsfigurelarge}[5][0.98\linewidth]{%
+  \begin{figure}[H]
+    \centering
+    \IfFileExists{#2}{%
+      \includegraphics[width=#1,height=0.88\textheight,keepaspectratio]{#2}%
+    }{%
+      \fbox{\parbox[c][4.2cm][c]{0.86\linewidth}{%
+        \centering\hei 待补图：#3\\[0.6em]
+        \song\small 图类型：#4\\[0.3em]
+        预期文件：\texttt{#2}%
+      }}%
+    }
+    \caption{#3}
+    \label{#5}
+  \end{figure}%
+}
+
 \newenvironment{srsusecase}[5]{%
   \begin{longtable}{|L{0.16\linewidth}|L{0.29\linewidth}|L{0.16\linewidth}|L{0.29\linewidth}|}
   \caption{#2用例说明}\label{#5}\\

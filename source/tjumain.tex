@@ -1,12 +1,22 @@
 \def\usewhat{xelatex}
 \documentclass[12pt,openany,oneside,fontset=none]{ctexbook}
-\setCJKmainfont[BoldFont=FandolSong-Bold]{FandolSong-Regular}
-\setCJKsansfont[BoldFont=FandolHei-Bold]{FandolHei-Regular}
-\setCJKmonofont{FandolFang-Regular}
-\setCJKfamilyfont{zhsong}[BoldFont=FandolSong-Bold]{FandolSong-Regular}
-\setCJKfamilyfont{zhhei}[BoldFont=FandolHei-Bold]{FandolHei-Regular}
-\setCJKfamilyfont{zhkai}{FandolKai-Regular}
-\setCJKfamilyfont{zhfs}{FandolFang-Regular}
+\IfFontExistsTF{STSong}{
+  \setCJKmainfont[BoldFont=STHeiti]{STSong}
+  \setCJKsansfont[AutoFakeBold=2.5]{STHeiti}
+  \setCJKmonofont{STFangsong}
+  \setCJKfamilyfont{zhsong}[BoldFont=STHeiti]{STSong}
+  \setCJKfamilyfont{zhhei}[AutoFakeBold=2.5]{STHeiti}
+  \setCJKfamilyfont{zhkai}{STKaiti}
+  \setCJKfamilyfont{zhfs}{STFangsong}
+}{
+  \setCJKmainfont[BoldFont=FandolSong-Bold.otf]{FandolSong-Regular.otf}
+  \setCJKsansfont[BoldFont=FandolHei-Bold.otf]{FandolHei-Regular.otf}
+  \setCJKmonofont{FandolFang-Regular.otf}
+  \setCJKfamilyfont{zhsong}[BoldFont=FandolSong-Bold.otf]{FandolSong-Regular.otf}
+  \setCJKfamilyfont{zhhei}[BoldFont=FandolHei-Bold.otf]{FandolHei-Regular.otf}
+  \setCJKfamilyfont{zhkai}{FandolKai-Regular.otf}
+  \setCJKfamilyfont{zhfs}{FandolFang-Regular.otf}
+}
 \input{setup/package}
 \graphicspath{{figures/}{figures/srs/}}
 \begin{document}

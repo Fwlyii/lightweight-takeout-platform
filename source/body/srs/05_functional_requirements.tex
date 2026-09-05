@@ -4,7 +4,9 @@
 
 执行者是位于系统边界之外、通过系统获得业务价值或向系统提供服务的人或外部系统。图~\ref{fig:actor-analysis} 说明执行者之间的泛化与协作关系；同一个自然人在通过审核后可以拥有多个业务角色，但每次请求仍按当前角色及资源归属授权。
 
-\srsfigure{figures/srs/09-actor-analysis.png}{系统执行者分析图}{UML 用例图}{fig:actor-analysis}
+图中的“商家”和“骑手”保留角色标识：申请阶段由已登录顾客身份发起，审核通过后才获得对应工作台能力；申请中、审核通过及上线/营业等差异由各用例的前置条件和状态规则限定，不再增加重复执行者。
+
+\srsfigurelarge{figures/srs/09-actor-analysis.png}{系统执行者分析图}{UML 用例图}{fig:actor-analysis}
 
 \begin{longtable}{|L{0.16\linewidth}|L{0.26\linewidth}|L{0.48\linewidth}|}
 \caption{系统执行者说明}\label{tab:actors}\\ \hline
@@ -20,6 +22,6 @@
 
 \subsection{总用例}
 
-\srsfigure{figures/srs/10-system-use-case.png}{系统总用例图}{UML 用例图}{fig:system-use-case}
+\srsfigurelarge{figures/srs/10-system-use-case.png}{系统总用例图}{UML 用例图}{fig:system-use-case}
 
 总用例图展示游客、四类登录角色和外部服务与一级用例的关系。角色用例在后续分图和用例表中展开，需求编号同时用于接口、数据库和测试材料。
