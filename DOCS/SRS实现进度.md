@@ -1,6 +1,6 @@
 # SRS 实现进度（2026-09-03）
 
-本文件对应 `elemopractice-refine-yi/report/result/tjumain.pdf`，记录当前 demo 已落地的可操作能力。
+本文件对应 [`DOCS/report/tjumain.pdf`](./report/tjumain.pdf)，记录当前 Demo 已落地的可操作能力。
 
 ## 已落地
 
