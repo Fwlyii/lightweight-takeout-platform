@@ -31,16 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-### Local secrets ###
-.env
-.env.*
-!.env.example
-application-local.yml
-application-local.yaml
-
-### Local deployment tool cache ###
-.wrangler/
-
-### Runtime user uploads ###
-/runtime-uploads/
