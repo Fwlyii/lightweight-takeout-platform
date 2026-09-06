@@ -4,7 +4,7 @@
 `src/render_diagrams.py`，使用 Python 3、Pillow 和微软雅黑字体生成：
 
 ```bash
-cd DOCS/source/figures/srs/src
+cd source/figures/srs/src
 ./render.sh
 ```
 

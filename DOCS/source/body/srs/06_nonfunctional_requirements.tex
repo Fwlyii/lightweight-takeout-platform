@@ -33,7 +33,7 @@ HTTP 方法 & GET 查询，POST 创建，PATCH 局部修改，DELETE 删除/逻�
 幂等与冲突 & 支付、取消、接单和资产变更支持幂等键或等价机制；重复请求返回已有结果，非法状态竞争返回 409。 \\ \hline
 \end{longtable}
 
-\begin{longtable}{|L{0.16\linewidth}|L{0.25\linewidth}|L{0.25\linewidth}|L{0.24\linewidth}|}
+\begin{longtable}{|L{0.18\linewidth}|L{0.25\linewidth}|L{0.25\linewidth}|L{0.22\linewidth}|}
 \caption{外部软件接口及降级要求}\label{tab:external-interfaces}\\ \hline
 \textbf{接口} & \textbf{输入} & \textbf{输出} & \textbf{失败时处理} \\ \hline
 AI 服务 & 脱敏后的问题、菜单候选或图片/语音 & 文本答复、结构化候选或识别结果 & 10 秒超时，提示用户并返回普通搜索或手工输入。 \\ \hline
@@ -55,7 +55,7 @@ AI 服务 & 脱敏后的问题、菜单候选或图片/语音 & 文本答复、�
 
 \subsection{性能}
 
-\begin{longtable}{|L{0.22\linewidth}|L{0.35\linewidth}|L{0.33\linewidth}|}
+\begin{longtable}{|L{0.27\linewidth}|L{0.33\linewidth}|L{0.30\linewidth}|}
 \caption{性能与容量验收基线}\label{tab:performance}\\ \hline
 \textbf{对象} & \textbf{指标} & \textbf{测量条件} \\ \hline
 普通查询/写入接口 & 95\% 请求在 2 秒内返回 & 本地验收环境、50 个并发用户，不包含外部 AI/地图调用 \\ \hline
@@ -73,19 +73,17 @@ AI 客服 & 10 秒超时并进入降级 & 使用可控延迟的测试适配器 \
 
 \srsfigurelarge{figures/srs/15-page-information-architecture.png}{四端页面信息架构图}{非 UML：信息架构图}{fig:page-ia}
 
-
+关键页面原型至少包含顾客 AI 点餐页、订单履约详情页、商家订单工作台、骑手当前任务页和管理员审核/看板页。原型用于约定信息层级和状态反馈，视觉色彩可以在不改变需求的前提下调整。
 
 \srsfigurelarge{figures/srs/16-key-page-wireframes.png}{关键页面低保真原型组}{非 UML：低保真原型}{fig:key-wireframes}
 
-关键页面原型至少包含顾客 AI 点餐页、订单履约详情页、商家订单工作台、骑手当前任务页和管理员审核/看板页。原型用于约定信息层级和状态反馈，视觉色彩可以在不改变需求的前提下调整。
-
-\begin{longtable}{|L{0.14\linewidth}|L{0.35\linewidth}|L{0.45\linewidth}|}
+\begin{longtable}{|L{0.17\linewidth}|L{0.31\linewidth}|L{0.42\linewidth}|}
 \caption{页面通用状态}\label{tab:ui-state}\\ \hline
 \textbf{状态} & \textbf{展示要求} & \textbf{交互要求} \\ \hline
 加载中 & 显示骨架屏或明确加载指示 & 防止重复提交产生副作用的操作 \\ \hline
-空数据 & 说明当前无数据的原因 & 在合适场景提供搜索或返回入口 \\ \hline
-表单错误 & 定位字段并显示可理解文字 & 保留合法输入，不清空整张表单 \\ \hline
-权限不足 & 显示无权访问，不展示数据 & 引导返回当前角色首页 \\ \hline
+空数据 & 说明当前无数据的原因 & 在合适场景提供创建、搜索或返回入口 \\ \hline
+表单错误 & 定位到具体字段并显示可理解文字 & 保留其他合法输入，不清空整张表单 \\ \hline
+权限不足 & 显示无权访问，不展示敏感数据 & 引导返回当前角色首页 \\ \hline
 状态冲突 & 显示数据已变更或操作已被他人完成 & 刷新最新状态，不覆盖已成功结果 \\ \hline
 服务失败 & 显示简洁错误与重试入口 & 写操作仅在存在幂等保护时允许自动重试 \\ \hline
 \end{longtable}
