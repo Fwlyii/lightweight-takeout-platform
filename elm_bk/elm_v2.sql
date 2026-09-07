@@ -134,6 +134,7 @@ CREATE TABLE `cart`  (
 DROP TABLE IF EXISTS `delivery_address`;
 CREATE TABLE `delivery_address`  (
   `id` bigint NOT NULL AUTO_INCREMENT,
+  `is_default` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否默认收货地址',
   `create_time` timestamp NULL DEFAULT NULL,
   `creator` bigint NULL DEFAULT NULL,
   `is_deleted` tinyint(1) NULL DEFAULT NULL,

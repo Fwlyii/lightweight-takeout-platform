@@ -4,17 +4,14 @@ import com.tju.elm_bk.dto.BusinessDTO;
 import com.tju.elm_bk.dto.BusinessInfoDTO;
 import com.tju.elm_bk.dto.BusinessUpdateDTO;
 import com.tju.elm_bk.constant.AuthorityName;
-import com.tju.elm_bk.constant.OrderStatus;
 import com.tju.elm_bk.entity.Business;
 import com.tju.elm_bk.entity.User;
 import com.tju.elm_bk.exception.APIException;
 import com.tju.elm_bk.mapper.BusinessMapper;
-import com.tju.elm_bk.mapper.OrdersMapper;
 import com.tju.elm_bk.mapper.UserMapper;
 import com.tju.elm_bk.result.ResultCodeEnum;
 import com.tju.elm_bk.service.BusinessService;
 import com.tju.elm_bk.service.BusinessPricingPolicy;
-import com.tju.elm_bk.service.BusinessRecommendationPolicy;
 import com.tju.elm_bk.service.CurrentUserService;
 import com.tju.elm_bk.vo.BusinessSearchVO;
 import com.tju.elm_bk.vo.BusinessVO;
@@ -24,13 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -39,11 +33,10 @@ public class BusinessServiceImpl implements BusinessService {
 
 
     private final UserMapper userMapper;
-    private final OrdersMapper ordersMapper;
     private final BusinessMapper businessMapper;
     private final CurrentUserService currentUserService;
     private final BusinessPricingPolicy businessPricingPolicy;
-    private final BusinessRecommendationPolicy recommendationPolicy;
+    private final com.tju.elm_bk.service.BusinessPresentationService presentation;
 
     @Override
     public BusinessVO getBusinessById(Long id) {
@@ -237,36 +230,7 @@ public class BusinessServiceImpl implements BusinessService {
     }
 
     private void enrichBusinessPresentations(List<BusinessSearchVO> businesses) {
-        Set<Long> recentPurchaseIds = getRecentPurchaseIds();
-        for (BusinessSearchVO business : businesses) {
-            if (business.getScore() != null) {
-                business.setScore(business.getScore().setScale(2, RoundingMode.HALF_UP));
-            }
-            recommendationPolicy.enrich(business, recentPurchaseIds.contains(business.getId()));
-        }
-    }
-
-    private static final int RECENT_PURCHASE_DAYS = 30;
-
-    private Set<Long> getRecentPurchaseIds() {
-        Set<Long> ids = new HashSet<>();
-        try {
-            Long userId = currentUserService.optionalUser().map(User::getId).orElse(null);
-            if (userId == null) return ids;
-            LocalDateTime cutoff = LocalDateTime.now().minusDays(RECENT_PURCHASE_DAYS);
-            List<com.tju.elm_bk.entity.Order> orders = ordersMapper.selectRecentOrdersByUserId(userId, 100);
-            if (orders == null) return ids;
-            orders.stream()
-                    .filter(order -> order.getBusinessId() != null)
-                    .filter(order -> order.getOrderState() == null || !Set.of(
-                            OrderStatus.CANCELLED.getCode(),
-                            OrderStatus.DELIVERY_EXCEPTION.getCode()).contains(order.getOrderState()))
-                    .filter(order -> order.getOrderDate() == null || !order.getOrderDate().isBefore(cutoff))
-                    .forEach(order -> ids.add(order.getBusinessId()));
-        } catch (Exception ignored) {
-            // 推荐是增强能力，订单历史查询失败不应阻塞首页浏览。
-        }
-        return ids;
+        presentation.enrich(businesses);
     }
 
     @Override

@@ -36,6 +36,8 @@ public class DeliveryAddress {
     @Schema(description = "是否删除")
     private Boolean isDeleted;
 
+    private Boolean isDefault = false;
+
     @Schema(description = "更新时间")
     private LocalDateTime updateTime;
 

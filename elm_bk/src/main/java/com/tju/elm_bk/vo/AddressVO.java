@@ -16,6 +16,8 @@ public class AddressVO {
     @Schema(description = "地址ID")
     private Long id;
 
+    private Boolean isDefault;
+
     @Schema(description = "联系人姓名")
     private String contactName;
 
