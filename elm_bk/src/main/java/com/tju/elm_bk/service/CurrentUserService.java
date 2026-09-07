@@ -29,4 +29,8 @@ public class CurrentUserService {
     }
 
     public Long requireUserId() { return requireUser().getId(); }
+
+    public boolean isAdmin(User user) {
+        return com.tju.elm_bk.constant.AuthorityName.ADMIN.isGrantedTo(user);
+    }
 }
