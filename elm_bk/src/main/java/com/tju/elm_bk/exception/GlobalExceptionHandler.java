@@ -17,6 +17,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +26,17 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<HttpResult<Object>> missingPartHandler(MissingServletRequestPartException ex) {
+        return ResponseEntity.badRequest().body(HttpResult.failure(ResultCodeEnum.PARAM_NOT_MATCHED_POST));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<HttpResult<Object>> uploadSizeHandler(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(HttpResult.failure("PARAM_VERIFIED_FAILED", "上传图片不能超过5MB"));
+    }
+
     @ExceptionHandler({DisabledException.class, LockedException.class})
     public ResponseEntity<HttpResult<Object>> disabledAccountHandler(AuthenticationException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)

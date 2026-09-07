@@ -128,7 +128,7 @@ onBeforeUnmount(releasePreview);
 </script>
 
 <style scoped>
-.registration-page { min-height: 100dvh; background: #f5f7fa; color: #263442; padding-bottom: 32px; }
+.registration-page { box-sizing: border-box; min-height: 100dvh; background: #f5f7fa; color: #263442; padding-bottom: 32px; }
 .registration-page * { box-sizing: border-box; }
 .registration-header { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; padding: 8px 12px; background: #fff; border-bottom: 1px solid #e4eaf0; }
 .registration-header h1 { margin: 0; text-align: center; font-size: 18px; line-height: 44px; }

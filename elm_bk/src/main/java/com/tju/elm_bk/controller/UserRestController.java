@@ -3,11 +3,13 @@ package com.tju.elm_bk.controller;
 import com.tju.elm_bk.dto.PersonCreateDTO;
 import com.tju.elm_bk.result.HttpResult;
 import com.tju.elm_bk.service.RegistrationService;
+import com.tju.elm_bk.service.CurrentProfileService;
 import com.tju.elm_bk.vo.PersonVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -21,6 +23,12 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class UserRestController {
     private final RegistrationService registration;
+    private final CurrentProfileService profile;
+
+    @GetMapping("/user")
+    public PersonVO currentUser() {
+        return profile.get();
+    }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public HttpResult<PersonVO> register(@Valid @RequestBody PersonCreateDTO request) throws IOException {

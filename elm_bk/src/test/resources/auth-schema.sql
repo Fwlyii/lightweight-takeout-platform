@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS users (
     updater BIGINT,
     activated TINYINT NOT NULL,
     password VARCHAR(100) NOT NULL,
-    username VARCHAR(100) NOT NULL
+    username VARCHAR(100) NOT NULL,
+    CONSTRAINT uk_users_username UNIQUE (username)
 );
 CREATE TABLE IF NOT EXISTS person (
     id BIGINT PRIMARY KEY REFERENCES users(id),
@@ -18,7 +19,8 @@ CREATE TABLE IF NOT EXISTS person (
     gender VARCHAR(255),
     last_name VARCHAR(255),
     phone VARCHAR(255),
-    photo TEXT
+    photo TEXT,
+    CONSTRAINT uk_person_phone UNIQUE (phone)
 );
 CREATE TABLE IF NOT EXISTS authority (name VARCHAR(50) PRIMARY KEY);
 CREATE TABLE IF NOT EXISTS user_authority (

@@ -11,7 +11,7 @@ import com.tju.elm_bk.mapper.UserMapper;
 import com.tju.elm_bk.result.ResultCodeEnum;
 import com.tju.elm_bk.vo.PersonVO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +34,16 @@ public class RegistrationService {
 
     @Transactional(rollbackFor = Exception.class)
     public PersonVO register(PersonCreateDTO request, MultipartFile avatar) throws IOException {
+        try {
+            return createAccount(request, avatar);
+        } catch (DuplicateKeyException ex) {
+            // A concurrent request can win after the checks below. The unique indexes arbitrate;
+            // this runtime exception still rolls back all rows and the uploaded file.
+            throw new APIException("用户名或手机号已注册");
+        }
+    }
+
+    private PersonVO createAccount(PersonCreateDTO request, MultipartFile avatar) throws IOException {
         if (users.findByUsername(request.getUsername()) != null) throw new APIException("用户名已存在");
         if (people.countByPhone(request.getPhone()) > 0) throw new APIException("手机号已注册");
 
@@ -72,14 +82,7 @@ public class RegistrationService {
         if (authority == null) throw new APIException(ResultCodeEnum.SERVER_ERROR.getCode(), "注册暂时不可用");
         users.insertUserAuthority(user.getId(), authority.getName());
 
-        var result = new PersonVO();
-        BeanUtils.copyProperties(person, result);
-        result.setUsername(user.getUsername());
-        result.setCreateTime(user.getCreateTime());
-        result.setUpdateTime(user.getUpdateTime());
-        result.setActivated(true);
-        result.setIsDeleted(false);
-        result.setAuthorities(List.of(authority));
-        return result;
+        user.setAuthorities(List.of(authority));
+        return ProfileViewFactory.from(user, person);
     }
 }
