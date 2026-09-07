@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -21,6 +24,18 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler({DisabledException.class, LockedException.class})
+    public ResponseEntity<HttpResult<Object>> disabledAccountHandler(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(HttpResult.failure("ACCOUNT_DISABLED", "账号已被禁用，请联系管理员"));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<HttpResult<Object>> authenticationFailureHandler(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(HttpResult.failure("AUTHENTICATION_FAILED", "账号或密码错误"));
+    }
+
     @ExceptionHandler
     public void clientAbortExceptionHandler(ClientAbortException clientAbortException) {
         log.warn(ResultCodeEnum.CLIENT_ABORT.getMessage());
