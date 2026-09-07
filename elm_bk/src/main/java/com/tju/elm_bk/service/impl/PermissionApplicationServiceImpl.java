@@ -14,7 +14,7 @@ import com.tju.elm_bk.service.PermissionApplicationService;
 import com.tju.elm_bk.vo.BusinessPermissionVO;
 import com.tju.elm_bk.vo.BusinessVO;
 import com.tju.elm_bk.vo.MerchantApplicationsVO;
-import com.tju.elm_bk.websocket.WebSocketServer;
+import com.tju.elm_bk.service.NotificationDispatcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -33,7 +33,7 @@ import java.util.List;
 public class PermissionApplicationServiceImpl implements PermissionApplicationService {
     private final PermissionApplicationMapper applicationMapper;
     private final UserMapper userMapper;
-    private final WebSocketServer webSocketServer;
+    private final NotificationDispatcher notifications;
     private final AuthorityMapper authorityMapper;
     private final UserAuthorityMapper userAuthorityMapper;
     private final BusinessMapper businessMapper;
@@ -73,7 +73,7 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
         // 5. 保存到数据库
         applicationMapper.insert(application);
 
-        // 6. 通过WebSocket向管理员推送消息
+        // 6. 提交成功后，通过可用的实时通知通道提醒管理员
         sendMerchantApplyNotification(currentUserId, currentUser.getUsername(), application.getId());
         return application;
     }
@@ -275,7 +275,7 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
             message.put("content", content);
         }
         message.put("userId", userId);
-        webSocketServer.sendToClient(userId.toString(), message.toJSONString());
+        notifications.sendToClient(userId.toString(), message.toJSONString());
 
         notification.setUserId(userId); // 接收消息的用户ID
         notification.setNotificationType(type); // 0=商家申请，1=开店申请
@@ -305,7 +305,7 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
             message.put("content", content);
         }
         message.put("userId", userId);
-        webSocketServer.sendToClient(userId.toString(), message.toJSONString());
+        notifications.sendToClient(userId.toString(), message.toJSONString());
         notification.setUserId(userId); // 接收消息的用户ID
         notification.setNotificationType(type); // 0=商家申请，1=开店申请
         notification.setAuditResult(2); // 1=通过，2=拒绝
@@ -330,7 +330,7 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
         message.put("userId", userId);
         message.put("content", "用户[" + username + "]申请成为商家，请及时审核");
 
-        webSocketServer.sendToAuthority("ADMIN", message.toJSONString());
+        notifications.sendToAuthority("ADMIN", message.toJSONString());
     }
 
     /**
@@ -347,6 +347,6 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
         message.put("userId", userId);
         message.put("content", "商家[" + username + "]申请开店，请及时审核");
 
-        webSocketServer.sendToAuthority("ADMIN", message.toJSONString());
+        notifications.sendToAuthority("ADMIN", message.toJSONString());
     }
 }

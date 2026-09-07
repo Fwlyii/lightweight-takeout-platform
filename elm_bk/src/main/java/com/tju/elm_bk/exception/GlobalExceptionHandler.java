@@ -115,6 +115,7 @@ public class GlobalExceptionHandler {
             return HttpStatus.CONFLICT;
         }
         return switch (code) {
+            case "FEATURE_UNAVAILABLE" -> HttpStatus.SERVICE_UNAVAILABLE;
             case "UNAUTHORIZED", "NOT_ENOUGH_PERMISSION", "USER_DENIED",
                     "ADDRESS_PERMISSION_DENIED", "USER_UNMATCHED" -> HttpStatus.FORBIDDEN;
             case "NOT_FOUND", "USER_MISSED", "BUSINESS_MISSED", "FOOD_MISSED",
