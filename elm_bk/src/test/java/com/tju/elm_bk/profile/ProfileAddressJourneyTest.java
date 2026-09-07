@@ -31,6 +31,47 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("auth-test")
 @WithMockUser(username = "owner", authorities = "USER")
 class ProfileAddressJourneyTest {
+ @Test
+ void parallelFirstAddressesHaveExactlyOneDefault() throws Exception {
+  runConcurrent(() -> mvc.perform(post("/api/addresses/me")
+   .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user("owner").authorities(new org.springframework.security.core.authority.SimpleGrantedAuthority("USER")))
+   .contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(address()))).andReturn().getResponse().getStatus());
+  assertEquals(6,jdbc.queryForObject("SELECT COUNT(*) FROM delivery_address WHERE user_id=1 AND is_deleted=0",Integer.class));
+  assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM delivery_address WHERE user_id=1 AND is_deleted=0 AND is_default=1",Integer.class));
+ }
+
+ @Test
+ void parallelFavoritesKeepOneRelationship() throws Exception {
+  runConcurrent(() -> mvc.perform(post("/api/merchant/interaction/update")
+   .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user("owner").authorities(new org.springframework.security.core.authority.SimpleGrantedAuthority("USER")))
+   .contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"collected\":true}")).andReturn().getResponse().getStatus());
+  assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM merchant_interaction WHERE user_id=1 AND collected=1",Integer.class));
+ }
+
+ private void runConcurrent(java.util.concurrent.Callable<Integer> action) throws Exception {
+  var executor=java.util.concurrent.Executors.newFixedThreadPool(6);
+  var start=new java.util.concurrent.CountDownLatch(1);
+  var futures=new java.util.ArrayList<java.util.concurrent.Future<Integer>>();
+  try {
+   for(int i=0;i<6;i++)futures.add(executor.submit(()->{start.await();return action.call();}));
+   start.countDown();
+   for(var future:futures)assertEquals(200,future.get(30,java.util.concurrent.TimeUnit.SECONDS));
+  } finally {executor.shutdownNow();}
+ }
+
+ @Test
+ @org.springframework.security.test.context.support.WithAnonymousUser
+ void anonymousCannotReadPersonalData() throws Exception {
+  for(String path:new String[]{"/api/user","/api/addresses/me","/api/merchant/interaction/collections/me"})
+   mvc.perform(get(path)).andExpect(status().isUnauthorized());
+ }
+
+ @Test
+ void favoritesReflectNewReviewsWithoutResavingFavorite() throws Exception {
+  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"collected\":true}")).andExpect(status().isOk());
+  jdbc.update("INSERT INTO review(business_id,rating,is_hidden) VALUES (1,5,0)");
+  mvc.perform(get("/api/merchant/interaction/collections/me")).andExpect(jsonPath("$.data[0].score").value(4.67));
+ }
  @Autowired MockMvc mvc;
  @Autowired JdbcTemplate jdbc;
  @Autowired ObjectMapper json;

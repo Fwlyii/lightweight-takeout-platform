@@ -54,6 +54,7 @@ public interface BusinessMapper {
 
 //    下面两个用于搜索+筛选
     List<BusinessSearchVO> searchBusinesses(@Param("keyword") String keyword);
+
     @MapKey("id")// 指定返回的Map的key为id
     Map<String, Object> getInteractionCounts(@Param("businessId") Long businessId);
 

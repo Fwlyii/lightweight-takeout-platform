@@ -13,7 +13,8 @@ public class ProfilePreviewApplication {
   var context=app.run("--spring.datasource.url=jdbc:h2:mem:profile_preview;MODE=MySQL;DB_CLOSE_DELAY=-1",
    "--spring.datasource.driver-class-name=org.h2.Driver","--spring.datasource.username=sa","--spring.datasource.password=",
    "--spring.sql.init.schema-locations=classpath:auth-schema.sql,classpath:profile-schema.sql",
-   "--app.upload.directory="+System.getProperty("java.io.tmpdir")+"/lcw-profile-preview-uploads","--server.port=8080");
+   "--app.upload.directory="+System.getProperty("java.io.tmpdir")+"/lcw-profile-preview-uploads",
+   "--server.port="+System.getenv().getOrDefault("PROFILE_PREVIEW_PORT","8080"));
   var jdbc=context.getBean(JdbcTemplate.class);
   var password=context.getBean(PasswordEncoder.class).encode("Study2026!");
   String[] roles={"USER","BUSINESS","RIDER","ADMIN"};

@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -20,15 +19,14 @@ import java.util.List;
 public class MerchantInteractionService {
     private final MerchantInteractionMapper interactions;
     private final BusinessMapper businesses;
-    private final BusinessService storefront;
+    private final BusinessPresentationService presentation;
     private final CurrentUserService currentUser;
     private final AccountWriteLock writeLock;
 
     public List<BusinessSearchVO> collections() {
-        var ids = new HashSet<>(interactions.collectionIds(currentUser.requireUserId()));
-        if (ids.isEmpty()) return List.of();
-        // Shared source of live ratings, sales and tags; no second formula or cached rating.
-        return storefront.getBusinessesBySearch(null, false, false).stream().filter(b -> ids.contains(b.getId())).toList();
+        var businesses = this.businesses.selectCollectedBusinesses(currentUser.requireUserId());
+        presentation.enrich(businesses);
+        return businesses;
     }
     public MerchantInteraction status(Long merchantId) {
         ensureVisible(merchantId);
