@@ -1,0 +1,24 @@
+package com.tju.elm_bk.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class AuditPermissionDTO {
+    @NotNull(message = "申请ID不能为空")
+    @Schema(description = "权限申请记录ID")
+    private Long id;
+
+    @NotNull(message = "审核结果不能为空")
+    @Min(value = 1, message = "审核结果只能是通过或拒绝")
+    @Max(value = 2, message = "审核结果只能是通过或拒绝")
+    @Schema(description = "审核结果（1-同意，2-拒绝）")
+    private Integer auditResult;
+}
