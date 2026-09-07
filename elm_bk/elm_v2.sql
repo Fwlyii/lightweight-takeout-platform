@@ -331,6 +331,7 @@ CREATE TABLE `person`  (
   `photo` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `id` bigint NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_person_phone` (`phone`),
   CONSTRAINT `person_ibfk_1` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
@@ -369,7 +370,8 @@ CREATE TABLE `users`  (
   `activated` tinyint(1) NOT NULL,
   `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_users_username` (`username`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------

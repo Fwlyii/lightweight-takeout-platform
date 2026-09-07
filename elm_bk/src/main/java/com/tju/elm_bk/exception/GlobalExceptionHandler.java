@@ -8,12 +8,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +26,29 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<HttpResult<Object>> missingPartHandler(MissingServletRequestPartException ex) {
+        return ResponseEntity.badRequest().body(HttpResult.failure(ResultCodeEnum.PARAM_NOT_MATCHED_POST));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<HttpResult<Object>> uploadSizeHandler(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(HttpResult.failure("PARAM_VERIFIED_FAILED", "上传图片不能超过5MB"));
+    }
+
+    @ExceptionHandler({DisabledException.class, LockedException.class})
+    public ResponseEntity<HttpResult<Object>> disabledAccountHandler(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(HttpResult.failure("ACCOUNT_DISABLED", "账号已被禁用，请联系管理员"));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<HttpResult<Object>> authenticationFailureHandler(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(HttpResult.failure("AUTHENTICATION_FAILED", "账号或密码错误"));
+    }
+
     @ExceptionHandler
     public void clientAbortExceptionHandler(ClientAbortException clientAbortException) {
         log.warn(ResultCodeEnum.CLIENT_ABORT.getMessage());

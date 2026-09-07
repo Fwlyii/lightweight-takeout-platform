@@ -24,7 +24,7 @@ request.interceptors.request.use(
     if (!excludePaths.includes(targetUrl.pathname)) {
       // 从 localStorage/sessionStorage 获取 token
       const token = getToken();
-      if (token) {
+      if (token && !config.headers.Authorization) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     }

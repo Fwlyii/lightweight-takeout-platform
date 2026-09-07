@@ -16,6 +16,7 @@ public interface UserMapper {
     @Select("SELECT * FROM users WHERE username = #{username} AND is_deleted = 0")
     User findByUsername(String username);
     User findByUsernameWithAuthorities(String username);
+    User findByPhoneWithAuthorities(String phone);
     User findByUserIdWithAuthorities(Long userId);
     void insert(User user);
     void update(User user);

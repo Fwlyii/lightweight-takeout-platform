@@ -1,7 +1,6 @@
 package com.tju.elm_bk.mapper;
 import java.util.List;
 
-import com.tju.elm_bk.dto.FoodCreateDTO;
 import com.tju.elm_bk.entity.Food;
 import com.tju.elm_bk.vo.FoodItemVO;
 import com.tju.elm_bk.vo.FoodVO;
