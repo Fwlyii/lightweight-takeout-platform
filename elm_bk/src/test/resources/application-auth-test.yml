@@ -1,0 +1,15 @@
+spring:
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:auth-schema.sql
+
+jwt:
+  # Synthetic test-only key. The test profile never connects to the demo database.
+  secret: authentication-tests-only-0123456789abcdef0123456789abcdef0123456789
+
+logging:
+  level:
+    root: WARN
+    org.springframework.jdbc.support.JdbcTransactionManager: WARN
+    com.tju.elm_bk.exception.GlobalExceptionHandler: OFF

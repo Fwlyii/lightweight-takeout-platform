@@ -1,0 +1,63 @@
+Authentication TDD — actual RED test results
+Run date: 2026-09-07
+Baseline: 03be626 + uncommitted persistence DTO/VO dependency repair
+Runtime: Maven 3.9.9 / Eclipse Temurin JDK 17 / Spring Boot 3.4.6
+Command (inside elm_bk): mvn -o -B test
+Database: isolated H2 in-memory database; no demo or production data
+Total: 47 tests, 45 assertion failures, 0 errors, 0 skipped; process exit code 1
+
+Failure interpretation: account endpoints and custom authentication security are not implemented.
+Spring's default security currently rejects registration/login POST requests with HTTP 403.
+That explains the status/JSON assertions below; application startup and SQL mapper checks passed.
+The pre-existing rejection of an expired token does not establish that JWT authentication works.
+
+com.tju.elm_bk.auth.AuthenticationJourneyTest
+[FAIL] riderWithLegacyBaseUserAuthorityStillCannotEnterCustomerPortal — No value at JSON path "$.success"
+[FAIL] wrongPasswordAndUnknownAccountReturnTheSameAuthenticationFailure — Status expected:<401> but was:<403>
+[FAIL] duplicateUsernameIsRejectedWithoutCreatingAnotherAccount — Status expected:<200> but was:<403>
+[FAIL] invalidPasswordDoesNotWriteAnAccount(String)[1] — Status expected:<400> but was:<403>
+[FAIL] invalidPasswordDoesNotWriteAnAccount(String)[2] — Status expected:<400> but was:<403>
+[FAIL] invalidPasswordDoesNotWriteAnAccount(String)[3] — Status expected:<400> but was:<403>
+[FAIL] invalidPasswordDoesNotWriteAnAccount(String)[4] — Status expected:<400> but was:<403>
+[FAIL] invalidPasswordDoesNotWriteAnAccount(String)[5] — Status expected:<400> but was:<403>
+[FAIL] invalidPasswordDoesNotWriteAnAccount(String)[6] — Status expected:<400> but was:<403>
+[FAIL] registrationCanBeFollowedByARealLoginAndAuthenticatedRequest — Status expected:<200> but was:<403>
+[FAIL] failureToAssignBaseAuthorityRollsBackTheWholeRegistration — Range for response status value 403 expected:<SERVER_ERROR> but was:<CLIENT_ERROR>
+[FAIL] invalidPhoneDoesNotWriteAnAccount(String)[1] — Status expected:<400> but was:<403>
+[FAIL] invalidPhoneDoesNotWriteAnAccount(String)[2] — Status expected:<400> but was:<403>
+[FAIL] invalidPhoneDoesNotWriteAnAccount(String)[3] — Status expected:<400> but was:<403>
+[FAIL] invalidPhoneDoesNotWriteAnAccount(String)[4] — Status expected:<400> but was:<403>
+[FAIL] invalidPhoneDoesNotWriteAnAccount(String)[5] — Status expected:<400> but was:<403>
+[FAIL] invalidPhoneDoesNotWriteAnAccount(String)[6] — Status expected:<400> but was:<403>
+[FAIL] multipartRegistrationAlsoAllowsOmittingTheAvatar — Status expected:<200> but was:<403>
+[FAIL] changingTheAccountStatusInvalidatesAnAlreadyIssuedToken — Status expected:<200> but was:<403>
+[FAIL] duplicatePhoneIsRejectedWithoutCreatingAnOrphanAccount — Status expected:<200> but was:<403>
+[FAIL] registrationTrimsUsernameBeforeCheckingUniqueness — Status expected:<200> but was:<403>
+[FAIL] missingOrUnknownPortalIsRejected(String)[1] — Status expected:<400> but was:<403>
+[FAIL] missingOrUnknownPortalIsRejected(String)[2] — Status expected:<400> but was:<403>
+[FAIL] missingOrUnknownPortalIsRejected(String)[3] — Status expected:<400> but was:<403>
+[FAIL] missingOrUnknownPortalIsRejected(String)[4] — Status expected:<400> but was:<403>
+[FAIL] registrationWithoutAvatarStoresDefaultAvatarAndHashedPassword — Status expected:<200> but was:<403>
+[PASS] expiredTokensAreRejectedEvenWhenTheirSignatureIsCorrect
+[FAIL] registeredPhoneCanAlsoBeUsedToLogInAsRequiredByTheSrs — Status expected:<200> but was:<403>
+[FAIL] clientCannotAssignAdministrativeAuthorityOrAnArbitraryAvatarUrl — Status expected:<200> but was:<403>
+[FAIL] eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority(String, String)[1] — Status expected:<200> but was:<403>
+[FAIL] eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority(String, String)[2] — Status expected:<200> but was:<403>
+[FAIL] eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority(String, String)[3] — Status expected:<200> but was:<403>
+[FAIL] eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority(String, String)[4] — Status expected:<200> but was:<403>
+[FAIL] disabledAccountCannotReceiveAToken — No value at JSON path "$.success"
+[FAIL] customerCanOnlyGetApplicantPermissionAtAnOperationalPortal(String, String)[1] — Status expected:<200> but was:<403>
+[FAIL] customerCanOnlyGetApplicantPermissionAtAnOperationalPortal(String, String)[2] — Status expected:<200> but was:<403>
+[FAIL] serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[1] — No value at JSON path "$.success"
+[FAIL] serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[2] — No value at JSON path "$.success"
+[FAIL] serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[3] — No value at JSON path "$.success"
+[FAIL] serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[4] — No value at JSON path "$.success"
+[FAIL] serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[5] — No value at JSON path "$.success"
+[FAIL] serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[6] — No value at JSON path "$.success"
+[FAIL] invalidUsernameIsRejected(String)[1] — Status expected:<400> but was:<403>
+[FAIL] invalidUsernameIsRejected(String)[2] — Status expected:<400> but was:<403>
+[FAIL] invalidUsernameIsRejected(String)[3] — Status expected:<400> but was:<403>
+[FAIL] invalidUsernameIsRejected(String)[4] — Status expected:<400> but was:<403>
+
+com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[PASS] applicationAndRealMybatisMappingsWorkAgainstAnIsolatedDatabase
