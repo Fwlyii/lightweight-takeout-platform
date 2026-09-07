@@ -11,6 +11,8 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
+    @org.apache.ibatis.annotations.Select("SELECT id FROM users WHERE id=#{id} FOR UPDATE")
+    Long lockAccount(Long id);
     @Select("SELECT * FROM users WHERE id = #{id} AND is_deleted = 0")
     User findById(Long id);
     @Select("SELECT * FROM users WHERE username = #{username} AND is_deleted = 0")

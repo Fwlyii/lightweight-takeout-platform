@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "serve:profile": "node scripts/profile-preview.cjs serve",
+    "build:profile": "node scripts/profile-preview.cjs build",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:auth": "node --test tests/*.test.mjs",

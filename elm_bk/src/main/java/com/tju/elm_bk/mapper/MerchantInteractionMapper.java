@@ -9,6 +9,8 @@ import java.util.List;
 // MerchantInteractionMapper.java
 @Mapper
 public interface MerchantInteractionMapper {
+    @Select("SELECT merchant_id FROM merchant_interaction WHERE user_id=#{userId} AND collected=1")
+    List<Long> collectionIds(Long userId);
     // 插入互动记录
     int insert(MerchantInteraction interaction);
 

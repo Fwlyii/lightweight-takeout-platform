@@ -24,6 +24,12 @@ import java.io.IOException;
 public class UserRestController {
     private final RegistrationService registration;
     private final CurrentProfileService profile;
+    private final com.tju.elm_bk.service.ProfileUpdateService profileUpdate;
+
+    @org.springframework.web.bind.annotation.PutMapping("/user")
+    public PersonVO updateProfile(@Valid @RequestBody com.tju.elm_bk.dto.ProfileUpdateDTO request) {
+        return profileUpdate.update(request);
+    }
 
     @GetMapping("/user")
     public PersonVO currentUser() {

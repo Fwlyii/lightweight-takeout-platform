@@ -21,3 +21,11 @@ ProfileAddressJourneyTest 在新业务接口实现之前加入，使用真实 Sp
 ### RED 实测（2026-09-07）
 
 运行 `mvn -Dtest=ProfileAddressJourneyTest test`：生产及测试代码编译成功，Spring/H2 启动成功；18 项验收断言失败，0 执行错误、0 跳过。当前 PUT /api/user 尚不存在，返回405；地址及互动路由尚不存在，由现有通用异常处理返回500，因此未满足测试要求的正常/校验/权限状态。完整摘要见 profile-address-red.txt。
+
+### GREEN 实测（2026-09-07）
+
+实现后，相同的 ProfileAddressJourneyTest 18 项全部通过，没有修改原有断言来迁就实现。后端全量127项测试通过、0失败/错误/跳过；前端 `npm run build:profile` 构建成功。该入口使用本次生产页面和真实接口，隔离其他成员尚未完成的路由，并不代表完整 demo 的前端构建已经通过。
+
+已实现的后端写操作使用数据库事务。AccountWriteLock 对当前用户记录加行锁，避免同一个用户并发创建地址时出现多个默认值、并发收藏时产生重复记录。不是仅靠前端禁用按钮。
+
+已有数据库先备份，再执行一次 elm_bk/db/migrations/002_default_address.sql；新数据库直接使用 elm_v2.sql。此次未操作演示数据库。

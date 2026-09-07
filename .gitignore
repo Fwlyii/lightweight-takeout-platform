@@ -44,3 +44,4 @@ application-local.yaml
 
 ### Runtime user uploads ###
 /runtime-uploads/
+elmclient/dist-profile/
