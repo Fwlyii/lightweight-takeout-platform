@@ -19,8 +19,7 @@ public class MerchantInteractionDTO {
     @Schema(description = "商铺ID")
     private Long merchantId;
 
-    @NotNull(message = "是否点赞,0没点赞，1点赞了")
+    // 两个状态允许单独修改；没有传入的字段保持原值。
     private Boolean liked;
-    @NotNull(message = "是否收藏,0没收藏，1收藏了")
     private Boolean collected;
 }

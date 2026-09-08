@@ -6,6 +6,8 @@ import com.tju.elm_bk.entity.User;
 import com.tju.elm_bk.mapper.BusinessMapper;
 import com.tju.elm_bk.mapper.MerchantInteractionMapper;
 import com.tju.elm_bk.service.CurrentUserService;
+import com.tju.elm_bk.service.AccountWriteLock;
+import com.tju.elm_bk.service.BusinessPresentationService;
 import com.tju.elm_bk.service.MerchantInteractionService;
 import com.tju.elm_bk.vo.BusinessSearchVO;
 import com.tju.elm_bk.vo.MerchantInteractionVO;
@@ -31,22 +33,32 @@ public class MerchantInteractionServiceImpl implements MerchantInteractionServic
     private final MerchantInteractionMapper interactionMapper;
     private final BusinessMapper businessMapper;
     private final CurrentUserService currentUserService;
+    private final AccountWriteLock writeLock;
+    private final BusinessPresentationService presentation;
 
     @Override
     @Transactional
     public void updateInteraction(MerchantInteractionDTO dto) {
         try {
             // 参数验证
-            if (dto.getMerchantId() == null) {
+            if (dto.getMerchantId() == null || (dto.getLiked() == null && dto.getCollected() == null)) {
                 throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
             }
 
-            User currentUser = currentUser();
-            Long operatorId = currentUser.getId();
+            // 同一账号的并发操作串行执行，避免首次收藏重复插入或覆盖另一个状态。
+            Long operatorId = writeLock.acquire();
 
             // 查询现有记录
             MerchantInteraction interaction = interactionMapper.selectByUserAndMerchant(
                     operatorId, dto.getMerchantId());
+
+            // 已隐藏的店铺仍允许取消已有收藏，但不能新增收藏或点赞。
+            if (interaction == null || Boolean.TRUE.equals(dto.getCollected()) || Boolean.TRUE.equals(dto.getLiked())) {
+                var business = businessMapper.selectBusinessById(dto.getMerchantId());
+                if (business == null || !Integer.valueOf(1).equals(business.getStatus())) {
+                    throw new APIException(ResultCodeEnum.BUSINESS_MISSED);
+                }
+            }
 
             if (interaction == null) {
                 // 创建新记录
@@ -85,7 +97,9 @@ public class MerchantInteractionServiceImpl implements MerchantInteractionServic
         if (!currentUserService.isAdmin(currentUser) && !Objects.equals(targetUserId, currentUser.getId())) {
             throw new APIException(ResultCodeEnum.USER_UNMATCHED);
         }
-        return businessMapper.selectCollectedBusinesses(targetUserId);
+        var collections = businessMapper.selectCollectedBusinesses(targetUserId);
+        presentation.enrich(collections);
+        return collections;
     }
 
     @Override

@@ -1,0 +1,71 @@
+=== BEFORE ===
+[INFO] Running com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[ERROR] Tests run: 25, Failures: 7, Errors: 0, Skipped: 0, Time elapsed: 17.94 s <<< FAILURE! -- in com.tju.elm_bk.profile.ProfileAddressJourneyTest
+java.lang.AssertionError: Status expected:<200> but was:<400>
+java.lang.AssertionError: Status expected:<404> but was:<400>
+java.lang.AssertionError: Status expected:<200> but was:<400>
+java.lang.AssertionError: Status expected:<200> but was:<400>
+java.lang.AssertionError: Status expected:<200> but was:<400>
+java.lang.AssertionError: Status expected:<404> but was:<200>
+[ERROR] Failures:
+[ERROR]   ProfileAddressJourneyTest.cannotFavoriteUnapprovedStore:202 Status expected:<404> but was:<400>
+[ERROR]   ProfileAddressJourneyTest.cannotLikeUnapprovedStore:240 Status expected:<404> but was:<200>
+[ERROR]   ProfileAddressJourneyTest.favoriteIsIdempotentAndSharesLiveRatingWithSearch:189 Status expected:<200> but was:<400>
+[ERROR]   ProfileAddressJourneyTest.favoritesReflectNewReviewsWithoutResavingFavorite:71 Status expected:<200> but was:<400>
+[ERROR]   ProfileAddressJourneyTest.hiddenStoreDisappearsButCanStillBeUnfavorited:206 Status expected:<200> but was:<400>
+[ERROR]   ProfileAddressJourneyTest.parallelFavoritesKeepOneRelationship:45->runConcurrent:58 expected: <200> but was: <400>
+[ERROR]   ProfileAddressJourneyTest.partialInteractionUpdatePreservesTheOtherFlag:223 Status expected:<200> but was:<400>
+[ERROR] Tests run: 25, Failures: 7, Errors: 0, Skipped: 0
+[INFO] BUILD FAILURE
+[INFO] Total time:  35.195 s
+[INFO] Finished at: 2026-09-08T20:45:32Z
+
+=== AFTER ===
+[INFO] Running com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.908 s -- in com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Running com.tju.elm_bk.security.TokenSessionTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.688 s -- in com.tju.elm_bk.security.TokenSessionTest
+[INFO] Running com.tju.elm_bk.security.OrderPricingTrustBoundaryTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.213 s -- in com.tju.elm_bk.security.OrderPricingTrustBoundaryTest
+[INFO] Running com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.123 s -- in com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Running com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 23.00 s -- in com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.786 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.063 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.603 s -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Running com.tju.elm_bk.controller.NotificationControllerTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.409 s -- in com.tju.elm_bk.controller.NotificationControllerTest
+[INFO] Running com.tju.elm_bk.controller.PreferenceControllerTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.155 s -- in com.tju.elm_bk.controller.PreferenceControllerTest
+[INFO] Running com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.068 s -- in com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Running com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Running com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.027 s -- in com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Running com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.378 s -- in com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Running com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.215 s -- in com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Running com.tju.elm_bk.service.OrderPricingServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in com.tju.elm_bk.service.OrderPricingServiceTest
+[INFO] Running com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.911 s -- in com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.BusinessRecommendationPolicyTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in com.tju.elm_bk.service.BusinessRecommendationPolicyTest
+[INFO] Running com.tju.elm_bk.service.OrderSettlementServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in com.tju.elm_bk.service.OrderSettlementServiceTest
+[INFO] Running com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.AssetServiceTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.063 s -- in com.tju.elm_bk.service.AssetServiceTest
+[INFO] Running com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 165, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  01:19 min
+[INFO] Finished at: 2026-09-08T20:47:10Z

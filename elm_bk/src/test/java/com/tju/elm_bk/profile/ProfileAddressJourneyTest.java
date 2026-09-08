@@ -214,4 +214,30 @@ class ProfileAddressJourneyTest {
   mvc.perform(get("/api/addresses/me")).andExpect(status().isForbidden());
   mvc.perform(get("/api/merchant/interaction/collections/me")).andExpect(status().isForbidden());
  }
+
+ @Test void partialInteractionUpdatePreservesTheOtherFlag() throws Exception {
+  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON)
+   .content("{\"merchantId\":1,\"liked\":true,\"collected\":true}")).andExpect(status().isOk());
+  // 收藏页只发送 collected；取消收藏不能同时取消点赞。
+  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON)
+   .content("{\"merchantId\":1,\"collected\":false}")).andExpect(status().isOk());
+  mvc.perform(get("/api/merchant/interaction/status/me").param("merchantId","1"))
+   .andExpect(jsonPath("$.data.liked").value(true)).andExpect(jsonPath("$.data.collected").value(false));
+  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON)
+   .content("{\"merchantId\":1,\"liked\":false}")).andExpect(status().isOk());
+  mvc.perform(get("/api/merchant/interaction/status/me").param("merchantId","1"))
+   .andExpect(jsonPath("$.data.liked").value(false)).andExpect(jsonPath("$.data.collected").value(false));
+ }
+
+ @Test void emptyInteractionUpdateCannotCreateARow() throws Exception {
+  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON)
+   .content("{\"merchantId\":1}")).andExpect(status().isBadRequest());
+  assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM merchant_interaction",Integer.class));
+ }
+
+ @Test void cannotLikeUnapprovedStore() throws Exception {
+  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON)
+   .content("{\"merchantId\":2,\"liked\":true,\"collected\":false}")).andExpect(status().isNotFound());
+  assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM merchant_interaction",Integer.class));
+ }
 }
