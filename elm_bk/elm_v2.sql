@@ -248,6 +248,7 @@ CREATE TABLE `orderdetailet`  (
   `food_id` bigint NOT NULL,
   `order_id` bigint NOT NULL,
   `food_price` decimal(10, 2) NOT NULL,
+  `food_name_snapshot` varchar(100) NULL DEFAULT NULL COMMENT '下单时商品名称，历史记录不回填',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `food_id`(`food_id` ASC) USING BTREE,
   INDEX `order_id`(`order_id` ASC) USING BTREE,

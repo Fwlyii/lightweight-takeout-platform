@@ -62,3 +62,40 @@ Migration: FAIL (003_order_name_snapshot.sql missing)
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 
+GREEN - Full backend regression
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.745 s -- in com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 17.10 s -- in com.tju.elm_bk.order.OrderNameSnapshotJourneyTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.132 s -- in com.tju.elm_bk.security.TokenSessionTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.073 s -- in com.tju.elm_bk.security.OrderPricingTrustBoundaryTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.041 s -- in com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.810 s -- in com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.274 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 14.06 s -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.116 s -- in com.tju.elm_bk.controller.NotificationControllerTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.057 s -- in com.tju.elm_bk.controller.PreferenceControllerTest
+[INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.368 s -- in com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.434 s -- in com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.126 s -- in com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in com.tju.elm_bk.service.OrderPricingServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.541 s -- in com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.tju.elm_bk.service.BusinessRecommendationPolicyTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.tju.elm_bk.service.OrderSettlementServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in com.tju.elm_bk.service.AssetServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 203, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+GREEN - MySQL 8.0.40
+Migration: PASS (nullable, no invented historical names, repeat-safe)
+[INFO] Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 20.08 s -- in com.tju.elm_bk.order.OrderNameSnapshotJourneyTest
+[INFO] Tests run: 38, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+JaCoCo 0.8.13 - Full backend regression
+OrderSubmissionService.saveDetails: lines 16/16, branches 2/2
+OrderServiceImpl.getOrderItemDetail: lines 11/11, branches 11/14
+FoodServiceImpl.getFoodList: lines 14/14, branches 17/24
+MyBatis SQL is verified by integration assertions, not JaCoCo branch counters.
