@@ -1,0 +1,656 @@
+=== snapshot / lcw-profile-address / RED ===
+$ bash 测试命令.sh
+FAIL profile-address executable source contract: missing production paths
+  - elm_bk/src/main/java/com/tju/elm_bk/controller/AddressController.java
+  - elmclient/src/views/Favorites.vue
+  - elmclient/src/components/AddressManager.vue
+exit_code=1
+
+=== snapshot / lcw-profile-address / GREEN ===
+$ bash 测试命令.sh
+PASS profile-address executable source contract: key paths and behavior markers verified
+exit_code=0
+
+=== snapshot / lcw-profile-address / REFACTOR ===
+$ bash 测试命令.sh
+PASS approval-permissions executable source contract: key paths and behavior markers verified
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+PASS deployment-foundation executable source contract: key paths and behavior markers verified
+PASS frontend-foundation executable source contract: key paths and behavior markers verified
+PASS merchant-catalog executable source contract: key paths and behavior markers verified
+PASS persistence-foundation executable source contract: key paths and behavior markers verified
+PASS profile-address executable source contract: key paths and behavior markers verified
+PASS role-authentication executable source contract: key paths and behavior markers verified
+PASS storefront-cart executable source contract: key paths and behavior markers verified
+PASS module structure: Maven pom.xml is well-formed
+PASS module structure: frontend package scripts are valid JSON
+PASS module structure: shell scripts passed syntax checks
+exit_code=0
+
+=== snapshot / lcw-profile-address / MERGE ===
+$ bash 测试命令.sh
+PASS approval-permissions executable source contract: key paths and behavior markers verified
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+PASS deployment-foundation executable source contract: key paths and behavior markers verified
+PASS frontend-foundation executable source contract: key paths and behavior markers verified
+PASS merchant-catalog executable source contract: key paths and behavior markers verified
+PASS persistence-foundation executable source contract: key paths and behavior markers verified
+PASS profile-address executable source contract: key paths and behavior markers verified
+PASS role-authentication executable source contract: key paths and behavior markers verified
+PASS storefront-cart executable source contract: key paths and behavior markers verified
+PASS module structure: Maven pom.xml is well-formed
+PASS module structure: frontend package scripts are valid JSON
+PASS module structure: shell scripts passed syntax checks
+exit_code=0
+
+=== elm_bk/target/profile-red.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] Compiling 136 source files with javac [debug parameters release 17] to target/classes
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 16 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[ERROR] Tests run: 18, Failures: 18, Errors: 0, Skipped: 0, Time elapsed: 12.71 s <<< FAILURE! -- in com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.riderSessionCannotUseCustomerAddressOrFavoriteEndpoints -- Time elapsed: 1.419 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.cannotFavoriteUnapprovedStore -- Time elapsed: 0.087 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.cannotReadOrChangeAnotherPersonsAddress(String)[1] -- Time elapsed: 0.420 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.cannotReadOrChangeAnotherPersonsAddress(String)[2] -- Time elapsed: 0.111 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.cannotReadOrChangeAnotherPersonsAddress(String)[3] -- Time elapsed: 0.067 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.cannotReadOrChangeAnotherPersonsAddress(String)[4] -- Time elapsed: 0.085 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.profileRejectsInvalidEmailAndPhone -- Time elapsed: 0.085 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.switchingAndDeletingDefaultLeavesExactlyOneDefault -- Time elapsed: 0.078 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.duplicatePhoneCannotPartiallyUpdateProfile -- Time elapsed: 0.032 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.invalidPhoneSexAndOversizedAddressAreRejected -- Time elapsed: 0.061 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.profileUpdateCannotChangeIdentityRolePasswordOrAvatarUrl -- Time elapsed: 0.041 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.requiredAddressFieldsAreValidatedOnServer(String)[1] -- Time elapsed: 0.042 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.requiredAddressFieldsAreValidatedOnServer(String)[2] -- Time elapsed: 0.049 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.requiredAddressFieldsAreValidatedOnServer(String)[3] -- Time elapsed: 0.047 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.hiddenStoreDisappearsButCanStillBeUnfavorited -- Time elapsed: 0.027 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.favoriteIsIdempotentAndSharesLiveRatingWithSearch -- Time elapsed: 0.031 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.optionalProfileFieldsCanBeCleared -- Time elapsed: 0.019 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.profile.ProfileAddressJourneyTest.addressCrudAndFirstDefaultUseServerIdentity -- Time elapsed: 0.024 s <<< FAILURE!
+[ERROR] Failures: 
+[ERROR]   ProfileAddressJourneyTest.addressCrudAndFirstDefaultUseServerIdentity:68 Status expected:<200> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.cannotFavoriteUnapprovedStore:161 Status expected:<404> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.cannotReadOrChangeAnotherPersonsAddress:97 Status expected:<404> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.cannotReadOrChangeAnotherPersonsAddress:97 Status expected:<404> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.cannotReadOrChangeAnotherPersonsAddress:97 Status expected:<404> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.cannotReadOrChangeAnotherPersonsAddress:97 Status expected:<404> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.duplicatePhoneCannotPartiallyUpdateProfile:129 Status expected:<409> but was:<405>
+[ERROR]   ProfileAddressJourneyTest.favoriteIsIdempotentAndSharesLiveRatingWithSearch:148 Status expected:<200> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.hiddenStoreDisappearsButCanStillBeUnfavorited:165 Status expected:<200> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.invalidPhoneSexAndOversizedAddressAreRejected:111 Status expected:<400> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.optionalProfileFieldsCanBeCleared:136 Status expected:<200> but was:<405>
+[ERROR]   ProfileAddressJourneyTest.profileRejectsInvalidEmailAndPhone:142 Status expected:<400> but was:<405>
+[ERROR]   ProfileAddressJourneyTest.profileUpdateCannotChangeIdentityRolePasswordOrAvatarUrl:119 Status expected:<200> but was:<405>
+[ERROR]   ProfileAddressJourneyTest.requiredAddressFieldsAreValidatedOnServer:104 Status expected:<400> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.requiredAddressFieldsAreValidatedOnServer:104 Status expected:<400> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.requiredAddressFieldsAreValidatedOnServer:104 Status expected:<400> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.riderSessionCannotUseCustomerAddressOrFavoriteEndpoints:174 Status expected:<403> but was:<500>
+[ERROR]   ProfileAddressJourneyTest.switchingAndDeletingDefaultLeavesExactlyOneDefault:81->createAddress:55 Status expected:<200> but was:<500>
+[ERROR] Tests run: 18, Failures: 18, Errors: 0, Skipped: 0
+[INFO] BUILD FAILURE
+[INFO] Total time:  30.925 s
+[INFO] Finished at: 2026-09-07T08:59:09Z
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.3:test (default-test) on project elm_bk: There are test failures.
+[ERROR] 
+[ERROR] See /workspace/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+=== elm_bk/target/profile-green.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] Compiling 146 source files with javac [debug parameters release 17] to target/classes
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 16 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 14.36 s -- in com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  33.918 s
+[INFO] Finished at: 2026-09-07T09:03:19Z
+
+=== elm_bk/target/profile-green-all.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 17 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.733 s -- in com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Running com.tju.elm_bk.security.TokenSessionTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.695 s -- in com.tju.elm_bk.security.TokenSessionTest
+[INFO] Running com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Running com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.39 s -- in com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.074 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.175 s -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Running com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.235 s -- in com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Running com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Running com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Running com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.706 s -- in com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Running com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.128 s -- in com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Running com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.550 s -- in com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.056 s -- in com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.029 s -- in com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 127, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  46.193 s
+[INFO] Finished at: 2026-09-07T09:08:18Z
+
+=== elm_bk/target/profile-refactor.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] Compiling 147 source files with javac [debug parameters release 17] to target/classes
+[ERROR] COMPILATION ERROR : 
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/mapper/BusinessMapper.java:[68,28] method selectCollectedBusinesses(java.lang.Long) is already defined in interface com.tju.elm_bk.mapper.BusinessMapper
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/UserModelDetailsService.java:[28,39] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/UserModelDetailsService.java:[31,34] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/UserModelDetailsService.java:[37,55] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/UserModelDetailsService.java:[35,87] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/UserModelDetailsService.java:[36,34] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[112,59] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[113,52] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[113,99] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[114,31] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[115,37] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[116,32] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[117,26] invalid method reference
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/constant/AuthorityName.java:[15,36] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/constant/AuthorityName.java:[16,24] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/AuthenticationRestController.java:[32,76] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/AuthenticationRestController.java:[32,99] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/AuthenticationRestController.java:[33,63] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/AuthenticationRestController.java:[37,44] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/BusinessController.java:[74,13] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/BusinessController.java:[86,13] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/CartController.java:[33,62] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/CartController.java:[33,83] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/dto/CartItemCreateDTO.java:[54,44] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/dto/CartItemCreateDTO.java:[54,84] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/dto/CartItemCreateDTO.java:[56,48] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/ImageStorageService.java:[48,13] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/FoodController.java:[85,31] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/FoodController.java:[85,57] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/FoodController.java:[85,79] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/FoodController.java:[89,15] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/FoodController.java:[89,50] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/dto/FoodDTO.java:[68,40] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[37,20] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[37,54] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[41,57] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[42,71] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[42,118] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[43,34] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[45,20] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[45,77] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[46,20] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[46,69] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[49,68] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[55,19] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[55,45] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[56,19] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[56,47] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[62,68] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[26,25] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[27,43] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[29,86] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[38,65] invalid method reference
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[44,43] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[45,43] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[47,85] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[48,43] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[48,76] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[49,52] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/CurrentUserService.java:[24,63] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/CurrentUserService.java:[24,111] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/CurrentUserService.java:[31,55] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[31,29] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[31,68] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[32,36] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[32,84] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[37,25] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[37,59] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[39,41] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[39,93] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[41,53] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[52,53] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[53,33] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[53,72] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[55,33] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[56,28] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[59,17] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[64,58] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[67,48] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[68,29] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[68,68] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[69,49] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[70,17] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[47,41] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[48,40] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[62,20] constructor User in class com.tju.elm_bk.entity.User cannot be applied to given types;
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[63,33] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[64,50] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[73,32] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[74,32] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[75,36] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[76,35] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[77,33] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[78,15] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[83,58] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/CurrentProfileService.java:[18,81] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/ProfileUpdateService.java:[23,51] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/ProfileUpdateService.java:[25,15] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/ProfileUpdateService.java:[26,32] cannot find symbol
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/ProfileUpdateService.java:[27,38] cannot find symbol
+[INFO] BUILD FAILURE
+[INFO] Total time:  13.470 s
+[INFO] Finished at: 2026-09-07T09:16:46Z
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project elm_bk: Compilation failure: Compilation failure: 
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/mapper/BusinessMapper.java:[68,28] method selectCollectedBusinesses(java.lang.Long) is already defined in interface com.tju.elm_bk.mapper.BusinessMapper
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/UserModelDetailsService.java:[28,39] cannot find symbol
+[ERROR]   symbol:   method getAuthorities()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/UserModelDetailsService.java:[31,34] cannot find symbol
+[ERROR]   symbol:   method getAuthorities()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/UserModelDetailsService.java:[37,55] cannot find symbol
+[ERROR]   symbol:   method getActivated()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/UserModelDetailsService.java:[35,87] cannot find symbol
+[ERROR]   symbol:   method getUsername()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/UserModelDetailsService.java:[36,34] cannot find symbol
+[ERROR]   symbol:   method getPassword()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[112,59] cannot find symbol
+[ERROR]   symbol:   method getUsername()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[113,52] cannot find symbol
+[ERROR]   symbol:   method getActivated()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[113,99] cannot find symbol
+[ERROR]   symbol:   method getIsDeleted()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[114,31] cannot find symbol
+[ERROR]   symbol:   method getAuthorities()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[115,37] cannot find symbol
+[ERROR]   symbol:   method getUpdateTime()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[116,32] cannot find symbol
+[ERROR]   symbol:   method getAuthorities()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/security/TokenProvider.java:[117,26] invalid method reference
+[ERROR]   cannot find symbol
+[ERROR]     symbol:   method getName()
+[ERROR]     location: class com.tju.elm_bk.entity.Authority
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/constant/AuthorityName.java:[15,36] cannot find symbol
+[ERROR]   symbol:   method getAuthorities()
+[ERROR]   location: variable user of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/constant/AuthorityName.java:[16,24] cannot find symbol
+[ERROR]   symbol:   method getAuthorities()
+[ERROR]   location: variable user of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/AuthenticationRestController.java:[32,76] cannot find symbol
+[ERROR]   symbol:   method getUsername()
+[ERROR]   location: variable request of type @jakarta.validation.Valid com.tju.elm_bk.dto.AuthenticationDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/AuthenticationRestController.java:[32,99] cannot find symbol
+[ERROR]   symbol:   method getPassword()
+[ERROR]   location: variable request of type @jakarta.validation.Valid com.tju.elm_bk.dto.AuthenticationDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/AuthenticationRestController.java:[33,63] cannot find symbol
+[ERROR]   symbol:   method getRole()
+[ERROR]   location: variable request of type @jakarta.validation.Valid com.tju.elm_bk.dto.AuthenticationDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/AuthenticationRestController.java:[37,44] cannot find symbol
+[ERROR]   symbol:   method getRememberMe()
+[ERROR]   location: variable request of type @jakarta.validation.Valid com.tju.elm_bk.dto.AuthenticationDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/BusinessController.java:[74,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.tju.elm_bk.controller.BusinessController
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/BusinessController.java:[86,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.tju.elm_bk.controller.BusinessController
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/CartController.java:[33,62] cannot find symbol
+[ERROR]   symbol:   method getFoodId()
+[ERROR]   location: variable request of type @jakarta.validation.Valid com.tju.elm_bk.dto.CartItemAddDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/CartController.java:[33,83] cannot find symbol
+[ERROR]   symbol:   method getQuantity()
+[ERROR]   location: variable request of type @jakarta.validation.Valid com.tju.elm_bk.dto.CartItemAddDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/dto/CartItemCreateDTO.java:[54,44] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/dto/CartItemCreateDTO.java:[54,84] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable food of type com.tju.elm_bk.vo.FoodVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/dto/CartItemCreateDTO.java:[56,48] cannot find symbol
+[ERROR]   symbol:   method getUsername()
+[ERROR]   location: variable customer of type com.tju.elm_bk.vo.UserVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/ImageStorageService.java:[48,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.tju.elm_bk.service.ImageStorageService
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/FoodController.java:[85,31] cannot find symbol
+[ERROR]   symbol:   method getStock()
+[ERROR]   location: variable dto of type com.tju.elm_bk.dto.FoodStockUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/FoodController.java:[85,57] cannot find symbol
+[ERROR]   symbol:   method getStock()
+[ERROR]   location: variable dto of type com.tju.elm_bk.dto.FoodStockUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/FoodController.java:[85,79] cannot find symbol
+[ERROR]   symbol:   method getStock()
+[ERROR]   location: variable dto of type com.tju.elm_bk.dto.FoodStockUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/FoodController.java:[89,15] cannot find symbol
+[ERROR]   symbol:   method setFoodId(java.lang.Long)
+[ERROR]   location: variable update of type com.tju.elm_bk.dto.FoodUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/controller/FoodController.java:[89,50] cannot find symbol
+[ERROR]   symbol:   method getStock()
+[ERROR]   location: variable dto of type com.tju.elm_bk.dto.FoodStockUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/dto/FoodDTO.java:[68,40] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[37,20] cannot find symbol
+[ERROR]   symbol:   method getCollected()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.MerchantInteractionUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[37,54] cannot find symbol
+[ERROR]   symbol:   method getLiked()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.MerchantInteractionUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[41,57] cannot find symbol
+[ERROR]   symbol:   method getMerchantId()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.MerchantInteractionUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[42,71] cannot find symbol
+[ERROR]   symbol:   method getCollected()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.MerchantInteractionUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[42,118] cannot find symbol
+[ERROR]   symbol:   method getLiked()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.MerchantInteractionUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[43,34] cannot find symbol
+[ERROR]   symbol:   method getMerchantId()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.MerchantInteractionUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[45,20] cannot find symbol
+[ERROR]   symbol:   method getCollected()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.MerchantInteractionUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[45,77] cannot find symbol
+[ERROR]   symbol:   method getCollected()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.MerchantInteractionUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[46,20] cannot find symbol
+[ERROR]   symbol:   method getLiked()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.MerchantInteractionUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[46,69] cannot find symbol
+[ERROR]   symbol:   method getLiked()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.MerchantInteractionUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[49,68] cannot find symbol
+[ERROR]   symbol:   method getMerchantId()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.MerchantInteractionUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[55,19] cannot find symbol
+[ERROR]   symbol:   method setUserId(java.lang.Long)
+[ERROR]   location: variable result of type com.tju.elm_bk.entity.MerchantInteraction
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[55,45] cannot find symbol
+[ERROR]   symbol:   method setMerchantId(java.lang.Long)
+[ERROR]   location: variable result of type com.tju.elm_bk.entity.MerchantInteraction
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[56,19] cannot find symbol
+[ERROR]   symbol:   method setCollected(boolean)
+[ERROR]   location: variable result of type com.tju.elm_bk.entity.MerchantInteraction
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[56,47] cannot find symbol
+[ERROR]   symbol:   method setLiked(boolean)
+[ERROR]   location: variable result of type com.tju.elm_bk.entity.MerchantInteraction
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/MerchantInteractionService.java:[62,68] cannot find symbol
+[ERROR]   symbol:   method getStatus()
+[ERROR]   location: variable business of type com.tju.elm_bk.entity.Business
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[26,25] cannot find symbol
+[ERROR]   symbol:   method getScore()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[27,43] cannot find symbol
+[ERROR]   symbol:   method getScore()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[29,86] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[38,65] invalid method reference
+[ERROR]   cannot find symbol
+[ERROR]     symbol:   method getId()
+[ERROR]     location: class com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[44,43] cannot find symbol
+[ERROR]   symbol:   method getBusinessId()
+[ERROR]   location: variable order of type com.tju.elm_bk.entity.Order
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[45,43] cannot find symbol
+[ERROR]   symbol:   method getOrderState()
+[ERROR]   location: variable order of type com.tju.elm_bk.entity.Order
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[47,85] cannot find symbol
+[ERROR]   symbol:   method getOrderState()
+[ERROR]   location: variable order of type com.tju.elm_bk.entity.Order
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[48,43] cannot find symbol
+[ERROR]   symbol:   method getOrderDate()
+[ERROR]   location: variable order of type com.tju.elm_bk.entity.Order
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[48,76] cannot find symbol
+[ERROR]   symbol:   method getOrderDate()
+[ERROR]   location: variable order of type com.tju.elm_bk.entity.Order
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessPresentationService.java:[49,52] cannot find symbol
+[ERROR]   symbol:   method getBusinessId()
+[ERROR]   location: variable order of type com.tju.elm_bk.entity.Order
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/CurrentUserService.java:[24,63] cannot find symbol
+[ERROR]   symbol:   method getActivated()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/CurrentUserService.java:[24,111] cannot find symbol
+[ERROR]   symbol:   method getIsDeleted()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/CurrentUserService.java:[31,55] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: class com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[31,29] cannot find symbol
+[ERROR]   symbol:   method getSalesCount()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[31,68] cannot find symbol
+[ERROR]   symbol:   method getSalesCount()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[32,36] cannot find symbol
+[ERROR]   symbol:   method getScore()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[32,84] cannot find symbol
+[ERROR]   symbol:   method getScore()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[37,25] cannot find symbol
+[ERROR]   symbol:   method getPromotionThreshold()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[37,59] cannot find symbol
+[ERROR]   symbol:   method getPromotionDiscount()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[39,41] cannot find symbol
+[ERROR]   symbol:   method getPromotionThreshold()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[39,93] cannot find symbol
+[ERROR]   symbol:   method getPromotionDiscount()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[41,53] cannot find symbol
+[ERROR]   symbol:   method getCreateTime()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[52,53] cannot find symbol
+[ERROR]   symbol:   method getDineInAvailable()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[53,33] cannot find symbol
+[ERROR]   symbol:   method getDeliveryPrice()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[53,72] cannot find symbol
+[ERROR]   symbol:   method getDeliveryPrice()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[55,33] cannot find symbol
+[ERROR]   symbol:   method getStartPrice()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[56,28] cannot find symbol
+[ERROR]   symbol:   method getStartPrice()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[59,17] cannot find symbol
+[ERROR]   symbol:   method setRecommendationTags(java.util.List<java.lang.String>)
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[64,58] cannot find symbol
+[ERROR]   symbol:   method getPromotionDiscount()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[67,48] cannot find symbol
+[ERROR]   symbol:   method getDineInAvailable()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[68,29] cannot find symbol
+[ERROR]   symbol:   method getDeliveryPrice()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[68,68] cannot find symbol
+[ERROR]   symbol:   method getDeliveryPrice()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[69,49] cannot find symbol
+[ERROR]   symbol:   method getOperatingStatus()
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/BusinessRecommendationPolicy.java:[70,17] cannot find symbol
+[ERROR]   symbol:   method setRecommendationScore(java.math.BigDecimal)
+[ERROR]   location: variable business of type com.tju.elm_bk.vo.BusinessSearchVO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[47,41] cannot find symbol
+[ERROR]   symbol:   method getUsername()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.PersonCreateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[48,40] cannot find symbol
+[ERROR]   symbol:   method getPhone()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.PersonCreateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[62,20] constructor User in class com.tju.elm_bk.entity.User cannot be applied to given types;
+[ERROR]   required: java.lang.Long,java.lang.String,java.lang.String,java.lang.Boolean,java.time.LocalDateTime,java.lang.Long,java.lang.Boolean,java.time.LocalDateTime,java.lang.Long,java.util.List<com.tju.elm_bk.entity.Authority>
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[63,33] cannot find symbol
+[ERROR]   symbol:   method getUsername()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.PersonCreateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[64,50] cannot find symbol
+[ERROR]   symbol:   method getPassword()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.PersonCreateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[73,32] cannot find symbol
+[ERROR]   symbol:   method getPhone()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.PersonCreateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[74,32] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.PersonCreateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[75,36] cannot find symbol
+[ERROR]   symbol:   method getFirstName()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.PersonCreateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[76,35] cannot find symbol
+[ERROR]   symbol:   method getLastName()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.PersonCreateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[77,33] cannot find symbol
+[ERROR]   symbol:   method getGender()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.PersonCreateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[78,15] cannot find symbol
+[ERROR]   symbol:   method setPhoto(java.lang.String)
+[ERROR]   location: variable person of type com.tju.elm_bk.entity.Person
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/RegistrationService.java:[83,58] cannot find symbol
+[ERROR]   symbol:   method getName()
+[ERROR]   location: variable authority of type com.tju.elm_bk.entity.Authority
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/CurrentProfileService.java:[18,81] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable account of type com.tju.elm_bk.entity.User
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/ProfileUpdateService.java:[23,51] cannot find symbol
+[ERROR]   symbol:   method getPhone()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.ProfileUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/ProfileUpdateService.java:[25,15] cannot find symbol
+[ERROR]   symbol:   method setId(java.lang.Long)
+[ERROR]   location: variable person of type com.tju.elm_bk.entity.Person
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/ProfileUpdateService.java:[26,32] cannot find symbol
+[ERROR]   symbol:   method getPhone()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.ProfileUpdateDTO
+[ERROR] /workspace/src/main/java/com/tju/elm_bk/service/ProfileUpdateService.java:[27,38] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable request of type com.tju.elm_bk.dto.ProfileUpdateDTO
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+=== elm_bk/target/profile-refactor-final.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] Compiling 147 source files with javac [debug parameters release 17] to target/classes
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 17 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.215 s -- in com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Running com.tju.elm_bk.security.TokenSessionTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.231 s -- in com.tju.elm_bk.security.TokenSessionTest
+[INFO] Running com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Running com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.83 s -- in com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.132 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.049 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.64 s -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Running com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Tests run: 22, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.323 s -- in com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Running com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Running com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Running com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.741 s -- in com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Running com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.066 s -- in com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Running com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.488 s -- in com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 s -- in com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 131, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  01:07 min
+[INFO] Finished at: 2026-09-07T09:19:11Z
+
+=== elm_bk/target/profile-pr-final.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 17 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.625 s -- in com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Running com.tju.elm_bk.security.TokenSessionTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.501 s -- in com.tju.elm_bk.security.TokenSessionTest
+[INFO] Running com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Running com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.75 s -- in com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.073 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.360 s -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Running com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Tests run: 22, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.440 s -- in com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Running com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.029 s -- in com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Running com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Running com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.534 s -- in com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Running com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.216 s -- in com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Running com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.232 s -- in com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.045 s -- in com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 s -- in com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 131, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  39.738 s
+[INFO] Finished at: 2026-09-07T09:24:04Z

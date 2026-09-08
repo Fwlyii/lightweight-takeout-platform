@@ -1,0 +1,10 @@
+=== snapshot / lcw-backend-foundation / FOUNDATION ===
+$ bash 测试命令.sh
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+exit_code=0
+
+=== snapshot / lcw-backend-foundation / MERGE ===
+$ bash 测试命令.sh
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+PASS module structure: Maven pom.xml is well-formed
+exit_code=0

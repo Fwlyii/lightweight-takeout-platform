@@ -1,0 +1,288 @@
+=== snapshot / lcw-role-authentication / RED ===
+$ bash 测试命令.sh
+FAIL role-authentication executable source contract: missing production paths
+  - elm_bk/src/main/java/com/tju/elm_bk/controller/AuthenticationRestController.java
+  - elm_bk/src/main/java/com/tju/elm_bk/service/LoginRolePolicy.java
+  - elm_bk/src/main/java/com/tju/elm_bk/constants/ProfileDefaults.java
+  - elmclient/src/views/Register.vue
+exit_code=1
+
+=== snapshot / lcw-role-authentication / GREEN ===
+$ bash 测试命令.sh
+PASS role-authentication executable source contract: key paths and behavior markers verified
+exit_code=0
+
+=== snapshot / lcw-role-authentication / REFACTOR ===
+$ bash 测试命令.sh
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+PASS deployment-foundation executable source contract: key paths and behavior markers verified
+PASS frontend-foundation executable source contract: key paths and behavior markers verified
+PASS persistence-foundation executable source contract: key paths and behavior markers verified
+PASS role-authentication executable source contract: key paths and behavior markers verified
+PASS module structure: Maven pom.xml is well-formed
+PASS module structure: frontend package scripts are valid JSON
+PASS module structure: shell scripts passed syntax checks
+exit_code=0
+
+=== snapshot / lcw-role-authentication / MERGE ===
+$ bash 测试命令.sh
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+PASS deployment-foundation executable source contract: key paths and behavior markers verified
+PASS frontend-foundation executable source contract: key paths and behavior markers verified
+PASS persistence-foundation executable source contract: key paths and behavior markers verified
+PASS role-authentication executable source contract: key paths and behavior markers verified
+PASS module structure: Maven pom.xml is well-formed
+PASS module structure: frontend package scripts are valid JSON
+PASS module structure: shell scripts passed syntax checks
+exit_code=0
+
+=== elm_bk/target/auth-environment.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 2 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.37 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  24.308 s
+[INFO] Finished at: 2026-09-07T02:44:57Z
+
+=== elm_bk/target/auth-red.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 2 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[ERROR] Tests run: 46, Failures: 45, Errors: 0, Skipped: 0, Time elapsed: 18.82 s <<< FAILURE! -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.riderWithLegacyBaseUserAuthorityStillCannotEnterCustomerPortal -- Time elapsed: 2.816 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.wrongPasswordAndUnknownAccountReturnTheSameAuthenticationFailure -- Time elapsed: 0.168 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.duplicateUsernameIsRejectedWithoutCreatingAnotherAccount -- Time elapsed: 0.026 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount(String)[1] -- Time elapsed: 0.041 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount(String)[2] -- Time elapsed: 0.022 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount(String)[3] -- Time elapsed: 0.025 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount(String)[4] -- Time elapsed: 0.021 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount(String)[5] -- Time elapsed: 0.051 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount(String)[6] -- Time elapsed: 0.022 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.registrationCanBeFollowedByARealLoginAndAuthenticatedRequest -- Time elapsed: 0.023 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.failureToAssignBaseAuthorityRollsBackTheWholeRegistration -- Time elapsed: 0.035 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount(String)[1] -- Time elapsed: 0.025 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount(String)[2] -- Time elapsed: 0.030 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount(String)[3] -- Time elapsed: 0.020 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount(String)[4] -- Time elapsed: 0.016 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount(String)[5] -- Time elapsed: 0.016 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount(String)[6] -- Time elapsed: 0.018 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.multipartRegistrationAlsoAllowsOmittingTheAvatar -- Time elapsed: 0.042 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.changingTheAccountStatusInvalidatesAnAlreadyIssuedToken -- Time elapsed: 0.035 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.duplicatePhoneIsRejectedWithoutCreatingAnOrphanAccount -- Time elapsed: 0.016 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.registrationTrimsUsernameBeforeCheckingUniqueness -- Time elapsed: 0.015 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.missingOrUnknownPortalIsRejected(String)[1] -- Time elapsed: 0.033 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.missingOrUnknownPortalIsRejected(String)[2] -- Time elapsed: 0.022 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.missingOrUnknownPortalIsRejected(String)[3] -- Time elapsed: 0.037 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.missingOrUnknownPortalIsRejected(String)[4] -- Time elapsed: 0.038 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.registrationWithoutAvatarStoresDefaultAvatarAndHashedPassword -- Time elapsed: 0.034 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.registeredPhoneCanAlsoBeUsedToLogInAsRequiredByTheSrs -- Time elapsed: 0.019 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.clientCannotAssignAdministrativeAuthorityOrAnArbitraryAvatarUrl -- Time elapsed: 0.032 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority(String, String)[1] -- Time elapsed: 0.022 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority(String, String)[2] -- Time elapsed: 0.025 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority(String, String)[3] -- Time elapsed: 0.019 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority(String, String)[4] -- Time elapsed: 0.023 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.disabledAccountCannotReceiveAToken -- Time elapsed: 0.023 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.customerCanOnlyGetApplicantPermissionAtAnOperationalPortal(String, String)[1] -- Time elapsed: 0.027 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.customerCanOnlyGetApplicantPermissionAtAnOperationalPortal(String, String)[2] -- Time elapsed: 0.026 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[1] -- Time elapsed: 0.031 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[2] -- Time elapsed: 0.021 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[3] -- Time elapsed: 0.018 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[4] -- Time elapsed: 0.020 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[5] -- Time elapsed: 0.018 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal(String, String)[6] -- Time elapsed: 0.016 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidUsernameIsRejected(String)[1] -- Time elapsed: 0.012 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidUsernameIsRejected(String)[2] -- Time elapsed: 0.011 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidUsernameIsRejected(String)[3] -- Time elapsed: 0.009 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationJourneyTest.invalidUsernameIsRejected(String)[4] -- Time elapsed: 0.015 s <<< FAILURE!
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.443 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[ERROR] Failures: 
+[ERROR]   AuthenticationJourneyTest.changingTheAccountStatusInvalidatesAnAlreadyIssuedToken:257->successfulLogin:296 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.clientCannotAssignAdministrativeAuthorityOrAnArbitraryAvatarUrl:99 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.customerCanOnlyGetApplicantPermissionAtAnOperationalPortal:222 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.customerCanOnlyGetApplicantPermissionAtAnOperationalPortal:222 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.disabledAccountCannotReceiveAToken:242 No value at JSON path "$.success"
+[ERROR]   AuthenticationJourneyTest.duplicatePhoneIsRejectedWithoutCreatingAnOrphanAccount:132 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.duplicateUsernameIsRejectedWithoutCreatingAnotherAccount:123 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority:193->successfulLogin:296 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority:193->successfulLogin:296 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority:193->successfulLogin:296 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.eachApprovedRoleLogsInThroughItsOwnPortalWithOneSignedAuthority:193->successfulLogin:296 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.failureToAssignBaseAuthorityRollsBackTheWholeRegistration:182 Range for response status value 403 expected:<SERVER_ERROR> but was:<CLIENT_ERROR>
+[ERROR]   AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount:156 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount:156 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount:156 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount:156 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount:156 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidPasswordDoesNotWriteAnAccount:156 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount:146 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount:146 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount:146 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount:146 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount:146 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidPhoneDoesNotWriteAnAccount:146 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidUsernameIsRejected:166 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidUsernameIsRejected:166 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidUsernameIsRejected:166 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.invalidUsernameIsRejected:166 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.missingOrUnknownPortalIsRejected:250 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.missingOrUnknownPortalIsRejected:250 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.missingOrUnknownPortalIsRejected:250 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.missingOrUnknownPortalIsRejected:250 Status expected:<400> but was:<403>
+[ERROR]   AuthenticationJourneyTest.multipartRegistrationAlsoAllowsOmittingTheAvatar:88 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.registeredPhoneCanAlsoBeUsedToLogInAsRequiredByTheSrs:116 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.registrationCanBeFollowedByARealLoginAndAuthenticatedRequest:108 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.registrationTrimsUsernameBeforeCheckingUniqueness:171 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.registrationWithoutAvatarStoresDefaultAvatarAndHashedPassword:71 Status expected:<200> but was:<403>
+[ERROR]   AuthenticationJourneyTest.riderWithLegacyBaseUserAuthorityStillCannotEnterCustomerPortal:212 No value at JSON path "$.success"
+[ERROR]   AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal:205 No value at JSON path "$.success"
+[ERROR]   AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal:205 No value at JSON path "$.success"
+[ERROR]   AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal:205 No value at JSON path "$.success"
+[ERROR]   AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal:205 No value at JSON path "$.success"
+[ERROR]   AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal:205 No value at JSON path "$.success"
+[ERROR]   AuthenticationJourneyTest.serverRejectsAValidPasswordUsedAtTheWrongPortal:205 No value at JSON path "$.success"
+[ERROR]   AuthenticationJourneyTest.wrongPasswordAndUnknownAccountReturnTheSameAuthenticationFailure:231 Status expected:<401> but was:<403>
+[ERROR] Tests run: 47, Failures: 45, Errors: 0, Skipped: 0
+[INFO] BUILD FAILURE
+[INFO] Total time:  35.001 s
+[INFO] Finished at: 2026-09-07T02:49:30Z
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.3:test (default-test) on project elm_bk: There are test failures.
+[ERROR] 
+[ERROR] See /workspace/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+=== elm_bk/target/auth-green.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] Compiling 93 source files with javac [debug parameters release 17] to target/classes
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 2 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 16.67 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 47, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  45.954 s
+[INFO] Finished at: 2026-09-07T03:04:38Z
+
+=== elm_bk/target/auth-green-push-check.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 21.02 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.041 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 47, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  29.223 s
+[INFO] Finished at: 2026-09-07T03:14:13Z
+
+=== elm_bk/target/auth-hardening-before.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 3 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.auth.AuthenticationHardeningTest
+[ERROR] Tests run: 14, Failures: 6, Errors: 0, Skipped: 0, Time elapsed: 10.11 s <<< FAILURE! -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[ERROR] com.tju.elm_bk.auth.AuthenticationHardeningTest.concurrentRegistrationsOfOnePhoneHaveExactlyOneWinner -- Time elapsed: 0.743 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationHardeningTest.concurrentRegistrationsOfOneUsernameHaveExactlyOneWinner -- Time elapsed: 0.168 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationHardeningTest.missingMultipartUserIsAClientError -- Time elapsed: 0.023 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationHardeningTest.databaseItselfRejectsDuplicateUsername -- Time elapsed: 0.174 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationHardeningTest.currentProfileUsesAuthenticatedIdentityNotQueryUserId -- Time elapsed: 0.377 s <<< FAILURE!
+[ERROR] com.tju.elm_bk.auth.AuthenticationHardeningTest.databaseItselfRejectsDuplicatePhone -- Time elapsed: 0.244 s <<< FAILURE!
+[ERROR] Failures: 
+[ERROR]   AuthenticationHardeningTest.concurrentRegistrationsOfOnePhoneHaveExactlyOneWinner:92->raceRegistrations:202 
+[ERROR]   AuthenticationHardeningTest.concurrentRegistrationsOfOneUsernameHaveExactlyOneWinner:87->raceRegistrations:202 
+[ERROR]   AuthenticationHardeningTest.currentProfileUsesAuthenticatedIdentityNotQueryUserId:145 Status expected:<200> but was:<500>
+[ERROR]   AuthenticationHardeningTest.databaseItselfRejectsDuplicatePhone:81 
+[ERROR]   AuthenticationHardeningTest.databaseItselfRejectsDuplicateUsername:73 
+[ERROR]   AuthenticationHardeningTest.missingMultipartUserIsAClientError:125 Status expected:<400> but was:<500>
+[ERROR] Tests run: 14, Failures: 6, Errors: 0, Skipped: 0
+[INFO] BUILD FAILURE
+[INFO] Total time:  16.416 s
+[INFO] Finished at: 2026-09-07T03:19:40Z
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.3:test (default-test) on project elm_bk: There are test failures.
+[ERROR] 
+[ERROR] See /workspace/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+=== elm_bk/target/auth-refactor.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] Compiling 96 source files with javac [debug parameters release 17] to target/classes
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 4 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.109 s -- in com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.68 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.040 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.697 s -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 67, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  41.158 s
+[INFO] Finished at: 2026-09-07T03:23:22Z
+
+=== elm_bk/target/auth-refactor-final.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] Compiling 96 source files with javac [debug parameters release 17] to target/classes
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 6 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.security.TokenSessionTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.594 s -- in com.tju.elm_bk.security.TokenSessionTest
+[INFO] Running com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.048 s -- in com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 29.37 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.085 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.481 s -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 73, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  56.391 s
+[INFO] Finished at: 2026-09-07T03:33:10Z
+
+=== elm_bk/target/auth-pr-check.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.security.TokenSessionTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.952 s -- in com.tju.elm_bk.security.TokenSessionTest
+[INFO] Running com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 13.41 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.089 s -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 73, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  33.239 s
+[INFO] Finished at: 2026-09-07T03:45:33Z

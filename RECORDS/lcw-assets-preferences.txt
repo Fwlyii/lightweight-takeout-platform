@@ -1,0 +1,207 @@
+=== snapshot / lcw-assets-preferences / RED ===
+$ bash 测试命令.sh
+FAIL assets-preferences executable source contract: missing production paths
+  - elm_bk/src/main/java/com/tju/elm_bk/controller/AssetController.java
+  - elmclient/src/utils/theme.js
+  - elmclient/src/views/Notifications.vue
+exit_code=1
+
+=== snapshot / lcw-assets-preferences / GREEN ===
+$ bash 测试命令.sh
+PASS assets-preferences executable source contract: key paths and behavior markers verified
+exit_code=0
+
+=== snapshot / lcw-assets-preferences / REFACTOR ===
+$ bash 测试命令.sh
+PASS approval-permissions executable source contract: key paths and behavior markers verified
+PASS assets-preferences executable source contract: key paths and behavior markers verified
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+PASS checkout-payment executable source contract: key paths and behavior markers verified
+PASS deployment-foundation executable source contract: key paths and behavior markers verified
+PASS frontend-foundation executable source contract: key paths and behavior markers verified
+PASS merchant-catalog executable source contract: key paths and behavior markers verified
+PASS merchant-fulfillment executable source contract: key paths and behavior markers verified
+PASS persistence-foundation executable source contract: key paths and behavior markers verified
+PASS profile-address executable source contract: key paths and behavior markers verified
+PASS rider-delivery executable source contract: key paths and behavior markers verified
+PASS role-authentication executable source contract: key paths and behavior markers verified
+PASS storefront-cart executable source contract: key paths and behavior markers verified
+PASS module structure: Maven pom.xml is well-formed
+PASS module structure: frontend package scripts are valid JSON
+PASS module structure: shell scripts passed syntax checks
+exit_code=0
+
+=== snapshot / lcw-assets-preferences / MERGE ===
+$ bash 测试命令.sh
+PASS approval-permissions executable source contract: key paths and behavior markers verified
+PASS assets-preferences executable source contract: key paths and behavior markers verified
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+PASS checkout-payment executable source contract: key paths and behavior markers verified
+PASS deployment-foundation executable source contract: key paths and behavior markers verified
+PASS frontend-foundation executable source contract: key paths and behavior markers verified
+PASS merchant-catalog executable source contract: key paths and behavior markers verified
+PASS merchant-fulfillment executable source contract: key paths and behavior markers verified
+PASS persistence-foundation executable source contract: key paths and behavior markers verified
+PASS profile-address executable source contract: key paths and behavior markers verified
+PASS rider-delivery executable source contract: key paths and behavior markers verified
+PASS role-authentication executable source contract: key paths and behavior markers verified
+PASS storefront-cart executable source contract: key paths and behavior markers verified
+PASS module structure: Maven pom.xml is well-formed
+PASS module structure: frontend package scripts are valid JSON
+PASS module structure: shell scripts passed syntax checks
+exit_code=0
+
+=== elm_bk/target/assets-green-test.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 21 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.267 s -- in com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Running com.tju.elm_bk.security.TokenSessionTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.242 s -- in com.tju.elm_bk.security.TokenSessionTest
+[INFO] Running com.tju.elm_bk.security.OrderPricingTrustBoundaryTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.876 s -- in com.tju.elm_bk.security.OrderPricingTrustBoundaryTest
+[INFO] Running com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Running com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.807 s -- in com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.930 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.737 s -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Running com.tju.elm_bk.controller.PreferenceControllerTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.052 s -- in com.tju.elm_bk.controller.PreferenceControllerTest
+[INFO] Running com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Tests run: 22, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.730 s -- in com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Running com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Running com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Running com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.068 s -- in com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Running com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Running com.tju.elm_bk.service.OrderPricingServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in com.tju.elm_bk.service.OrderPricingServiceTest
+[INFO] Running com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.145 s -- in com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.OrderSettlementServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.tju.elm_bk.service.OrderSettlementServiceTest
+[INFO] Running com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 140, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  13.062 s
+[INFO] Finished at: 2026-09-08T07:26:39Z
+
+=== elm_bk/target/assets-final-test.log ===
+[INFO] --- compiler:3.13.0:compile (default-compile) @ elm_bk ---
+[INFO] Compiling 176 source files with javac [debug parameters release 17] to target/classes
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ elm_bk ---
+[INFO] Compiling 23 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] --- surefire:3.5.3:test (default-test) @ elm_bk ---
+[INFO] Running com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.249 s -- in com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Running com.tju.elm_bk.security.TokenSessionTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.783 s -- in com.tju.elm_bk.security.TokenSessionTest
+[INFO] Running com.tju.elm_bk.security.OrderPricingTrustBoundaryTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.199 s -- in com.tju.elm_bk.security.OrderPricingTrustBoundaryTest
+[INFO] Running com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Running com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.664 s -- in com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.903 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Running com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.795 s -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Running com.tju.elm_bk.controller.NotificationControllerTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.051 s -- in com.tju.elm_bk.controller.NotificationControllerTest
+[INFO] Running com.tju.elm_bk.controller.PreferenceControllerTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in com.tju.elm_bk.controller.PreferenceControllerTest
+[INFO] Running com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Tests run: 22, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.618 s -- in com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Running com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Running com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Running com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.043 s -- in com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Running com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Running com.tju.elm_bk.service.OrderPricingServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in com.tju.elm_bk.service.OrderPricingServiceTest
+[INFO] Running com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.116 s -- in com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.OrderSettlementServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.tju.elm_bk.service.OrderSettlementServiceTest
+[INFO] Running com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Running com.tju.elm_bk.service.AssetServiceTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in com.tju.elm_bk.service.AssetServiceTest
+[INFO] Running com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 160, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  14.393 s
+[INFO] Finished at: 2026-09-08T07:40:55Z
+
+=== frontend-cache/lcw-assets-build.log ===
+DONE  Compiled successfully in 730ms3:27:11 PM
+ DONE  Compiled successfully in 930ms3:27:11 PM
+ DONE  Compiled successfully in 1429ms3:27:12 PM
+
+=== frontend-cache/lcw-preferences-build.log ===
+DONE  Compiled successfully in 1151ms3:27:14 PM
+
+=== frontend-cache/lcw-notifications-build.log ===
+DONE  Compiled successfully in 1205ms3:27:15 PM
+
+=== frontend-cache/lcw-assets-preview/tests.log ===
+> elmclient@0.1.0 test
+> node --test tests/*.test.mjs
+✔ successful login stores the verified profile and selected portal together (1.224709ms)
+✔ failed profile request cannot leave a partial session (0.221666ms)
+✔ server role must match the submitted role (0.06025ms)
+✔ role changed between login and profile retrieval asks for a new login (0.05925ms)
+✔ customer can retain an applicant session but cannot turn it into approved rider access (0.122375ms)
+✔ missing signed token is a failed login (0.069458ms)
+✔ valid customer redirect is retained (0.112916ms)
+✔ unsafe or unavailable redirect is rejected: //evil.test (0.043166ms)
+✔ unsafe or unavailable redirect is rejected: /\evil.test (0.058125ms)
+✔ unsafe or unavailable redirect is rejected: https://evil.test (0.075208ms)
+✔ unsafe or unavailable redirect is rejected: /admin/user (0.042333ms)
+✔ unsafe or unavailable redirect is rejected: /missing (0.030416ms)
+✔ unsafe or unavailable redirect is rejected: /login (0.076667ms)
+✔ applicants always go to their application route (0.040125ms)
+✔ approved operational account goes to its own workspace (0.045667ms)
+✔ shared rating formatter preserves unrated state and consistent rounding (0.3905ms)
+✔ address requests do not submit owner, audit or default flags (2.146417ms)
+✔ default selection is a server request, not a browser-only preference (0.136459ms)
+✔ reject malformed ids before making requests (0.258125ms)
+✔ profile payload contains editable fields only and supports clearing optional values (0.107709ms)
+✔ invalid profile responses are not accepted as a new session profile (0.073417ms)
+✔ unfavorite sends false explicitly and discards request identity (0.080584ms)
+✔ string false must not be coerced to a true interaction (0.074125ms)
+✔ business failure is surfaced instead of returning an empty successful list (0.230125ms)
+✔ every offered theme is accepted and unknown values fall back to light (0.773ms)
+✔ theme applies to the document and round-trips through storage (0.141375ms)
+✔ unavailable storage does not prevent visual theme changes (0.079167ms)
+✔ theme utilities also work without browser globals (0.043542ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 43.750083
+
+=== frontend-cache/lcw-assets-preview/build.log ===
+DONE  Build complete. The node_modules/.cache/lcw-assets-preview/dist directory is ready to be deployed.
