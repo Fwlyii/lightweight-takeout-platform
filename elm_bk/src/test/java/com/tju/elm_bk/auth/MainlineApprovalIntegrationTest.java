@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** Real Spring transaction/security proxies and MyBatis SQL; no demo database or service mocks. */
+/** Real approval transactions and SQL; delivery is isolated from the approval-only schema. */
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:mainline_approval;MODE=MySQL;DB_CLOSE_DELAY=-1",
         "spring.datasource.driver-class-name=org.h2.Driver",
@@ -31,6 +31,8 @@ class MainlineApprovalIntegrationTest {
     @Autowired JdbcTemplate jdbc;
     @Autowired RiderService riders;
     @Autowired MockMvc mvc;
+    @org.springframework.test.context.bean.override.mockito.MockitoBean
+    com.tju.elm_bk.service.DeliveryService delivery;
 
     @BeforeEach
     void seedIsolatedDatabase() {
@@ -81,15 +83,18 @@ class MainlineApprovalIntegrationTest {
 
     @Test
     @WithMockUser(authorities = "ADMIN")
-    void adminGetsExplicitUnavailableResponseForFutureDeliveryModule() throws Exception {
+    void adminCanReachInstalledDeliveryModule() throws Exception {
+        org.mockito.Mockito.when(delivery.listExceptions(null)).thenReturn(java.util.List.of());
         mvc.perform(get("/api/v1/admin/delivery-exceptions"))
-                .andExpect(status().isServiceUnavailable())
-                .andExpect(jsonPath("$.code").value("FEATURE_UNAVAILABLE"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isEmpty());
+        org.mockito.Mockito.verify(delivery).listExceptions(null);
     }
 
     @Test
     @WithMockUser(authorities = "USER")
-    void unavailableEndpointStillEnforcesAdminPermission() throws Exception {
+    void deliveryEndpointStillEnforcesAdminPermission() throws Exception {
         mvc.perform(get("/api/v1/admin/delivery-exceptions")).andExpect(status().isForbidden());
     }
 }
