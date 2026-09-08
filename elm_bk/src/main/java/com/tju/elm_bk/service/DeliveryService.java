@@ -19,6 +19,7 @@ public interface DeliveryService {
     DeliveryTaskVO getOrderDelivery(Long orderId);
 
     DeliveryTaskVO merchantAcceptOrder(Long orderId);
+
     DeliveryTaskVO merchantReadyOrder(Long orderId);
 
     void merchantRejectOrder(Long orderId);

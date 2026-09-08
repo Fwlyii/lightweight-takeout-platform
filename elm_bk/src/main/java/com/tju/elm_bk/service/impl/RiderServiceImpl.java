@@ -1,7 +1,7 @@
 package com.tju.elm_bk.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.tju.elm_bk.constants.RiderAuditStatus;
+import com.tju.elm_bk.constant.RiderAuditStatus;
 import com.tju.elm_bk.dto.RiderApplicationDTO;
 import com.tju.elm_bk.dto.RiderAuditDTO;
 import com.tju.elm_bk.entity.Notification;
@@ -11,10 +11,9 @@ import com.tju.elm_bk.exception.APIException;
 import com.tju.elm_bk.mapper.*;
 import com.tju.elm_bk.service.CurrentUserService;
 import com.tju.elm_bk.service.RiderService;
-import com.tju.elm_bk.service.NotificationDispatcher;
+import com.tju.elm_bk.websocket.WebSocketServer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -28,7 +27,7 @@ public class RiderServiceImpl implements RiderService {
     private final UserAuthorityMapper userAuthorityMapper;
     private final DeliveryTaskMapper deliveryTaskMapper;
     private final NotificationMapper notificationMapper;
-    private final NotificationDispatcher notifications;
+    private final WebSocketServer webSocketServer;
     private final CurrentUserService currentUserService;
 
     @Override
@@ -60,7 +59,7 @@ public class RiderServiceImpl implements RiderService {
         JSONObject message = new JSONObject();
         message.put("type", "rider_application");
         message.put("content", "用户[" + current.getUsername() + "]提交了骑手申请");
-        notifications.sendToAuthority("ADMIN", message.toJSONString());
+        webSocketServer.sendToAuthority("ADMIN", message.toJSONString());
         return riderMapper.findByUserId(current.getId());
     }
 
@@ -87,22 +86,13 @@ public class RiderServiceImpl implements RiderService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<RiderProfile> listApplications(Integer auditStatus) {
-        if (auditStatus != null && (auditStatus < 0 || auditStatus > 2)) {
-            throw new APIException("不支持的审核状态");
-        }
         return riderMapper.listApplications(auditStatus);
     }
 
     @Override
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN')")
     public RiderProfile audit(Long applicationId, RiderAuditDTO dto) {
-        if (applicationId == null || applicationId <= 0 || dto == null || dto.getApproved() == null
-                || (dto.getReason() != null && dto.getReason().length() > 200)) {
-            throw new APIException("骑手审核参数不合法");
-        }
         RiderProfile application = riderMapper.findById(applicationId);
         if (application == null) {
             throw new APIException("骑手申请不存在");
@@ -152,6 +142,6 @@ public class RiderServiceImpl implements RiderService {
         JSONObject message = new JSONObject();
         message.put("type", "rider_audit");
         message.put("content", content);
-        notifications.sendToClient(userId.toString(), message.toJSONString());
+        webSocketServer.sendToClient(userId.toString(), message.toJSONString());
     }
 }
