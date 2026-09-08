@@ -99,3 +99,40 @@ OrderSubmissionService.saveDetails: lines 16/16, branches 2/2
 OrderServiceImpl.getOrderItemDetail: lines 11/11, branches 11/14
 FoodServiceImpl.getFoodList: lines 14/14, branches 17/24
 MyBatis SQL is verified by integration assertions, not JaCoCo branch counters.
+
+REFACTOR - Full backend regression
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.127 s -- in com.tju.elm_bk.dto.BusinessOwnerDTOValidationTest
+[INFO] Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 13.15 s -- in com.tju.elm_bk.order.OrderNameSnapshotJourneyTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.752 s -- in com.tju.elm_bk.security.TokenSessionTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.822 s -- in com.tju.elm_bk.security.OrderPricingTrustBoundaryTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.tju.elm_bk.security.LoginRolePolicyTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.438 s -- in com.tju.elm_bk.auth.MainlineApprovalIntegrationTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.831 s -- in com.tju.elm_bk.auth.AuthenticationJourneyTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.020 s -- in com.tju.elm_bk.auth.AuthenticationTestEnvironmentTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.76 s -- in com.tju.elm_bk.auth.AuthenticationHardeningTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.106 s -- in com.tju.elm_bk.controller.NotificationControllerTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.056 s -- in com.tju.elm_bk.controller.PreferenceControllerTest
+[INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.951 s -- in com.tju.elm_bk.profile.ProfileAddressJourneyTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in com.tju.elm_bk.service.BusinessPricingPolicyTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.tju.elm_bk.service.ProductPurchasePolicyTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.158 s -- in com.tju.elm_bk.service.AdminDeliveryAvailabilityTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.033 s -- in com.tju.elm_bk.service.NotificationDispatcherTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.tju.elm_bk.service.OrderPricingServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.516 s -- in com.tju.elm_bk.service.RiderAuditCompatibilityTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in com.tju.elm_bk.service.BusinessRecommendationPolicyTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in com.tju.elm_bk.service.OrderSettlementServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in com.tju.elm_bk.service.MainlinePolicyCompatibilityTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.048 s -- in com.tju.elm_bk.service.AssetServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.tju.elm_bk.service.ImageStorageServiceTest
+[INFO] Tests run: 203, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+REFACTOR - MySQL 8.0.40
+Migration: PASS (nullable, no invented historical names, repeat-safe)
+[INFO] Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 32.04 s -- in com.tju.elm_bk.order.OrderNameSnapshotJourneyTest
+[INFO] Tests run: 38, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+JaCoCo 0.8.13 - Full backend regression
+OrderSubmissionService.saveDetails: lines 16/16, branches 2/2
+OrderServiceImpl.getOrderItemDetail: lines 11/11, branches 11/14
+FoodServiceImpl.getFoodList: lines 14/14, branches 17/24

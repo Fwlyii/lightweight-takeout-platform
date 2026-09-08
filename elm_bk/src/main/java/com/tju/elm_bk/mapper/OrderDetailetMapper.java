@@ -16,10 +16,8 @@ public interface OrderDetailetMapper {
     @Select("""
         select od.id,od.quantity,od.food_id,
            COALESCE(od.food_name_snapshot, '历史商品（名称未留存）') as food_name,od.food_price,
-           o.id as order_id
+           od.order_id
         from orderdetailet od
-        left join food f on f.id = od.food_id
-        left join orders o on o.id = od.order_id
         where od.order_id = #{orderId}
     """)
     List<OrderFoodVO> selectOrderDetailList(Long orderId);
