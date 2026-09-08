@@ -1,0 +1,64 @@
+RED - MySQL 8.0.40
+Migration: FAIL (003_order_name_snapshot.sql missing)
+[ERROR] Failures: 
+[ERROR]   OrderNameSnapshotJourneyTest.completedOrderKeepsItsOriginalName:118->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.legacyOrdersHaveAnExplicitMissingNameLabel:208 Multiple Failures (2 failures)
+	org.opentest4j.MultipleFailuresError: Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <历史商品（名称未留存）> but was: <番茄炒蛋>
+	org.opentest4j.MultipleFailuresError: Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <历史商品（名称未留存）> but was: <番茄炒蛋>
+[ERROR]   OrderNameSnapshotJourneyTest.legacyOrdersHaveAnExplicitMissingNameLabel:208 Multiple Failures (2 failures)
+	org.opentest4j.MultipleFailuresError: Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <历史商品（名称未留存）> but was: <红烧牛肉>
+	org.opentest4j.MultipleFailuresError: Multiple Failures (2 failures)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <历史商品（名称未留存）> but was: <红烧牛肉>
+	org.opentest4j.AssertionFailedError: 商品单价 ==> expected: <0> but was: <-1>
+[ERROR]   OrderNameSnapshotJourneyTest.legacyOrdersHaveAnExplicitMissingNameLabel:208 Multiple Failures (2 failures)
+	org.opentest4j.MultipleFailuresError: Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <历史商品（名称未留存）> but was: <红烧牛肉>
+	org.opentest4j.AssertionFailedError: 订单明细中缺少商品 1001
+[ERROR]   OrderNameSnapshotJourneyTest.multipleItemsAndRepeatedRenamesKeepEachSnapshot:165 Multiple Failures (2 failures)
+	org.opentest4j.MultipleFailuresError: Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <清蒸鱼>
+	org.opentest4j.MultipleFailuresError: Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <米饭> but was: <炒饭>
+[ERROR]   OrderNameSnapshotJourneyTest.oldAndNewOrdersKeepTheirOwnNamesAndPrices:130 Multiple Failures (1 failure)
+	org.opentest4j.MultipleFailuresError: Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.renamedMenuCannotRewritePendingOrder:101->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.renamedMenuCannotRewritePendingOrder:101->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.renamedMenuCannotRewritePendingOrder:101->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.renamedMenuCannotRewritePendingOrder:101->assertItem:342 Multiple Failures (2 failures)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+	org.opentest4j.AssertionFailedError: 商品单价 ==> expected: <0> but was: <-1>
+[ERROR]   OrderNameSnapshotJourneyTest.repeatedSubmissionKeepsTheOriginalSnapshot:266->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.snapshotNameIsPersistedOnTheOrderLine:276 expected: <番茄炒蛋> but was: <null>
+[ERROR]   OrderNameSnapshotJourneyTest.supportedNamesArePreservedExactly:180->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋（微辣）> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.supportedNamesArePreservedExactly:180->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <Chef's special> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.supportedNamesArePreservedExactly:180->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜菜> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.unavailableFoodRemainsInOrderHistory:150->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.unavailableFoodRemainsInOrderHistory:150->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.unavailableFoodRemainsInOrderHistory:150->assertItem:342 Multiple Failures (2 failures)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+	org.opentest4j.AssertionFailedError: 商品单价 ==> expected: <0> but was: <-1>
+[ERROR]   OrderNameSnapshotJourneyTest.unavailableFoodRemainsInOrderHistory:150->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.unavailableFoodRemainsInOrderHistory:150->assertItem:342 Multiple Failures (1 failure)
+	org.opentest4j.AssertionFailedError: 订单商品名称 ==> expected: <番茄炒蛋> but was: <红烧牛肉>
+[ERROR]   OrderNameSnapshotJourneyTest.unavailableFoodRemainsInOrderHistory:150->assertItem:348 订单明细中缺少商品 1001
+[INFO] 
+[ERROR] Tests run: 38, Failures: 21, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+
