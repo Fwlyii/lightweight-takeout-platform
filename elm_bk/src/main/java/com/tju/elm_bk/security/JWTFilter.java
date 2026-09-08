@@ -23,6 +23,14 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         String header = request.getHeader("Authorization");
+        // Browser WebSocket handshakes cannot set an Authorization header.
+        // Query tokens are accepted only for this existing, authenticated transport.
+        if (header == null && "GET".equals(request.getMethod())
+                && request.getServletPath().startsWith("/ws/")
+                && "websocket".equalsIgnoreCase(request.getHeader("Upgrade"))) {
+            String[] queryTokens = request.getParameterValues("access_token");
+            if (queryTokens != null && queryTokens.length == 1) header = "Bearer " + queryTokens[0];
+        }
         if (header != null && header.startsWith("Bearer ")) {
             try {
                 var session = tokens.readSession(header.substring(7));

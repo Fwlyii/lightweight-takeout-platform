@@ -4,7 +4,7 @@ import com.tju.elm_bk.constant.AuthorityName;
 import com.tju.elm_bk.constant.DeliveryTaskStatus;
 import com.tju.elm_bk.constant.FulfillmentMode;
 import com.tju.elm_bk.constant.OrderStatus;
-import com.tju.elm_bk.constant.RiderAuditStatus;
+import com.tju.elm_bk.constants.RiderAuditStatus;
 import com.tju.elm_bk.dto.DeliveryExceptionCreateDTO;
 import com.tju.elm_bk.dto.DeliveryExceptionResolveDTO;
 import com.tju.elm_bk.entity.*;

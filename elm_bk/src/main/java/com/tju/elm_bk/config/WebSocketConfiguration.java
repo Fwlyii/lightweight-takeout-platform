@@ -11,6 +11,8 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 public class WebSocketConfiguration {
 
     @Bean
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
+            name = "app.websocket.enabled", havingValue = "true", matchIfMissing = true)
     public ServerEndpointExporter serverEndpointExporter() {
         return new ServerEndpointExporter();
     }

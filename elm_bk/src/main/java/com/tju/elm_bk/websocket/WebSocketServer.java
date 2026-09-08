@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Component
 @ServerEndpoint("/ws/{sid}")
 @Slf4j
-public class WebSocketServer {
+public class WebSocketServer implements com.tju.elm_bk.service.NotificationTransport {
 
     // 同一账号可同时打开多个页面；不能让后建立的连接覆盖原会话。
     private static final Map<String, Set<Session>> sessionMap = new ConcurrentHashMap<>();

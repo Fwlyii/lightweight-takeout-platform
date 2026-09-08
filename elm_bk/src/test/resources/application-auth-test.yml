@@ -1,3 +1,9 @@
+app:
+  scheduling:
+    enabled: false
+  websocket:
+    enabled: false # MockMvc has no servlet WebSocket container.
+
 spring:
   sql:
     init:
