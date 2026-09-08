@@ -31,12 +31,13 @@ class PreferenceControllerTest {
         controller = new PreferenceController(preferenceMapper, currentUserService);
     }
 
-    @Test
-    void acceptsEveryThemeOfferedByTheFrontend() {
-        PreferenceUpdateDTO request = preference("mint");
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"light", "dark", "mint", "warm"})
+    void acceptsEveryThemeOfferedByTheFrontend(String theme) {
+        PreferenceUpdateDTO request = preference(theme);
         UserPreference saved = new UserPreference();
         saved.setUserId(7L);
-        saved.setTheme("mint");
+        saved.setTheme(theme);
         saved.setSpicyLevel(0);
         when(preferenceMapper.findByUserId(7L)).thenReturn(saved);
 
@@ -44,7 +45,8 @@ class PreferenceControllerTest {
 
         ArgumentCaptor<UserPreference> captor = ArgumentCaptor.forClass(UserPreference.class);
         verify(preferenceMapper).upsert(captor.capture());
-        assertEquals("mint", captor.getValue().getTheme());
+        assertEquals(theme, captor.getValue().getTheme());
+        assertEquals(7L, captor.getValue().getUserId());
     }
 
     @Test
@@ -58,5 +60,27 @@ class PreferenceControllerTest {
         request.setTheme(theme);
         request.setSpicyLevel(0);
         return request;
+    }
+
+    @Test
+    void missingPreferenceReturnsDefaultsAndClearUsesCurrentAccount() {
+        assertEquals("light", controller.me().getData().getTheme());
+        assertEquals(0, controller.me().getData().getSpicyLevel());
+        controller.clear();
+        verify(preferenceMapper).deleteByUserId(7L);
+    }
+
+    @Test
+    void rejectsMissingPayloadInvalidSpiceAndOversizedTags() {
+        assertThrows(APIException.class, () -> controller.update(null));
+        PreferenceUpdateDTO dto = preference("light");
+        dto.setSpicyLevel(4);
+        assertThrows(APIException.class, () -> controller.update(dto));
+        dto.setSpicyLevel(-1);
+        assertThrows(APIException.class, () -> controller.update(dto));
+        dto.setSpicyLevel(0);
+        dto.setTasteTags("a".repeat(201));
+        assertThrows(APIException.class, () -> controller.update(dto));
+        verify(preferenceMapper, org.mockito.Mockito.never()).upsert(any());
     }
 }

@@ -73,6 +73,44 @@ class TokenSessionTest {
                 "student", "not-kept", List.of(new SimpleGrantedAuthority("USER"))), false, "user");
     }
 
+    @Test
+    void browserWebSocketHandshakeUsesTheSameSignedSessionValidation() throws Exception {
+        assertThat(filterQueryToken("/ws/7", true, validToken(), account())).isNotNull();
+    }
+
+    @Test
+    void queryTokenDoesNotAuthenticateOrdinaryHttpRequests() throws Exception {
+        assertThat(filterQueryToken("/api/user", true, validToken(), account())).isNull();
+        assertThat(filterQueryToken("/ws/7", false, validToken(), account())).isNull();
+    }
+
+    @Test
+    void invalidOrRevokedQueryTokenCannotAuthenticateWebSocket() throws Exception {
+        assertThat(filterQueryToken("/ws/7", true, "invalid", account())).isNull();
+        User disabled = account();
+        disabled.setActivated(false);
+        assertThat(filterQueryToken("/ws/7", true, validToken(), disabled)).isNull();
+    }
+
+    private org.springframework.security.core.Authentication filterQueryToken(
+            String path, boolean upgrade, String token, User user) throws Exception {
+        var users = org.mockito.Mockito.mock(com.tju.elm_bk.mapper.UserMapper.class);
+        org.mockito.Mockito.when(users.findByUsernameWithAuthorities("student")).thenReturn(user);
+        var request = new org.springframework.mock.web.MockHttpServletRequest("GET", path);
+        request.setServletPath(path);
+        request.addParameter("access_token", token);
+        if (upgrade) request.addHeader("Upgrade", "websocket");
+        org.springframework.security.core.context.SecurityContextHolder.clearContext();
+        try {
+            new JWTFilter(tokens, users).doFilter(request,
+                    new org.springframework.mock.web.MockHttpServletResponse(),
+                    new org.springframework.mock.web.MockFilterChain());
+            return org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        } finally {
+            org.springframework.security.core.context.SecurityContextHolder.clearContext();
+        }
+    }
+
     private User account() {
         var account = new User();
         account.setUsername("student");

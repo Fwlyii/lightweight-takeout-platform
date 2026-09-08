@@ -2,7 +2,7 @@
   <div class="notifications-container">
     <div class="header">
       <button class="header-back" type="button" aria-label="返回" @click="router.back()">
-        <i class="fas fa-chevron-left"></i>
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
       </button>
       <h1 class="title">消息与通知</h1>
       <div v-if="unreadCount > 0" class="unread-badge">{{ unreadCount }}</div>
@@ -16,7 +16,7 @@
 
     <!-- 历史接口真正不可用时才显示错误；实时通道断开不遮住消息列表。 -->
     <div v-else-if="historyError && messages.length === 0" class="error-state">
-      <i class="fas fa-exclamation-circle"></i>
+      <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
       <p>{{ historyError }}</p>
       <button class="retry-btn" @click="retryAll">重新加载</button>
     </div>
@@ -24,7 +24,7 @@
     <!-- 消息列表 -->
     <div v-else class="notification-list">
       <div v-if="realtimeNotice" class="sync-notice">
-        <i class="fas fa-sync-alt"></i>
+        <i class="fa fa-refresh" aria-hidden="true"></i>
         <span>{{ realtimeNotice }}</span>
         <button type="button" @click="retryRealtime">重试</button>
       </div>
@@ -36,14 +36,14 @@
         </div>
         <div class="content">
           <div class="message-text" :class="{ 'bold': message.unread }">{{ message.notificationContent }}</div>
-          <div class="timestamp">{{ formatTime(message.currentTime) }}</div>
+          <div class="timestamp">{{ formatTime(message.createTime) }}</div>
         </div>
         <div v-if="message.unread" class="dot"></div>
       </div>
 
       <!-- 空状态 -->
       <div v-if="messages.length === 0" class="empty-state">
-        <i class="fas fa-envelope-open"></i>
+        <i class="fa fa-envelope-open" aria-hidden="true"></i>
         <p>暂无消息通知</p>
       </div>
     </div>
@@ -66,6 +66,8 @@ const historyError = ref('');
 const realtimeState = ref(REALTIME_STATE.IDLE);
 const currentUserId = getStoredUser()?.id;
 let realtimeConnection = null;
+let disposed = false;
+let historyRequest = 0;
 
 // 计算未读消息数量
 const unreadCount = computed(() => {
@@ -83,6 +85,7 @@ const realtimeNotice = computed(() => {
 // 初始化：历史消息优先展示，实时通道作为增强能力独立连接。
 onMounted(async () => {
   await fetchHistoryMessages();
+  if (disposed) return;
   realtimeConnection = createRealtimeConnection({
     onMessage: handleNewMessage,
     onStatusChange: ({ state }) => { realtimeState.value = state; },
@@ -93,6 +96,8 @@ onMounted(async () => {
 
 // 组件卸载时关闭WebSocket连接
 onUnmounted(() => {
+  disposed = true;
+  historyRequest += 1;
   realtimeConnection?.stop();
 });
 
@@ -100,22 +105,20 @@ onUnmounted(() => {
  * 加载历史消息
  */
 const fetchHistoryMessages = async ({ silent = false } = {}) => {
+  const requestId = ++historyRequest;
   if (!silent) loading.value = true;
   try {
     const res = await request.get('/api/notifications');
-    if (res.success) {
-      historyError.value = '';
-      messages.value = res.data.map(msg => ({
-        ...msg,
-        unread: msg.isRead !== 1, // isRead=0 → 未读 → unread=true；isRead=1 → 已读 → unread=false
-        createTime: msg.createTime
-      }));
+    if (disposed || requestId !== historyRequest) return;
+    if (!res?.success || !Array.isArray(res.data)) {
+      throw new Error(res?.message || '消息加载失败');
     }
+    historyError.value = '';
+    messages.value = res.data.map(msg => ({ ...msg, unread: Number(msg.isRead) !== 1 }));
   } catch (err) {
-    console.error('加载历史消息失败:', err);
-    if (!silent) historyError.value = '消息加载失败，请稍后重试';
+    if (!disposed && requestId === historyRequest) historyError.value = '消息加载失败，请稍后重试';
   } finally {
-    if (!silent) loading.value = false;
+    if (!disposed && requestId === historyRequest) loading.value = false;
   }
 };
 
@@ -144,27 +147,8 @@ const handleNewMessage = (message) => {
 
   toast.info(`新消息：${content}`);
 
-  // 4. 延迟调用接口重新拉取消息列表（避免后端写入数据库延迟导致漏消息）
-  // 延迟300ms是为了确保后端已将新消息写入数据库，再前端拉取
-  setTimeout(async () => {
-    try {
-      // 5. 调用接口重新获取完整消息列表（复用加载历史消息的逻辑，确保数据一致）
-      const res = await request.get('/api/notifications');
-      if (res.success) {
-        // 6. 重新映射消息状态（isRead → unread），覆盖本地列表
-        messages.value = res.data.map(msg => ({
-          ...msg,
-          // 后端isRead=0→未读（unread=true），isRead=1→已读（unread=false）
-          unread: msg.isRead !== 1,
-          createTime: msg.createTime
-        }));
-      }
-    } catch (err) {
-      console.error('WebSocket消息触发重新拉取失败:', err);
-      // 失败时给用户提示，允许手动重试
-      toast.error('新消息已收到，但加载失败，可下拉刷新重试');
-    }
-  }, 300);
+  // 推送在事务提交后发送；历史接口始终是消息列表的数据来源。
+  void fetchHistoryMessages({ silent: true });
 };
 
 /**
@@ -175,10 +159,12 @@ const markAsRead = async (message) => {
 
   try {
     // 调用接口标记为已读
-    await request.put(`/api/notifications/${message.id}/read`);
+    const response = await request.put(`/api/notifications/${message.id}/read`);
+    if (!response?.success) throw new Error(response?.message || '更新消息状态失败');
 
     // 更新本地状态
     message.unread = false;
+    await fetchHistoryMessages({ silent: true });
   } catch (err) {
     console.error('标记消息为已读失败:', err);
     toast.error('更新消息状态失败');
@@ -203,8 +189,6 @@ const formatTime = (timeStr) => {
 </script>
 
 <style scoped>
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
-
 .notifications-container {
   max-width: 600px;
   margin: 0 auto;
