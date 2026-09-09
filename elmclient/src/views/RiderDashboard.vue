@@ -127,9 +127,9 @@
                             <div v-else-if="task.taskStatus === 'EXCEPTION'" class="waiting-confirm warning"><i
                                     class="fas fa-headset"></i>
                                 管理员正在处理异常</div>
-                            <div v-else class="complete-note"><i class="fas fa-check"></i> {{ task.completedTime ? '完成于
-                                ' +
-                            formatTime(task.completedTime) : '任务已结束' }}</div>
+                            <div v-else class="complete-note"><i class="fas fa-check"></i>
+                                {{ task.completedTime ? '完成于 ' + formatTime(task.completedTime) : '任务已结束' }}
+                            </div>
                         </div>
                     </article>
                 </div>

@@ -26,12 +26,12 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import request from '../utils/request';
-import { DEFAULT_USER_AVATAR } from '../utils/profileDefaults';
+import { DEFAULT_AVATAR_URL } from '../utils/profileDefaults';
 export default {
     name: 'ManageBusiness',
     setup() {
         const businessList = ref([]);
-        const defaultImg = DEFAULT_USER_AVATAR;
+        const defaultImg = DEFAULT_AVATAR_URL;
         const router = useRouter();
 
         const onImgError = (e) => {

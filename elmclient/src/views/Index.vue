@@ -34,6 +34,7 @@
                             </div>
 
                             <!-- 位置列表 -->
+                            <p v-if="locationError" role="alert">{{ locationError }}</p>
                             <div class="location-list-container">
                                 <div v-if="loading" class="loading-state">
                                     <i class="fa fa-spinner fa-spin"></i>
@@ -46,7 +47,7 @@
                                 </div>
 
                                 <div v-else class="location-items">
-                                    <div v-for="item in locationData" :key="item.id"
+                                    <div v-for="item in locationData" :key="item.adcode || item.name"
                                         :class="['location-item', { selected: isSelected(item) }]"
                                         @click="selectLocation(item)">
                                         <span class="item-name">{{ item.name }}</span>
@@ -320,6 +321,7 @@ export default {
             displayLocation,
             showPicker,
             loading,
+            error: locationError,
             locationData,
             currentLevel,
             locationLevels,
@@ -629,6 +631,7 @@ export default {
             displayLocation,
             showPicker,
             loading,
+            locationError,
             locationData,
             currentLevel,
             locationLevels,

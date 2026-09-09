@@ -23,7 +23,7 @@ if ! docker info >/dev/null 2>&1; then
 fi
 
 ./scripts/ensure-demo-env.sh
-docker compose -f docker-compose.demo.yml up -d
+docker compose -f docker-compose.demo.yml up -d --build
 open "http://localhost:18081"
 
 print "演示已启动：http://localhost:18081"

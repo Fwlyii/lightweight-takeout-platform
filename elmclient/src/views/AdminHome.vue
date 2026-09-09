@@ -7,7 +7,7 @@
 
             <div class="user-card">
                 <div class="avatar">
-                    <img :src="DEFAULT_USER_AVATAR" alt="用户头像" class="avatar-img" />
+                    <img :src="DEFAULT_AVATAR_URL" alt="用户头像" class="avatar-img" />
                 </div>
                 <div class="user-details">
                     <div class="user-name">
@@ -231,7 +231,7 @@ import request from '../utils/request';
 import { toast } from '../utils/toast';
 import { createRealtimeConnection } from '@/services/realtimeService';
 import { clearAuth, getStoredUser, updateStoredUser } from '@/utils/auth';
-import { DEFAULT_USER_AVATAR } from '@/utils/profileDefaults';
+import { DEFAULT_AVATAR_URL } from '@/utils/profileDefaults';
 
 // 路由实例
 const router = useRouter();
