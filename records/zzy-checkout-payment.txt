@@ -1,0 +1,48 @@
+=== snapshot / zzy-checkout-payment / RED ===
+$ bash 测试命令.sh
+FAIL checkout-payment executable source contract: missing production paths
+  - elm_bk/src/main/java/com/tju/elm_bk/service/OrderPricingService.java
+  - elm_bk/src/main/java/com/tju/elm_bk/service/OrderSubmissionService.java
+  - elm_bk/src/test/java/com/tju/elm_bk/security/OrderPricingTrustBoundaryTest.java
+exit_code=1
+
+=== snapshot / zzy-checkout-payment / GREEN ===
+$ bash 测试命令.sh
+PASS checkout-payment executable source contract: key paths and behavior markers verified
+exit_code=0
+
+=== snapshot / zzy-checkout-payment / REFACTOR ===
+$ bash 测试命令.sh
+PASS approval-permissions executable source contract: key paths and behavior markers verified
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+PASS checkout-payment executable source contract: key paths and behavior markers verified
+PASS deployment-foundation executable source contract: key paths and behavior markers verified
+PASS frontend-foundation executable source contract: key paths and behavior markers verified
+PASS merchant-catalog executable source contract: key paths and behavior markers verified
+PASS merchant-fulfillment executable source contract: key paths and behavior markers verified
+PASS persistence-foundation executable source contract: key paths and behavior markers verified
+PASS profile-address executable source contract: key paths and behavior markers verified
+PASS role-authentication executable source contract: key paths and behavior markers verified
+PASS storefront-cart executable source contract: key paths and behavior markers verified
+PASS module structure: Maven pom.xml is well-formed
+PASS module structure: frontend package scripts are valid JSON
+PASS module structure: shell scripts passed syntax checks
+exit_code=0
+
+=== snapshot / zzy-checkout-payment / MERGE ===
+$ bash 测试命令.sh
+PASS approval-permissions executable source contract: key paths and behavior markers verified
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+PASS checkout-payment executable source contract: key paths and behavior markers verified
+PASS deployment-foundation executable source contract: key paths and behavior markers verified
+PASS frontend-foundation executable source contract: key paths and behavior markers verified
+PASS merchant-catalog executable source contract: key paths and behavior markers verified
+PASS merchant-fulfillment executable source contract: key paths and behavior markers verified
+PASS persistence-foundation executable source contract: key paths and behavior markers verified
+PASS profile-address executable source contract: key paths and behavior markers verified
+PASS role-authentication executable source contract: key paths and behavior markers verified
+PASS storefront-cart executable source contract: key paths and behavior markers verified
+PASS module structure: Maven pom.xml is well-formed
+PASS module structure: frontend package scripts are valid JSON
+PASS module structure: shell scripts passed syntax checks
+exit_code=0
