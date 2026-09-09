@@ -1,10 +1,13 @@
 // MerchantInteractionServiceImpl.java
 package com.tju.elm_bk.service.impl;
 
+import com.tju.elm_bk.entity.Business;
 import com.tju.elm_bk.entity.MerchantInteraction;
 import com.tju.elm_bk.entity.User;
 import com.tju.elm_bk.mapper.BusinessMapper;
 import com.tju.elm_bk.mapper.MerchantInteractionMapper;
+import com.tju.elm_bk.service.AccountWriteLock;
+import com.tju.elm_bk.service.BusinessPresentationService;
 import com.tju.elm_bk.service.CurrentUserService;
 import com.tju.elm_bk.service.MerchantInteractionService;
 import com.tju.elm_bk.vo.BusinessSearchVO;
@@ -31,6 +34,8 @@ public class MerchantInteractionServiceImpl implements MerchantInteractionServic
     private final MerchantInteractionMapper interactionMapper;
     private final BusinessMapper businessMapper;
     private final CurrentUserService currentUserService;
+    private final AccountWriteLock writeLock;
+    private final BusinessPresentationService presentation;
 
     @Override
     @Transactional
@@ -41,8 +46,16 @@ public class MerchantInteractionServiceImpl implements MerchantInteractionServic
                 throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
             }
 
-            User currentUser = currentUser();
-            Long operatorId = currentUser.getId();
+            Long operatorId = writeLock.acquire();
+
+        // 点赞或收藏时，只允许操作已审核通过的商家。
+        // 取消点赞/收藏时仍然允许，避免商家隐藏后用户无法取消收藏。
+        if (Boolean.TRUE.equals(dto.getLiked()) || Boolean.TRUE.equals(dto.getCollected())) {
+            Business business = businessMapper.selectBusinessById(dto.getMerchantId());
+            if (business == null || !Objects.equals(business.getStatus(), 1)) {
+                throw new APIException(ResultCodeEnum.BUSINESS_MISSED);
+            }
+        }
 
             // 查询现有记录
             MerchantInteraction interaction = interactionMapper.selectByUserAndMerchant(
@@ -85,7 +98,9 @@ public class MerchantInteractionServiceImpl implements MerchantInteractionServic
         if (!currentUserService.isAdmin(currentUser) && !Objects.equals(targetUserId, currentUser.getId())) {
             throw new APIException(ResultCodeEnum.USER_UNMATCHED);
         }
-        return businessMapper.selectCollectedBusinesses(targetUserId);
+        List<BusinessSearchVO> collections = businessMapper.selectCollectedBusinesses(targetUserId);
+    presentation.enrich(collections);
+    return collections;
     }
 
     @Override

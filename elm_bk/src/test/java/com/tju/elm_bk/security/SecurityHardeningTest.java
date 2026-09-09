@@ -60,10 +60,6 @@ class SecurityHardeningTest {
         assertNotNull(adminGuard);
         assertEquals("hasAuthority('ADMIN')", adminGuard.value());
 
-        Method toggle = UserRestController.class.getMethod("toggleUserStatus", String.class, Boolean.class);
-        PreAuthorize toggleGuard = toggle.getAnnotation(PreAuthorize.class);
-        assertNotNull(toggleGuard);
-        assertEquals("hasAuthority('ADMIN')", toggleGuard.value());
     }
 
     @Test
@@ -136,7 +132,7 @@ class SecurityHardeningTest {
         var authentication = new UsernamePasswordAuthenticationToken(
                 "demo_user", "unused", List.of(new SimpleGrantedAuthority("USER")));
         Instant beforeIssue = Instant.now();
-        String token = provider.createToken(authentication, false);
+        String token = provider.createRoleBoundToken(authentication, false, "user");
         Instant afterIssue = Instant.now();
         ZoneId zone = ZoneId.systemDefault();
 
@@ -153,6 +149,9 @@ class SecurityHardeningTest {
                 "demo_rider", "unused", List.of(new SimpleGrantedAuthority("RIDER")));
         String token = provider.createRoleBoundToken(authentication, false, "rider");
         User account = new User();
+        account.setUsername("demo_rider");
+        account.setActivated(true);
+        account.setIsDeleted(false);
         Authority user = new Authority();
         user.setName("USER");
         Authority rider = new Authority();

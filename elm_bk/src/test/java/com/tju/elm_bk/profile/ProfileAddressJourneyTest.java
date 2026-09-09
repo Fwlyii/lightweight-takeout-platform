@@ -44,7 +44,7 @@ class ProfileAddressJourneyTest {
  void parallelFavoritesKeepOneRelationship() throws Exception {
   runConcurrent(() -> mvc.perform(post("/api/merchant/interaction/update")
    .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user("owner").authorities(new org.springframework.security.core.authority.SimpleGrantedAuthority("USER")))
-   .contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"collected\":true}")).andReturn().getResponse().getStatus());
+   .contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"liked\":false,\"collected\":true}")).andReturn().getResponse().getStatus());
   assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM merchant_interaction WHERE user_id=1 AND collected=1",Integer.class));
  }
 
@@ -68,7 +68,7 @@ class ProfileAddressJourneyTest {
 
  @Test
  void favoritesReflectNewReviewsWithoutResavingFavorite() throws Exception {
-  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"collected\":true}")).andExpect(status().isOk());
+  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"liked\":false,\"collected\":true}")).andExpect(status().isOk());
   jdbc.update("INSERT INTO review(business_id,rating,is_hidden) VALUES (1,5,0)");
   mvc.perform(get("/api/merchant/interaction/collections/me")).andExpect(jsonPath("$.data[0].score").value(4.67));
  }
@@ -185,7 +185,7 @@ class ProfileAddressJourneyTest {
  }
 
  @Test void favoriteIsIdempotentAndSharesLiveRatingWithSearch() throws Exception {
-  String body="{\"merchantId\":1,\"userId\":2,\"collected\":true}";
+  String body="{\"merchantId\":1,\"userId\":2,\"liked\":false,\"collected\":true}";
   for(int i=0;i<2;i++) mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isOk());
   assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM merchant_interaction WHERE user_id=1 AND collected=1",Integer.class));
   assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM merchant_interaction WHERE user_id=2",Integer.class));
@@ -194,19 +194,19 @@ class ProfileAddressJourneyTest {
   assertEquals(search.get("score"),favorite.get("score"));
   assertEquals(4.5,favorite.get("score").asDouble());
   assertEquals(search.get("recommendationTags"),favorite.get("recommendationTags"));
-  for(int i=0;i<2;i++) mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"collected\":false}")).andExpect(status().isOk());
+  for(int i=0;i<2;i++) mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"liked\":false,\"collected\":false}")).andExpect(status().isOk());
   mvc.perform(get("/api/merchant/interaction/collections/me")).andExpect(jsonPath("$.data.length()").value(0));
  }
 
  @Test void cannotFavoriteUnapprovedStore() throws Exception {
-  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":2,\"collected\":true}")).andExpect(status().isNotFound());
+  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":2,\"liked\":false,\"collected\":true}")).andExpect(status().isNotFound());
  }
 
  @Test void hiddenStoreDisappearsButCanStillBeUnfavorited() throws Exception {
-  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"collected\":true}")).andExpect(status().isOk());
+  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"liked\":false,\"collected\":true}")).andExpect(status().isOk());
   jdbc.update("UPDATE business SET is_deleted=1 WHERE id=1");
   mvc.perform(get("/api/merchant/interaction/collections/me")).andExpect(jsonPath("$.data.length()").value(0));
-  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"collected\":false}")).andExpect(status().isOk());
+  mvc.perform(post("/api/merchant/interaction/update").contentType(MediaType.APPLICATION_JSON).content("{\"merchantId\":1,\"liked\":false,\"collected\":false}")).andExpect(status().isOk());
  }
 
  @Test @WithMockUser(username="owner",authorities="RIDER")
