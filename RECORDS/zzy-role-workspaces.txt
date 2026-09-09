@@ -1,0 +1,57 @@
+=== snapshot / zzy-role-workspaces / RED ===
+$ bash 测试命令.sh
+FAIL role-workspaces executable source contract: missing production paths
+  - elmclient/src/components/Footer.vue
+  - elmclient/src/components/AdminFooter.vue
+  - elmclient/src/components/BusinessFooter.vue
+  - elmclient/src/components/RiderFooter.vue
+exit_code=1
+
+=== snapshot / zzy-role-workspaces / GREEN ===
+$ bash 测试命令.sh
+PASS role-workspaces executable source contract: key paths and behavior markers verified
+exit_code=0
+
+=== snapshot / zzy-role-workspaces / REFACTOR ===
+$ bash 测试命令.sh
+PASS approval-permissions executable source contract: key paths and behavior markers verified
+PASS assets-preferences executable source contract: key paths and behavior markers verified
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+PASS checkout-payment executable source contract: key paths and behavior markers verified
+PASS deployment-foundation executable source contract: key paths and behavior markers verified
+PASS frontend-foundation executable source contract: key paths and behavior markers verified
+PASS merchant-catalog executable source contract: key paths and behavior markers verified
+PASS merchant-fulfillment executable source contract: key paths and behavior markers verified
+PASS persistence-foundation executable source contract: key paths and behavior markers verified
+PASS profile-address executable source contract: key paths and behavior markers verified
+PASS reviews-recommendation executable source contract: key paths and behavior markers verified
+PASS rider-delivery executable source contract: key paths and behavior markers verified
+PASS role-authentication executable source contract: key paths and behavior markers verified
+PASS role-workspaces executable source contract: key paths and behavior markers verified
+PASS storefront-cart executable source contract: key paths and behavior markers verified
+PASS module structure: Maven pom.xml is well-formed
+PASS module structure: frontend package scripts are valid JSON
+PASS module structure: shell scripts passed syntax checks
+exit_code=0
+
+=== snapshot / zzy-role-workspaces / MERGE ===
+$ bash 测试命令.sh
+PASS approval-permissions executable source contract: key paths and behavior markers verified
+PASS assets-preferences executable source contract: key paths and behavior markers verified
+PASS backend-foundation executable source contract: key paths and behavior markers verified
+PASS checkout-payment executable source contract: key paths and behavior markers verified
+PASS deployment-foundation executable source contract: key paths and behavior markers verified
+PASS frontend-foundation executable source contract: key paths and behavior markers verified
+PASS merchant-catalog executable source contract: key paths and behavior markers verified
+PASS merchant-fulfillment executable source contract: key paths and behavior markers verified
+PASS persistence-foundation executable source contract: key paths and behavior markers verified
+PASS profile-address executable source contract: key paths and behavior markers verified
+PASS reviews-recommendation executable source contract: key paths and behavior markers verified
+PASS rider-delivery executable source contract: key paths and behavior markers verified
+PASS role-authentication executable source contract: key paths and behavior markers verified
+PASS role-workspaces executable source contract: key paths and behavior markers verified
+PASS storefront-cart executable source contract: key paths and behavior markers verified
+PASS module structure: Maven pom.xml is well-formed
+PASS module structure: frontend package scripts are valid JSON
+PASS module structure: shell scripts passed syntax checks
+exit_code=0
