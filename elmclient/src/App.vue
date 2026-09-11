@@ -211,7 +211,7 @@ a {
     width: 100% !important;
     height: 100% !important;
     border-radius: 0 !important;
-    background: url('./assets/login-food-bg.webp') left center / cover no-repeat !important;
+    background: url('/images/login-food-bg.webp') left center / cover no-repeat !important;
     opacity: .42 !important;
     filter: saturate(.82) contrast(.94) brightness(1.04);
     -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, .96) 38%, rgba(0, 0, 0, .58) 52%, transparent 70%);
