@@ -6,6 +6,7 @@ import 'font-awesome/css/font-awesome.min.css';
 import './assets/styles/global.css';
 import './assets/styles/ai-assistant.css';
 import './assets/styles/ai-compact-tools.css';
+import './assets/styles/ai-redesign-v3.css';
 
 installAuthGuard(router);
 createApp(App).use(router).mount('#app');
