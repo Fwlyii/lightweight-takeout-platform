@@ -1,0 +1,175 @@
+/* Compact AI action rail inspired by mainstream food-delivery quick actions and conversational search entry patterns. */
+
+.assistant-page .feature-bubbles {
+  width: min(640px, calc(100% - 24px));
+  margin: 14px auto 12px;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  border: 1px solid #d8eaf6;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 8px 28px rgba(35, 96, 136, .08);
+  backdrop-filter: blur(12px);
+}
+
+.assistant-page .feature-bubbles button {
+  min-height: 48px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
+  box-shadow: none;
+  color: #4f6f87;
+  text-align: center;
+  transform: none;
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+}
+
+.assistant-page .feature-bubbles button + button {
+  position: relative;
+}
+
+.assistant-page .feature-bubbles button + button::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: #e8f0f5;
+}
+
+.assistant-page .feature-bubbles button:hover {
+  border-color: transparent;
+  background: #f0f8ff;
+  color: #008eea;
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+.assistant-page .feature-bubbles button:active {
+  transform: translateY(0) scale(.985);
+}
+
+.assistant-page .feature-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: #0097ff;
+  background: linear-gradient(145deg, #eef9ff, #e3f4ff);
+  font-size: 15px;
+  box-shadow: inset 0 0 0 1px rgba(0, 151, 255, .08);
+  transition: transform .22s cubic-bezier(.2, .8, .2, 1), box-shadow .22s ease;
+}
+
+.assistant-page .feature-bubbles button:hover .feature-icon {
+  transform: scale(1.06);
+  box-shadow: inset 0 0 0 1px rgba(0, 151, 255, .13), 0 5px 12px rgba(0, 151, 255, .10);
+}
+
+.assistant-page .feature-copy {
+  min-width: 0;
+  display: block;
+}
+
+.assistant-page .feature-copy b {
+  display: block;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.assistant-page .feature-copy small,
+.assistant-page .feature-arrow {
+  display: none !important;
+}
+
+/* Pull the conversation closer to the compact rail and make the assistant itself the primary focus. */
+.assistant-page .page-content {
+  padding-top: 12px;
+}
+
+.assistant-page .chat-shell {
+  margin-top: 0;
+}
+
+.assistant-page .empty-chat {
+  padding-top: 22px;
+  align-content: center;
+}
+
+.assistant-page .empty-chat > i {
+  animation: compactAiFloat 3.8s ease-in-out infinite;
+}
+
+.assistant-page .quick-list button {
+  transition: border-color .18s ease, color .18s ease, background .18s ease, transform .18s ease;
+}
+
+.assistant-page .quick-list button:hover {
+  transform: translateY(-1px);
+}
+
+@keyframes compactAiFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@media (max-width: 760px) {
+  .assistant-page .feature-bubbles {
+    width: calc(100% - 16px);
+    margin: 8px auto 10px;
+    padding: 5px;
+    gap: 2px;
+    border-radius: 15px;
+  }
+
+  .assistant-page .feature-bubbles button {
+    min-height: 46px;
+    padding: 5px 4px;
+    gap: 5px;
+    flex-direction: column;
+  }
+
+  .assistant-page .feature-bubbles button + button::before {
+    top: 9px;
+    bottom: 9px;
+  }
+
+  .assistant-page .feature-icon {
+    width: 29px;
+    height: 29px;
+    flex-basis: 29px;
+    border-radius: 9px;
+    font-size: 14px;
+  }
+
+  .assistant-page .feature-copy b {
+    font-size: 10px;
+  }
+
+  .assistant-page .page-content {
+    padding-top: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assistant-page .empty-chat > i,
+  .assistant-page .feature-bubbles button,
+  .assistant-page .feature-icon,
+  .assistant-page .quick-list button {
+    animation: none !important;
+    transition: none !important;
+  }
+}
