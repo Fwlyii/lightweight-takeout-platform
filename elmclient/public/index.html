@@ -8,19 +8,41 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
+      /* 登录页桌面端左侧直接展示仓库内的美食照片。
+         使用 BASE_URL，避免项目部署到子路径后 /images 绝对路径失效。 */
       @media (min-width: 881px) {
         html body #app .app-container .content .login-page {
           background-color: #f8fbfe !important;
           background-image:
-            linear-gradient(90deg, rgba(248, 251, 254, .04) 0%, rgba(248, 251, 254, .14) 36%, rgba(248, 251, 254, .78) 57%, #f8fbfe 72%),
-            url('/images/login-food-bg.webp?v=20260911-3') !important;
-          background-size: cover, cover !important;
+            linear-gradient(
+              90deg,
+              rgba(248, 251, 254, .08) 0%,
+              rgba(248, 251, 254, .14) 30%,
+              rgba(248, 251, 254, .42) 44%,
+              rgba(248, 251, 254, .88) 60%,
+              #f8fbfe 72%
+            ),
+            url('<%= BASE_URL %>images/login-food-bg.webp?v=20260912-1') !important;
+          background-size: 100% 100%, 62% 100% !important;
           background-position: center, left center !important;
           background-repeat: no-repeat, no-repeat !important;
         }
 
+        /* Login.vue 原本的装饰圆会挡在照片上，桌面端直接关掉。 */
         html body #app .app-container .content .login-page::before {
           display: none !important;
+        }
+
+        /* 确保文字与登录面板始终压在照片上方。 */
+        html body #app .app-container .content .login-page .brand-header,
+        html body #app .app-container .content .login-page .hero-shell,
+        html body #app .app-container .content .login-page .login-footer {
+          position: relative;
+          z-index: 1;
+        }
+
+        html body #app .app-container .content .login-page .hero-copy {
+          text-shadow: 0 1px 2px rgba(255, 255, 255, .72);
         }
       }
 
