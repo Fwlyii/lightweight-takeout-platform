@@ -11,7 +11,7 @@
             <h2>外观主题</h2>
             <p>选择你习惯的页面显示方式</p>
           </div>
-          <span class="heading-icon"><i class="fa fa-paint-brush" aria-hidden="true"></i></span>
+          <span class="heading-icon"><i class="fas fa-palette"></i></span>
         </div>
         <div class="theme-grid" role="radiogroup" aria-label="页面主题">
           <button
@@ -30,7 +30,7 @@
               <strong>{{ option.label }}</strong>
               <small>{{ option.description }}</small>
             </span>
-            <i v-if="preference.theme === option.value" class="fa fa-check-circle theme-check" aria-hidden="true"></i>
+            <i v-if="preference.theme === option.value" class="fas fa-check-circle theme-check" aria-hidden="true"></i>
           </button>
         </div>
         <p class="field-hint">主题只影响页面显示，不会改变订单和资产数据。</p>
@@ -42,7 +42,7 @@
             <h2>点餐偏好</h2>
             <p>用于智能点餐和商家推荐，可随时修改</p>
           </div>
-          <span class="heading-icon"><i class="fa fa-sliders" aria-hidden="true"></i></span>
+          <span class="heading-icon"><i class="fas fa-sliders-h"></i></span>
         </div>
         <label class="field-row" for="spicy-select">
           <span>辣度</span>

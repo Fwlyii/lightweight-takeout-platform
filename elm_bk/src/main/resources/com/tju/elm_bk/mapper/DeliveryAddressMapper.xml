@@ -5,8 +5,8 @@
 <mapper namespace="com.tju.elm_bk.mapper.DeliveryAddressMapper">
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO delivery_address (contact_name,contact_sex,contact_tel,address,user_id,creator,updater,is_deleted,is_default,create_time,update_time)
-        VALUES (#{contactName},#{contactSex},#{contactTel},#{address},#{userId},#{creator},#{updater},#{isDeleted},#{isDefault},#{createTime},#{updateTime})
+        INSERT INTO delivery_address (contact_name,contact_sex,contact_tel,address,user_id,creator,updater,is_deleted,create_time,update_time)
+        VALUES (#{contactName},#{contactSex},#{contactTel},#{address},#{userId},#{creator},#{updater},#{isDeleted},#{createTime},#{updateTime})
     </insert>
     <update id="updateDeliveryAddress">
         UPDATE delivery_address

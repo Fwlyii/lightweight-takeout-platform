@@ -110,16 +110,10 @@
         f.creator,
         f.updater,
         f.is_deleted,
-        <choose>
-            <when test="orderId != null">COALESCE(od.food_name_snapshot, '历史商品（名称未留存）') as food_name,</when>
-            <otherwise>f.food_name,</otherwise>
-        </choose>
+        f.food_name,
         f.food_explain,
         f.food_img,
-        <choose>
-            <when test="orderId != null">od.food_price,</when>
-            <otherwise>f.food_price,</otherwise>
-        </choose>
+        f.food_price,
         f.remarks,
         f.stock,
         f.category,
@@ -153,10 +147,7 @@
         </if>
         LEFT JOIN business b ON f.business_id = b.id
         LEFT JOIN users u ON b.user_id = u.id
-        WHERE 1 = 1
-        <if test="orderId == null">
-            AND f.is_deleted = 0
-        </if>
+        WHERE f.is_deleted = 0
         <if test="businessId != null">
             AND f.business_id = #{businessId}
         </if>

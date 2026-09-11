@@ -5,6 +5,7 @@ import com.tju.elm_bk.entity.DeliveryException;
 import com.tju.elm_bk.result.HttpResult;
 import com.tju.elm_bk.service.DeliveryService;
 import com.tju.elm_bk.vo.DeliveryTaskVO;
+import com.tju.elm_bk.vo.NavigationVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,6 +26,12 @@ public class DeliveryTaskController {
     @GetMapping("/{id}")
     public HttpResult<DeliveryTaskVO> get(@PathVariable Long id) {
         return HttpResult.success(deliveryService.getTask(id));
+    }
+
+    @GetMapping("/{id}/navigation")
+    @Operation(summary = "获取当前配送阶段的安全导航地址")
+    public HttpResult<NavigationVO> navigation(@PathVariable Long id) {
+        return HttpResult.success(deliveryService.getNavigation(id));
     }
 
     @PostMapping("/{id}/accept")
@@ -50,7 +57,7 @@ public class DeliveryTaskController {
 
     @PostMapping("/{id}/exceptions")
     public HttpResult<DeliveryException> reportException(@PathVariable Long id,
-            @Valid @RequestBody DeliveryExceptionCreateDTO dto) {
+                                                         @Valid @RequestBody DeliveryExceptionCreateDTO dto) {
         return HttpResult.success(deliveryService.reportException(id, dto));
     }
 }

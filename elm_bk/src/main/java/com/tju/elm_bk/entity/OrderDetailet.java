@@ -43,7 +43,4 @@ public class OrderDetailet {
     @Schema(description = "商品价格")
     private BigDecimal foodPrice;
 
-    @Schema(description = "下单时商品名称；升级前的历史记录可为空")
-    private String foodNameSnapshot;
-
 }

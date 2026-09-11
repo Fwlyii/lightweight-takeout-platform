@@ -36,21 +36,21 @@ import java.util.ArrayList;
 @Validated
 @Tag(name = "AI智能客服", description = "提供AI智能客服对话相关的接口")
 public class AiChatController {
-
+    
     private final AiChatService aiChatService;
     private final CurrentUserService currentUserService;
     private final FoodMapper foodMapper;
     private final BusinessMapper businessMapper;
     private final PreferenceMapper preferenceMapper;
     private final AiChatHistoryMapper chatHistoryMapper;
-
+    
     /**
      * 获取当前用户ID的辅助方法
      */
     private Long getCurrentUserId() {
         return currentUserService.optionalUser().map(User::getId).orElse(null);
     }
-
+    
     /**
      * AI聊天接口
      */
@@ -71,18 +71,18 @@ public class AiChatController {
             } else if (request.getUserId() != null) {
                 request.setUserId(null);
             }
-
+            
             // 对话正文可能包含手机号、地址等隐私，不写入应用日志。
             log.info("AI聊天请求: userId={}, messageLength={}, chatType={}",
                     request.getUserId(), request.getMessage().length(), request.getChatType());
-
+            
             AiChatResponseVO response = aiChatService.chat(request);
-
-            log.info("AI聊天响应: sessionId={}, processingTime={}ms",
+            
+            log.info("AI聊天响应: sessionId={}, processingTime={}ms", 
                     response.getSessionId(), response.getProcessingTime());
-
+            
             return HttpResult.success(response);
-
+            
         } catch (APIException e) {
             throw e;
         } catch (Exception e) {
@@ -90,17 +90,20 @@ public class AiChatController {
             throw new APIException(ResultCodeEnum.SERVER_ERROR);
         }
     }
-
+    
     /**
      * 获取用户对话历史
      */
     @GetMapping("/history")
     @Operation(summary = "获取用户对话历史", description = "分页获取用户的AI对话历史记录")
     public HttpResult<List<AiChatHistoryVO>> getChatHistory(
-            @Parameter(description = "用户ID，不传则使用当前登录用户") @RequestParam(required = false) Long userId,
-            @Parameter(description = "页码，从1开始") @RequestParam(defaultValue = "1") Integer page,
-            @Parameter(description = "每页大小，最大50") @RequestParam(defaultValue = "20") Integer size) {
-
+            @Parameter(description = "用户ID，不传则使用当前登录用户") 
+            @RequestParam(required = false) Long userId,
+            @Parameter(description = "页码，从1开始") 
+            @RequestParam(defaultValue = "1") Integer page,
+            @Parameter(description = "每页大小，最大50") 
+            @RequestParam(defaultValue = "20") Integer size) {
+        
         try {
             Long currentUserId = getCurrentUserId();
             if (currentUserId == null) {
@@ -112,10 +115,10 @@ public class AiChatController {
             if (!currentUserId.equals(userId) && !isAdmin()) {
                 throw new APIException(ResultCodeEnum.NOT_ENOUGH_PERMISSION);
             }
-
+            
             List<AiChatHistoryVO> history = aiChatService.getChatHistory(userId, page, size);
             return HttpResult.success(history);
-
+            
         } catch (APIException e) {
             throw e;
         } catch (Exception e) {
@@ -123,28 +126,28 @@ public class AiChatController {
             throw new APIException(ResultCodeEnum.SERVER_ERROR);
         }
     }
-
+    
     /**
      * 根据会话ID获取对话历史
      */
     @GetMapping("/history/session/{sessionId}")
     @Operation(summary = "根据会话ID获取对话历史", description = "获取指定会话的完整对话历史")
     public HttpResult<List<AiChatHistoryVO>> getChatHistoryBySession(
-            @Parameter(description = "会话ID") @PathVariable String sessionId) {
-
+            @Parameter(description = "会话ID") 
+            @PathVariable String sessionId) {
+        
         try {
             if (sessionId == null || sessionId.trim().isEmpty()) {
                 throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
             }
             Long currentUserId = getCurrentUserId();
             Long sessionUserId = chatHistoryMapper.findUserIdBySessionId(sessionId);
-            if (currentUserId == null || sessionUserId == null
-                    || (!currentUserId.equals(sessionUserId) && !isAdmin())) {
+            if (currentUserId == null || sessionUserId == null || (!currentUserId.equals(sessionUserId) && !isAdmin())) {
                 throw new APIException(ResultCodeEnum.NOT_ENOUGH_PERMISSION);
             }
             List<AiChatHistoryVO> history = aiChatService.getChatHistoryBySession(sessionId);
             return HttpResult.success(history);
-
+            
         } catch (APIException e) {
             throw e;
         } catch (Exception e) {
@@ -152,28 +155,29 @@ public class AiChatController {
             throw new APIException(ResultCodeEnum.SERVER_ERROR);
         }
     }
-
+    
     /**
      * 删除对话历史
      */
     @DeleteMapping("/history/{historyId}")
     @Operation(summary = "删除对话历史", description = "删除指定的对话历史记录")
     public HttpResult<Boolean> deleteChatHistory(
-            @Parameter(description = "对话历史ID") @PathVariable Long historyId) {
-
+            @Parameter(description = "对话历史ID") 
+            @PathVariable Long historyId) {
+        
         try {
             if (historyId == null || historyId <= 0) {
                 throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
             }
-
+            
             Long currentUserId = getCurrentUserId();
             if (currentUserId == null) {
                 throw new APIException(ResultCodeEnum.UNAUTHORIZED);
             }
-
+            
             Boolean result = aiChatService.deleteChatHistory(historyId, currentUserId);
             return HttpResult.success(result);
-
+            
         } catch (APIException e) {
             throw e;
         } catch (Exception e) {
@@ -181,24 +185,25 @@ public class AiChatController {
             throw new APIException(ResultCodeEnum.SERVER_ERROR);
         }
     }
-
+    
     /**
      * 清理用户的旧对话记录
      */
     @PostMapping("/history/clean")
     @Operation(summary = "清理旧对话记录", description = "清理用户的旧对话记录，保留最近的N条")
     public HttpResult<Boolean> cleanOldChatHistory(
-            @Parameter(description = "保留的记录数量，默认50条") @RequestParam(defaultValue = "50") Integer keepCount) {
-
+            @Parameter(description = "保留的记录数量，默认50条") 
+            @RequestParam(defaultValue = "50") Integer keepCount) {
+        
         try {
             Long currentUserId = getCurrentUserId();
             if (currentUserId == null) {
                 throw new APIException(ResultCodeEnum.UNAUTHORIZED);
             }
-
+            
             Boolean result = aiChatService.cleanOldChatHistory(currentUserId, keepCount);
             return HttpResult.success(result);
-
+            
         } catch (APIException e) {
             throw e;
         } catch (Exception e) {
@@ -206,7 +211,7 @@ public class AiChatController {
             throw new APIException(ResultCodeEnum.SERVER_ERROR);
         }
     }
-
+    
     /**
      * AI客服健康检查
      */
@@ -226,7 +231,7 @@ public class AiChatController {
     @GetMapping("/recommendations")
     @Operation(summary = "结构化智能点餐推荐")
     public HttpResult<List<AiRecommendationVO>> recommendations(
-            @RequestParam(required = false, defaultValue = "") String query,
+        @RequestParam(required = false, defaultValue = "") String query,
             @RequestParam(required = false) BigDecimal budget) {
         String keyword = query == null ? "" : query.trim();
         User preferenceUser = currentUserOrNull();
@@ -234,8 +239,7 @@ public class AiChatController {
             var preference = preferenceMapper.findByUserId(preferenceUser.getId());
             if (preference != null && preference.getTasteTags() != null && !preference.getTasteTags().isBlank()) {
                 keyword = preference.getTasteTags().split("[,，\\s]+", 2)[0];
-            } else if (preference != null && preference.getCategoryTags() != null
-                    && !preference.getCategoryTags().isBlank()) {
+            } else if (preference != null && preference.getCategoryTags() != null && !preference.getCategoryTags().isBlank()) {
                 keyword = preference.getCategoryTags().split("[,，\\s]+", 2)[0];
             }
         }
@@ -245,22 +249,16 @@ public class AiChatController {
             if (preference != null && preference.getAvoidTags() != null && !preference.getAvoidTags().isBlank()) {
                 var avoid = java.util.Arrays.stream(preference.getAvoidTags().split("[,，\\s]+"))
                         .filter(s -> !s.isBlank()).toList();
-                foods = foods
-                        .stream().filter(
-                                f -> avoid.stream()
-                                        .noneMatch(tag -> (f.getFoodName() != null && f.getFoodName().contains(tag)) ||
-                                                (f.getFoodExplain() != null && f.getFoodExplain().contains(tag))))
-                        .toList();
+                foods = foods.stream().filter(f -> avoid.stream().noneMatch(tag ->
+                        (f.getFoodName() != null && f.getFoodName().contains(tag)) ||
+                        (f.getFoodExplain() != null && f.getFoodExplain().contains(tag)))).toList();
             }
         }
-        if (budget != null && budget.compareTo(BigDecimal.ZERO) > 0)
-            foods = foods.stream().filter(f -> f.getFoodPrice() != null && f.getFoodPrice().compareTo(budget) <= 0)
-                    .toList();
+        if (budget != null && budget.compareTo(BigDecimal.ZERO) > 0) foods = foods.stream().filter(f -> f.getFoodPrice() != null && f.getFoodPrice().compareTo(budget) <= 0).toList();
         List<AiRecommendationVO> result = new ArrayList<>();
         for (Food food : foods.stream().limit(6).toList()) {
             Business b = businessMapper.selectBusinessById(food.getBusinessId());
-            result.add(new AiRecommendationVO(food.getId(), food.getFoodName(), food.getFoodPrice(), food.getFoodImg(),
-                    food.getBusinessId(), b == null ? "" : b.getBusinessName(), "根据在售菜品与预算匹配"));
+            result.add(new AiRecommendationVO(food.getId(), food.getFoodName(), food.getFoodPrice(), food.getFoodImg(), food.getBusinessId(), b == null ? "" : b.getBusinessName(), "根据在售菜品与预算匹配"));
         }
         return HttpResult.success(result);
     }

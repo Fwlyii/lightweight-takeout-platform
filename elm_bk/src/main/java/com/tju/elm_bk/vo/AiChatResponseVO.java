@@ -12,32 +12,29 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AiChatResponseVO {
-
+    
     @Schema(description = "AI回复消息内容")
     private String message;
-
+    
     @Schema(description = "会话ID")
     private String sessionId;
-
+    
     @Schema(description = "回复类型：text-文本, suggestion-建议, data-数据展示")
     private String responseType = "text";
-
-    @Schema(description = "回复来源：local-本地帮助，deepseek-外部模型")
-    private String source;
-
+    
     @Schema(description = "相关数据，当responseType为data时使用")
     private Object relatedData;
-
+    
     @Schema(description = "是否需要用户确认")
     private Boolean needConfirmation = false;
-
+    
     @Schema(description = "确认操作类型")
     private String confirmationType;
-
+    
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Schema(description = "响应时间")
     private LocalDateTime responseTime;
-
+    
     @Schema(description = "处理耗时（毫秒）")
     private Long processingTime;
 }

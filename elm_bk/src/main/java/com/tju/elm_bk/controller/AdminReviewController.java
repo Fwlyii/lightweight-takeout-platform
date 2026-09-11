@@ -18,14 +18,11 @@ public class AdminReviewController {
     private final ReviewMapper reviewMapper;
 
     @GetMapping
-    public HttpResult<List<ReviewVO>> list() {
-        return HttpResult.success(reviewMapper.listAll());
-    }
+    public HttpResult<List<ReviewVO>> list() { return HttpResult.success(reviewMapper.listAll()); }
 
     @PatchMapping("/{id}/hide")
     public HttpResult<Void> hide(@PathVariable Long id) {
-        if (reviewMapper.hide(id) != 1)
-            throw new com.tju.elm_bk.exception.APIException("评价不存在或已隐藏");
+        if (reviewMapper.hide(id) != 1) throw new com.tju.elm_bk.exception.APIException("评价不存在或已隐藏");
         return HttpResult.success();
     }
 }

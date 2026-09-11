@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Component
 @ServerEndpoint("/ws/{sid}")
 @Slf4j
-public class WebSocketServer implements com.tju.elm_bk.service.NotificationTransport {
+public class WebSocketServer {
 
     // 同一账号可同时打开多个页面；不能让后建立的连接覆盖原会话。
     private static final Map<String, Set<Session>> sessionMap = new ConcurrentHashMap<>();
@@ -76,7 +76,6 @@ public class WebSocketServer implements com.tju.elm_bk.service.NotificationTrans
 
     /**
      * 群发消息（线程安全）
-     * 
      * @param message 消息内容（JSON格式）
      */
     public void sendToAllClient(String message) {
@@ -120,8 +119,7 @@ public class WebSocketServer implements com.tju.elm_bk.service.NotificationTrans
 
     public void sendToAuthority(String authority, String message) {
         UserMapper mapper = userMapper;
-        if (mapper == null || authority == null)
-            return;
+        if (mapper == null || authority == null) return;
         List<Long> userIds = mapper.findUserIdsByAuthority(authority);
         if (userIds != null) {
             userIds.forEach(id -> sendToClient(id.toString(), message));
@@ -133,11 +131,9 @@ public class WebSocketServer implements com.tju.elm_bk.service.NotificationTrans
             TokenProvider provider = tokenProvider;
             UserMapper mapper = userMapper;
             List<String> tokens = session.getRequestParameterMap().get("access_token");
-            if (provider == null || mapper == null || tokens == null || tokens.size() != 1)
-                return false;
+            if (provider == null || mapper == null || tokens == null || tokens.size() != 1) return false;
             String token = tokens.get(0);
-            if (!provider.validateToken(token))
-                return false;
+            if (!provider.validateToken(token)) return false;
             String username = provider.getAuthentication(token).getName();
             User user = mapper.findByUsernameWithAuthorities(username);
             return user != null && Boolean.TRUE.equals(user.getActivated())

@@ -193,7 +193,25 @@ const routes = [
     path: '/ai-chat',
     name: 'AiChat',
     component: AiChat,
-    meta: { title: 'AI智能客服', public: true }
+    meta: { title: 'AI智能客服', role: 'user' }
+  },
+  {
+    path: '/ai-chat/recommend',
+    name: 'AiRecommend',
+    component: AiChat,
+    meta: { title: 'AI智能筛选', role: 'user', aiTool: 'recommend' }
+  },
+  {
+    path: '/ai-chat/voice',
+    name: 'AiVoiceOrder',
+    component: AiChat,
+    meta: { title: 'AI语音点菜', role: 'user', aiTool: 'voice' }
+  },
+  {
+    path: '/ai-chat/image',
+    name: 'AiDishRecognition',
+    component: AiChat,
+    meta: { title: 'AI菜品识别', role: 'user', aiTool: 'image' }
   },
   {
     path: '/rider/apply',

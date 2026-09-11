@@ -37,7 +37,7 @@ public enum OrderStatus {
 
     public static OrderStatus fromCode(Integer code) {
         return Arrays.stream(values())
-                .filter(status -> code != null && status.code == code)
+                .filter(status -> status.code == code)
                 .findFirst()
                 .orElseThrow(() -> new APIException("未知订单状态：" + code));
     }

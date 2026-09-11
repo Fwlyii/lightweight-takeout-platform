@@ -14,7 +14,7 @@ import com.tju.elm_bk.service.PermissionApplicationService;
 import com.tju.elm_bk.vo.BusinessPermissionVO;
 import com.tju.elm_bk.vo.BusinessVO;
 import com.tju.elm_bk.vo.MerchantApplicationsVO;
-import com.tju.elm_bk.service.NotificationDispatcher;
+import com.tju.elm_bk.websocket.WebSocketServer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -33,7 +33,7 @@ import java.util.List;
 public class PermissionApplicationServiceImpl implements PermissionApplicationService {
     private final PermissionApplicationMapper applicationMapper;
     private final UserMapper userMapper;
-    private final NotificationDispatcher notifications;
+    private final WebSocketServer webSocketServer;
     private final AuthorityMapper authorityMapper;
     private final UserAuthorityMapper userAuthorityMapper;
     private final BusinessMapper businessMapper;
@@ -73,7 +73,7 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
         // 5. 保存到数据库
         applicationMapper.insert(application);
 
-        // 6. 提交成功后，通过可用的实时通知通道提醒管理员
+        //6. 通过WebSocket向管理员推送消息
         sendMerchantApplyNotification(currentUserId, currentUser.getUsername(), application.getId());
         return application;
     }
@@ -114,13 +114,14 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
         if (auditDTO.getAuditResult() == 1) { // 1-同意
             addBusinessAuthority(applicantUserId);
             // 5. 推送WebSocket通知给申请人
-            sendAuditPassNotification(applicantUserId, 0);
+            sendAuditPassNotification(applicantUserId,0);
         } else {
             // 若拒绝，可选择性推送拒绝通知
-            sendAuditRejectNotification(applicantUserId, 0);
+            sendAuditRejectNotification(applicantUserId,0);
         }
         return application;
     }
+
 
     /**
      * 顾客申请开店
@@ -169,14 +170,13 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
         if (businessMapper.updateBusinessStatus(businessPermissionDTO) != 1) {
             throw new APIException("开店申请状态已变化，请刷新后重试");
         }
-        BusinessPermissionVO businessPermissionVO = businessMapper
-                .getBusinessPermissionById(businessPermissionDTO.getId());
+        BusinessPermissionVO businessPermissionVO =businessMapper.getBusinessPermissionById(businessPermissionDTO.getId());
         Long applicantUserId = businessPermissionVO.getUserId();
         if (businessPermissionDTO.getStatus() == 1) { // 1-同意
-            sendAuditPassNotification(applicantUserId, 1);
+            sendAuditPassNotification(applicantUserId,1);
         } else {
             // 若拒绝，可选择性推送拒绝通知
-            sendAuditRejectNotification(applicantUserId, 1);
+            sendAuditRejectNotification(applicantUserId,1);
         }
         return businessPermissionVO;
     }
@@ -190,19 +190,17 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
             throw new APIException("店铺名称、地址和经营类型不能为空且必须合法");
         }
         java.math.BigDecimal start = dto.getStartPrice() == null ? java.math.BigDecimal.ZERO : dto.getStartPrice();
-        java.math.BigDecimal delivery = dto.getDeliveryPrice() == null ? java.math.BigDecimal.ZERO
-                : dto.getDeliveryPrice();
+        java.math.BigDecimal delivery = dto.getDeliveryPrice() == null ? java.math.BigDecimal.ZERO : dto.getDeliveryPrice();
         if (start.compareTo(java.math.BigDecimal.ZERO) < 0 || start.compareTo(new java.math.BigDecimal("100000")) > 0
-                || delivery.compareTo(java.math.BigDecimal.ZERO) < 0
-                || delivery.compareTo(new java.math.BigDecimal("10000")) > 0) {
+                || delivery.compareTo(java.math.BigDecimal.ZERO) < 0 || delivery.compareTo(new java.math.BigDecimal("10000")) > 0) {
             throw new APIException("起送价和配送费必须为合理的非负金额");
         }
         java.math.BigDecimal threshold = dto.getPromotionThreshold();
         java.math.BigDecimal discount = dto.getPromotionDiscount();
         if ((threshold == null) != (discount == null)
                 || (threshold != null && (threshold.compareTo(java.math.BigDecimal.ZERO) <= 0
-                        || discount.compareTo(java.math.BigDecimal.ZERO) <= 0
-                        || discount.compareTo(threshold) >= 0))) {
+                || discount.compareTo(java.math.BigDecimal.ZERO) <= 0
+                || discount.compareTo(threshold) >= 0))) {
             throw new APIException("满减门槛和优惠金额必须同时填写，且优惠金额应小于门槛");
         }
         dto.setBusinessName(dto.getBusinessName().trim());
@@ -224,14 +222,15 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
                     application.getId(),
                     application.getUserId(),
                     userMapper.findById(application.getUserId()).getUsername(),
-                    application.getCreateTime()));
+                    application.getCreateTime()
+            ));
         }
         return merchantApplications;
     }
 
     @Override
     public List<BusinessPermissionVO> getShopApplications() {
-        List<BusinessPermissionVO> applications = businessMapper.listNotAudited();
+        List<BusinessPermissionVO> applications =businessMapper.listNotAudited();
         return applications;
     }
 
@@ -259,23 +258,23 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
     /**
      * 推送"审核通过"通知给顾客
      */
-    private void sendAuditPassNotification(Long userId, Integer type) {
+    private void sendAuditPassNotification(Long userId,Integer type) {
         JSONObject message = new JSONObject();
         message.put("currentTime", LocalDateTime.now().format(TIME_FORMATTER));
         Notification notification = new Notification();
-        if (type == 0) {
+        if(type==0){
             String content = "恭喜！您的成为商家申请已通过审核，现在可以开始营业了";
             notification.setNotificationContent(content);
             message.put("type", 0); // 0表示申请成为商家的回复
-            message.put("content", content);
-        } else if (type == 1) {
+            message.put("content",content);
+        }else if(type==1){
             String content = "恭喜！您的开店申请已通过审核，现在可以开始营业了";
             notification.setNotificationContent(content);
             message.put("type", 1); // 1表示申请开店的回复
             message.put("content", content);
         }
         message.put("userId", userId);
-        notifications.sendToClient(userId.toString(), message.toJSONString());
+        webSocketServer.sendToClient(userId.toString(), message.toJSONString());
 
         notification.setUserId(userId); // 接收消息的用户ID
         notification.setNotificationType(type); // 0=商家申请，1=开店申请
@@ -289,23 +288,23 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
     /**
      * 推送"审核拒绝"通知给顾客
      */
-    private void sendAuditRejectNotification(Long userId, Integer type) {
+    private void sendAuditRejectNotification(Long userId,Integer type) {
         JSONObject message = new JSONObject();
         message.put("currentTime", LocalDateTime.now().format(TIME_FORMATTER));
         Notification notification = new Notification();
-        if (type == 0) {
+        if(type==0){
             String content = "抱歉，您的成为商家申请未通过审核";
             notification.setNotificationContent(content);
             message.put("type", 0); // 0表示申请成为商家的回复
             message.put("content", content);
-        } else if (type == 1) {
+        }else if(type==1){
             String content = "抱歉，您的开店申请未通过审核";
             notification.setNotificationContent(content);
             message.put("type", 1); // 1表示申请开店的回复
             message.put("content", content);
         }
         message.put("userId", userId);
-        notifications.sendToClient(userId.toString(), message.toJSONString());
+        webSocketServer.sendToClient(userId.toString(), message.toJSONString());
         notification.setUserId(userId); // 接收消息的用户ID
         notification.setNotificationType(type); // 0=商家申请，1=开店申请
         notification.setAuditResult(2); // 1=通过，2=拒绝
@@ -317,11 +316,10 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
 
     /**
      * 向管理员推送新申请通知
-     * 
-     * @param userId   申请人ID
+     * @param userId 申请人ID
      * @param username 申请人用户名
      */
-    private void sendMerchantApplyNotification(Long userId, String username, Long applicationId) {
+    private void sendMerchantApplyNotification(Long userId, String username,Long applicationId) {
         // 构建消息体（包含type、userId、content）
         JSONObject message = new JSONObject();
         message.put("applicationId", applicationId);
@@ -330,13 +328,11 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
         message.put("userId", userId);
         message.put("content", "用户[" + username + "]申请成为商家，请及时审核");
 
-        notifications.sendToAuthority("ADMIN", message.toJSONString());
+        webSocketServer.sendToAuthority("ADMIN", message.toJSONString());
     }
-
     /**
      * 向管理员推送开店申请通知
-     * 
-     * @param userId   申请人ID
+     * @param userId 申请人ID
      * @param username 申请人用户名
      */
     private void sendShopApplyNotification(Long userId, String username) {
@@ -347,6 +343,6 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
         message.put("userId", userId);
         message.put("content", "商家[" + username + "]申请开店，请及时审核");
 
-        notifications.sendToAuthority("ADMIN", message.toJSONString());
+        webSocketServer.sendToAuthority("ADMIN", message.toJSONString());
     }
 }

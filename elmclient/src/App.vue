@@ -25,13 +25,15 @@ import { getAuthRole, getToken } from './utils/auth';
 
 const ROUTES_WITHOUT_GLOBAL_BACK = new Set([
   'Index', 'MyInformation', 'SuccessfulPayment', 'BusinessInfo',
-  'UserAddress', 'AddUserAddress', 'EditUserAddress', 'Assets', 'Notifications', 'AiChat', 'Favorites', 'ListDetail', 'Login', 'Register'
+  'UserAddress', 'Assets', 'AiChat', 'AiRecommend', 'AiVoiceOrder',
+  'AiDishRecognition', 'Favorites', 'ListDetail'
 ]);
 
 const ROUTES_WITHOUT_CUSTOMER_FOOTER = new Set([
   'BusinessInfo', 'Payment', 'SuccessfulPayment', 'Cart', 'Favorites',
   'Notifications', 'UserAddress', 'AddUserAddress', 'ListDetail',
-  'Register', 'Login', 'EditUserAddress'
+  'Register', 'Login', 'EditUserAddress', 'AiChat', 'AiRecommend',
+  'AiVoiceOrder', 'AiDishRecognition'
 ]);
 
 export default {

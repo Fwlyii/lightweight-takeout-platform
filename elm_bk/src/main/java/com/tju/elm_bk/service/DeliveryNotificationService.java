@@ -7,6 +7,7 @@ import com.tju.elm_bk.entity.Notification;
 import com.tju.elm_bk.entity.Order;
 import com.tju.elm_bk.mapper.BusinessMapper;
 import com.tju.elm_bk.mapper.NotificationMapper;
+import com.tju.elm_bk.websocket.WebSocketServer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,24 +21,21 @@ import java.time.LocalDateTime;
 public class DeliveryNotificationService {
     private final NotificationMapper notificationMapper;
     private final BusinessMapper businessMapper;
-    private final NotificationDispatcher webSocketServer;
+    private final WebSocketServer webSocketServer;
 
     public void notifyOrderParties(Order order, Long riderUserId, String content) {
         notifyUser(order.getCustomerId(), content, order.getId());
         notifyMerchant(order, content);
-        if (riderUserId != null)
-            notifyUser(riderUserId, content, order.getId());
+        if (riderUserId != null) notifyUser(riderUserId, content, order.getId());
     }
 
     public void notifyMerchant(Order order, String content) {
         Business business = businessMapper.selectBusinessById(order.getBusinessId());
-        if (business != null)
-            notifyUser(business.getUserId(), content, order.getId());
+        if (business != null) notifyUser(business.getUserId(), content, order.getId());
     }
 
     public void notifyUser(Long userId, String content, Long orderId) {
-        if (userId == null)
-            return;
+        if (userId == null) return;
 
         Notification notification = new Notification();
         notification.setUserId(userId);

@@ -1,0 +1,32 @@
+package com.tju.elm_bk.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tju.elm_bk.entity.Authority;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserCreateDTO {
+    @NotBlank(message = "用户名不能为空")
+    @Size(min = 1, max = 20, message = "用户名长度必须在1-20个字符之间")
+    private String username;
+
+    @NotBlank(message = "密码不能为空")
+    @Size(min = 8, max = 32, message = "密码长度需为8-32位")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "密码必须同时包含字母和数字")
+    private String password;
+
+    @JsonProperty("deleted") // 映射JSON的deleted字段
+    private Boolean isDeleted = false; // 默认未删除
+
+    private List<Authority> authorities; // 权限列表
+
+}

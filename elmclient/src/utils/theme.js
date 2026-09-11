@@ -21,20 +21,12 @@ export const applyTheme = (theme) => {
     document.documentElement.dataset.theme = normalized;
   }
   if (typeof localStorage !== 'undefined') {
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, normalized);
-    } catch (_) {
-      // 禁用本地存储时，仍允许切换主题并由服务端保存偏好。
-    }
+    localStorage.setItem(THEME_STORAGE_KEY, normalized);
   }
   return normalized;
 };
 
 export const getStoredTheme = () => {
   if (typeof localStorage === 'undefined') return 'light';
-  try {
-    return normalizeTheme(localStorage.getItem(THEME_STORAGE_KEY));
-  } catch (_) {
-    return 'light';
-  }
+  return normalizeTheme(localStorage.getItem(THEME_STORAGE_KEY));
 };

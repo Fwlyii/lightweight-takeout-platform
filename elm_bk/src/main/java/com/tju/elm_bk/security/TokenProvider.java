@@ -7,6 +7,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,8 @@ import org.springframework.util.StringUtils;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -90,49 +93,35 @@ public class TokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        return readSession(token).authentication();
-    }
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
 
-    /** Parse and verify once per request; never expose unverified claims to the filter. */
-    public VerifiedSession readSession(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-        String subject = claims.getSubject();
-        String authority = claims.get(AUTHORITIES_KEY, String.class);
-        String role = claims.get(SESSION_ROLE_KEY, String.class);
-        Number issuedAt = claims.get(ISSUED_AT_MILLIS_KEY, Number.class);
-        if (!StringUtils.hasText(subject) || !StringUtils.hasText(authority) || authority.contains(",")
-                || !StringUtils.hasText(role) || issuedAt == null || claims.getExpiration() == null) {
-            throw new IllegalArgumentException("不完整的角色会话");
-        }
-        return new VerifiedSession(subject, authority, role, issuedAt.longValue());
-    }
+        Collection<? extends GrantedAuthority> authorities =
+                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+                        .filter(auth -> !auth.trim().isEmpty())
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
 
-    public record VerifiedSession(String subject, String authority, String role, long issuedAtMillis) {
-        public boolean isCurrentFor(User account) {
-            if (account == null || !subject.equals(account.getUsername())
-                    || !Boolean.TRUE.equals(account.getActivated()) || Boolean.TRUE.equals(account.getIsDeleted())
-                    || account.getAuthorities() == null) return false;
-            if (!issuedAfter(account.getUpdateTime())) return false;
-            var names = account.getAuthorities().stream().filter(Objects::nonNull)
-                    .map(Authority::getName).filter(StringUtils::hasText).toList();
-            return LoginRolePolicy.isCurrentSession(role, authority, names);
-        }
+        org.springframework.security.core.userdetails.User principal =
+                new org.springframework.security.core.userdetails.User(
+                claims.getSubject(),
+                "",
+                true,
+                true,
+                true,
+                true,
+                authorities
+        );
 
-        public Authentication authentication() {
-            var authorities = List.of(new SimpleGrantedAuthority(authority));
-            var principal = new org.springframework.security.core.userdetails.User(subject, "", authorities);
-            return UsernamePasswordAuthenticationToken.authenticated(principal, null, authorities);
-        }
-
-        public boolean issuedAfter(LocalDateTime accountUpdatedAt) {
-            return accountUpdatedAt == null || issuedAtMillis >= accountUpdatedAt
-                    .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        }
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
     public boolean validateToken(String authToken) {
         try {
-            readSession(authToken);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(authToken);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             LOG.info("Invalid JWT token.");
@@ -146,16 +135,35 @@ public class TokenProvider {
      * 缺少毫秒签发时间的历史令牌也默认失效，以免部署升级后继续绕过新规则。
      */
     public boolean isCurrentForAccount(String token, LocalDateTime accountUpdatedAt) {
+        if (accountUpdatedAt == null) return true;
         try {
-            return readSession(token).issuedAfter(accountUpdatedAt);
+            Claims claims = Jwts.parserBuilder().setSigningKey(key).build()
+                    .parseClaimsJws(token).getBody();
+            Number issuedAtMillis = claims.get(ISSUED_AT_MILLIS_KEY, Number.class);
+            if (issuedAtMillis == null) return false;
+            long accountUpdatedMillis = accountUpdatedAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            return issuedAtMillis.longValue() >= accountUpdatedMillis;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
     public boolean isRoleBoundAndCurrentForAccount(String token, User account) {
+        if (account == null || account.getAuthorities() == null) return false;
         try {
-            return readSession(token).isCurrentFor(account);
+            Claims claims = Jwts.parserBuilder().setSigningKey(key).build()
+                    .parseClaimsJws(token).getBody();
+            String sessionRole = claims.get(SESSION_ROLE_KEY, String.class);
+            String authorityClaim = claims.get(AUTHORITIES_KEY, String.class);
+            if (!StringUtils.hasText(sessionRole) || !StringUtils.hasText(authorityClaim)
+                    || authorityClaim.contains(",")) return false;
+            List<String> currentAuthorities = account.getAuthorities().stream()
+                    .filter(Objects::nonNull)
+                    .map(Authority::getName)
+                    .filter(StringUtils::hasText)
+                    .collect(Collectors.toList());
+            return LoginRolePolicy.isCurrentSession(
+                    sessionRole, authorityClaim, currentAuthorities);
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }

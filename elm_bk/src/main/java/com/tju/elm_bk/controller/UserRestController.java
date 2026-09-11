@@ -1,49 +1,408 @@
 package com.tju.elm_bk.controller;
 
-import com.tju.elm_bk.dto.PersonCreateDTO;
+import com.tju.elm_bk.constants.ProfileDefaults;
+import com.tju.elm_bk.dto.*;
+import com.tju.elm_bk.entity.Authority;
+import com.tju.elm_bk.entity.Person;
+import com.tju.elm_bk.entity.User;
+import com.tju.elm_bk.exception.APIException;
+import com.tju.elm_bk.mapper.AuthorityMapper;
+import com.tju.elm_bk.mapper.PersonMapper;
+import com.tju.elm_bk.mapper.UserMapper;
 import com.tju.elm_bk.result.HttpResult;
-import com.tju.elm_bk.service.RegistrationService;
-import com.tju.elm_bk.service.CurrentProfileService;
+import com.tju.elm_bk.service.PersonService;
+import com.tju.elm_bk.service.ImageStorageService;
+import com.tju.elm_bk.service.UserModelDetailsService;
+import com.tju.elm_bk.service.UserService;
 import com.tju.elm_bk.vo.PersonVO;
+import com.tju.elm_bk.vo.UserVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
+@Tag(name = "用户管理", description = "提供用户的增删改查操作")
+@Slf4j
 @RequiredArgsConstructor
 public class UserRestController {
-    private final RegistrationService registration;
-    private final CurrentProfileService profile;
-    private final com.tju.elm_bk.service.ProfileUpdateService profileUpdate;
+    private final UserMapper userMapper;
+    private final AuthorityMapper authorityMapper;
+    private final UserModelDetailsService userModelDetailsService;
+    private final PasswordEncoder passwordEncoder;
+    private final PersonService personService;
+    private final UserService userService;
+    private final PersonMapper personMapper;
+    private final ImageStorageService imageStorageService;
 
-    @org.springframework.web.bind.annotation.PutMapping("/user")
-    public PersonVO updateProfile(@Valid @RequestBody com.tju.elm_bk.dto.ProfileUpdateDTO request) {
-        return profileUpdate.update(request);
+    @PostMapping("/users")
+    @Operation(summary = "新增用户(仅登录账号)", description = "创建一个新的用户")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<UserVO> createUser(@Valid @RequestBody UserCreateDTO newUser) {
+        String username = newUser.getUsername();
+        if (username == null || username.trim().isEmpty()) {
+            throw new APIException("用户名不能为空");
+        }
+
+        // 检查数据库中是否已存在相同用户名
+        User existingUser = userService.findByUsername(username);
+        if (existingUser != null) {
+            throw new APIException("用户名已存在，请更换其他用户名");
+        }
+        User currentUser = getCurrentUser();
+        User user = new User();
+        BeanUtils.copyProperties(newUser, user);
+        LocalDateTime now = LocalDateTime.now();
+        user.setCreateTime(now);
+        user.setUpdateTime(now);
+        user.setActivated(true);
+        user.setCreator(currentUser.getId());
+        user.setUpdater(currentUser.getId());
+        user.setIsDeleted(false);
+
+        // 加密密码
+        user.setPassword(passwordEncoder.encode(newUser.getPassword()));
+
+        // 保存用户
+        userService.addUser(user);
+
+        // 分配默认USER角色
+        if (user.getAuthorities() == null || user.getAuthorities().isEmpty()) {
+            Authority userAuthority = authorityMapper.findByName("USER");
+            if (userAuthority != null) {
+                userMapper.insertUserAuthority(user.getId(), userAuthority.getName());
+            }
+        } else {
+            // 保存用户指定的角色
+            for (Authority authority : user.getAuthorities()) {
+                userMapper.insertUserAuthority(user.getId(), authority.getName());
+            }
+        }
+
+        User user1 = userService.getUserWithAuthorities(user.getUsername());
+        UserVO userVO=new UserVO();
+        BeanUtils.copyProperties(user1, userVO);
+        // 返回包含权限信息的用户对象
+        return ResponseEntity.ok(userVO);
     }
 
     @GetMapping("/user")
-    public PersonVO currentUser() {
-        return profile.get();
+    @Operation(summary = "获取当前登录用户", description = "获取当前登录用户的信息")
+    public ResponseEntity<UserVO> getActualUser() {
+        User currentUser = getCurrentUser();
+        UserVO userVO=new UserVO();
+        BeanUtils.copyProperties(currentUser, userVO);
+        return ResponseEntity.ok(userVO);
+    }
+
+    @GetMapping("/person")
+    @Operation(summary = "获取当前登录用户及其自然人属性", description = "获取当前登录用户及其自然人信息")
+    public ResponseEntity<PersonVO> getActualPerson() {
+        User currentUser = getCurrentUser();
+        PersonVO personVO=new PersonVO();
+        BeanUtils.copyProperties(currentUser, personVO);
+        Person person = personService.getPersonByUserId(currentUser.getId());
+        if (person == null) throw new APIException("当前账号缺少个人信息");
+        BeanUtils.copyProperties(person, personVO);
+        return ResponseEntity.ok(personVO);
+    }
+
+    @GetMapping("/persons")
+    @Operation(summary = "获取不同状态的自然人用户", description = "获取不同状态自然人用户，传入0-全部，1-启用，2-禁用")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public HttpResult<List<PersonVO>> listPersons(Integer status) {
+        return HttpResult.success(personService.listPersons(status));
+    }
+
+    /**
+     * 搜索用户（按关键词+状态筛选）
+     */
+    @PostMapping("/persons/search")
+    @Operation(summary = "搜索用户（用户名/手机号/邮箱）")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public HttpResult<List<PersonVO>> searchPersons(@RequestBody UserSearchDTO searchDTO) {
+        List<PersonVO> searchResult = personService.searchPersons(searchDTO);
+        return HttpResult.success(searchResult);
+    }
+
+
+    @PostMapping("/password")
+    @Operation(summary = "修改密码", description = "已登录用户可修改自己的密码，管理员可修改任何用户的密码")
+    public ResponseEntity<String> updateUserPassword(@Valid @RequestBody LoginDTO loginDto) {
+        String newPassword = loginDto.getPassword();
+        if (newPassword == null || newPassword.length() < 8 || newPassword.length() > 32
+                || !newPassword.matches(".*[A-Za-z].*") || !newPassword.matches(".*\\d.*")) {
+            throw new APIException("密码长度需为8-32位且同时包含字母和数字");
+        }
+        User currentUser = getCurrentUser();
+        boolean isAdmin = currentUser.getAuthorities().stream()
+                .anyMatch(auth -> "ADMIN".equals(auth.getName()));
+
+        User targetUser = userService.getUserWithAuthorities(loginDto.getUsername());
+        if (targetUser == null) {
+            throw new APIException("用户不存在");
+        }
+
+        // 检查权限：只能修改自己的密码，或者管理员可以修改任何人的密码
+        if (currentUser.getUsername().equals(targetUser.getUsername()) || isAdmin) {
+            targetUser.setPassword(passwordEncoder.encode(newPassword));
+            targetUser.setUpdateTime(LocalDateTime.now());
+            targetUser.setUpdater(currentUser.getId());
+            userService.updateUser(targetUser);
+
+            // 清除用户缓存
+            userModelDetailsService.clearUserCache(targetUser.getUsername());
+            return ResponseEntity.ok().body("密码更新成功");
+        } else {
+            return ResponseEntity.unprocessableEntity().body("权限不足");
+        }
+    }
+
+    @PostMapping("/persons")
+    @Operation(summary = "新增自然人用户", description = "创建一个新的自然人用户")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public PersonVO addPerson(@Valid @RequestBody PersonCreateDTO createDTO) {
+        String username = createDTO.getUsername();
+        if (username == null || username.trim().isEmpty()) {
+            throw new APIException("用户名不能为空");
+        }
+
+        // 检查数据库中是否已存在相同用户名
+        User existingUser = userService.findByUsername(username);
+        if (existingUser != null) {
+            throw new APIException("用户名已存在，请更换其他用户名");
+        }
+        User currentUser = getCurrentUser();
+        LocalDateTime now = LocalDateTime.now();
+        User user = new User();
+        user.setCreator(currentUser.getId());
+        user.setCreateTime(now);
+        user.setUpdater(currentUser.getId());
+        user.setUpdateTime(now);
+        user.setIsDeleted(false); // 默认未删除
+        user.setActivated(true); // 默认激活（可登录）
+        user.setUsername(createDTO.getUsername());
+        user.setPassword(passwordEncoder.encode(createDTO.getPassword()));
+        // 保存User，获取自增ID
+        userService.addUser(user);
+        Person person = new Person();
+        person.setId(user.getId());
+        person.setEmail(createDTO.getEmail());
+        person.setFirstName(createDTO.getFirstName());
+        person.setLastName(createDTO.getLastName());
+        person.setGender(createDTO.getGender());
+        person.setPhone(createDTO.getPhone());
+        person.setPhoto(createDTO.getPhoto());
+        person.setUser(user); // 关联User对象（若MyBatis存储时不需要，可只存user_id）
+        // 保存Person
+        personService.addPerson(person);
+
+        List<String> authorityNames = new ArrayList<>();
+        if (createDTO.getAuthorities() != null && !createDTO.getAuthorities().isEmpty()) {
+
+            authorityNames = createDTO.getAuthorities().stream()
+                    .map(Authority::getName)
+                    .collect(Collectors.toList());
+        } else {
+            // DTO未指定权限，默认分配USER角色
+            authorityNames.add("USER");
+        }
+
+        for (String authName : authorityNames) {
+            Authority authority = authorityMapper.findByName(authName);
+            if (authority == null) {
+                throw new RuntimeException("权限不存在：" + authName);
+            }
+            userMapper.insertUserAuthority(user.getId(), authName);
+        }
+
+        User userWithAuthorities = userService.getUserWithAuthorities(user.getUsername());
+        if (userWithAuthorities == null) {
+            throw new APIException("新增用户后查询失败");
+        }
+
+        // 6. 构建响应DTO（对齐接口文档）
+        PersonVO responseVO = convertToResponseVO(person, userWithAuthorities);
+
+        // 7. 返回响应（200 OK + 响应体）
+        return responseVO;
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public HttpResult<PersonVO> register(@Valid @RequestBody PersonCreateDTO request) throws IOException {
-        return HttpResult.success(registration.register(request, null));
+    @Operation(summary = "注册顾客账号", description = "不上传头像时由后端使用平台默认头像")
+    @Transactional
+    public HttpResult<PersonVO> addUser(@Valid @RequestBody PersonCreateDTO newUser) {
+        validateRegistration(newUser);
+        return persistRegisteredUser(newUser, ProfileDefaults.DEFAULT_AVATAR_URL);
     }
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public HttpResult<PersonVO> registerWithAvatar(@Valid @RequestPart("user") PersonCreateDTO request,
+    @Operation(summary = "注册顾客账号并上传可选头像", description = "头像仅支持 JPG、PNG 或 WebP，最大 5MB")
+    @Transactional
+    public HttpResult<PersonVO> addUserWithAvatar(
+            @Valid @RequestPart("user") PersonCreateDTO newUser,
             @RequestPart(value = "avatar", required = false) MultipartFile avatar) throws IOException {
-        return HttpResult.success(registration.register(request, avatar));
+        validateRegistration(newUser);
+        String photoUrl = avatar == null || avatar.isEmpty()
+                ? ProfileDefaults.DEFAULT_AVATAR_URL
+                : imageStorageService.storeImage(avatar);
+        return persistRegisteredUser(newUser, photoUrl);
+    }
+
+    private void validateRegistration(PersonCreateDTO newUser) {
+        String username = newUser.getUsername();
+        if (username == null || username.trim().isEmpty()) {
+            throw new APIException("用户名不能为空");
+        }
+        username = username.trim();
+        newUser.setUsername(username);
+        if (newUser.getPhone() == null || !newUser.getPhone().matches("^1[3-9]\\d{9}$")) {
+            throw new APIException("手机号必须为11位有效手机号");
+        }
+        if (personMapper.countByPhone(newUser.getPhone()) > 0) {
+            throw new APIException("手机号已注册，请更换其他手机号");
+        }
+        String rawPassword = newUser.getPassword();
+        if (rawPassword == null || rawPassword.length() < 8 || rawPassword.length() > 32
+                || !rawPassword.matches(".*[A-Za-z].*") || !rawPassword.matches(".*\\d.*")) {
+            throw new APIException("密码长度需为8-32位且同时包含字母和数字");
+        }
+
+        // 检查数据库中是否已存在相同用户名
+        User existingUser = userService.findByUsername(username);
+        if (existingUser != null) {
+            throw new APIException("用户名已存在，请更换其他用户名");
+        }
+    }
+
+    private HttpResult<PersonVO> persistRegisteredUser(PersonCreateDTO newUser, String photoUrl) {
+        User user = new User();
+        BeanUtils.copyProperties(newUser, user);
+        LocalDateTime now = LocalDateTime.now();
+        user.setCreateTime(now);
+        user.setUpdateTime(now);
+        user.setActivated(true);
+        user.setIsDeleted(false);
+
+        // 加密密码
+        user.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        Person person = new Person();
+        BeanUtils.copyProperties(newUser, person);
+        // 头像地址只能来自后端默认值或经过校验并由后端保存的文件，不能信任请求体中的 URL。
+        person.setPhoto(photoUrl);
+
+
+        // 保存用户
+        userService.addUser(user);
+        person.setId(user.getId());
+        personService.addPerson(person);
+
+        // 顾客自助注册只能获得 USER 权限，客户端不能指定更高权限。
+        Authority userAuthority = authorityMapper.findByName("USER");
+        if (userAuthority != null) {
+            userMapper.insertUserAuthority(user.getId(), userAuthority.getName());
+        } else {
+            throw new APIException("USER权限不存在");
+        }
+
+        User user1 = userService.getUserWithAuthorities(user.getUsername());
+        PersonVO personVO = new PersonVO();
+
+        BeanUtils.copyProperties(person, personVO);
+        BeanUtils.copyProperties(user1, personVO);
+        // 返回包含权限信息的用户对象
+        return HttpResult.success(personVO);
+    }
+
+    @PutMapping("/{username}/status")
+    @Operation(summary = "启用/禁用用户")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public HttpResult<String> toggleUserStatus(
+            @PathVariable String username,
+            @RequestParam Boolean activated) { // true-启用，false-禁用
+        userService.toggleUserActivated(username, activated);
+        String message = activated ? "用户已启用" : "用户已禁用";
+        return HttpResult.success(message);
+    }
+
+    @DeleteMapping("/{username}")
+    @Operation(summary = "删除用户", description = "逻辑删除用户（标记isDeleted=true），仅管理员可操作")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public HttpResult deleteUser(@PathVariable String username) {
+        userService.deleteUser(username);
+        return HttpResult.success();
+    }
+
+    @PutMapping("/person/info")
+    @Operation(summary = "修改个人信息", description = "支持修改邮箱、姓名、头像（需先调用文件上传接口获取URL）、手机号、性别")
+    public HttpResult<Person> updatePersonInfo(@Valid @RequestBody PersonUpdateDTO updateDTO) {
+        Person updatedPerson = personService.updatePerson(updateDTO);
+        return HttpResult.success(updatedPerson);
+    }
+
+    @GetMapping("/personInfo")
+    @Operation(summary = "根据id获取自然人属性", description = "根据id获取自然人属性")
+    public HttpResult<Person> getPersonInfo(Long id) {
+        if (id == null) {
+            throw new APIException("用户ID不能为空");
+        }
+        User currentUser = getCurrentUser();
+        boolean isAdmin = currentUser.getAuthorities() != null && currentUser.getAuthorities().stream()
+                .anyMatch(auth -> "ADMIN".equals(auth.getName()));
+        if (!isAdmin && !Objects.equals(currentUser.getId(), id)) {
+            throw new APIException("无权查看其他用户的个人信息");
+        }
+        return HttpResult.success(personMapper.getPersonByUserId(id));
+    }
+
+    // 获取当前登录用户
+    private User getCurrentUser() {
+        String username = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication().getName();
+        return userService.getUserWithAuthorities(username);
+    }
+
+    private PersonVO convertToResponseVO(Person person, User user) {
+        PersonVO responseVO = new PersonVO();
+        // 1. 填充Person相关字段
+        responseVO.setId(person.getId());
+        responseVO.setFirstName(person.getFirstName());
+        responseVO.setLastName(person.getLastName());
+        responseVO.setEmail(person.getEmail());
+        responseVO.setPhone(person.getPhone());
+        responseVO.setGender(person.getGender());
+        responseVO.setPhoto(person.getPhoto());
+
+        // 2. 填充User相关字段（含审计字段和权限）
+        responseVO.setUsername(user.getUsername());
+        responseVO.setCreator(user.getCreator());
+        responseVO.setCreateTime(user.getCreateTime());
+        responseVO.setUpdater(user.getUpdater());
+        responseVO.setUpdateTime(user.getUpdateTime());
+        responseVO.setIsDeleted(user.getIsDeleted());
+
+        // 3. 填充权限列表
+        if (user.getAuthorities() != null && !user.getAuthorities().isEmpty()) {
+            responseVO.setAuthorities(user.getAuthorities());
+        }
+        return responseVO;
     }
 }

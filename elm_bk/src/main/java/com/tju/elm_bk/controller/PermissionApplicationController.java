@@ -79,4 +79,3 @@ public class PermissionApplicationController {
         return HttpResult.success(permissionApplicationService.getShopApplications());
     }
 }
-

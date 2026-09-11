@@ -134,7 +134,6 @@ CREATE TABLE `cart`  (
 DROP TABLE IF EXISTS `delivery_address`;
 CREATE TABLE `delivery_address`  (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `is_default` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否默认收货地址',
   `create_time` timestamp NULL DEFAULT NULL,
   `creator` bigint NULL DEFAULT NULL,
   `is_deleted` tinyint(1) NULL DEFAULT NULL,
@@ -248,7 +247,6 @@ CREATE TABLE `orderdetailet`  (
   `food_id` bigint NOT NULL,
   `order_id` bigint NOT NULL,
   `food_price` decimal(10, 2) NOT NULL,
-  `food_name_snapshot` varchar(100) NULL DEFAULT NULL COMMENT '下单时商品名称，历史记录不回填',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `food_id`(`food_id` ASC) USING BTREE,
   INDEX `order_id`(`order_id` ASC) USING BTREE,
@@ -333,7 +331,6 @@ CREATE TABLE `person`  (
   `photo` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `id` bigint NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `uk_person_phone` (`phone`),
   CONSTRAINT `person_ibfk_1` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
@@ -372,8 +369,7 @@ CREATE TABLE `users`  (
   `activated` tinyint(1) NOT NULL,
   `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `uk_users_username` (`username`)
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------

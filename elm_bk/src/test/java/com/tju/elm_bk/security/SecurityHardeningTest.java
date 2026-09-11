@@ -60,6 +60,10 @@ class SecurityHardeningTest {
         assertNotNull(adminGuard);
         assertEquals("hasAuthority('ADMIN')", adminGuard.value());
 
+        Method toggle = UserRestController.class.getMethod("toggleUserStatus", String.class, Boolean.class);
+        PreAuthorize toggleGuard = toggle.getAnnotation(PreAuthorize.class);
+        assertNotNull(toggleGuard);
+        assertEquals("hasAuthority('ADMIN')", toggleGuard.value());
     }
 
     @Test
@@ -120,7 +124,7 @@ class SecurityHardeningTest {
     }
 
     private void assertGuard(Class<?> controller, String methodName, String expression,
-            Class<?>... parameterTypes) throws Exception {
+                             Class<?>... parameterTypes) throws Exception {
         PreAuthorize guard = controller.getMethod(methodName, parameterTypes).getAnnotation(PreAuthorize.class);
         assertNotNull(guard, controller.getSimpleName() + "." + methodName + " 缺少端权限约束");
         assertEquals(expression, guard.value());
@@ -132,7 +136,7 @@ class SecurityHardeningTest {
         var authentication = new UsernamePasswordAuthenticationToken(
                 "demo_user", "unused", List.of(new SimpleGrantedAuthority("USER")));
         Instant beforeIssue = Instant.now();
-        String token = provider.createRoleBoundToken(authentication, false, "user");
+        String token = provider.createToken(authentication, false);
         Instant afterIssue = Instant.now();
         ZoneId zone = ZoneId.systemDefault();
 
@@ -149,9 +153,6 @@ class SecurityHardeningTest {
                 "demo_rider", "unused", List.of(new SimpleGrantedAuthority("RIDER")));
         String token = provider.createRoleBoundToken(authentication, false, "rider");
         User account = new User();
-        account.setUsername("demo_rider");
-        account.setActivated(true);
-        account.setIsDeleted(false);
         Authority user = new Authority();
         user.setName("USER");
         Authority rider = new Authority();

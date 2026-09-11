@@ -1,39 +1,71 @@
 package com.tju.elm_bk.service;
 
 import com.tju.elm_bk.entity.User;
+import com.tju.elm_bk.exception.UserNotActivatedException;
 import com.tju.elm_bk.mapper.UserMapper;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Service("userDetailsService")
-@RequiredArgsConstructor
-public class UserModelDetailsService implements UserDetailsService {
-    private final UserMapper users;
+@Slf4j
+@Component("userDetailsService")
+public class UserModelDetailsService implements UserDetailsService{
+    private final UserMapper userMapper;
+
+    public UserModelDetailsService(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
 
     @Override
-    @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String login) {
-        String identifier = login == null ? "" : login.trim();
-        User account = users.findByUsernameWithAuthorities(identifier);
-        if (account == null && identifier.matches("^1[3-9]\\d{9}$")) {
-            account = users.findByPhoneWithAuthorities(identifier);
+    @Transactional
+    public UserDetails loadUserByUsername(final String login) {
+        log.debug("Authenticating user '{}'", login);
+
+        User user = userMapper.findByUsernameWithAuthorities(login);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User " + login + " was not found in the database");
+        } else if (user.getActivated() == null||!user.getActivated()) {
+            throw new UserNotActivatedException("User " + login + " was not activated");
         }
-        if (account == null || account.getAuthorities() == null) {
-            throw new UsernameNotFoundException("账号或密码错误");
+
+        log.debug("用户 {} 的权限原始数据：{}", user.getUsername(), user.getAuthorities());
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>(); // 初始化空列表，避免null
+        if (user.getAuthorities() != null) { // 若权限列表不为null，处理有效权限
+            grantedAuthorities = user.getAuthorities().stream()
+                    // 过滤：Authority不为null 且 name不为null/空字符串
+                    .filter(auth -> auth != null && StringUtils.hasText(auth.getName()))
+                    .map(auth -> new SimpleGrantedAuthority(auth.getName()))
+                    .collect(Collectors.toList());
         }
-        var authorities = account.getAuthorities().stream().filter(Objects::nonNull)
-                .map(a -> a.getName()).filter(n -> n != null && !n.isBlank())
-                .map(SimpleGrantedAuthority::new).toList();
-        if (authorities.isEmpty()) throw new UsernameNotFoundException("账号或密码错误");
-        return org.springframework.security.core.userdetails.User.withUsername(account.getUsername())
-                .password(account.getPassword()).authorities(authorities)
-                .disabled(!Boolean.TRUE.equals(account.getActivated())).build();
+        // 打印处理后的权限列表
+        log.debug("处理后的权限列表：{}", grantedAuthorities);
+
+        // 权限缺失属于账号配置异常，必须默认拒绝；不能在认证阶段擅自补成普通用户。
+        if (grantedAuthorities.isEmpty()) {
+            log.warn("用户 {} 未分配任何权限，拒绝认证", user.getUsername());
+            throw new UsernameNotFoundException("User " + login + " has no authorities");
+        }
+
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                grantedAuthorities
+        );
+    }
+
+    public void clearUserCache(String username) {
+        // 因为没有使用Redis，这里不需要实现
     }
 }

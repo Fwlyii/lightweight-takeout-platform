@@ -11,26 +11,35 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeepSeekRequestDTO {
-
-    private String model = "deepseek-chat";
-
+    
+    private String model = "deepseek-v4-flash";
+    
     private List<MessageDTO> messages;
-
+    
     private boolean stream = false;
-
+    
     @JsonProperty("max_tokens")
     private Integer maxTokens = 1024;
-
+    
     private Double temperature = 0.7;
-
+    
     @JsonProperty("top_p")
     private Double topP = 0.9;
 
+    private ThinkingDTO thinking = new ThinkingDTO("disabled");
+    
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     public static class MessageDTO {
         private String role; // system, user, assistant
         private String content;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ThinkingDTO {
+        private String type;
     }
 }

@@ -3,15 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve:profile": "node scripts/profile-preview.cjs serve",
-    "build:profile": "node scripts/profile-preview.cjs build",
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "test": "node --test tests/*.test.mjs",
-    "test:auth": "node --test tests/authentication.test.mjs",
-    "test:profile": "node --test tests/profile-api.test.mjs",
-    "serve:auth": "node scripts/auth-preview.cjs serve",
-    "build:auth": "node scripts/auth-preview.cjs build"
+    "build": "vue-cli-service build"
   },
   "dependencies": {
     "axios": "^1.20.0",

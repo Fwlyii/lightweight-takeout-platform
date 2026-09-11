@@ -1,10 +1,12 @@
 package com.tju.elm_bk.service.impl;
 
+import com.tju.elm_bk.adapter.MapAdapter;
+
 import com.tju.elm_bk.constant.AuthorityName;
 import com.tju.elm_bk.constant.DeliveryTaskStatus;
 import com.tju.elm_bk.constant.FulfillmentMode;
 import com.tju.elm_bk.constant.OrderStatus;
-import com.tju.elm_bk.constants.RiderAuditStatus;
+import com.tju.elm_bk.constant.RiderAuditStatus;
 import com.tju.elm_bk.dto.DeliveryExceptionCreateDTO;
 import com.tju.elm_bk.dto.DeliveryExceptionResolveDTO;
 import com.tju.elm_bk.entity.*;
@@ -17,6 +19,7 @@ import com.tju.elm_bk.service.OrderSettlementService;
 import com.tju.elm_bk.service.OrderStateTransitionService;
 import com.tju.elm_bk.vo.DeliveryExceptionVO;
 import com.tju.elm_bk.vo.DeliveryTaskVO;
+import com.tju.elm_bk.vo.NavigationVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final OrderStateTransitionService orderStateTransitionService;
     private final OrderSettlementService orderSettlementService;
     private final DeliveryNotificationService notificationService;
+    private final MapAdapter mapAdapter;
 
     @Override
     public List<DeliveryTaskVO> listAvailableTasks() {
@@ -59,6 +63,49 @@ public class DeliveryServiceImpl implements DeliveryService {
         DeliveryTask task = requireTask(taskId);
         assertTaskVisibleTo(current, task);
         return deliveryTaskMapper.selectViewById(taskId);
+    }
+
+    @Override
+    public NavigationVO getNavigation(Long taskId) {
+        User rider = requireApprovedRider(false);
+        DeliveryTask task = requireOwnedTask(taskId, rider.getId());
+        DeliveryTaskVO view = deliveryTaskMapper.selectViewById(taskId);
+        DeliveryTaskStatus status = DeliveryTaskStatus.fromName(task.getTaskStatus());
+        String destinationType;
+        String destinationName;
+        String address;
+
+        if (status == DeliveryTaskStatus.ACCEPTED || status == DeliveryTaskStatus.ARRIVED_STORE) {
+            destinationType = "MERCHANT";
+            destinationName = view.getBusinessName();
+            address = view.getBusinessAddress();
+        } else if (status == DeliveryTaskStatus.DELIVERING) {
+            destinationType = "CUSTOMER";
+            destinationName = view.getContactName();
+            address = view.getDeliveryAddress();
+        } else if (status == DeliveryTaskStatus.EXCEPTION) {
+            DeliveryException openException = deliveryTaskMapper.selectOpenExceptionByTask(taskId);
+            DeliveryTaskStatus previous = openException == null ? null
+                    : DeliveryTaskStatus.fromName(openException.getPreviousTaskStatus());
+            if (previous == DeliveryTaskStatus.DELIVERING) {
+                destinationType = "CUSTOMER";
+                destinationName = view.getContactName();
+                address = view.getDeliveryAddress();
+            } else if (previous == DeliveryTaskStatus.ACCEPTED || previous == DeliveryTaskStatus.ARRIVED_STORE) {
+                destinationType = "MERCHANT";
+                destinationName = view.getBusinessName();
+                address = view.getBusinessAddress();
+            } else {
+                throw new APIException("当前异常任务没有可用导航阶段");
+            }
+        } else {
+            throw new APIException("当前任务状态不允许获取导航地址");
+        }
+        if (address == null || address.isBlank()) {
+            throw new APIException("当前任务缺少可用导航地址");
+        }
+        return new NavigationVO(taskId, destinationType, destinationName, address,
+                mapAdapter.navigationUrl(address), mapAdapter.provider());
     }
 
     @Override
@@ -98,15 +145,11 @@ public class DeliveryServiceImpl implements DeliveryService {
             notificationService.notifyUser(order.getCustomerId(), "餐品已备好，请到店取餐", orderId);
             return null;
         }
-        if (deliveryTaskMapper.selectByOrderId(orderId) != null)
-            throw new APIException("该订单已经生成配送任务");
+        if (deliveryTaskMapper.selectByOrderId(orderId) != null) throw new APIException("该订单已经生成配送任务");
         changeOrderState(orderId, OrderStatus.WAITING_DISPATCH, OrderStatus.WAITING_RIDER_ACCEPT,
                 merchant.getId(), "商家确认出餐，配送任务进入接单大厅");
-        DeliveryTask task = new DeliveryTask();
-        task.setOrderId(orderId);
-        task.setTaskStatus(DeliveryTaskStatus.WAITING_RIDER.name());
-        task.setDistanceKm(estimateDistance(orderId));
-        task.setRiderFee(order.getDeliveryPrice() == null ? BigDecimal.ZERO : order.getDeliveryPrice());
+        DeliveryTask task = new DeliveryTask(); task.setOrderId(orderId); task.setTaskStatus(DeliveryTaskStatus.WAITING_RIDER.name());
+        task.setDistanceKm(estimateDistance(orderId)); task.setRiderFee(order.getDeliveryPrice() == null ? BigDecimal.ZERO : order.getDeliveryPrice());
         deliveryTaskMapper.insertTask(task);
         notificationService.notifyUser(order.getCustomerId(), "餐品已出餐，正在等待骑手接单", orderId);
         notificationService.notifyAudience(AuthorityName.RIDER, "新配送任务 #" + task.getId() + " 等待骑手接单", orderId);
@@ -376,10 +419,10 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     private void changeOrderState(Long orderId,
-            OrderStatus expected,
-            OrderStatus target,
-            Long operatorUserId,
-            String reason) {
+                                  OrderStatus expected,
+                                  OrderStatus target,
+                                  Long operatorUserId,
+                                  String reason) {
         orderStateTransitionService.transition(orderId, expected, target, operatorUserId, reason);
     }
 

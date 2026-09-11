@@ -1,35 +1,59 @@
 package com.tju.elm_bk.dto;
 
-import jakarta.validation.constraints.Email;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tju.elm_bk.entity.Authority;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/** Self-registration accepts profile fields only; authority and account status are server-owned. */
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
+@Schema(description = "自然人用户创建请求DTO")
+@AllArgsConstructor
+@NoArgsConstructor
 public class PersonCreateDTO {
+    @Schema(description = "删除状态")
+    @JsonProperty("deleted")
+    private Boolean isDeleted=false;
+
     @NotBlank(message = "用户名不能为空")
-    @Size(max = 20, message = "用户名不能超过20个字符")
+    @Schema(description = "用户名")
+    @Size(min = 1, max = 20, message = "用户名长度必须在1-20个字符之间")
     private String username;
 
+    @Schema(description = "密码")
     @NotBlank(message = "密码不能为空")
-    @Size(min = 8, max = 32, message = "密码长度需为8–32位")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "密码须同时包含字母和数字")
+    @Size(min = 8, max = 32, message = "密码长度需为8-32位")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "密码必须同时包含字母和数字")
     private String password;
 
-    @NotBlank(message = "手机号不能为空")
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "请输入11位有效手机号")
+    @Schema(description = "用户权限")
+    private List<Authority> authorities;
+
+    @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$", message = "邮箱格式错误")
+    @Schema(description = "邮箱")
+    private String email;
+
+    @Schema(description = "名")
+    private String firstName;
+
+    @Schema(description = "姓")
+    private String lastName;
+
+    @Schema(description = "性别")
+    private String gender;
+
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式错误")
+    @Schema(description = "电话")
     private String phone;
 
-    @Email(message = "邮箱格式不正确")
-    @Size(max = 255)
-    private String email;
-    @Size(max = 255) private String firstName;
-    @Size(max = 255) private String lastName;
-    @Size(max = 20) private String gender;
+    @Schema(description = "照片")
+    private String photo;
 
-    public void setUsername(String username) {
-        this.username = username == null ? null : username.trim();
-    }
 }

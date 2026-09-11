@@ -195,7 +195,6 @@ public class OrderSubmissionService {
             detail.setOrderId(orderId);
             detail.setQuantity(item.getQuantity());
             detail.setFoodId(item.getFoodId());
-            detail.setFoodNameSnapshot(item.getFoodName());
             detail.setFoodPrice(item.getFoodPrice().setScale(2, RoundingMode.HALF_UP));
             detail.setCreator(userId);
             detail.setUpdater(userId);

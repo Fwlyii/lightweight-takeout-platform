@@ -4,15 +4,16 @@ server:
 spring:
   application:
     name: elm
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
+      file-size-threshold: 10MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:mysql://localhost:3306/elm_v2}}
     username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:root}}
     password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 6MB
 
 
 #  data:
@@ -58,11 +59,26 @@ app:
 # DeepSeek AI配置
 deepseek:
   api-key: ${DEEPSEEK_API_KEY:}
-  base-url: https://api.deepseek.com
+  base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
   chat-endpoint: /chat/completions
-  model: deepseek-chat
+  model: ${DEEPSEEK_MODEL:deepseek-v4-flash}
+  thinking-enabled: ${DEEPSEEK_THINKING_ENABLED:false}
   max-tokens: 1024
   temperature: 0.7
   top-p: 0.9
   timeout-seconds: 10
-  max-retries: 3
+  max-retries: 1
+
+# 千问AI平台多模态能力：Qwen-VL 图片识菜与 Qwen-ASR 语音转写。
+# 密钥只允许通过环境变量注入。
+multimodal-ai:
+  api-key: ${DASHSCOPE_API_KEY:}
+  base-url: ${DASHSCOPE_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+  chat-endpoint: /chat/completions
+  vision-model: ${DASHSCOPE_VISION_MODEL:qwen3-vl-flash}
+  speech-model: ${DASHSCOPE_SPEECH_MODEL:qwen3-asr-flash}
+  timeout-seconds: 10
+  max-retries: 1
+  max-image-bytes: 5242880
+  # OpenAI兼容接口要求Base64编码后的音频不超过10MB，原始文件限制为7MB。
+  max-audio-bytes: 7340032

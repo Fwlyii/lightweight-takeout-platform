@@ -20,17 +20,6 @@ services:
       timeout: 5s
       retries: 30
 
-  migrate:
-    image: mysql:8.0.40
-    environment:
-      MYSQL_PWD: elm_demo_root_password
-    volumes:
-      - ./elm_bk/db/migrations/003_order_name_snapshot.sql:/migrations/003_order_name_snapshot.sql:ro
-    command: ["sh", "-c", "mysql -hmysql -uroot elm_v2 < /migrations/003_order_name_snapshot.sql"]
-    depends_on:
-      mysql:
-        condition: service_healthy
-
   backend:
     build:
       context: ./elm_bk
@@ -42,7 +31,15 @@ services:
       JWT_SECRET: ${JWT_SECRET:?请先通过启动脚本生成或在.env中配置JWT_SECRET}
       APP_DEMO_ENABLED: "true"
       APP_UPLOAD_DIR: /app/uploads
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-}
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_BASE_URL: ${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-v4-flash}
+      DEEPSEEK_THINKING_ENABLED: ${DEEPSEEK_THINKING_ENABLED:-false}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+      DASHSCOPE_BASE_URL: ${DASHSCOPE_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+      DASHSCOPE_VISION_MODEL: ${DASHSCOPE_VISION_MODEL:-qwen3-vl-flash}
+      DASHSCOPE_SPEECH_MODEL: ${DASHSCOPE_SPEECH_MODEL:-qwen3-asr-flash}
       TZ: Asia/Shanghai
     volumes:
       - ./runtime-uploads:/app/uploads
@@ -51,15 +48,11 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
 
   frontend:
     build:
       context: ./elmclient
       dockerfile: Dockerfile.demo
-      args:
-        VUE_APP_AMAP_KEY: ${VUE_APP_AMAP_KEY:-}
     ports:
       - "127.0.0.1:18081:80"
     depends_on:

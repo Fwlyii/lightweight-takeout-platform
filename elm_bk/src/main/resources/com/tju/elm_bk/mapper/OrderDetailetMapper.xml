@@ -4,8 +4,8 @@
 
 <mapper namespace="com.tju.elm_bk.mapper.OrderDetailetMapper">
     <insert id="saveOrderDetailPlus" useGeneratedKeys="true" keyProperty="id">
-        insert into orderdetailet (create_time, creator, is_deleted, update_time, updater, quantity, food_id, order_id, food_price, food_name_snapshot)
-        values (#{createTime}, #{creator}, #{isDeleted}, #{updateTime}, #{updater}, #{quantity}, #{foodId}, #{orderId}, #{foodPrice}, #{foodNameSnapshot})
+        insert into orderdetailet (create_time, creator, is_deleted, update_time, updater, quantity, food_id, order_id,food_price)
+        values (#{createTime}, #{creator}, #{isDeleted}, #{updateTime}, #{updater}, #{quantity}, #{foodId}, #{orderId},#{foodPrice})
     </insert>
 
 </mapper>

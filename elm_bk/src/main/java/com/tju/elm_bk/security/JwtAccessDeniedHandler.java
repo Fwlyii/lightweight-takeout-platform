@@ -2,6 +2,7 @@ package com.tju.elm_bk.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tju.elm_bk.result.HttpResult;
+import com.tju.elm_bk.result.ResultCodeEnum;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +15,16 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
-    private final ObjectMapper json;
+
+    private final ObjectMapper objectMapper;
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException ex)
-            throws IOException {
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException {
+        // sendError 会触发 /error 二次分发，并可能把已认证用户的 403 错写成 401。
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json;charset=UTF-8");
-        json.writeValue(response.getOutputStream(), HttpResult.failure("NOT_ENOUGH_PERMISSION", "无权进行此操作"));
+        objectMapper.writeValue(response.getOutputStream(),
+                HttpResult.failure(ResultCodeEnum.NOT_ENOUGH_PERMISSION));
     }
 }

@@ -1,14 +1,15 @@
 package com.tju.elm_bk.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.tju.elm_bk.dto.AddressCreateDTO;
 import com.tju.elm_bk.dto.AiChatRequestDTO;
 import com.tju.elm_bk.dto.BusinessPermissionDTO;
 import com.tju.elm_bk.dto.MerchantInteractionDTO;
 import com.tju.elm_bk.entity.DeliveryAddress;
+import com.tju.elm_bk.entity.User;
+import com.tju.elm_bk.exception.APIException;
 import com.tju.elm_bk.mapper.DeliveryAddressMapper;
-import com.tju.elm_bk.service.AccountWriteLock;
+import com.tju.elm_bk.mapper.UserMapper;
 import com.tju.elm_bk.service.CurrentUserService;
 import com.tju.elm_bk.service.impl.AddressServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -54,45 +55,37 @@ class RequestIdentityBoundaryTest {
 
     @Test
     void addressWithoutClientIdentityBelongsToAuthenticatedUser() {
+        UserMapper userMapper = mock(UserMapper.class);
         DeliveryAddressMapper addressMapper = mock(DeliveryAddressMapper.class);
         CurrentUserService currentUserService = mock(CurrentUserService.class);
-        AccountWriteLock writeLock = mock(AccountWriteLock.class);
+        AddressServiceImpl service = new AddressServiceImpl(userMapper, addressMapper, currentUserService);
+        User currentUser = user(7L, "current-user");
+        when(currentUserService.requireUser()).thenReturn(currentUser);
+        when(currentUserService.isAdmin(currentUser)).thenReturn(false);
 
-        AddressServiceImpl service =
-                new AddressServiceImpl(addressMapper, currentUserService, writeLock);
+        service.addDeliveryAddress(validAddress());
 
-        when(writeLock.acquire()).thenReturn(7L);
-        when(addressMapper.listDeliveryAddressByUserId(7L))
-                .thenReturn(java.util.List.of());
-
-        service.create(validAddress());
-
-        ArgumentCaptor<DeliveryAddress> captor =
-                ArgumentCaptor.forClass(DeliveryAddress.class);
-
+        ArgumentCaptor<DeliveryAddress> captor = ArgumentCaptor.forClass(DeliveryAddress.class);
         verify(addressMapper).insert(captor.capture());
-
         assertEquals(7L, captor.getValue().getUserId());
         assertEquals(7L, captor.getValue().getCreator());
-        assertEquals(7L, captor.getValue().getUpdater());
     }
 
     @Test
-    void addressRequestCannotInjectOwnershipThroughJson() {
-        assertThrows(
-                UnrecognizedPropertyException.class,
-                () -> new ObjectMapper().readValue(
-                        """
-                        {
-                          "contactName":"张同学",
-                          "contactSex":1,
-                          "contactTel":"13800138000",
-                          "address":"天津大学北洋园校区",
-                          "userId":999
-                        }
-                        """,
-                        AddressCreateDTO.class)
-        );
+    void normalUserCannotCreateAddressForAnotherUsername() {
+        UserMapper userMapper = mock(UserMapper.class);
+        DeliveryAddressMapper addressMapper = mock(DeliveryAddressMapper.class);
+        CurrentUserService currentUserService = mock(CurrentUserService.class);
+        AddressServiceImpl service = new AddressServiceImpl(userMapper, addressMapper, currentUserService);
+        User currentUser = user(7L, "current-user");
+        when(currentUserService.requireUser()).thenReturn(currentUser);
+        when(currentUserService.isAdmin(currentUser)).thenReturn(false);
+        AddressCreateDTO request = validAddress();
+        AddressCreateDTO.CustomerSimpleDTO customer = new AddressCreateDTO.CustomerSimpleDTO();
+        customer.setUsername("another-user");
+        request.setCustomer(customer);
+
+        assertThrows(APIException.class, () -> service.addDeliveryAddress(request));
     }
 
     private AddressCreateDTO validAddress() {
@@ -102,5 +95,12 @@ class RequestIdentityBoundaryTest {
         dto.setContactTel("13800138000");
         dto.setAddress("天津大学北洋园校区");
         return dto;
+    }
+
+    private User user(Long id, String username) {
+        User user = new User();
+        user.setId(id);
+        user.setUsername(username);
+        return user;
     }
 }

@@ -1,30 +1,53 @@
 <template>
   <main class="login-page">
-    <form class="login-card" @submit.prevent="login">
-      <h1>{{ activeRole.title }}</h1>
-      <fieldset :disabled="submitting">
-        <legend>选择登录端</legend>
-        <div class="role-options">
-          <button v-for="role in roleOptions" :key="role.key" type="button"
-                  :aria-pressed="selectedRole === role.key" :class="{ selected: selectedRole === role.key }"
-                  @click="selectRole(role.key)">{{ role.label }}</button>
+    <section class="login-shell">
+      <aside class="login-intro">
+        <div class="intro-logo"><i class="fas fa-utensils"></i></div>
+        <p class="eyebrow">饿了么</p>
+        <h1>选择登录端</h1>
+      </aside>
+
+      <form class="login-card" @submit.prevent="login">
+        <div class="card-heading">
+          <p class="card-kicker">账号登录</p>
+          <h2>{{ activeRole.title }}</h2>
+          <p>{{ activeRole.subtitle }}</p>
         </div>
-        <label for="login-username">用户名 / 手机号</label>
-        <input id="login-username" v-model.trim="username" autocomplete="username" required maxlength="100"
-               placeholder="请输入用户名或手机号">
-        <label for="login-password">密码</label>
-        <div class="password-row">
-          <input id="login-password" v-model="password" :type="showPassword ? 'text' : 'password'"
-                 autocomplete="current-password" required maxlength="72" placeholder="请输入密码">
-          <button type="button" @click="showPassword = !showPassword">{{ showPassword ? '隐藏' : '显示' }}</button>
+
+        <div class="role-grid" role="tablist" aria-label="登录身份">
+          <button
+            v-for="item in roleOptions"
+            :key="item.key"
+            type="button"
+            class="role-item"
+            :class="{ selected: selectedRole === item.key }"
+            @click="selectRole(item.key)"
+          >
+            <i :class="item.icon"></i>
+            <span>{{ item.label }}</span>
+          </button>
         </div>
-        <label class="remember"><input v-model="rememberMe" type="checkbox">记住我</label>
-        <p v-if="error" class="error" role="alert">{{ error }}</p>
-        <button class="login-button" type="submit">{{ submitting ? '正在登录…' : '登录' }}</button>
-        <router-link v-if="selectedRole !== 'admin'" class="register-link"
-                     :to="{ path: '/register', query: { role: selectedRole } }">还没有账号？立即注册</router-link>
-      </fieldset>
-    </form>
+
+        <label class="field">
+          <span>用户名</span>
+          <div class="input-wrap"><i class="fas fa-user"></i><input v-model.trim="userName" type="text" autocomplete="username" placeholder="请输入用户名" /></div>
+        </label>
+        <label class="field">
+          <span>密码</span>
+          <div class="input-wrap"><i class="fas fa-lock"></i><input v-model="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password" placeholder="请输入密码" /><button class="password-toggle" type="button" :aria-label="showPassword ? '隐藏密码' : '显示密码'" @click="showPassword = !showPassword"><i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i></button></div>
+        </label>
+
+        <div class="form-options">
+          <label><input v-model="rememberMe" type="checkbox" /> 记住我</label>
+          <span v-if="savedUserName">上次登录：{{ savedUserName }}</span>
+        </div>
+        <button class="login-button" type="submit" :disabled="submitting">
+          <i v-if="submitting" class="fas fa-spinner fa-spin"></i>
+          {{ submitting ? '正在登录…' : activeRole.button }}
+        </button>
+        <p v-if="selectedRole === 'user'" class="register-hint">还没有账号？ <router-link to="/register">立即注册</router-link></p>
+      </form>
+    </section>
   </main>
 </template>
 
@@ -32,73 +55,80 @@
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import request from '../utils/request';
-import { saveAuth, clearAuth } from '../utils/auth';
-import { ROLE_DEFINITIONS } from '../utils/roles';
-import { createAuthenticationClient, selectLoginDestination } from '../utils/authenticationClient';
+import { toast } from '../utils/toast';
+import { ROLE_DEFINITIONS, roleCanEnter } from '../utils/roles';
+import { clearAuth, saveAuth, updateStoredUser } from '../utils/auth';
 
-const route = useRoute();
 const router = useRouter();
-const selectedRole = ref('user');
-const roleOptions = Object.values(ROLE_DEFINITIONS);
-const activeRole = computed(() => ROLE_DEFINITIONS[selectedRole.value]);
-const username = ref('');
+const route = useRoute();
+const roleMap = ROLE_DEFINITIONS;
+const roleOptions = Object.values(roleMap);
+const queryRole = typeof route.query.role === 'string' && roleMap[route.query.role] ? route.query.role : 'user';
+const selectedRole = ref(queryRole);
+const userName = ref(localStorage.getItem('savedUserName') || '');
 const password = ref('');
 const showPassword = ref(false);
 const rememberMe = ref(false);
 const submitting = ref(false);
-const error = ref('');
-const authentication = createAuthenticationClient(request, { saveAuth, clearAuth });
+const savedUserName = computed(() => localStorage.getItem('savedUserName') || '');
+const activeRole = computed(() => roleMap[selectedRole.value]);
 
-watch(() => route.query.role, role => {
-  selectedRole.value = Object.hasOwn(ROLE_DEFINITIONS, role) ? role : 'user';
-  error.value = '';
-}, { immediate: true });
+watch(() => route.query.role, value => {
+  if (typeof value === 'string' && roleMap[value]) selectedRole.value = value;
+});
 
-function selectRole(role) {
-  if (!submitting.value) router.replace({ query: { ...route.query, role } });
-}
+const selectRole = (key) => {
+  selectedRole.value = key;
+  router.replace({ query: { ...route.query, role: key } });
+};
 
-async function login() {
-  if (submitting.value) return;
-  if (!username.value || !password.value) { error.value = '请输入账号和密码'; return; }
+const login = async () => {
+  if (!userName.value) return toast.error('请输入用户名');
+  if (!password.value) return toast.error('请输入密码');
   submitting.value = true;
-  error.value = '';
   try {
-    const session = await authentication.login({
-      username: username.value, password: password.value, role: selectedRole.value, rememberMe: rememberMe.value
+    const auth = await request.post('/api/auth', {
+      username: userName.value,
+      password: password.value,
+      rememberMe: rememberMe.value,
+      role: selectedRole.value
     });
-    password.value = '';
-    const target = selectLoginDestination(session, route.query.redirect, path => router.resolve(path));
-    await router.replace(target);
-  } catch (failure) {
-    error.value = failure.response?.data?.message
-      || (failure.isAxiosError ? '网络连接失败，请稍后重试' : failure.message || '登录失败，请重试');
+    if (!auth?.id_token) return toast.error(auth?.message || '登录失败');
+    // 登录身份切换时先清掉上一个账号的认证信息，避免路由守卫读到旧的 localStorage。
+    // 这对“记住我”后再切换用户/商家/骑手尤其重要。
+    saveAuth(auth.id_token, null, rememberMe.value, auth.role || selectedRole.value);
+    const userRes = await request.get('/api/user');
+    updateStoredUser(userRes);
+    if (rememberMe.value) localStorage.setItem('savedUserName', userName.value);
+    else localStorage.removeItem('savedUserName');
+
+    if (auth.application_only && activeRole.value.applyTarget) {
+      toast.info(`请先完成${activeRole.value.label}入驻申请`);
+      router.push(activeRole.value.applyTarget);
+      return;
+    }
+    if (!roleCanEnter(userRes, selectedRole.value)) {
+      clearAuth();
+      toast.error('账号权限刚刚发生变化，请重新登录');
+      return;
+    }
+	    toast.success(`已进入${activeRole.value.label}端`);
+	    const redirect = typeof route.query.redirect === 'string'
+	      && route.query.redirect.startsWith('/')
+	      && !route.query.redirect.startsWith('//')
+	      ? route.query.redirect
+	      : null;
+	    router.push(selectedRole.value === 'user' && redirect ? redirect : activeRole.value.target);
+  } catch (error) {
+    clearAuth();
+    toast.error(error.response?.data?.message || '用户名或密码错误');
   } finally {
     submitting.value = false;
   }
-}
+};
 </script>
 
 <style scoped>
-.login-page { box-sizing: border-box; min-height: 100dvh; display: grid; place-items: center; padding: 24px 12px; background: #f5f7fa; color: #263442; }
-.login-page * { box-sizing: border-box; }
-.login-card { width: 100%; max-width: 430px; padding: 28px; border-radius: 10px; background: #fff; }
-h1 { margin: 0 0 26px; font-size: 24px; text-align: center; }
-fieldset { border: 0; min-width: 0; padding: 0; margin: 0; }
-legend { padding: 0; margin-bottom: 10px; font-size: 14px; color: #607182; }
-.role-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 24px; }
-.role-options button { min-height: 42px; padding: 8px 2px; border: 1px solid #d9e1e8; border-radius: 6px; background: #fff; color: #526371; font: inherit; font-size: 14px; }
-.role-options .selected { background: #edf7ff; color: #087bbb; border-color: #168bd2; }
-label { display: block; margin: 18px 0 8px; font-size: 14px; }
-input:not([type=checkbox]) { width: 100%; min-width: 0; height: 44px; padding: 10px 12px; border: 1px solid #d9e1e8; border-radius: 6px; background: #fff; color: inherit; font: inherit; font-size: 16px; }
-input:focus-visible, button:focus-visible { outline: 2px solid #168bd2; outline-offset: 2px; }
-.password-row { display: flex; gap: 8px; }
-.password-row button { flex-shrink: 0; padding: 0 10px; background: #f1f6fa; border: 0; border-radius: 6px; color: #168bd2; }
-.remember { display: flex; align-items: center; gap: 6px; color: #607182; }
-.remember input { accent-color: #168bd2; width: 16px; height: 16px; }
-.error { color: #c0392b; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
-.login-button { width: 100%; min-height: 44px; margin-top: 16px; background: #168bd2; color: #fff; border: 0; border-radius: 6px; font: inherit; cursor: pointer; }
-fieldset:disabled { opacity: .65; }
-.register-link { display: block; margin-top: 20px; text-align: center; color: #168bd2; font-size: 14px; text-decoration: none; }
-@media (max-width: 360px) { .login-card { padding: 22px 18px; } }
+*{box-sizing:border-box}.login-page{min-height:100vh;background:#f5f9fd;display:flex;align-items:center;justify-content:center;padding:32px 20px;color:#24405c}.back-btn-container{position:fixed;top:18px;left:20px;z-index:10}.login-shell{width:min(100%,980px);min-height:590px;background:#fff;border:1px solid #e1edf8;border-radius:12px;display:grid;grid-template-columns:42% 58%;overflow:hidden;box-shadow:0 12px 35px rgba(45,100,155,.09)}.login-intro{padding:68px 52px;background:#eaf5ff;border-right:1px solid #dcecf9;display:flex;flex-direction:column;justify-content:center}.intro-logo{width:52px;height:52px;border-radius:10px;background:#0097ff;color:#fff;display:grid;place-items:center;font-size:22px;margin-bottom:28px}.eyebrow{font-size:10px;color:#4f8ac0;letter-spacing:1.4px;font-weight:700}.login-intro h1{font-size:36px;line-height:1.25;margin:18px 0;color:#173b60;font-weight:700}.login-intro h1 span{color:#0097ff}.intro-copy{color:#69839d;font-size:14px;line-height:1.9;max-width:280px}.intro-line{display:flex;align-items:center;gap:10px;margin-top:46px;color:#7592ad;font-size:11px}.intro-line span{width:30px;border-top:1px solid #95c8ed}.login-card{padding:58px 70px;display:flex;flex-direction:column;justify-content:center}.card-kicker{margin:0;color:#5f87aa;font-size:12px}.card-heading h2{font-size:28px;margin:8px 0;color:#183b5e}.card-heading>p:last-child{font-size:13px;color:#8096ab;margin-bottom:25px}.role-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px}.role-item{border:1px solid #dfebf5;background:#fff;border-radius:7px;height:64px;color:#7b92a7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:11px}.role-item i{font-size:17px}.role-item:hover,.role-item.selected{border-color:#80c5f4;background:#edf8ff;color:#007fda}.field{display:block;margin-bottom:16px}.field>span{display:block;font-size:12px;color:#526f8b;font-weight:600;margin-bottom:7px}.input-wrap{height:44px;display:flex;align-items:center;gap:9px;padding:0 13px;border:1px solid #d8e5f0;border-radius:6px;background:#fff}.input-wrap:focus-within{border-color:#66b9ee;box-shadow:0 0 0 3px #e8f5ff}.input-wrap i{color:#98aec1;font-size:13px}.input-wrap input{border:0;outline:0;flex:1;font-size:14px;color:#29455f}.form-options{display:flex;justify-content:space-between;align-items:center;color:#8297aa;font-size:11px;margin:1px 0 21px}.form-options label{display:flex;align-items:center;gap:5px}.form-options input{accent-color:#0097ff}.login-button{height:45px;border:0;border-radius:6px;background:#0097ff;color:#fff;font-weight:600;font-size:15px;cursor:pointer;box-shadow:0 5px 12px rgba(0,151,255,.2)}.login-button:hover{background:#007fd8}.login-button:disabled{opacity:.7;cursor:wait}.register-hint{text-align:center;color:#8297aa;font-size:12px;margin:18px 0 0}.register-hint a{color:#008be7}.security-note{text-align:center;color:#a0afbd;font-size:10px;margin:20px 0 0}.security-note i{color:#7db9e5;margin-right:4px}@media(max-width:760px){.login-page{padding:18px 14px}.login-shell{display:block;min-height:0}.login-intro{padding:28px 26px;min-height:205px}.intro-logo{width:42px;height:42px;font-size:18px;margin-bottom:14px}.login-intro h1{font-size:27px;margin:10px 0}.intro-copy{font-size:12px;line-height:1.6}.intro-line{margin-top:18px}.login-card{padding:30px 24px 34px}.role-item{height:58px}.card-heading h2{font-size:24px}}
+.input-wrap input{min-width:0}.password-toggle{border:0;background:transparent;color:#7592aa;padding:6px;cursor:pointer}.password-toggle i{color:inherit}
 </style>

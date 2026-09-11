@@ -83,11 +83,10 @@ class OrderPricingTrustBoundaryTest {
                 currentUserService, stateTransitionService, submissionService, settlementService);
 
         SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("demo_user", "unused", List.of()));
+                new UsernamePasswordAuthenticationToken("demo_user", "unused"));
         User currentUser = new User();
         currentUser.setId(11L);
         currentUser.setUsername("demo_user");
-        currentUser.setActivated(true);
         currentUser.setIsDeleted(false);
         when(userMapper.findByUsernameWithAuthorities("demo_user")).thenReturn(currentUser);
 

@@ -1,1 +1,1 @@
-export const DEFAULT_AVATAR_URL = '/images/default-user-avatar.png';
+export const DEFAULT_USER_AVATAR = '/images/default-user-avatar.png';
