@@ -7,6 +7,29 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+      @media (min-width: 881px) {
+        html body #app .app-container .content .login-page {
+          background-color: #f8fbfe !important;
+          background-image:
+            linear-gradient(90deg, rgba(248, 251, 254, .04) 0%, rgba(248, 251, 254, .14) 36%, rgba(248, 251, 254, .78) 57%, #f8fbfe 72%),
+            url('/images/login-food-bg.webp?v=20260911-3') !important;
+          background-size: cover, cover !important;
+          background-position: center, left center !important;
+          background-repeat: no-repeat, no-repeat !important;
+        }
+
+        html body #app .app-container .content .login-page::before {
+          display: none !important;
+        }
+      }
+
+      @media (max-width: 880px) {
+        html body #app .app-container .content .login-page {
+          background-image: none !important;
+        }
+      }
+    </style>
   </head>
   <body>
     <noscript>
