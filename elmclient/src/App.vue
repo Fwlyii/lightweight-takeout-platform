@@ -2,7 +2,11 @@
   <div class="app-container">
     <BackButton v-if="showBackButton" />
     <div class="content">
-      <router-view />
+      <router-view v-slot="{ Component, route: viewRoute }">
+        <transition :name="viewRoute.name === 'Login' ? 'auth-route' : 'page-route'" mode="out-in">
+          <component :is="Component" :key="viewRoute.path" />
+        </transition>
+      </router-view>
     </div>
     <Footer v-if="showFooter" />
     <BusinessFooter v-if="showBusinessFooter" />
@@ -149,6 +153,7 @@ ol {
 a {
   text-decoration: none;
 }
+
 .app-container {
   display: flex;
   flex-direction: column;
@@ -158,5 +163,61 @@ a {
 .content {
   flex: 1;
   overflow-y: auto;
+}
+
+/* 普通页面保持轻量淡入，避免路由切换出现生硬闪烁。 */
+.page-route-enter-active,
+.page-route-leave-active {
+  transition: opacity .16s ease, transform .16s ease;
+}
+
+.page-route-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.page-route-leave-to {
+  opacity: 0;
+  transform: translateY(-2px);
+}
+
+/* 登录页进入时稍慢一些，形成独立但克制的身份切换反馈。 */
+.auth-route-enter-active {
+  transition: opacity .24s ease, transform .24s cubic-bezier(.22, .61, .36, 1);
+}
+
+.auth-route-leave-active {
+  transition: opacity .14s ease, transform .14s ease;
+}
+
+.auth-route-enter-from {
+  opacity: 0;
+  transform: translateY(12px) scale(.992);
+}
+
+.auth-route-leave-to {
+  opacity: 0;
+  transform: scale(.995);
+}
+
+@media (max-width: 680px) {
+  .auth-route-enter-from {
+    opacity: 0;
+    transform: translateX(22px);
+  }
+
+  .auth-route-leave-to {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-route-enter-active,
+  .page-route-leave-active,
+  .auth-route-enter-active,
+  .auth-route-leave-active {
+    transition: none;
+  }
 }
 </style>
