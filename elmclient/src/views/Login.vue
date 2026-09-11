@@ -1,5 +1,8 @@
 <template>
   <main class="login-page">
+    <div class="ambient ambient-left" aria-hidden="true"></div>
+    <div class="ambient ambient-right" aria-hidden="true"></div>
+
     <header class="brand-header">
       <router-link class="brand-link" to="/index" aria-label="返回首页">
         <span class="brand-mark" aria-hidden="true"><i class="fa fa-cutlery"></i></span>
@@ -7,16 +10,25 @@
         <span class="brand-divider" aria-hidden="true"></span>
         <span class="brand-product">校园外卖</span>
       </router-link>
-      <router-link class="home-link" to="/index">返回首页</router-link>
+      <router-link class="home-link" to="/index">
+        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+        <span>返回首页</span>
+      </router-link>
     </header>
 
     <section class="hero-shell" aria-label="账号登录">
-      <div class="hero-copy" aria-hidden="true">
-        <p class="hero-kicker">ELEME CAMPUS</p>
-        <h1>想吃什么，<br><span>现在就点。</span></h1>
-        <p class="hero-description">附近好店、便捷下单、即时配送。<br>登录后，继续你的这一餐。</p>
-        <div class="hero-line"></div>
-        <p class="hero-note">让校园里的每一餐，更简单一点。</p>
+      <div class="hero-side" aria-hidden="true">
+        <div class="hero-copy">
+          <p class="hero-kicker">ELEME CAMPUS</p>
+          <h1>想吃什么，<br><span>现在就点。</span></h1>
+          <p class="hero-description">附近好店、便捷下单、即时配送。<br>登录后，继续你的这一餐。</p>
+          <div class="hero-line"></div>
+          <p class="hero-note">让校园里的每一餐，更简单一点。</p>
+        </div>
+
+        <div class="food-visual">
+          <img src="/images/login-food-bg.webp?v=20260912-1" alt="" />
+        </div>
       </div>
 
       <form
@@ -103,9 +115,9 @@
         <div class="form-row">
           <label class="remember-option">
             <input v-model="rememberMe" type="checkbox" />
+            <span class="checkbox-ui" aria-hidden="true"><i class="fa fa-check"></i></span>
             <span>记住我</span>
           </label>
-          <span class="identity-note">{{ activeRole.label }}端</span>
         </div>
 
         <transition name="error-fade">
@@ -126,11 +138,10 @@
           <span>{{ loginButtonText }}</span>
         </button>
 
-        <transition name="hint-fade" mode="out-in">
-          <p v-if="selectedRole === 'user'" key="register" class="register-line">
+        <transition name="hint-fade">
+          <p v-if="selectedRole === 'user'" class="register-line">
             还没有账号？<router-link to="/register">立即注册</router-link>
           </p>
-          <p v-else key="role-note" class="register-line muted">请使用对应身份账号登录</p>
         </transition>
       </form>
     </section>
@@ -271,42 +282,38 @@ const login = async () => {
   flex-direction: column;
   overflow: hidden;
   color: #173b60;
-  background: #f8fbfe;
+  background: linear-gradient(135deg, #fbfdff 0%, #f7fbfe 48%, #fafdff 100%);
 }
 
-.login-page::before {
-  content: '';
+.ambient {
   position: absolute;
-  width: 720px;
-  height: 720px;
-  left: -250px;
-  bottom: -330px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, rgba(0, 151, 255, .16), rgba(72, 183, 255, .03));
   pointer-events: none;
-  animation: ambient-left 13s ease-in-out infinite alternate;
-  transform-origin: 52% 48%;
+  border-radius: 50%;
 }
 
-.login-page::after {
-  content: '';
-  position: absolute;
+.ambient-left {
+  width: 520px;
+  height: 520px;
+  left: -300px;
+  bottom: -290px;
+  background: rgba(0, 151, 255, .07);
+  animation: ambient-left 14s ease-in-out infinite alternate;
+}
+
+.ambient-right {
   width: 420px;
   height: 420px;
   right: -190px;
   top: -230px;
-  border-radius: 50%;
   background: rgba(0, 151, 255, .055);
-  pointer-events: none;
   animation: ambient-right 16s ease-in-out infinite alternate;
-  transform-origin: 42% 56%;
 }
 
 .brand-header {
   position: relative;
-  z-index: 2;
+  z-index: 5;
   width: min(1180px, calc(100% - 64px));
-  height: 92px;
+  height: 88px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -341,10 +348,10 @@ const login = async () => {
 }
 
 .brand-name {
+  color: #173b60;
   font-size: 20px;
   font-weight: 800;
   letter-spacing: .02em;
-  color: #173b60;
 }
 
 .brand-divider {
@@ -360,41 +367,52 @@ const login = async () => {
 }
 
 .home-link {
-  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   color: #70899f;
   font-size: 13px;
   text-decoration: none;
-  transition: color .18s ease;
+  transition: color .18s ease, transform .18s ease;
 }
 
-.home-link::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 100%;
-  bottom: -5px;
-  height: 1px;
-  background: #0097ff;
-  transition: right .2s ease;
+.home-link i {
+  font-size: 11px;
+  transition: transform .18s ease;
 }
 
-.home-link:hover { color: #0097ff; }
-.home-link:hover::after { right: 0; }
+.home-link:hover {
+  color: #0097ff;
+  transform: translateX(-2px);
+}
+
+.home-link:hover i { transform: translateX(-2px); }
 
 .hero-shell {
   position: relative;
-  z-index: 1;
-  width: min(1120px, calc(100% - 64px));
+  z-index: 2;
+  width: min(1100px, calc(100% - 64px));
   margin: auto;
-  padding: 38px 0 68px;
+  padding: 18px 0 54px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 430px;
+  grid-template-columns: minmax(0, 1fr) 410px;
   align-items: center;
-  gap: 92px;
+  gap: 78px;
+}
+
+.hero-side {
+  position: relative;
+  min-width: 0;
+  min-height: 540px;
+  display: flex;
+  align-items: center;
 }
 
 .hero-copy {
-  padding-left: 26px;
+  position: relative;
+  z-index: 3;
+  padding-left: 8px;
+  transform: translateY(-58px);
 }
 
 .hero-kicker,
@@ -413,86 +431,114 @@ const login = async () => {
 .hero-note { animation-delay: .34s; }
 
 .hero-kicker {
-  margin: 0 0 17px;
+  margin: 0 0 15px;
   color: #4e91c5;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: .22em;
+  letter-spacing: .17em;
 }
 
 .hero-copy h1 {
   margin: 0;
   color: #173b60;
-  font-size: clamp(50px, 5vw, 70px);
-  line-height: 1.06;
-  letter-spacing: -.05em;
+  font-size: clamp(48px, 4.5vw, 64px);
+  line-height: 1.045;
+  letter-spacing: -.048em;
   font-weight: 800;
 }
 
 .hero-copy h1 span { color: #0097ff; }
 
 .hero-description {
-  margin: 28px 0 0;
+  margin: 23px 0 0;
   color: #748da3;
-  font-size: 15px;
-  line-height: 1.85;
+  font-size: 14px;
+  line-height: 1.8;
 }
 
 .hero-line {
-  width: 46px;
+  width: 42px;
   height: 3px;
-  margin-top: 31px;
+  margin-top: 25px;
   border-radius: 999px;
   background: #0097ff;
 }
 
 .hero-note {
-  margin: 13px 0 0;
+  margin: 11px 0 0;
   color: #9aaab7;
-  font-size: 12px;
+  font-size: 11px;
+}
+
+.food-visual {
+  position: absolute;
+  z-index: 1;
+  left: -34px;
+  bottom: -22px;
+  width: min(590px, 104%);
+  height: 292px;
+  opacity: .78;
+  pointer-events: none;
+  animation: food-float 11s ease-in-out infinite alternate;
+  -webkit-mask-image: radial-gradient(ellipse 72% 74% at 44% 58%, #000 0%, #000 47%, rgba(0,0,0,.82) 62%, rgba(0,0,0,.25) 78%, transparent 92%);
+  mask-image: radial-gradient(ellipse 72% 74% at 44% 58%, #000 0%, #000 47%, rgba(0,0,0,.82) 62%, rgba(0,0,0,.25) 78%, transparent 92%);
+}
+
+.food-visual img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: left 58%;
+  filter: saturate(.9) contrast(.97) brightness(1.025);
+  border-radius: 34px;
 }
 
 .login-panel {
   width: 100%;
-  padding: 36px 40px 32px;
-  border: 1px solid #e1eaf1;
+  padding: 31px 34px 27px;
+  border: 1px solid rgba(207, 223, 235, .88);
   border-radius: 18px;
-  background: rgba(255, 255, 255, .97);
-  box-shadow: 0 18px 48px rgba(50, 83, 112, .08);
+  background: rgba(255, 255, 255, .965);
+  box-shadow: 0 18px 46px rgba(50, 83, 112, .075);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   animation: panel-rise .58s cubic-bezier(.22, .61, .36, 1) .17s both;
-  transition: border-color .22s ease, box-shadow .22s ease;
+  transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease;
 }
 
 .login-panel:hover {
-  border-color: #d7e7f2;
-  box-shadow: 0 21px 52px rgba(50, 83, 112, .095);
+  border-color: #d3e4ef;
+  box-shadow: 0 20px 50px rgba(50, 83, 112, .09);
 }
 
-.login-panel.success-state {
-  border-color: rgba(32, 165, 107, .28);
-}
+.login-panel.success-state { border-color: rgba(32, 165, 107, .28); }
 
-.panel-heading { min-height: 78px; margin-bottom: 22px; }
+.panel-heading {
+  min-height: 70px;
+  margin-bottom: 17px;
+}
 
 .panel-kicker {
-  margin: 0 0 7px;
+  margin: 0 0 6px;
   color: #5c8db4;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
+  letter-spacing: .02em;
 }
 
 .panel-heading h2 {
   margin: 0;
   color: #173b60;
-  font-size: 28px;
-  line-height: 1.25;
-  letter-spacing: -.03em;
+  font-size: 27px;
+  line-height: 1.22;
+  letter-spacing: -.028em;
 }
 
 .panel-heading-copy > p {
-  margin: 8px 0 0;
+  margin: 7px 0 0;
   color: #8a9dac;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .role-heading-enter-active,
@@ -500,35 +546,28 @@ const login = async () => {
   transition: opacity .16s ease, transform .16s ease;
 }
 
-.role-heading-enter-from {
-  opacity: 0;
-  transform: translateY(5px);
-}
-
-.role-heading-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
-}
+.role-heading-enter-from { opacity: 0; transform: translateY(5px); }
+.role-heading-leave-to { opacity: 0; transform: translateY(-4px); }
 
 .role-tabs {
   --role-index: 0;
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  margin-bottom: 25px;
+  margin-bottom: 21px;
   border-bottom: 1px solid #e8eff4;
 }
 
 .role-tabs button {
   position: relative;
   z-index: 1;
-  height: 42px;
+  height: 40px;
   padding: 0 4px;
   border: 0;
   background: transparent;
   color: #8297aa;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
   transition: color .2s ease, transform .18s ease;
 }
@@ -555,7 +594,7 @@ const login = async () => {
 .role-indicator::after {
   content: '';
   display: block;
-  width: 62%;
+  width: 58%;
   height: 100%;
   margin: 0 auto;
   border-radius: 999px;
@@ -567,28 +606,28 @@ const login = async () => {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: -10px 0 20px;
+  margin: -8px 0 17px;
   color: #6f90a9;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .redirect-hint i { color: #0097ff; }
 
 .field {
   display: block;
-  margin-bottom: 18px;
+  margin-bottom: 15px;
 }
 
 .field > span {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 7px;
   color: #425f78;
   font-size: 12px;
   font-weight: 600;
 }
 
 .input-shell {
-  height: 50px;
+  height: 48px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -599,14 +638,12 @@ const login = async () => {
   transition: border-color .18s ease, box-shadow .18s ease, background .18s ease, transform .18s ease;
 }
 
-.input-shell:hover {
-  border-color: #cddfea;
-}
+.input-shell:hover { border-color: #cddfea; }
 
 .input-shell:focus-within {
   border-color: #62b9f1;
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(0, 151, 255, .07);
+  box-shadow: 0 0 0 4px rgba(0, 151, 255, .065);
   transform: translateY(-1px);
 }
 
@@ -635,11 +672,11 @@ const login = async () => {
 .input-shell input::placeholder { color: #b1c0cc; }
 
 .password-toggle {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: grid;
   place-items: center;
-  flex: 0 0 32px;
+  flex: 0 0 30px;
   border: 0;
   background: transparent;
   color: #8ea4b6;
@@ -652,38 +689,67 @@ const login = async () => {
 .form-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin: 2px 0 20px;
+  margin: 1px 0 18px;
   color: #7f95a7;
   font-size: 12px;
 }
 
 .remember-option {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   cursor: pointer;
+  user-select: none;
 }
 
 .remember-option input {
-  width: 15px;
-  height: 15px;
-  margin: 0;
-  accent-color: #0097ff;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.identity-note { color: #a0afba; }
+.checkbox-ui {
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #c7d7e3;
+  border-radius: 5px;
+  background: #fff;
+  color: transparent;
+  font-size: 9px;
+  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.remember-option:hover .checkbox-ui {
+  border-color: #8dcdf7;
+  transform: translateY(-1px);
+}
+
+.remember-option input:checked + .checkbox-ui {
+  border-color: #0097ff;
+  background: #0097ff;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(0, 151, 255, .18);
+}
+
+.remember-option input:focus-visible + .checkbox-ui {
+  box-shadow: 0 0 0 3px rgba(0, 151, 255, .12);
+}
 
 .inline-error {
   display: flex;
   align-items: flex-start;
   gap: 7px;
-  margin: -5px 0 14px;
-  padding: 10px 12px;
+  margin: -4px 0 13px;
+  padding: 9px 11px;
   border-radius: 9px;
   background: #fff4f2;
   color: #c04c42;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -697,20 +763,14 @@ const login = async () => {
 }
 
 .error-fade-enter-from,
-.hint-fade-enter-from {
-  opacity: 0;
-  transform: translateY(-4px);
-}
+.hint-fade-enter-from { opacity: 0; transform: translateY(-4px); }
 
 .error-fade-leave-to,
-.hint-fade-leave-to {
-  opacity: 0;
-  transform: translateY(3px);
-}
+.hint-fade-leave-to { opacity: 0; transform: translateY(3px); }
 
 .login-button {
   width: 100%;
-  height: 50px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -720,17 +780,17 @@ const login = async () => {
   background: #0097ff;
   color: #fff;
   font: inherit;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 9px 22px rgba(0, 151, 255, .17);
+  box-shadow: 0 9px 22px rgba(0, 151, 255, .16);
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
 }
 
 .login-button:hover:not(:disabled) {
   background: #008ae8;
   transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(0, 151, 255, .22);
+  box-shadow: 0 12px 26px rgba(0, 151, 255, .21);
 }
 
 .login-button:active:not(:disabled) { transform: translateY(1px) scale(.995); }
@@ -738,10 +798,10 @@ const login = async () => {
 .login-button.success { background: #20a56b; box-shadow: 0 9px 22px rgba(32, 165, 107, .18); }
 
 .register-line {
-  margin: 18px 0 0;
+  margin: 16px 0 0;
   text-align: center;
   color: #879aa9;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .register-line a {
@@ -752,16 +812,15 @@ const login = async () => {
 }
 
 .register-line a:hover { text-decoration: underline; }
-.register-line.muted { color: #a0afba; }
 
 .login-footer {
   position: relative;
-  z-index: 1;
-  padding: 0 20px 24px;
+  z-index: 2;
+  padding: 0 20px 20px;
   text-align: center;
-  color: #b1bec8;
-  font-size: 10px;
-  letter-spacing: .08em;
+  color: #bfccd5;
+  font-size: 9px;
+  letter-spacing: .07em;
   animation: footer-fade .5s ease .34s both;
 }
 
@@ -778,7 +837,7 @@ const login = async () => {
 }
 
 @keyframes panel-rise {
-  from { opacity: 0; transform: translateY(16px) scale(.992); }
+  from { opacity: 0; transform: translateY(14px) scale(.994); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
@@ -787,9 +846,14 @@ const login = async () => {
   to { opacity: 1; }
 }
 
+@keyframes food-float {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(8px, -6px, 0) scale(1.012); }
+}
+
 @keyframes ambient-left {
   from { transform: translate3d(0, 0, 0) scale(1); }
-  to { transform: translate3d(12px, -7px, 0) scale(1.025); }
+  to { transform: translate3d(10px, -6px, 0) scale(1.025); }
 }
 
 @keyframes ambient-right {
@@ -805,43 +869,61 @@ const login = async () => {
   80% { transform: translateX(3px); }
 }
 
+@media (max-width: 980px) {
+  .hero-shell {
+    gap: 52px;
+    grid-template-columns: minmax(0, 1fr) 400px;
+  }
+
+  .food-visual { width: 520px; opacity: .68; }
+}
+
 @media (max-width: 880px) {
   .brand-header {
     width: min(100% - 36px, 640px);
-    height: 78px;
+    height: 76px;
   }
 
   .brand-product,
-  .brand-divider,
-  .home-link { display: none; }
+  .brand-divider { display: none; }
+
+  .home-link span { display: none; }
+  .home-link { width: 36px; height: 36px; justify-content: center; }
 
   .hero-shell {
     width: min(100% - 36px, 460px);
     grid-template-columns: 1fr;
-    gap: 28px;
-    padding: 16px 0 46px;
+    gap: 26px;
+    padding: 14px 0 40px;
+  }
+
+  .hero-side {
+    min-height: auto;
+    display: block;
   }
 
   .hero-copy {
-    padding: 4px 2px 0;
+    padding: 2px 2px 0;
     text-align: center;
+    transform: none;
   }
 
   .hero-kicker,
   .hero-line,
-  .hero-note { display: none; }
+  .hero-note,
+  .food-visual { display: none; }
 
   .hero-copy h1 {
-    font-size: 36px;
+    font-size: 35px;
     line-height: 1.12;
-    letter-spacing: -.045em;
+    letter-spacing: -.04em;
   }
 
   .hero-copy h1 br { display: none; }
   .hero-copy h1 span::before { content: ' '; }
 
   .hero-description {
-    margin-top: 12px;
+    margin-top: 11px;
     font-size: 13px;
     line-height: 1.7;
   }
@@ -849,7 +931,7 @@ const login = async () => {
   .hero-description br { display: none; }
 
   .login-panel {
-    padding: 30px 26px 28px;
+    padding: 28px 25px 26px;
     border-radius: 17px;
   }
 }
@@ -858,20 +940,20 @@ const login = async () => {
   .brand-header,
   .hero-shell { width: calc(100% - 28px); }
 
-  .brand-header { height: 70px; }
+  .brand-header { height: 68px; }
   .brand-mark { width: 38px; height: 38px; border-radius: 11px; }
   .brand-name { font-size: 18px; }
 
-  .hero-shell { padding-top: 4px; gap: 22px; }
-  .hero-copy h1 { font-size: 31px; }
+  .hero-shell { padding-top: 2px; gap: 20px; }
+  .hero-copy h1 { font-size: 30px; }
   .hero-description { font-size: 12px; }
 
-  .login-panel { padding: 26px 20px 24px; }
-  .panel-heading h2 { font-size: 25px; }
+  .login-panel { padding: 25px 19px 23px; }
+  .panel-heading h2 { font-size: 24px; }
 
-  .role-tabs button { height: 40px; font-size: 12px; }
-  .input-shell { height: 48px; }
-  .login-button { height: 48px; }
+  .role-tabs button { height: 39px; font-size: 12px; }
+  .input-shell { height: 47px; }
+  .login-button { height: 47px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
