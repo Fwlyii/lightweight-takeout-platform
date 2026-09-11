@@ -200,6 +200,46 @@ a {
   transform: scale(.995);
 }
 
+/* 登录页美食背景：只在桌面端轻量展示，向右逐渐淡出，避免干扰登录表单。 */
+@media (min-width: 881px) {
+  .login-page {
+    background: #f8fbfe !important;
+  }
+
+  .login-page::before {
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    background: url('/images/login-food-bg.webp') left center / cover no-repeat !important;
+    opacity: .42 !important;
+    filter: saturate(.82) contrast(.94) brightness(1.04);
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, .96) 38%, rgba(0, 0, 0, .58) 52%, transparent 70%);
+    mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, .96) 38%, rgba(0, 0, 0, .58) 52%, transparent 70%);
+    animation: none !important;
+    pointer-events: none;
+  }
+
+  .login-page .hero-copy {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .45);
+  }
+
+  .login-page .login-panel,
+  .login-page .brand-header,
+  .login-page .login-footer {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+@media (max-width: 880px) {
+  .login-page::before {
+    background: none !important;
+  }
+}
+
 @media (max-width: 680px) {
   .auth-route-enter-from {
     opacity: 0;
