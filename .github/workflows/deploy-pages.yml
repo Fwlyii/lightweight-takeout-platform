@@ -1,0 +1,61 @@
+name: Deploy frontend to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - fwl-AI
+  workflow_dispatch:
+
+concurrency:
+  group: cloudflare-pages-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - name: Checkout fwl-AI
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: elmclient/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: elmclient
+        run: npm ci --no-audit --no-fund
+
+      - name: Build frontend
+        working-directory: elmclient
+        run: npm run build
+
+      - name: Prepare Pages bundle
+        env:
+          BACKEND_ORIGIN: ${{ secrets.BACKEND_ORIGIN }}
+        run: |
+          if [[ -z "$BACKEND_ORIGIN" ]]; then
+            echo "::error::GitHub secret BACKEND_ORIGIN is not configured."
+            exit 1
+          fi
+          mkdir -p pages-output
+          cp -R elmclient/dist/. pages-output/
+          sed "s|__BACKEND_ORIGIN__|$BACKEND_ORIGIN|g" \
+            deploy/cloudflare-pages/_worker.template.js \
+            > pages-output/_worker.js
+
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: 4.44.0
+          command: pages deploy pages-output --project-name=fwl-ai-demo --branch=main --commit-dirty=true
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
