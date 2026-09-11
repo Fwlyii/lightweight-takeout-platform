@@ -23,7 +23,7 @@ if ! docker info >/dev/null 2>&1; then
 fi
 
 ./scripts/deploy-cloudflare-pages.sh main
-open "https://elm-demo.whliugong.xyz"
+open "https://fwl-ai-demo.pages.dev"
 
 print "部署完成。固定网址不会改变，但演示期间本机与 Docker Desktop 必须保持运行。"
 read "?按回车键关闭窗口……"

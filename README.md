@@ -92,6 +92,6 @@ cd ../elm_bk && ./mvnw test
 
 后端主要环境变量为 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD`、`JWT_SECRET` 和可选的 `DEEPSEEK_API_KEY`。前端高德地图 Key 通过 `elmclient/.env.local` 中的 `VUE_APP_AMAP_KEY` 配置。请勿将密钥或本地 `.env` 提交到 Git。
 
-固定演示地址为 [elm-demo.pages.dev](https://elm-demo.pages.dev) 和 [elm-demo.whliugong.xyz](https://elm-demo.whliugong.xyz)。部署方式见 [固定公网部署说明](./固定公网部署说明.md)。
+固定演示地址为 [fwl-ai-demo.pages.dev](https://fwl-ai-demo.pages.dev)。部署方式见 [固定公网部署说明](./固定公网部署说明.md)。
 
 课程演示可设置 `APP_DEMO_ENABLED=true` 开放模拟支付、余额充值和免费会员。正式部署必须关闭该开关，并接入支付平台的服务端签名回调。

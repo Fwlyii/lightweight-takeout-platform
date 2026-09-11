@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="${0:A:h}"
 REPO_DIR="${SCRIPT_DIR:h}"
 BRANCH="${1:-main}"
-PAGES_PROJECT="elm-demo"
+PAGES_PROJECT="fwl-ai-demo"
 WRANGLER_VERSION="4.129.0"
 WORKER_TEMPLATE="$REPO_DIR/deploy/cloudflare-pages/_worker.template.js"
 
@@ -96,7 +96,7 @@ npm --cache "$WRANGLER_NPM_CACHE" exec --yes "wrangler@$WRANGLER_VERSION" -- \
   --commit-dirty=true
 
 if [[ "$BRANCH" == "main" ]]; then
-  print "固定演示地址：https://elm-demo.whliugong.xyz"
+  print "固定演示地址：https://fwl-ai-demo.pages.dev"
 else
   print "这是预览部署，不会覆盖固定演示地址。"
 fi

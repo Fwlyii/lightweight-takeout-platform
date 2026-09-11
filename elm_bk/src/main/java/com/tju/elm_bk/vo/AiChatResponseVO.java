@@ -21,6 +21,9 @@ public class AiChatResponseVO {
     
     @Schema(description = "回复类型：text-文本, suggestion-建议, data-数据展示")
     private String responseType = "text";
+
+    @Schema(description = "回复来源：local-本地帮助，deepseek-外部模型")
+    private String source;
     
     @Schema(description = "相关数据，当responseType为data时使用")
     private Object relatedData;
