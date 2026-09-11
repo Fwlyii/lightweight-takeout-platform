@@ -300,3 +300,12 @@ html[data-theme="warm"] .bottom-nav .active,
 html[data-theme="warm"] .nav-item.active {
   color: var(--primary-color) !important;
 }
+
+/* 首页搜索栏切换为 fixed 后，仍与 600px 主内容区保持同宽并居中。 */
+#app .wrapper .search .search-fixed-top {
+  max-width: 600px;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
