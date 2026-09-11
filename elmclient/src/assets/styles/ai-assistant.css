@@ -1,0 +1,641 @@
+/* AI 点餐助手视觉层：只覆盖顾客 AI 页面，不改变接口和业务逻辑。 */
+.assistant-page {
+  --ai-blue: #0097ff;
+  --ai-blue-deep: #0087e8;
+  --ai-ink: #173b60;
+  --ai-muted: #7890a3;
+  --ai-line: #dfeaf2;
+  --ai-soft: #f5f9fc;
+  --ai-card: rgba(255, 255, 255, .94);
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(0, 151, 255, .08), transparent 28%),
+    radial-gradient(circle at 86% 82%, rgba(71, 184, 255, .07), transparent 30%),
+    linear-gradient(180deg, #f7fbfe 0%, #f3f7fa 100%) !important;
+  color: var(--ai-ink) !important;
+}
+
+.assistant-page::before,
+.assistant-page::after {
+  content: '';
+  position: fixed;
+  z-index: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+.assistant-page::before {
+  width: 360px;
+  height: 360px;
+  left: -180px;
+  top: 190px;
+  background: rgba(0, 151, 255, .045);
+}
+
+.assistant-page::after {
+  width: 280px;
+  height: 280px;
+  right: -130px;
+  bottom: 90px;
+  background: rgba(0, 151, 255, .035);
+}
+
+/* 顶栏：保留外卖蓝，但降低“后台系统”感。 */
+.assistant-page .ai-topbar {
+  min-height: 68px !important;
+  padding: 10px max(18px, calc((100% - 1120px) / 2)) !important;
+  gap: 13px !important;
+  background: linear-gradient(115deg, #0aa2ff 0%, #0097ff 48%, #048ee8 100%) !important;
+  box-shadow: 0 8px 28px rgba(0, 119, 205, .16) !important;
+  animation: ai-topbar-in .38s cubic-bezier(.22, .72, .28, 1) both;
+}
+
+.assistant-page .topbar-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border: 1px solid rgba(255, 255, 255, .14) !important;
+  border-radius: 13px !important;
+  background: rgba(255, 255, 255, .13) !important;
+  backdrop-filter: blur(8px);
+  transition: transform .18s ease, background .18s ease !important;
+}
+
+.assistant-page .topbar-icon:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, .22) !important;
+}
+
+.assistant-page .topbar-title h1 {
+  position: relative;
+  min-height: 27px;
+  margin: 0 !important;
+  font-size: 0 !important;
+  line-height: 1 !important;
+}
+
+.assistant-page .topbar-title h1::after {
+  content: 'AI点餐助手';
+  display: inline-block;
+  color: #fff;
+  font-size: 21px;
+  line-height: 27px;
+  font-weight: 760;
+  letter-spacing: -.02em;
+}
+
+.assistant-page .topbar-title span {
+  margin-top: 1px !important;
+  color: rgba(255, 255, 255, .76) !important;
+}
+
+.assistant-page .service-status {
+  min-height: 28px;
+  padding: 0 10px;
+  gap: 7px !important;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .1);
+  color: #fff !important;
+  font-size: 0 !important;
+  backdrop-filter: blur(8px);
+}
+
+.assistant-page .service-status::after {
+  content: '连接中';
+  font-size: 11px;
+  color: rgba(255, 255, 255, .9);
+}
+
+.assistant-page .service-status.online::after { content: 'AI在线'; }
+.assistant-page .service-status.offline::after { content: '服务异常'; }
+.assistant-page .service-status i { width: 7px !important; height: 7px !important; }
+
+.assistant-page .page-content {
+  position: relative;
+  z-index: 1;
+  width: min(1120px, calc(100% - 36px)) !important;
+  padding: 26px 0 40px !important;
+}
+
+/* 三个能力入口改成轻量的“点餐方式”卡片。 */
+.assistant-page .feature-bubbles {
+  width: min(100%, 920px) !important;
+  margin: 0 auto 14px !important;
+  padding: 0 !important;
+  gap: 10px !important;
+}
+
+.assistant-page .feature-bubbles button {
+  min-height: 64px !important;
+  padding: 10px 13px !important;
+  grid-template-columns: 38px minmax(0, 1fr) 12px !important;
+  gap: 9px !important;
+  border: 1px solid rgba(186, 219, 240, .78) !important;
+  border-radius: 16px !important;
+  color: #365a75 !important;
+  background: rgba(255, 255, 255, .9) !important;
+  box-shadow: 0 8px 24px rgba(41, 87, 119, .07) !important;
+  backdrop-filter: blur(10px);
+  animation: ai-card-rise .42s cubic-bezier(.22, .72, .28, 1) both;
+}
+
+.assistant-page .feature-bubbles button:nth-child(2) { animation-delay: .05s; }
+.assistant-page .feature-bubbles button:nth-child(3) { animation-delay: .1s; }
+
+.assistant-page .feature-bubbles button:hover {
+  border-color: rgba(0, 151, 255, .42) !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 13px 30px rgba(0, 126, 214, .12) !important;
+}
+
+.assistant-page .feature-icon {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  color: var(--ai-blue) !important;
+  background: linear-gradient(145deg, #edf8ff, #e5f4ff) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 151, 255, .05);
+}
+
+.assistant-page .feature-copy b {
+  color: #214867 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.assistant-page .feature-copy small {
+  margin-top: 3px;
+  color: #8aa0b1 !important;
+  font-size: 10px !important;
+}
+
+.assistant-page .feature-bubbles button:nth-child(1) .feature-copy b,
+.assistant-page .feature-bubbles button:nth-child(2) .feature-copy b,
+.assistant-page .feature-bubbles button:nth-child(3) .feature-copy b { font-size: 0 !important; }
+
+.assistant-page .feature-bubbles button:nth-child(1) .feature-copy b::after { content: '智能推荐'; font-size: 13px; }
+.assistant-page .feature-bubbles button:nth-child(2) .feature-copy b::after { content: '语音点单'; font-size: 13px; }
+.assistant-page .feature-bubbles button:nth-child(3) .feature-copy b::after { content: '拍照识菜'; font-size: 13px; }
+
+/* 主聊天区：欢迎态更像点餐入口，而不是客服后台。 */
+.assistant-page .chat-shell {
+  position: relative;
+  width: min(100%, 960px) !important;
+  height: min(690px, calc(100vh - 184px)) !important;
+  min-height: 520px !important;
+  margin: 0 auto !important;
+  padding-top: 0 !important;
+  border: 1px solid rgba(210, 227, 239, .92) !important;
+  border-radius: 22px !important;
+  background: rgba(255, 255, 255, .94) !important;
+  box-shadow: 0 18px 52px rgba(36, 79, 109, .09) !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(12px);
+  animation: ai-shell-rise .5s cubic-bezier(.22, .72, .28, 1) .06s both;
+}
+
+.assistant-page .chat-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 210px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 12%, rgba(0, 151, 255, .10), transparent 32%),
+    radial-gradient(circle at 82% 8%, rgba(95, 195, 255, .08), transparent 27%),
+    linear-gradient(180deg, rgba(243, 250, 255, .92), transparent);
+}
+
+.assistant-page .message-list {
+  position: relative;
+  z-index: 1;
+  padding: 24px 28px !important;
+  scroll-behavior: smooth;
+}
+
+.assistant-page .empty-chat {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 650px);
+  min-height: 100% !important;
+  margin: 0 auto;
+  align-content: center !important;
+  padding: 36px 16px 30px;
+}
+
+.assistant-page .empty-chat > i {
+  width: 64px !important;
+  height: 64px !important;
+  display: grid !important;
+  place-items: center;
+  border-radius: 22px !important;
+  color: var(--ai-blue) !important;
+  background: linear-gradient(145deg, #eef9ff 0%, #dff2ff 100%) !important;
+  box-shadow: 0 12px 30px rgba(0, 151, 255, .12), inset 0 0 0 1px rgba(0, 151, 255, .07);
+  font-size: 28px !important;
+  animation: ai-icon-float 4.2s ease-in-out infinite;
+}
+
+.assistant-page .empty-chat h2 {
+  margin: 18px 0 0 !important;
+  color: var(--ai-ink) !important;
+  font-size: 0 !important;
+  letter-spacing: -.025em;
+}
+
+.assistant-page .empty-chat h2::after {
+  content: '今天想吃什么？';
+  font-size: 25px;
+  font-weight: 760;
+}
+
+.assistant-page .empty-chat p {
+  margin-top: 9px !important;
+  color: var(--ai-muted) !important;
+  font-size: 0 !important;
+}
+
+.assistant-page .empty-chat p::after {
+  content: '告诉我预算、口味，或者直接问我';
+  font-size: 13px;
+}
+
+.assistant-page .quick-list {
+  margin-top: 22px !important;
+  gap: 8px !important;
+}
+
+.assistant-page .quick-list button {
+  min-height: 34px;
+  padding: 0 13px !important;
+  border: 1px solid #d9e7f0 !important;
+  border-radius: 999px !important;
+  color: #527087 !important;
+  background: rgba(255, 255, 255, .84) !important;
+  box-shadow: 0 3px 10px rgba(35, 81, 111, .035);
+  transition: transform .18s ease, border-color .18s ease, color .18s ease, background .18s ease !important;
+  animation: ai-chip-rise .38s ease both;
+}
+
+.assistant-page .quick-list button:nth-child(2) { animation-delay: .04s; }
+.assistant-page .quick-list button:nth-child(3) { animation-delay: .08s; }
+.assistant-page .quick-list button:nth-child(4) { animation-delay: .12s; }
+
+.assistant-page .quick-list button:hover {
+  border-color: rgba(0, 151, 255, .38) !important;
+  color: var(--ai-blue) !important;
+  background: #f5fbff !important;
+  transform: translateY(-2px);
+}
+
+/* 输入区：变成真正的核心操作入口。 */
+.assistant-page .chat-composer {
+  position: relative;
+  z-index: 3;
+  padding: 13px 14px 12px !important;
+  border-top: 1px solid rgba(218, 231, 240, .84) !important;
+  background: rgba(255, 255, 255, .96) !important;
+  box-shadow: 0 -10px 30px rgba(43, 82, 109, .045) !important;
+  backdrop-filter: blur(14px);
+}
+
+.assistant-page .chat-composer textarea {
+  min-height: 52px !important;
+  max-height: 132px !important;
+  padding: 14px 16px !important;
+  border: 1px solid #d5e5ef !important;
+  border-radius: 16px !important;
+  background: #fafdff !important;
+  color: #2f5069 !important;
+  font-size: 14px !important;
+  line-height: 1.55;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease !important;
+}
+
+.assistant-page .chat-composer textarea:focus {
+  border-color: rgba(0, 151, 255, .56) !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 4px rgba(0, 151, 255, .07) !important;
+}
+
+.assistant-page .composer-actions {
+  min-height: 39px !important;
+  padding: 8px 1px 0 !important;
+}
+
+.assistant-page .icon-button {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 11px !important;
+  border-color: #d8e6ef !important;
+  color: #678298 !important;
+  background: #fff !important;
+  transition: transform .18s ease, color .18s ease, border-color .18s ease, background .18s ease !important;
+}
+
+.assistant-page .icon-button:hover {
+  color: var(--ai-blue) !important;
+  border-color: rgba(0, 151, 255, .3) !important;
+  background: #f5fbff !important;
+  transform: translateY(-1px);
+}
+
+.assistant-page .send-button {
+  min-width: 92px !important;
+  height: 38px !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #10a4ff, #008ce9) !important;
+  box-shadow: 0 8px 20px rgba(0, 151, 255, .18);
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease !important;
+}
+
+.assistant-page .send-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 11px 25px rgba(0, 151, 255, .24);
+  filter: saturate(1.05);
+}
+
+/* 消息气泡与推荐卡。 */
+.assistant-page .message {
+  gap: 10px !important;
+  margin-bottom: 18px !important;
+  animation: ai-message-in .28s cubic-bezier(.22, .72, .28, 1) both;
+}
+
+.assistant-page .message-avatar {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 12px !important;
+  background: #eaf7ff !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 151, 255, .06);
+}
+
+.assistant-page .message-body { max-width: min(84%, 760px) !important; }
+
+.assistant-page .message-bubble {
+  padding: 11px 14px !important;
+  border-radius: 7px 17px 17px 17px !important;
+  background: #f3f7fa !important;
+  color: #34536a !important;
+  box-shadow: 0 2px 7px rgba(34, 76, 103, .035);
+}
+
+.assistant-page .message.user .message-bubble {
+  border-radius: 17px 7px 17px 17px !important;
+  background: linear-gradient(135deg, #0aa2ff, #008fe9) !important;
+  color: #fff !important;
+  box-shadow: 0 7px 18px rgba(0, 151, 255, .13);
+}
+
+.assistant-page .message-body time {
+  margin-top: 6px !important;
+  color: #9aacb9 !important;
+  font-size: 9px !important;
+}
+
+.assistant-page .candidate-list {
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)) !important;
+  gap: 11px !important;
+  margin-top: 12px !important;
+}
+
+.assistant-page .candidate-item {
+  min-height: 94px !important;
+  padding: 10px !important;
+  grid-template-columns: 74px minmax(0, 1fr) auto !important;
+  gap: 11px !important;
+  border: 1px solid #e2ebf1 !important;
+  border-radius: 15px !important;
+  background: #fff !important;
+  box-shadow: 0 6px 18px rgba(38, 79, 106, .055);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  animation: ai-card-rise .3s ease both;
+}
+
+.assistant-page .candidate-item:nth-child(2) { animation-delay: .04s; }
+.assistant-page .candidate-item:nth-child(3) { animation-delay: .08s; }
+.assistant-page .candidate-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 151, 255, .24) !important;
+  box-shadow: 0 10px 24px rgba(38, 79, 106, .085);
+}
+
+.assistant-page .candidate-item img,
+.assistant-page .food-placeholder {
+  width: 74px !important;
+  height: 74px !important;
+  border-radius: 12px !important;
+}
+
+.assistant-page .candidate-copy b {
+  color: #244761;
+  font-size: 14px !important;
+  font-weight: 720;
+}
+
+.assistant-page .candidate-copy span { margin-top: 4px; color: #668096; font-size: 11px; }
+.assistant-page .candidate-copy small { margin-top: 5px; color: #93a4b0; font-size: 10px; }
+
+.assistant-page .candidate-item > button {
+  height: 34px !important;
+  padding: 0 10px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: #edf8ff !important;
+  color: var(--ai-blue) !important;
+  transition: transform .18s ease, background .18s ease !important;
+}
+
+.assistant-page .candidate-item > button:hover {
+  background: #dff2ff !important;
+  transform: translateY(-1px);
+}
+
+/* 工具子页也使用同一套卡片语言。 */
+.assistant-page .feature-switcher {
+  gap: 7px !important;
+  margin: 0 auto 14px !important;
+  padding: 5px !important;
+  border: 1px solid #deebf3;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, .8);
+  box-shadow: 0 6px 20px rgba(37, 81, 110, .05);
+}
+
+.assistant-page .feature-switcher button {
+  min-height: 42px !important;
+  border: 0 !important;
+  border-radius: 11px !important;
+  background: transparent !important;
+  transition: background .18s ease, color .18s ease, transform .18s ease !important;
+}
+
+.assistant-page .feature-switcher button:hover,
+.assistant-page .feature-switcher button.active {
+  color: var(--ai-blue) !important;
+  background: #edf8ff !important;
+}
+
+.assistant-page .tool-panel {
+  border: 1px solid #deebf3 !important;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, .94) !important;
+  box-shadow: 0 16px 42px rgba(35, 79, 108, .075) !important;
+  overflow: hidden;
+  animation: ai-shell-rise .42s cubic-bezier(.22, .72, .28, 1) both;
+}
+
+.assistant-page .tool-content { padding: 26px !important; }
+.assistant-page .tool-heading h2 { color: var(--ai-ink); font-size: 19px !important; }
+.assistant-page .tool-heading p { color: #8499a9 !important; }
+
+.assistant-page .tool-panel input,
+.assistant-page .tool-panel textarea {
+  border-radius: 12px !important;
+  border-color: #d9e5ee !important;
+  background: #fbfdff !important;
+}
+
+.assistant-page .primary-button,
+.assistant-page .secondary-button,
+.assistant-page .record-button {
+  border-radius: 12px !important;
+}
+
+.assistant-page .upload-zone {
+  min-height: 176px !important;
+  border-radius: 16px !important;
+  border-color: #b8d8eb !important;
+  background: linear-gradient(145deg, #f9fdff, #f1f9fe) !important;
+}
+
+/* 历史抽屉。 */
+.assistant-page .drawer-mask { backdrop-filter: blur(3px); }
+.assistant-page .history-drawer {
+  width: min(390px, 94vw) !important;
+  padding: 20px !important;
+  border-radius: 24px 0 0 24px;
+  box-shadow: -18px 0 44px rgba(24, 60, 84, .16) !important;
+  animation: ai-drawer-in .28s cubic-bezier(.22, .72, .28, 1) both;
+}
+
+.assistant-page .history-list > button {
+  padding: 12px !important;
+  border-radius: 12px !important;
+  background: #fbfdff !important;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.assistant-page .history-list > button:hover {
+  transform: translateX(-2px);
+  border-color: rgba(0, 151, 255, .25) !important;
+  background: #f5fbff !important;
+}
+
+/* 深色模式保持可读。 */
+html[data-theme="dark"] .assistant-page {
+  --ai-card: rgba(23, 40, 58, .94);
+  background: #101b28 !important;
+}
+
+html[data-theme="dark"] .assistant-page .chat-shell,
+html[data-theme="dark"] .assistant-page .tool-panel,
+html[data-theme="dark"] .assistant-page .feature-bubbles button,
+html[data-theme="dark"] .assistant-page .chat-composer {
+  background: rgba(23, 40, 58, .95) !important;
+  border-color: #29445a !important;
+}
+
+@keyframes ai-topbar-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ai-card-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ai-shell-rise {
+  from { opacity: 0; transform: translateY(14px) scale(.992); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes ai-chip-rise {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ai-icon-float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-5px) rotate(-2deg); }
+}
+
+@keyframes ai-message-in {
+  from { opacity: 0; transform: translateY(6px) scale(.995); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes ai-drawer-in {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 760px) {
+  .assistant-page .ai-topbar { min-height: 60px !important; padding: 8px 10px !important; }
+  .assistant-page .topbar-title h1::after { font-size: 18px; }
+  .assistant-page .service-status { display: none !important; }
+  .assistant-page .page-content { width: 100% !important; padding: 14px 8px 22px !important; }
+
+  .assistant-page .feature-bubbles {
+    display: flex !important;
+    gap: 8px !important;
+    overflow-x: auto;
+    padding: 0 1px 4px !important;
+    scrollbar-width: none;
+  }
+
+  .assistant-page .feature-bubbles::-webkit-scrollbar { display: none; }
+  .assistant-page .feature-bubbles button {
+    flex: 0 0 188px;
+    min-height: 60px !important;
+    border-radius: 14px !important;
+  }
+
+  .assistant-page .chat-shell {
+    width: 100% !important;
+    height: calc(100dvh - 154px) !important;
+    min-height: 520px !important;
+    border-radius: 18px !important;
+  }
+
+  .assistant-page .message-list { padding: 17px 13px !important; }
+  .assistant-page .empty-chat { padding-left: 8px; padding-right: 8px; }
+  .assistant-page .empty-chat h2::after { font-size: 22px; }
+  .assistant-page .quick-list { max-width: 340px; }
+  .assistant-page .message-body { max-width: 88% !important; }
+  .assistant-page .candidate-list { grid-template-columns: 1fr !important; }
+  .assistant-page .candidate-item { grid-template-columns: 62px minmax(0, 1fr) auto !important; }
+  .assistant-page .candidate-item img,
+  .assistant-page .food-placeholder { width: 62px !important; height: 62px !important; }
+  .assistant-page .chat-composer { padding: 10px !important; }
+  .assistant-page .chat-composer textarea { min-height: 48px !important; border-radius: 14px !important; }
+  .assistant-page .send-button { min-width: 44px !important; width: 44px; padding: 0 !important; }
+  .assistant-page .send-button span { display: none; }
+  .assistant-page .tool-content { padding: 16px !important; }
+  .assistant-page .history-drawer { border-radius: 20px 0 0 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assistant-page *,
+  .assistant-page *::before,
+  .assistant-page *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
