@@ -1,0 +1,208 @@
+/* Final polish for AI 点餐助手 landing/chat experience. */
+
+.assistant-page .ai-topbar {
+  min-height: 64px !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+.assistant-page .topbar-title {
+  display: block !important;
+  min-width: 0;
+}
+.assistant-page .topbar-title h1 {
+  display: block !important;
+  margin: 0 !important;
+}
+.assistant-page .topbar-title h1::after {
+  font-size: 18px !important;
+  letter-spacing: -.015em !important;
+}
+.assistant-page .service-status.online {
+  width: auto !important;
+  height: 30px !important;
+  padding: 0 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  overflow: visible !important;
+  border: 1px solid #dcecf5;
+  border-radius: 999px;
+  background: #f6fbfe;
+  color: transparent !important;
+  font-size: 0 !important;
+}
+.assistant-page .service-status.online::after {
+  content: "AI在线";
+  color: #5f7d91;
+  font-size: 12px;
+  font-weight: 600;
+}
+.assistant-page .service-status.online i {
+  width: 7px !important;
+  height: 7px !important;
+  flex: 0 0 7px;
+  box-shadow: 0 0 0 4px rgba(57,200,137,.10) !important;
+}
+
+/* Welcome state: tighter vertical rhythm and a clearer AI-search hierarchy. */
+.assistant-page .page-content:has(.empty-chat) .chat-shell {
+  width: min(720px, 100%) !important;
+  margin-top: clamp(54px, 8vh, 86px) !important;
+}
+.assistant-page .page-content:has(.empty-chat) .empty-chat {
+  padding-bottom: 20px !important;
+}
+.assistant-page .page-content:has(.empty-chat) .empty-chat > i {
+  width: 54px !important;
+  height: 54px !important;
+  margin-bottom: 17px !important;
+  border-radius: 18px !important;
+  box-shadow: 0 10px 28px rgba(0,133,224,.09) !important;
+}
+.assistant-page .page-content:has(.empty-chat) .empty-chat h2::after {
+  font-size: clamp(31px, 2.7vw, 39px) !important;
+}
+.assistant-page .page-content:has(.empty-chat) .empty-chat p {
+  margin-top: 9px !important;
+}
+.assistant-page .page-content:has(.empty-chat) .empty-chat p::after {
+  font-size: 14px !important;
+}
+.assistant-page .page-content:has(.empty-chat) .quick-list {
+  margin-top: 18px !important;
+  gap: 8px !important;
+}
+.assistant-page .page-content:has(.empty-chat) .quick-list button {
+  min-height: 34px !important;
+  padding: 0 13px !important;
+  background: rgba(255,255,255,.72) !important;
+  border-color: #dce9f1 !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+}
+.assistant-page .page-content:has(.empty-chat) .quick-list button:nth-child(1),
+.assistant-page .page-content:has(.empty-chat) .quick-list button:nth-child(2),
+.assistant-page .page-content:has(.empty-chat) .quick-list button:nth-child(3),
+.assistant-page .page-content:has(.empty-chat) .quick-list button:nth-child(4) {
+  font-size: 0 !important;
+}
+.assistant-page .page-content:has(.empty-chat) .quick-list button:nth-child(1)::after { content: "20元以内吃什么"; font-size: 12px; }
+.assistant-page .page-content:has(.empty-chat) .quick-list button:nth-child(2)::after { content: "看看最近订单"; font-size: 12px; }
+.assistant-page .page-content:has(.empty-chat) .quick-list button:nth-child(3)::after { content: "配送大概多久"; font-size: 12px; }
+.assistant-page .page-content:has(.empty-chat) .quick-list button:nth-child(4)::after { content: "会员有哪些权益"; font-size: 12px; }
+
+/* Composer: less like a textarea form, more like a consumer AI search box. */
+.assistant-page .page-content:has(.empty-chat) .chat-composer {
+  margin-top: 0 !important;
+  padding: 8px 9px 7px !important;
+  border-radius: 22px !important;
+  border-color: #d9e8f1 !important;
+  box-shadow: 0 14px 38px rgba(31,87,125,.095) !important;
+}
+.assistant-page .page-content:has(.empty-chat) .chat-composer:focus-within {
+  box-shadow: 0 16px 42px rgba(0,137,224,.12), 0 0 0 3px rgba(0,151,255,.045) !important;
+}
+.assistant-page .page-content:has(.empty-chat) .chat-composer textarea {
+  min-height: 46px !important;
+  max-height: 104px !important;
+  padding: 12px 14px 7px !important;
+  font-size: 15px !important;
+}
+.assistant-page .page-content:has(.empty-chat) .composer-actions {
+  min-height: 38px !important;
+  padding: 0 3px 0 9px !important;
+}
+.assistant-page .page-content:has(.empty-chat) .composer-actions > span {
+  font-size: 10px !important;
+}
+.assistant-page .page-content:has(.empty-chat) .icon-button {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 11px !important;
+}
+.assistant-page .page-content:has(.empty-chat) .send-button {
+  min-width: 86px !important;
+  min-height: 36px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 15px rgba(0,151,255,.16) !important;
+}
+
+/* Capability actions should read as secondary shortcuts, not a fourth card container. */
+.assistant-page .page-content:has(.empty-chat) .feature-bubbles {
+  margin-top: 14px !important;
+  padding: 0 !important;
+  gap: 8px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+.assistant-page .page-content:has(.empty-chat) .feature-bubbles button {
+  min-height: 36px !important;
+  padding: 0 12px !important;
+  border: 1px solid #dceaf3 !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.72) !important;
+  color: #56758a !important;
+}
+.assistant-page .page-content:has(.empty-chat) .feature-bubbles button + button::before {
+  display: none !important;
+}
+.assistant-page .page-content:has(.empty-chat) .feature-bubbles button:hover {
+  border-color: #b7ddf4 !important;
+  background: #f4fbff !important;
+  color: #008fe9 !important;
+  transform: translateY(-1px) !important;
+}
+.assistant-page .page-content:has(.empty-chat) .feature-icon {
+  width: 23px !important;
+  height: 23px !important;
+  flex-basis: 23px !important;
+  border-radius: 8px !important;
+  font-size: 11px !important;
+  background: #edf8ff !important;
+}
+.assistant-page .page-content:has(.empty-chat) .feature-copy b {
+  font-size: 11px !important;
+}
+
+/* Conversation state: slightly calmer chrome, larger usable message area. */
+.assistant-page .page-content:not(:has(.empty-chat)) {
+  padding-top: 14px !important;
+}
+.assistant-page .page-content:not(:has(.empty-chat)) .chat-shell {
+  width: min(920px, 100%) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 12px 34px rgba(31,82,118,.065) !important;
+}
+.assistant-page .page-content:not(:has(.empty-chat)) .message-list {
+  padding: 22px 22px 16px !important;
+}
+.assistant-page .page-content:not(:has(.empty-chat)) .chat-composer {
+  padding: 9px 11px 11px !important;
+}
+
+@media (max-width: 760px) {
+  .assistant-page .ai-topbar { min-height: 58px !important; padding: 7px 10px !important; }
+  .assistant-page .topbar-title h1::after { font-size: 16px !important; }
+  .assistant-page .service-status.online { display: none !important; }
+  .assistant-page .page-content:has(.empty-chat) .chat-shell { margin-top: 34px !important; }
+  .assistant-page .page-content:has(.empty-chat) .empty-chat { padding-left: 8px !important; padding-right: 8px !important; }
+  .assistant-page .page-content:has(.empty-chat) .empty-chat h2::after { font-size: 30px !important; }
+  .assistant-page .page-content:has(.empty-chat) .empty-chat p::after { font-size: 13px !important; }
+  .assistant-page .page-content:has(.empty-chat) .quick-list { gap: 7px !important; }
+  .assistant-page .page-content:has(.empty-chat) .quick-list button { min-height: 32px !important; padding: 0 11px !important; }
+  .assistant-page .page-content:has(.empty-chat) .chat-composer { border-radius: 19px !important; }
+  .assistant-page .page-content:has(.empty-chat) .feature-bubbles { gap: 6px !important; }
+  .assistant-page .page-content:has(.empty-chat) .feature-bubbles button { min-height: 34px !important; padding: 0 10px !important; flex-direction: row !important; gap: 5px !important; }
+  .assistant-page .page-content:has(.empty-chat) .feature-icon { width: 21px !important; height: 21px !important; flex-basis: 21px !important; }
+  .assistant-page .page-content:has(.empty-chat) .feature-copy b { font-size: 10px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assistant-page .page-content:has(.empty-chat) .chat-composer,
+  .assistant-page .page-content:has(.empty-chat) .feature-bubbles button {
+    transition: none !important;
+  }
+}
