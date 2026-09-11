@@ -28,7 +28,7 @@ import { applyTheme, getStoredTheme } from './utils/theme';
 import { getAuthRole, getToken } from './utils/auth';
 
 const ROUTES_WITHOUT_GLOBAL_BACK = new Set([
-  'Index', 'MyInformation', 'SuccessfulPayment', 'BusinessInfo',
+  'Index', 'Login', 'MyInformation', 'SuccessfulPayment', 'BusinessInfo',
   'UserAddress', 'Assets', 'AiChat', 'AiRecommend', 'AiVoiceOrder',
   'AiDishRecognition', 'Favorites', 'ListDetail'
 ]);
