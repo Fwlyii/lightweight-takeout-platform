@@ -10,6 +10,7 @@ import './assets/styles/ai-redesign-v3.css';
 import './assets/styles/ai-final-polish.css';
 import './assets/styles/ai-nav-gradient.css';
 import './assets/styles/layout-alignment.css';
+import './assets/styles/interaction-motion.css';
 
 installAuthGuard(router);
 createApp(App).use(router).mount('#app');
