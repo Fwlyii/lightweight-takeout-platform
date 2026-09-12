@@ -1,0 +1,52 @@
+/*
+ * Interaction motion — pass 1.
+ * Inspired by the lightweight transform-feedback pattern used by Hover.css,
+ * but kept local to restaurant cards so no animation dependency is required.
+ */
+
+/* Smooth press feedback works on both mouse and touch devices. */
+.content .wrapper .business-list li,
+.content .guess-card {
+  transform-origin: center center;
+  transition:
+    transform 180ms cubic-bezier(.2, .7, .25, 1),
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.content .wrapper .business-list li:active,
+.content .guess-card:active {
+  transform: scale(.985);
+}
+
+/* Only lift cards on devices that actually have hover, avoiding sticky hover
+ * states on phones and tablets.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .content .wrapper .business-list li:hover {
+    transform: translateY(-3px);
+    border-color: #cfe5f2;
+    box-shadow: 0 9px 22px rgba(39, 86, 114, .11);
+  }
+
+  .content .guess-card:hover {
+    transform: translateY(-3px);
+    border-color: #cfe5f2;
+    box-shadow: 0 8px 18px rgba(39, 86, 114, .10);
+  }
+}
+
+/* Respect the user's OS-level reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  .content .wrapper .business-list li,
+  .content .guess-card {
+    transition: none;
+  }
+
+  .content .wrapper .business-list li:hover,
+  .content .wrapper .business-list li:active,
+  .content .guess-card:hover,
+  .content .guess-card:active {
+    transform: none;
+  }
+}
