@@ -1,14 +1,14 @@
 <template>
 	<ul class="footer">
-	  <li @click="toIndex">
+	  <li :class="{ active: route.path === '/index' }" @click="toIndex">
 		<i class="fa fa-home"></i>
 		<p>首页</p>
 	  </li>
-	  <li @click="toOrderList">
+	  <li :class="{ active: route.path === '/orderList' }" @click="toOrderList">
 		<i class="fa fa-file-text-o"></i>
 		<p>订单</p>
 	  </li>
-	  <li @click="toMyInformation">
+	  <li :class="{ active: route.path === '/myInformation' }" @click="toMyInformation">
 		<i class="fa fa-user-o"></i>
 		<p>我的</p>
 	  </li>
@@ -17,11 +17,12 @@
   
   <script>
   import { defineComponent } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   export default defineComponent({
 	name: 'Footer',
 	setup() {
 	  const router = useRouter();
+	  const route = useRoute();
 	  const toIndex = () => {
 		router.push({ path: '/index' });
 	  };
@@ -33,6 +34,7 @@
 		router.push({ path: '/myInformation' });
 	  };
 	  return {
+		route,
 		toIndex,
 		toOrderList,
 		toMyInformation,
@@ -76,5 +78,4 @@
   .footer > li i {
 	font-size: 3.5vh; /* 使用视口高度单位 */
   }
-  </style>
-  
+</style>

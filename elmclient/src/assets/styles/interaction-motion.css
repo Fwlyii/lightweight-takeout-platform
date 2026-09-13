@@ -50,3 +50,163 @@
     transform: none;
   }
 }
+
+/* Home content enters in small visual groups instead of moving as one page. */
+.content .home-page .home-motion {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.content .home-page.home-page-ready .home-motion {
+  animation: home-content-in 360ms cubic-bezier(.22, .61, .36, 1) forwards;
+}
+
+.content .home-page.home-page-ready .home-motion-search { animation-delay: 20ms; }
+.content .home-page.home-page-ready .home-motion-categories { animation-delay: 80ms; }
+.content .home-page.home-page-ready .home-motion-offers { animation-delay: 140ms; }
+.content .home-page.home-page-ready .home-motion-recommend { animation-delay: 200ms; }
+.content .home-page.home-page-ready .home-motion-businesses { animation-delay: 250ms; }
+
+.content .home-page .business-list > li {
+  opacity: 0;
+  animation: home-card-in 340ms cubic-bezier(.22, .61, .36, 1) both;
+  animation-delay: calc(250ms + (var(--stagger-index, 0) * 52ms));
+}
+
+.content .home-page:not(.home-page-ready) .business-list > li {
+  animation-play-state: paused;
+}
+
+.content .business-list-page .business-item {
+  opacity: 0;
+  animation: home-card-in 340ms cubic-bezier(.22, .61, .36, 1) both;
+  animation-delay: calc(var(--stagger-index, 0) * 52ms);
+}
+
+.content .business-list-page:not(.business-list-page-ready) .business-item {
+  animation-play-state: paused;
+}
+
+@keyframes home-content-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes home-card-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content .home-page .home-motion,
+  .content .home-page .business-list > li,
+  .content .business-list-page .business-item {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+/* Detail pages reveal their fixed chrome and content in a short, quiet sequence. */
+.content .business-detail-page .store-header,
+.content .business-detail-page .store-hero,
+.content .business-detail-page .offer-strip,
+.content .business-detail-page .page-tabs,
+.content .business-detail-page .page-content,
+.content .business-detail-page > .cart {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.content .business-detail-page.business-detail-ready .store-header,
+.content .business-detail-page.business-detail-ready .store-hero,
+.content .business-detail-page.business-detail-ready .offer-strip,
+.content .business-detail-page.business-detail-ready .page-tabs,
+.content .business-detail-page.business-detail-ready .page-content,
+.content .business-detail-page.business-detail-ready > .cart {
+  animation: detail-section-in 320ms cubic-bezier(.22, .61, .36, 1) forwards;
+}
+
+.content .business-detail-page.business-detail-ready .store-header { animation-delay: 0ms; }
+.content .business-detail-page.business-detail-ready .store-hero { animation-delay: 35ms; }
+.content .business-detail-page.business-detail-ready .offer-strip { animation-delay: 70ms; }
+.content .business-detail-page.business-detail-ready .page-tabs { animation-delay: 105ms; }
+.content .business-detail-page.business-detail-ready .page-content { animation-delay: 140ms; }
+.content .business-detail-page.business-detail-ready > .cart { animation-delay: 170ms; }
+
+.cart-fly-dot {
+  position: fixed;
+  z-index: 10001;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  border-radius: 50%;
+  background: var(--tertiary-color, #0097ff);
+  box-shadow: 0 3px 10px rgba(0, 151, 255, .35);
+  will-change: transform;
+}
+
+.cart-bump {
+  animation: cart-bump 380ms cubic-bezier(.22, .8, .32, 1.25);
+}
+
+/* Keep the mobile navigation feedback tactile without moving the layout. */
+.content + .footer > li,
+.app-container > .footer > li {
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.content + .footer > li:active,
+.app-container > .footer > li:active {
+  transform: scale(.94);
+}
+
+.content + .footer > li.active,
+.app-container > .footer > li.active {
+  color: var(--tertiary-color, #0097ff);
+}
+
+.content + .footer > li.active i,
+.app-container > .footer > li.active i {
+  transform: translateY(-1px);
+}
+
+.content + .footer > li i,
+.app-container > .footer > li i {
+  transition: transform 180ms ease;
+}
+
+@keyframes detail-section-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cart-bump {
+  0%, 100% { transform: scale(1); }
+  38% { transform: scale(1.14); }
+  70% { transform: scale(.97); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content .business-detail-page .store-header,
+  .content .business-detail-page .store-hero,
+  .content .business-detail-page .offer-strip,
+  .content .business-detail-page .page-tabs,
+  .content .business-detail-page .page-content,
+  .content .business-detail-page > .cart {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .cart-fly-dot { display: none; }
+  .cart-bump { animation: none; }
+
+  .content + .footer > li,
+  .app-container > .footer > li,
+  .content + .footer > li i,
+  .app-container > .footer > li i {
+    transition: none;
+    transform: none;
+  }
+}

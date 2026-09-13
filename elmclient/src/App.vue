@@ -1,5 +1,12 @@
 <template>
   <div class="app-container">
+    <div
+      v-if="routeMotion.active"
+      class="route-wipe"
+      :class="{ settling: routeMotion.settling }"
+      :style="routeWipeStyle"
+      aria-hidden="true"
+    ></div>
     <BackButton v-if="showBackButton" />
     <div class="content">
       <router-view v-slot="{ Component, route: viewRoute }">
@@ -26,6 +33,7 @@ import { useRoute } from 'vue-router';
 import request from './utils/request';
 import { applyTheme, getStoredTheme } from './utils/theme';
 import { getAuthRole, getToken } from './utils/auth';
+import { routeMotion } from './utils/routeMotion';
 
 const ROUTES_WITHOUT_GLOBAL_BACK = new Set([
   'Index', 'Login', 'MyInformation', 'SuccessfulPayment', 'BusinessInfo',
@@ -103,7 +111,20 @@ export default {
     const showRiderFooter = computed(() => isRiderContext.value);
     const showAdminFooter = computed(() => route.path.startsWith('/admin'));
 
-    return { showFooter, showBusinessFooter, showAdminFooter, showRiderFooter, showBackButton };
+    const routeWipeStyle = computed(() => ({
+      '--route-wipe-x': `${routeMotion.x}px`,
+      '--route-wipe-y': `${routeMotion.y}px`
+    }));
+
+    return {
+      showFooter,
+      showBusinessFooter,
+      showAdminFooter,
+      showRiderFooter,
+      showBackButton,
+      routeMotion,
+      routeWipeStyle
+    };
   },
 };
 </script>
@@ -157,6 +178,30 @@ a { text-decoration: none; }
   overflow-y: auto;
 }
 
+.route-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 1;
+  background: var(--tertiary-color, #0097ff);
+  clip-path: circle(0 at var(--route-wipe-x) var(--route-wipe-y));
+  animation: route-wipe-expand .5s cubic-bezier(.22, .75, .2, 1) forwards;
+}
+
+.route-wipe.settling {
+  animation: route-wipe-expand .5s cubic-bezier(.22, .75, .2, 1) forwards,
+    route-wipe-fade .3s ease .02s forwards;
+}
+
+@keyframes route-wipe-expand {
+  to { clip-path: circle(150vmax at var(--route-wipe-x) var(--route-wipe-y)); }
+}
+
+@keyframes route-wipe-fade {
+  to { opacity: 0; }
+}
+
 .page-route-enter-active,
 .page-route-leave-active {
   transition: opacity .16s ease, transform .16s ease;
@@ -203,6 +248,12 @@ a { text-decoration: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .route-wipe {
+    animation: none;
+    clip-path: none;
+    opacity: 0;
+  }
+
   .page-route-enter-active,
   .page-route-leave-active,
   .auth-route-enter-active,

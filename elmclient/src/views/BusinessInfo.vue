@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper">
+    <div class="wrapper business-detail-page" :class="{ 'business-detail-ready': pageReady }">
         <header class="store-header">
             <button class="back-button" type="button" aria-label="返回" @click="goBack">‹</button>
             <div class="service-switch" role="tablist" aria-label="配送方式">
@@ -13,10 +13,10 @@
         </header>
 
         <section class="store-hero">
-            <img class="business-logo" :src="business.businessImg || require('@/assets/business-default.png')" :alt="business.businessName || '商家图片'" @error="handleImageError" />
+            <img class="business-logo" :src="business.businessImg || require('@/assets/business-default.png')" :alt="business.businessName || '商家图片'" @error="handleImageError" :style="{ viewTransitionName: `restaurant-image-${business.id || businessId}` }" />
             <div class="business-info">
                 <div class="business-title-row">
-                    <h1>{{ business.businessName || '商家' }}</h1>
+                    <h1 :style="{ viewTransitionName: `restaurant-title-${business.id || businessId}` }">{{ business.businessName || '商家' }}</h1>
                     <span class="open-badge" :class="{ closed: !isBusinessOpen }">{{ business.status !== undefined && business.status !== 1 ? '暂未上线' : business.operatingStatus === false ? '休息中' : '营业中' }}</span>
                 </div>
                 <p class="business-meta">{{ deliveryMode === 'pickup' ? '到店自取 · 无起送门槛' : `起送 ¥${formatMoney(business.startPrice)} · 配送 ¥${formatMoney(business.deliveryPrice)}` }}</p>
@@ -74,7 +74,7 @@
                                         :disabled="isSoldOut(item) || isCartQuantityAtLimit(item)"
                                         :class="{ disabled: isCartQuantityAtLimit(item) }"
                                         :title="isCartQuantityAtLimit(item) ? cartQuantityLimitMessage(item) : ''"
-                                        @click="add(item)"
+                                        @click="add(item, $event)"
                                         :aria-label="isCartQuantityAtLimit(item) ? `${item.foodName}已达限购数量` : `增加${item.foodName}数量`">＋</button>
                                 </div>
                             </li>
@@ -150,6 +150,7 @@ export default {
         const loadingBusiness = ref(false);
         const loadingFoods = ref(false);
         const loadingCart = ref(false);
+        const pageReady = ref(false);
 
         // 用户交互状态
         const isLiked = ref(false);
@@ -274,7 +275,48 @@ export default {
         const isCartQuantityAtLimit = (food) => getCartQuantity(food.id) >= maxCartQuantity(food);
 
         // 添加商品到购物车
-        const addToCart = async (food) => {
+        const animateCartFlight = (sourceElement) => {
+            if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+            const targetElement = document.querySelector('.business-detail-page .cart-left-icon');
+            if (!sourceElement || !targetElement) return;
+
+            const source = sourceElement.getBoundingClientRect();
+            const target = targetElement.getBoundingClientRect();
+            const startX = source.left + source.width / 2;
+            const startY = source.top + source.height / 2;
+            const endX = target.left + target.width / 2;
+            const endY = target.top + target.height / 2;
+            const controlX = (startX + endX) / 2;
+            const controlY = Math.min(startY, endY) - 72;
+            const dot = document.createElement('span');
+            dot.className = 'cart-fly-dot';
+            dot.style.left = `${startX - 6}px`;
+            dot.style.top = `${startY - 6}px`;
+            document.body.appendChild(dot);
+
+            const startedAt = performance.now();
+            const duration = 460;
+            const animate = (now) => {
+                const progress = Math.min(1, (now - startedAt) / duration);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const inverse = 1 - eased;
+                const x = inverse * inverse * startX + 2 * inverse * eased * controlX + eased * eased * endX;
+                const y = inverse * inverse * startY + 2 * inverse * eased * controlY + eased * eased * endY;
+                const scale = progress < .78 ? 1 : .6 + ((1 - progress) / .22) * .4;
+                dot.style.transform = `translate3d(${x - startX}px, ${y - startY}px, 0) scale(${scale})`;
+                if (progress < 1) requestAnimationFrame(animate);
+                else dot.remove();
+            };
+            requestAnimationFrame(animate);
+
+            targetElement.classList.remove('cart-bump');
+            void targetElement.offsetWidth;
+            targetElement.classList.add('cart-bump');
+            window.setTimeout(() => targetElement.classList.remove('cart-bump'), 380);
+        };
+
+        const addToCart = async (food, event) => {
+            const sourceElement = event?.currentTarget;
             // 检查用户是否登录
             if (!userInfo.value?.id) {
                 requireLogin('登录后即可加入购物车');
@@ -296,6 +338,8 @@ export default {
                     // 如果商品不在购物车中，添加新商品
                     await addNewCartItem(food.id);
                 }
+
+                animateCartFlight(sourceElement);
 
                 // 重新获取购物车列表以更新显示
                 await fetchCartList();
@@ -629,6 +673,7 @@ export default {
             await fetchFoodList();
             await fetchCartList(); // 获取购物车数据
             await loadReactions();
+            requestAnimationFrame(() => { pageReady.value = true; });
         });
 
         // 监听businessId变化
@@ -647,6 +692,7 @@ export default {
 
         return {
             business,
+            pageReady,
             foodArr,
             activeCategory,
             menuCategories,

@@ -1,5 +1,5 @@
 <template>
-	<div class="wrapper">
+	<div class="wrapper business-list-page" :class="{ 'business-list-page-ready': pageReady }">
 		<!-- header部分 -->
 		<div class="header">
 			<p>商家列表</p>
@@ -13,14 +13,16 @@
 			<p>该分类暂时没有商家</p>
 		</div>
 		<div v-if="businessArr.length" class="business-list">
-			<div class="business-item" v-for="business in businessArr" :key="business.id"
+			<div class="business-item" v-for="(business, index) in businessArr" :key="business.id"
+				:style="{ '--stagger-index': index }"
 				@click="toBusinessInfo(business.id)">
 				<div class="business-info">
 					<img :src="business.businessImg || require('@/assets/business-default.png')"
-						:alt="business.businessName" @error="handleImageError" />
+						:alt="business.businessName" @error="handleImageError"
+						:style="{ viewTransitionName: `restaurant-image-${business.id}` }" />
 					<div class="business-details">
 						<div class="business-header">
-							<h3>{{ business.businessName || '未知商铺' }} <small v-if="business.operatingStatus === false" class="closed-shop-tag">休息中</small></h3>
+						<h3 :style="{ viewTransitionName: `restaurant-title-${business.id}` }">{{ business.businessName || '未知商铺' }} <small v-if="business.operatingStatus === false" class="closed-shop-tag">休息中</small></h3>
 						</div>
 						<p class="description">{{ business.businessExplain || '暂无描述' }}</p>
 						<p class="description">{{ business.businessAddress || '暂无地址信息' }}</p>
@@ -41,12 +43,14 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import request from "@/utils/request";
+import { pushWithViewTransition } from "@/utils/navigationMotion";
 export default {
 	name: "BusinessList",
 	setup() {
 		const businessArr = ref([]);
 		const loading = ref(true);
 		const loadError = ref(false);
+		const pageReady = ref(false);
 		const route = useRoute();
 		const router = useRouter();
 
@@ -75,13 +79,14 @@ export default {
 				console.error("请求商家列表出错:", error);
 			} finally {
 				loading.value = false;
+				requestAnimationFrame(() => { pageReady.value = true; });
 			}
 		});
 
 		const money = (value) => Number(value || 0).toFixed(2);
 
 		const toBusinessInfo = (businessId) => {
-			router.push({
+			pushWithViewTransition(router, {
 				path: '/businessInfo',
 				query: { businessId }
 			});
@@ -97,6 +102,7 @@ export default {
 			businessArr,
 			loading,
 			loadError,
+			pageReady,
 			money,
 			toBusinessInfo,
 			handleImageError,

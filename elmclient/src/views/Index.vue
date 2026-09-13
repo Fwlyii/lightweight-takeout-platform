@@ -1,6 +1,6 @@
 <template>
     <!-- 登录、注册部分 -->
-    <div class="wrapper">
+    <div class="wrapper home-page" :class="{ 'home-page-ready': pageReady }">
         <!-- header部分 -->
         <header>
             <div class="icon-location-box">
@@ -87,7 +87,7 @@
             </div>
         </header>
         <!-- search部分 -->
-        <div class="search">
+        <div class="search home-motion home-motion-search">
             <div class="search-fixed-top" ref="fixedBox">
                 <div class="search-box">
                     <i class="fa fa-search"></i>
@@ -99,7 +99,7 @@
 
 
         <!-- 点餐分类部分 -->
-        <ul class="foodtype">
+        <ul class="foodtype home-motion home-motion-categories">
             <li @click="toBusinessList(1)">
                 <img src="@/assets/dcfl01.png" alt="美食">
                 <p>美食</p>
@@ -143,7 +143,7 @@
         </ul>
 
         <!-- 猜你喜欢：保留为轻量横向推荐，不再突出销量冠军或排名 -->
-        <section v-if="suggestedBusinesses.length" class="guess-section" aria-label="猜你喜欢">
+        <section v-if="suggestedBusinesses.length" class="guess-section home-motion home-motion-offers" aria-label="猜你喜欢">
             <div class="section-heading">
                 <div><h2>猜你喜欢</h2><span>附近口碑好店</span></div>
                 <button type="button" @click="scrollToRecommendations">更多 <i class="fa fa-angle-right"></i></button>
@@ -158,14 +158,14 @@
         </section>
 
         <!-- 推荐商家部分 -->
-        <div id="recommendations" class="recommend">
+        <div id="recommendations" class="recommend home-motion home-motion-recommend">
             <div class="recommend-line"></div>
             <p>推荐商家</p>
             <div class="recommend-line"></div>
         </div>
 
         <!-- 推荐方式部分 -->
-        <ul class="recommendtype">
+        <ul class="recommendtype home-motion home-motion-recommend">
             <li :class="{ active: sortBy === 'default' }" @click="setSortBy('default')">
                 综合排序<i class="fa fa-caret-down"></i>
             </li>
@@ -256,14 +256,16 @@
             </div>
         </div>
 
-        <ul class="business-list" v-if="businessList && businessList.length > 0">
-            <li v-for="business in visibleBusinessList" :key="business.id || business.businessId"
+        <ul class="business-list home-motion home-motion-businesses" v-if="businessList && businessList.length > 0">
+            <li v-for="(business, index) in visibleBusinessList" :key="business.id || business.businessId"
+                :style="{ '--stagger-index': index }"
                 @click="toBusinessInfo(business.id || business.businessId)">
                 <div class="business-info">
                     <img :src="business.businessImg || require('@/assets/business-default.png')"
-                        @error="handleImageError" :alt="business.businessName">
+                        @error="handleImageError" :alt="business.businessName"
+                        :style="{ viewTransitionName: `restaurant-image-${business.id || business.businessId}` }">
                     <div class="business-info-detail">
-                        <h3>{{ business.businessName || '未命名商铺'}} <small v-if="business.operatingStatus === false" class="closed-shop-tag">休息中</small></h3>
+                        <h3 :style="{ viewTransitionName: `restaurant-title-${business.id || business.businessId}` }">{{ business.businessName || '未命名商铺'}} <small v-if="business.operatingStatus === false" class="closed-shop-tag">休息中</small></h3>
                         <div class="business-info-rating">
                             <span class="rating-score">{{ formatBusinessRating(business.score) }}</span>
                             <span class="monthly-sales">月售 {{ business.salesCount || 0 }}</span>
@@ -303,6 +305,7 @@ import {
     hasConfiguredPromotion,
     supportsDineIn
 } from '../utils/businessPresentation';
+import { pushWithViewTransition } from '../utils/navigationMotion';
 export default {
     name: 'Index',
     setup() {
@@ -312,6 +315,7 @@ export default {
         const businessList = ref([]);
         const originalBusinessList = ref([]); // 保存原始数据用于筛选和排序
         const currentPage = ref(1);
+        const pageReady = ref(false);
         const pageSize = 6;
         const suggestedBusinesses = computed(() => businessList.value.slice(0, 3));
         const visibleBusinessList = computed(() => businessList.value.slice(0, currentPage.value * pageSize));
@@ -448,6 +452,7 @@ export default {
             window.addEventListener('scroll', handleScroll);
 
             getBusinessList();
+            requestAnimationFrame(() => { pageReady.value = true; });
         });
 
         onBeforeUnmount(() => {
@@ -538,7 +543,7 @@ export default {
 
         // 跳转到商家详情页
         const toBusinessInfo = (businessId) => {
-            router.push({
+            pushWithViewTransition(router, {
                 path: '/businessInfo',
                 query: { businessId }
             });
@@ -611,6 +616,7 @@ export default {
 
         return {
             fixedBox,
+            pageReady,
             toBusinessList,
             navigateToOrders,
             goToLChoose,
