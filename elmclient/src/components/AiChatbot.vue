@@ -46,16 +46,21 @@ const openAssistant = () => router.push('/ai-chat')
   overflow: visible;
   isolation: isolate;
   transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
-  animation: launcher-enter .42s cubic-bezier(.22, .72, .28, 1) both;
+  animation:
+    launcher-enter .42s cubic-bezier(.22, .72, .28, 1) both,
+    launcher-breathe 5s ease-in-out 1.1s infinite;
 }
 
 .ai-chat-launcher:hover {
   transform: translateY(-3px);
   box-shadow: 0 15px 34px rgba(0, 132, 225, .31), 0 4px 12px rgba(25, 72, 108, .1);
   filter: saturate(1.04);
+  animation-play-state: paused;
 }
 
-.ai-chat-launcher:active { transform: translateY(-1px) scale(.985); }
+.ai-chat-launcher:active {
+  animation: launcher-press 220ms cubic-bezier(.22, 1, .36, 1);
+}
 
 .launcher-halo {
   position: absolute;
@@ -64,7 +69,7 @@ const openAssistant = () => router.push('/ai-chat')
   border-radius: 24px;
   border: 1px solid rgba(0, 151, 255, .2);
   opacity: 0;
-  animation: launcher-pulse 4s ease-out 1.1s infinite;
+  animation: launcher-pulse 5s ease-out 1.1s infinite;
 }
 
 .launcher-icon {
@@ -115,10 +120,23 @@ const openAssistant = () => router.push('/ai-chat')
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes launcher-breathe {
+  0%, 84%, 100% { transform: scale(1); }
+  88% { transform: scale(1.03); }
+  92% { transform: scale(1.01); }
+}
+
+@keyframes launcher-press {
+  0% { transform: scale(1); }
+  45% { transform: scale(.95); }
+  100% { transform: scale(1); }
+}
+
 @keyframes launcher-pulse {
-  0%, 68% { opacity: 0; transform: scale(.96); }
-  76% { opacity: .75; }
-  94%, 100% { opacity: 0; transform: scale(1.12); }
+  0%, 84% { opacity: 0; transform: scale(.96); }
+  88% { opacity: .15; transform: scale(1.02); }
+  94% { opacity: .06; transform: scale(1.08); }
+  100% { opacity: 0; transform: scale(1.12); }
 }
 
 @media (max-width: 760px) {
