@@ -166,6 +166,16 @@ public class BusinessController {
         return HttpResult.success(businesses);
     }
 
+    /**
+     * 分类页商家展示数据，沿用首页的统一评分、销量、人均和推荐标签口径。
+     */
+    @GetMapping("/type/presentations")
+    @Operation(summary = "通过类型获取商家展示数据")
+    public HttpResult<List<BusinessSearchVO>> listBusinessPresentationsByType(
+            @RequestParam(required = false) Integer type) {
+        return HttpResult.success(businessService.getBusinessesByTypeForPresentation(type));
+    }
+
     @GetMapping("/id_list")
     @Operation(summary = "获取当前商家用户商铺id列表")
     @PreAuthorize("hasAnyAuthority('BUSINESS','ADMIN')")

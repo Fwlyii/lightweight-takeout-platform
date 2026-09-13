@@ -344,6 +344,13 @@ public class BusinessServiceImpl implements BusinessService {
     }
 
     @Override
+    public List<BusinessSearchVO> getBusinessesByTypeForPresentation(Integer type) {
+        List<BusinessSearchVO> businesses = businessMapper.searchBusinessesByType(type);
+        enrichBusinessPresentations(businesses);
+        return businesses;
+    }
+
+    @Override
     public List<MerchantStatsVO> getBusinessIdList() {
         return businessMapper.selectBusinessIdListByUserId(currentUserService.requireUserId());
     }

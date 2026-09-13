@@ -289,6 +289,13 @@
         </if>
     </select>
 
+    <select id="searchBusinessesByType" resultType="com.tju.elm_bk.vo.BusinessSearchVO">
+        SELECT <include refid="BusinessSearchColumns" />
+        FROM business b
+        WHERE b.is_deleted = 0 AND b.status = 1
+          AND b.order_type_id = #{type}
+    </select>
+
     <select id="getBusinessSummaryById" resultType="com.tju.elm_bk.vo.BusinessSearchVO">
         SELECT <include refid="BusinessSearchColumns" />
         FROM business b
