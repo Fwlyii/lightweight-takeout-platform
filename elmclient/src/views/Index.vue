@@ -2129,6 +2129,14 @@ export default {
     color: #83a5c0;
     box-shadow: 0 8px 18px rgba(35, 113, 166, .14);
     font-family: inherit;
+    transform-origin: center;
+    transition: transform 180ms cubic-bezier(.22, 1, .36, 1), box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.home-page .search .search-fixed-top .search-box:focus-within {
+    transform: translateY(-2px) scale(1.01);
+    border-color: rgba(112, 194, 243, .95);
+    box-shadow: 0 12px 24px rgba(35, 113, 166, .19), 0 0 0 3px rgba(255, 255, 255, .22);
 }
 
 .home-page .search .search-fixed-top .search-box .fa-search {
@@ -2156,6 +2164,14 @@ export default {
     font-size: 14px;
     font-weight: 700;
     box-shadow: 0 4px 10px rgba(18, 126, 207, .2);
+    transform-origin: center;
+    transition: transform 160ms cubic-bezier(.22, 1, .36, 1), filter 160ms ease, box-shadow 160ms ease;
+}
+
+.home-page .search .search-fixed-top .search-box .search-btn:active {
+    transform: scale(.94);
+    filter: brightness(.97);
+    box-shadow: 0 2px 6px rgba(18, 126, 207, .16);
 }
 
 .home-page .foodtype {
@@ -2181,6 +2197,8 @@ export default {
     width: auto;
     height: 65px;
     gap: 5px;
+    cursor: pointer;
+    touch-action: manipulation;
 }
 
 .home-page .foodtype li img {
@@ -2188,12 +2206,23 @@ export default {
     height: 38px;
     object-fit: contain;
     filter: drop-shadow(0 4px 5px rgba(45, 111, 155, .08));
+    transform-origin: center;
+    transition: transform 180ms cubic-bezier(.22, 1, .36, 1), filter 180ms ease;
 }
 
 .home-page .foodtype li p {
     color: #244b73;
     font-size: 12px;
     font-weight: 600;
+    transition: color 180ms ease;
+}
+
+.home-page .foodtype li:active img {
+    animation: category-press 220ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.home-page .foodtype li:active p {
+    color: var(--home-blue);
 }
 
 .home-page .guess-section {
@@ -2261,6 +2290,16 @@ export default {
 .home-page .guess-card img {
     height: 76px;
     border-radius: 9px;
+    transform-origin: center;
+    transition: transform 180ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.home-page .guess-card:active {
+    transform: scale(.97);
+}
+
+.home-page .guess-card:active img {
+    transform: scale(1.03);
 }
 
 .home-page .guess-card strong {
@@ -2400,5 +2439,27 @@ export default {
     .home-page header .login-register { right: 14px; }
     .home-page header .login-register button { min-width: 37px; padding-left: 7px; padding-right: 7px; }
     .home-page .business-list li .business-info img { width: 92px; height: 92px; flex-basis: 92px; }
+}
+
+@keyframes category-press {
+    0% { transform: scale(1); }
+    38% { transform: scale(.9); }
+    72% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-page .search .search-fixed-top .search-box,
+    .home-page .search .search-fixed-top .search-box .search-btn,
+    .home-page .foodtype li img,
+    .home-page .foodtype li p,
+    .home-page .guess-card,
+    .home-page .guess-card img {
+        transition: none;
+    }
+
+    .home-page .foodtype li:active img {
+        animation: none;
+    }
 }
 </style>
