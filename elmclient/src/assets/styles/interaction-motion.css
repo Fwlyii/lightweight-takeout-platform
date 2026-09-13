@@ -61,11 +61,11 @@
   animation: home-content-in 360ms cubic-bezier(.22, .61, .36, 1) forwards;
 }
 
-.content .home-page.home-page-ready .home-motion-search { animation-delay: 20ms; }
-.content .home-page.home-page-ready .home-motion-categories { animation-delay: 80ms; }
-.content .home-page.home-page-ready .home-motion-offers { animation-delay: 140ms; }
-.content .home-page.home-page-ready .home-motion-recommend { animation-delay: 200ms; }
-.content .home-page.home-page-ready .home-motion-businesses { animation-delay: 250ms; }
+.content .home-page.home-page-ready .home-motion-header { animation-delay: 0ms; }
+.content .home-page.home-page-ready .home-motion-search { animation-delay: 50ms; }
+.content .home-page.home-page-ready .home-motion-categories { animation-delay: 100ms; }
+.content .home-page.home-page-ready .home-motion-offers { animation-delay: 150ms; }
+.content .home-page.home-page-ready .home-motion-recommend { animation-delay: 220ms; }
 
 .content .home-page .business-list > li {
   opacity: 0;
@@ -93,7 +93,7 @@
 }
 
 @keyframes home-card-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 

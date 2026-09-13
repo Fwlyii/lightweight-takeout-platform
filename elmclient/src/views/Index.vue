@@ -2,7 +2,7 @@
     <!-- 登录、注册部分 -->
     <div class="wrapper home-page" :class="{ 'home-page-ready': pageReady }">
         <!-- header部分 -->
-        <header>
+        <header class="home-motion home-motion-header">
             <div class="icon-location-box">
                 <i class="fas fa-map-marker-alt"></i>
             </div>
@@ -431,32 +431,46 @@ export default {
         const navigateToOrders = () => {
             router.push({ path: '/orderList' });
         };
+        let scrollFrame = 0;
+        let scrollContainer = null;
         const handleScroll = () => {
-            let scroll = window.scrollY || document.documentElement.scrollTop;
-            let width = document.documentElement.clientWidth;
-            let search = fixedBox.value;
+            if (scrollFrame) return;
+            scrollFrame = requestAnimationFrame(() => {
+                scrollFrame = 0;
+                const scroll = scrollContainer?.scrollTop || 0;
+                const width = document.documentElement.clientWidth;
+                const search = fixedBox.value;
+                const parallax = Math.min(scroll, 80);
 
-            if (scroll > width * 0.12) {
-                search.style.position = 'fixed';
-                search.style.left = '0';
-                search.style.top = '0';
-            } else {
-                search.style.position = 'static';
-            }
+                if (search) {
+                    if (scroll > width * 0.12) {
+                        search.style.position = 'fixed';
+                        search.style.left = '0';
+                        search.style.top = '0';
+                    } else {
+                        search.style.position = 'static';
+                    }
+                }
+
+                document.querySelector('.home-page')?.style.setProperty('--home-bg-shift', `${-Math.min(parallax * 0.1, 8)}px`);
+                document.querySelector('.home-page')?.style.setProperty('--home-text-shift', `${-Math.min(parallax * 0.0375, 3)}px`);
+            });
         };
         onMounted(() => {
             restoreSavedLocation();
             // 加载用户信息
             fetchUserInfo();
 
-            window.addEventListener('scroll', handleScroll);
+            scrollContainer = document.querySelector('.content');
+            scrollContainer?.addEventListener('scroll', handleScroll, { passive: true });
 
             getBusinessList();
             requestAnimationFrame(() => { pageReady.value = true; });
         });
 
         onBeforeUnmount(() => {
-            window.removeEventListener('scroll', handleScroll);
+            scrollContainer?.removeEventListener('scroll', handleScroll);
+            if (scrollFrame) cancelAnimationFrame(scrollFrame);
         });
 
         const toBusinessList = (orderTypeId) => {
@@ -1975,6 +1989,8 @@ export default {
     color: var(--home-deep-blue);
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
     isolation: isolate;
+    --home-bg-shift: 0px;
+    --home-text-shift: 0px;
 }
 
 .home-page::before {
@@ -1986,7 +2002,7 @@ export default {
     pointer-events: none;
     background:
         linear-gradient(180deg, rgba(20, 142, 228, .08), rgba(243, 249, 253, .98) 94%),
-        url('../assets/home-reference.png') center top / 100% auto no-repeat;
+        url('../assets/home-reference.png') center var(--home-bg-shift) / 100% auto no-repeat;
     filter: saturate(.98) blur(.15px);
 }
 
@@ -2000,7 +2016,7 @@ export default {
     justify-content: flex-start;
     background:
         linear-gradient(180deg, rgba(20, 145, 231, .08), rgba(20, 145, 231, .62)),
-        url('../assets/home-reference.png') center top / 100% auto no-repeat;
+        url('../assets/home-reference.png') center var(--home-bg-shift) / 100% auto no-repeat;
     border: 0;
 }
 
@@ -2020,6 +2036,7 @@ export default {
 .home-page header > * {
     position: relative;
     z-index: 1;
+    transform: translateY(var(--home-text-shift));
 }
 
 .home-page header .icon-location-box {
