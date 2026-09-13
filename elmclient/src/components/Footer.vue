@@ -79,13 +79,19 @@
 	font-weight: 600;
   }
   
-  .footer > li i {
+	.footer > li i {
 	font-size: 25px;
 	line-height: 1;
-  }
+	transform-origin: center;
+	transition: transform 200ms cubic-bezier(.22, 1, .36, 1);
+	}
 
 	.footer > li.active {
 		color: #168fe4;
+	}
+
+	.footer > li.active i {
+		transform: translateY(-3px) scale(1.08);
 	}
 
 	.footer > li.active p {

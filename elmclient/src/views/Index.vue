@@ -165,17 +165,18 @@
         </div>
 
         <!-- 推荐方式部分 -->
-        <ul class="recommendtype home-motion home-motion-recommend">
-            <li :class="{ active: sortBy === 'default' }" @click="setSortBy('default')">
+        <ul ref="sortTabs" class="recommendtype home-motion home-motion-recommend">
+            <li :ref="element => setSortTabRef(element, 0)" :class="{ active: sortBy === 'default' }" @click="setSortBy('default')">
                 综合排序<i class="fa fa-caret-down"></i>
             </li>
 
-            <li :class="{ active: sortBy === 'sales' }" @click="setSortBy('sales')">
+            <li :ref="element => setSortTabRef(element, 1)" :class="{ active: sortBy === 'sales' }" @click="setSortBy('sales')">
                 销量最高
             </li>
-            <li :class="{ active: showFilter }" @click="toggleFilter">
+            <li :ref="element => setSortTabRef(element, 2)" :class="{ active: showFilter }" @click="toggleFilter">
                 筛选<i class="fa fa-filter"></i>
             </li>
+            <span class="sort-indicator" :style="sortIndicatorStyle" aria-hidden="true"></span>
         </ul>
 
         <!-- 筛选弹窗 -->
@@ -383,6 +384,25 @@ export default {
         const searchKeyword = ref('');
         const sortBy = ref('default');
         const showFilter = ref(false);
+        const sortTabs = ref(null);
+        const sortTabElements = [];
+        const sortIndicatorStyle = ref({ width: '0px', transform: 'translateX(0)', opacity: 0 });
+        const setSortTabRef = (element, index) => {
+            if (element) sortTabElements[index] = element;
+        };
+        const updateSortIndicator = () => {
+            nextTick(() => {
+                const activeIndex = showFilter.value ? 2 : (sortBy.value === 'sales' ? 1 : 0);
+                const tab = sortTabElements[activeIndex];
+                const container = sortTabs.value;
+                if (!tab || !container) return;
+                sortIndicatorStyle.value = {
+                    width: `${tab.offsetWidth}px`,
+                    transform: `translateX(${tab.offsetLeft}px)`,
+                    opacity: 1
+                };
+            });
+        };
         const filters = ref({
             freeDelivery: false,
             startPrice: '0',
@@ -501,19 +521,23 @@ export default {
 
             scrollContainer = document.querySelector('.content');
             scrollContainer?.addEventListener('scroll', handleScroll, { passive: true });
+            window.addEventListener('resize', updateSortIndicator);
 
             getBusinessList();
             requestAnimationFrame(() => { pageReady.value = true; });
             nextTick(observeBusinessItems);
+            updateSortIndicator();
         });
 
         onBeforeUnmount(() => {
             scrollContainer?.removeEventListener('scroll', handleScroll);
             if (scrollFrame) cancelAnimationFrame(scrollFrame);
+            window.removeEventListener('resize', updateSortIndicator);
             businessObserver?.disconnect();
         });
 
         watch(visibleBusinessList, () => nextTick(observeBusinessItems), { flush: 'post' });
+        watch([sortBy, showFilter], updateSortIndicator, { flush: 'post' });
 
         const toBusinessList = (orderTypeId) => {
             router.push({ path: '/BusinessList', query: { orderTypeId } });
@@ -708,6 +732,9 @@ export default {
             getDisplayText,
             searchKeyword,
             sortBy,
+            sortTabs,
+            sortIndicatorStyle,
+            setSortTabRef,
             performSearch,
             setSortBy,
             showFilter,
@@ -2378,6 +2405,7 @@ export default {
 }
 
 .home-page .recommendtype {
+    position: relative;
     height: 45px;
     padding: 0 14px;
     gap: 25px;
@@ -2392,12 +2420,24 @@ export default {
     border-radius: 0;
     color: #718aa4;
     font-size: 13px;
+    position: relative;
 }
 
 .home-page .recommendtype li.active {
     color: var(--home-blue);
     background: transparent;
-    border-bottom: 3px solid var(--home-blue);
+    border-bottom: 0;
+}
+
+.home-page .recommendtype .sort-indicator {
+    position: absolute;
+    left: 14px;
+    bottom: 0;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--home-blue);
+    pointer-events: none;
+    transition: transform 250ms cubic-bezier(.22, 1, .36, 1), width 250ms cubic-bezier(.22, 1, .36, 1), opacity 180ms ease;
 }
 
 .home-page .business-list {
@@ -2506,6 +2546,10 @@ export default {
 
     .home-page .foodtype li:active img {
         animation: none;
+    }
+
+    .home-page .recommendtype .sort-indicator {
+        transition: none;
     }
 }
 </style>

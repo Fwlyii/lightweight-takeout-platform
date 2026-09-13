@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container information-page" :class="{ 'information-page-ready': pageReady }">
     <!-- 固定顶部栏 -->
     <div class="fixed-top">
       <div class="top-background">
@@ -183,6 +183,7 @@ export default {
     const showEditModal = ref(false);
     const showAddressSection = ref(false);
     const unreadMessageCount = ref(0);
+    const pageReady = ref(false);
     const uploading = ref(false);
     const fileInput = ref(null);
     let realtimeConnection = null;
@@ -201,6 +202,7 @@ export default {
     });
 
     onMounted(async () => {
+      requestAnimationFrame(() => { pageReady.value = true; });
       const token = getToken();
       if (!token) {
         toast.warning('用户未登录，请先登录！');
@@ -451,6 +453,7 @@ export default {
       triggerFileInput,
       handleFileUpload,
       unreadMessageCount
+      ,pageReady
     };
   },
 };
