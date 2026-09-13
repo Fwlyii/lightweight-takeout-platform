@@ -2093,13 +2093,13 @@ export default {
     border: 0;
 }
 
-/* The supplied artwork already contains a location line and decorative copy.
- * Cover that narrow band so the live location control is shown only once. */
+/* The supplied artwork contains a phone status bar and decorative copy.
+ * Cover the complete header so the browser's live controls never overlap it. */
 .home-page header::before {
     content: "";
     position: absolute;
     z-index: 0;
-    top: 32px;
+    top: 0;
     right: 0;
     bottom: 0;
     left: 0;
