@@ -136,7 +136,7 @@
           :disabled="submitting || loginSucceeded"
         >
           <i v-if="submitting" class="fa fa-spinner fa-spin"></i>
-          <i v-else-if="loginSucceeded" class="fa fa-check"></i>
+          <i v-else-if="loginSucceeded" class="fa fa-spinner fa-spin"></i>
           <span>{{ loginButtonText }}</span>
         </button>
 
@@ -147,6 +147,16 @@
         </transition>
       </form>
     </section>
+
+    <transition name="success-feedback">
+      <div v-if="loginSucceeded" class="success-feedback" role="status" aria-live="polite">
+        <span class="success-feedback-icon" aria-hidden="true"><i class="fa fa-check"></i></span>
+        <span class="success-feedback-copy">
+          <strong>登录成功</strong>
+          <small>正在进入首页，请稍候...</small>
+        </span>
+      </div>
+    </transition>
 
     <footer class="login-footer" aria-label="校园外卖服务优势">
       <div v-for="feature in features" :key="feature.title" class="feature-item">
@@ -1602,10 +1612,105 @@ const login = async () => {
 .login-button { height: 56px; border-radius: 15px; font-size: 19px; }
 .register-line { margin-top: 18px; }
 
+.success-feedback {
+  position: fixed;
+  z-index: 20;
+  top: 50%;
+  left: 50%;
+  width: min(420px, calc(100% - 40px));
+  min-height: 154px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 25px 34px;
+  border: 1px solid rgba(255, 255, 255, .78);
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(249, 253, 255, .93), rgba(231, 245, 255, .82));
+  box-shadow: 0 24px 56px rgba(53, 116, 162, .2), 0 2px 12px rgba(255, 255, 255, .6) inset;
+  backdrop-filter: blur(18px) saturate(1.12);
+  -webkit-backdrop-filter: blur(18px) saturate(1.12);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.success-feedback-icon {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 76px;
+  border: 10px solid rgba(122, 197, 246, .2);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #27a6ff, #087cf0);
+  color: #fff;
+  font-size: 30px;
+  box-shadow: 0 8px 20px rgba(8, 124, 240, .2);
+}
+
+.success-feedback-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.success-feedback-copy strong {
+  color: #172b43;
+  font-size: 27px;
+  line-height: 1.15;
+  font-weight: 800;
+}
+
+.success-feedback-copy small {
+  color: #6685a4;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.success-feedback-enter-active,
+.success-feedback-leave-active {
+  transition: opacity 180ms ease, transform 220ms cubic-bezier(.22, .61, .36, 1);
+}
+
+.success-feedback-enter-from,
+.success-feedback-leave-to {
+  opacity: 0;
+  transform: translate(-50%, calc(-50% + 10px)) scale(.96);
+}
+
 @media (max-width: 370px) {
   .hero-shell { width: calc(100% - 24px); }
   .login-panel { padding-left: 16px; padding-right: 16px; }
   .panel-heading h2 { font-size: 25px; }
   .form-row, .forgot-link, .register-line { font-size: 13px; }
+}
+
+@media (max-width: 420px) {
+  .success-feedback {
+    width: calc(100% - 32px);
+    min-height: 126px;
+    gap: 16px;
+    padding: 20px 21px;
+    border-radius: 20px;
+  }
+
+  .success-feedback-icon {
+    width: 62px;
+    height: 62px;
+    flex-basis: 62px;
+    border-width: 8px;
+    font-size: 24px;
+  }
+
+  .success-feedback-copy { gap: 6px; }
+  .success-feedback-copy strong { font-size: 23px; }
+  .success-feedback-copy small { font-size: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .success-feedback-enter-active,
+  .success-feedback-leave-active {
+    transition: none;
+  }
 }
 </style>

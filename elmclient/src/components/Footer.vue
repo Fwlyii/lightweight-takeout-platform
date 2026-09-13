@@ -46,9 +46,11 @@
   <style scoped>
   .footer {
 	width: 100%;
-	height: 8vh; /* 使用视口高度单位，适应不同屏幕 */
-	border-top: solid 1px #ddd;
-	background-color: #fff;
+	height: 72px;
+	border-top: 1px solid rgba(180, 211, 230, .7);
+	background: rgba(255, 255, 255, .94);
+	box-shadow: 0 -8px 22px rgba(58, 112, 150, .08);
+	backdrop-filter: blur(14px);
   
 	position: fixed;
 	left: 0;
@@ -65,17 +67,28 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	color: #999;
+	color: #91a0aa;
 	user-select: none;
 	cursor: pointer;
 	flex: 1; /* 使每个 li 平均分配宽度 */
   }
   
   .footer > li p {
-	font-size: 1.8vh; /* 使用视口高度单位 */
+	margin-top: 4px;
+	font-size: 12px;
+	font-weight: 600;
   }
   
   .footer > li i {
-	font-size: 3.5vh; /* 使用视口高度单位 */
+	font-size: 25px;
+	line-height: 1;
   }
+
+	.footer > li.active {
+		color: #168fe4;
+	}
+
+	.footer > li.active p {
+		font-weight: 800;
+	}
 </style>

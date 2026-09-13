@@ -1960,4 +1960,426 @@ export default {
     .wrapper .search .search-fixed-top { max-width: 600px; margin: 0 auto; }
     .wrapper .business-list { padding-left: 0; padding-right: 0; }
 }
+
+/* Reference-led home polish: keep the supplied campus artwork visible in the
+ * first viewport while all controls and data remain live Vue elements. */
+.home-page {
+    --home-blue: #168fe4;
+    --home-deep-blue: #123f70;
+    --home-muted: #718aa4;
+    --home-surface: rgba(255, 255, 255, .92);
+    --home-border: rgba(157, 205, 238, .58);
+    position: relative;
+    min-height: 100vh;
+    background: #f3f9fd;
+    color: var(--home-deep-blue);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+    isolation: isolate;
+}
+
+.home-page::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0 0 auto;
+    height: 220px;
+    pointer-events: none;
+    background:
+        linear-gradient(180deg, rgba(20, 142, 228, .08), rgba(243, 249, 253, .98) 94%),
+        url('../assets/home-reference.png') center top / 100% auto no-repeat;
+    filter: saturate(.98) blur(.15px);
+}
+
+.home-page header {
+    position: relative;
+    z-index: 2;
+    height: 112px;
+    padding: 43px 20px 0;
+    box-sizing: border-box;
+    align-items: flex-start;
+    justify-content: flex-start;
+    background:
+        linear-gradient(180deg, rgba(20, 145, 231, .08), rgba(20, 145, 231, .62)),
+        url('../assets/home-reference.png') center top / 100% auto no-repeat;
+    border: 0;
+}
+
+/* The supplied artwork already contains a location line and decorative copy.
+ * Cover that narrow band so the live location control is shown only once. */
+.home-page header::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: 32px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: #2498e5;
+}
+
+.home-page header > * {
+    position: relative;
+    z-index: 1;
+}
+
+.home-page header .icon-location-box {
+    width: 19px;
+    height: 21px;
+    margin-right: 8px;
+    line-height: 21px;
+}
+
+.home-page header .icon-location-box i {
+    color: #fff;
+    font-size: 19px;
+    filter: drop-shadow(0 1px 2px rgba(12, 73, 124, .16));
+}
+
+.home-page header .location-text {
+    max-width: calc(100% - 112px);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 21px;
+    text-shadow: 0 1px 2px rgba(14, 74, 126, .2);
+}
+
+.home-page header .location-text .fa-caret-down {
+    margin-left: 7px;
+    font-size: 12px;
+}
+
+.home-page header .login-register {
+    position: absolute;
+    top: 41px;
+    right: 18px;
+    margin: 0;
+    gap: 5px;
+}
+
+.home-page header .login-register button {
+    min-width: 42px;
+    padding: 5px 9px;
+    border: 1px solid rgba(255, 255, 255, .55);
+    border-radius: 14px;
+    color: #fff;
+    background: rgba(255, 255, 255, .16);
+    font-size: 12px;
+    box-shadow: 0 3px 8px rgba(12, 78, 133, .08);
+    backdrop-filter: blur(8px);
+}
+
+.home-page header .login-register button:hover {
+    background: rgba(255, 255, 255, .28);
+}
+
+.home-page header .login-register .user-info {
+    width: 106px;
+    max-width: 106px;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, .52);
+    border-radius: 14px;
+    color: #fff;
+    background: rgba(255, 255, 255, .15);
+    font-size: 12px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+}
+
+.home-page .search {
+    position: relative;
+    z-index: 3;
+    height: 72px;
+}
+
+.home-page .search .search-fixed-top {
+    height: 72px;
+    padding: 11px 14px 15px;
+    box-sizing: border-box;
+    background: #2498e5;
+    backdrop-filter: none;
+}
+
+.home-page .search .search-fixed-top .search-box {
+    width: 100%;
+    height: 46px;
+    padding: 0 6px 0 16px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, .72);
+    border-radius: 25px;
+    background: rgba(255, 255, 255, .95);
+    color: #83a5c0;
+    box-shadow: 0 8px 18px rgba(35, 113, 166, .14);
+    font-family: inherit;
+}
+
+.home-page .search .search-fixed-top .search-box .fa-search {
+    margin-right: 9px;
+    color: var(--home-blue);
+    font-size: 20px;
+}
+
+.home-page .search .search-fixed-top .search-box input {
+    min-width: 0;
+    margin: 0 8px;
+    color: var(--home-deep-blue);
+    font-size: 14px;
+}
+
+.home-page .search .search-fixed-top .search-box input::placeholder {
+    color: #8fa8be;
+}
+
+.home-page .search .search-fixed-top .search-box .search-btn {
+    min-width: 70px;
+    padding: 9px 15px;
+    border-radius: 21px;
+    background: linear-gradient(135deg, #2aa9f1, #0f83dc);
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(18, 126, 207, .2);
+}
+
+.home-page .foodtype {
+    position: relative;
+    z-index: 2;
+    width: calc(100% - 24px);
+    height: auto;
+    margin: 13px auto 0;
+    padding: 17px 11px 13px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 13px 2px;
+    align-content: initial;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, .9);
+    border-radius: 19px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(58, 129, 177, .1), inset 0 1px 0 rgba(255, 255, 255, .8);
+    backdrop-filter: blur(14px);
+}
+
+.home-page .foodtype li {
+    width: auto;
+    height: 65px;
+    gap: 5px;
+}
+
+.home-page .foodtype li img {
+    width: 42px;
+    height: 38px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 5px rgba(45, 111, 155, .08));
+}
+
+.home-page .foodtype li p {
+    color: #244b73;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.home-page .guess-section {
+    padding: 22px 14px 13px;
+    background: transparent;
+    border: 0;
+}
+
+.home-page .guess-section .section-heading {
+    margin: 0 1px 11px;
+}
+
+.home-page .guess-section .section-heading > div {
+    gap: 9px;
+}
+
+.home-page .guess-section .section-heading h2,
+.home-page .recommend p {
+    position: relative;
+    color: #103c6c;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.home-page .guess-section .section-heading h2 {
+    font-size: 21px;
+}
+
+.home-page .guess-section .section-heading h2::after,
+.home-page .recommend p::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -7px;
+    width: 34px;
+    height: 4px;
+    border-radius: 4px;
+    background: #168fe4;
+}
+
+.home-page .guess-section .section-heading span {
+    color: #829ab0;
+    font-size: 12px;
+}
+
+.home-page .guess-section .section-heading button {
+    color: #7592ad;
+    font-size: 12px;
+}
+
+.home-page .guess-scroll {
+    gap: 10px;
+    padding: 2px 1px 4px;
+}
+
+.home-page .guess-card {
+    flex-basis: 145px;
+    padding: 8px;
+    border: 1px solid var(--home-border);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 7px 16px rgba(59, 120, 161, .08);
+}
+
+.home-page .guess-card img {
+    height: 76px;
+    border-radius: 9px;
+}
+
+.home-page .guess-card strong {
+    color: #183f6c;
+    font-size: 13px;
+}
+
+.home-page .guess-card span {
+    color: #839bb0;
+    font-size: 10px;
+}
+
+.home-page .guess-card b {
+    color: #f27b3a;
+}
+
+.home-page .recommend {
+    min-height: 52px;
+    margin-top: 2px;
+    padding: 17px 14px 12px;
+    background: transparent;
+}
+
+.home-page .recommend p {
+    color: #103c6c;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.home-page .recommendtype {
+    height: 45px;
+    padding: 0 14px;
+    gap: 25px;
+    background: rgba(243, 249, 253, .88);
+    border-bottom: 1px solid rgba(174, 207, 228, .6);
+    backdrop-filter: blur(9px);
+}
+
+.home-page .recommendtype li {
+    height: 45px;
+    padding: 13px 0 10px;
+    border-radius: 0;
+    color: #718aa4;
+    font-size: 13px;
+}
+
+.home-page .recommendtype li.active {
+    color: var(--home-blue);
+    background: transparent;
+    border-bottom: 3px solid var(--home-blue);
+}
+
+.home-page .business-list {
+    padding: 12px 12px 88px;
+}
+
+.home-page .business-list li {
+    min-height: 122px;
+    margin-bottom: 11px;
+    padding: 12px;
+    border: 1px solid var(--home-border);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 7px 17px rgba(51, 111, 151, .08);
+}
+
+.home-page .business-list li .business-info {
+    gap: 12px;
+}
+
+.home-page .business-list li .business-info img {
+    width: 104px;
+    height: 104px;
+    flex-basis: 104px;
+    border-radius: 10px;
+}
+
+.home-page .business-list li .business-info .business-info-detail h3 {
+    margin-bottom: 0;
+    color: #103c6c;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.home-page .business-list li .business-info .business-info-rating {
+    gap: 8px;
+    margin-top: 7px;
+}
+
+.home-page .business-list li .business-info .business-info-rating .rating-score {
+    color: #f27635;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.home-page .business-list li .business-info .business-info-rating .monthly-sales,
+.home-page .business-list li .business-info .business-info-rating .average-price,
+.home-page .business-list li .business-info .business-info-delivery .start-price,
+.home-page .business-list li .business-info .business-info-delivery .delivery-fee {
+    color: #7893ac;
+    font-size: 11px;
+}
+
+.home-page .business-list li .business-info .business-info-delivery {
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.home-page .business-list li .business-info .business-info-delivery .free-delivery {
+    color: var(--home-blue);
+}
+
+.home-page .business-tags {
+    gap: 5px;
+    margin-top: 8px;
+}
+
+.home-page .business-tag {
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+}
+
+.home-page .load-more {
+    margin-bottom: 90px;
+    border-color: #b9dff4;
+    border-radius: 9px;
+    color: var(--home-blue);
+    background: rgba(255, 255, 255, .88);
+}
+
+@media (max-width: 380px) {
+    .home-page header { padding-left: 16px; padding-right: 14px; }
+    .home-page header .location-text { max-width: calc(100% - 96px); font-size: 14px; }
+    .home-page header .login-register { right: 14px; }
+    .home-page header .login-register button { min-width: 37px; padding-left: 7px; padding-right: 7px; }
+    .home-page .business-list li .business-info img { width: 92px; height: 92px; flex-basis: 92px; }
+}
 </style>
