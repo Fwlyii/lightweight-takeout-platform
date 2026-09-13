@@ -67,24 +67,17 @@
 .content .home-page.home-page-ready .home-motion-offers { animation-delay: 150ms; }
 .content .home-page.home-page-ready .home-motion-recommend { animation-delay: 220ms; }
 
-.content .home-page .business-list > li {
+.content .home-page .business-list.business-list-observe > li,
+.content .business-list-page .business-list.business-list-observe .business-item {
   opacity: 0;
-  animation: home-card-in 340ms cubic-bezier(.22, .61, .36, 1) both;
-  animation-delay: calc(250ms + (var(--stagger-index, 0) * 52ms));
+  transform: translateY(20px);
+  will-change: transform, opacity;
 }
 
-.content .home-page:not(.home-page-ready) .business-list > li {
-  animation-play-state: paused;
-}
-
-.content .business-list-page .business-item {
-  opacity: 0;
-  animation: home-card-in 340ms cubic-bezier(.22, .61, .36, 1) both;
-  animation-delay: calc(var(--stagger-index, 0) * 52ms);
-}
-
-.content .business-list-page:not(.business-list-page-ready) .business-item {
-  animation-play-state: paused;
+.content .home-page .business-list.business-list-observe > li.is-visible,
+.content .business-list-page .business-list.business-list-observe .business-item.is-visible {
+  animation: restaurant-card-in 250ms cubic-bezier(.22, .61, .36, 1) both;
+  animation-delay: calc(var(--stagger-index, 0) * 50ms);
 }
 
 @keyframes home-content-in {
@@ -92,15 +85,15 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes home-card-in {
+@keyframes restaurant-card-in {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .content .home-page .home-motion,
-  .content .home-page .business-list > li,
-  .content .business-list-page .business-item {
+  .content .home-page .business-list.business-list-observe > li,
+  .content .business-list-page .business-list.business-list-observe .business-item {
     opacity: 1;
     transform: none;
     animation: none;

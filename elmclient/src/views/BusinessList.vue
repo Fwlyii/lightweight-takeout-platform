@@ -12,8 +12,10 @@
 			<i class="fa fa-store-o"></i>
 			<p>该分类暂时没有商家</p>
 		</div>
-		<div v-if="businessArr.length" class="business-list">
+        <div v-if="businessArr.length" class="business-list" :class="{ 'business-list-observe': observeBusinesses }" ref="businessListRef">
 			<div class="business-item" v-for="(business, index) in businessArr" :key="business.id"
+				:class="{ 'is-visible': revealedBusinessIds.has(String(business.id)) }"
+				:data-business-id="business.id"
 				:style="{ '--stagger-index': index }"
 				@click="toBusinessInfo(business.id)">
 				<div class="business-info">
@@ -40,7 +42,7 @@
 </template>
   
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import request from "@/utils/request";
 import { pushWithViewTransition } from "@/utils/navigationMotion";
@@ -51,6 +53,32 @@ export default {
 		const loading = ref(true);
 		const loadError = ref(false);
 		const pageReady = ref(false);
+		const businessListRef = ref(null);
+		const observeBusinesses = ref(false);
+		const revealedBusinessIds = ref(new Set());
+		let businessObserver = null;
+		const observeBusinessItems = () => {
+			const elements = businessListRef.value?.querySelectorAll('[data-business-id]');
+			if (!elements?.length) return;
+			if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+				revealedBusinessIds.value = new Set([...elements].map(element => String(element.dataset.businessId)));
+				observeBusinesses.value = false;
+				return;
+			}
+			observeBusinesses.value = true;
+			businessObserver ||= new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					if (!entry.isIntersecting) return;
+					const next = new Set(revealedBusinessIds.value);
+					next.add(String(entry.target.dataset.businessId));
+					revealedBusinessIds.value = next;
+					businessObserver?.unobserve(entry.target);
+				});
+			}, { root: document.querySelector('.content'), rootMargin: '0px 0px 24px', threshold: 0.08 });
+			elements.forEach(element => {
+				if (!revealedBusinessIds.value.has(String(element.dataset.businessId))) businessObserver.observe(element);
+			});
+		};
 		const route = useRoute();
 		const router = useRouter();
 
@@ -80,8 +108,10 @@ export default {
 			} finally {
 				loading.value = false;
 				requestAnimationFrame(() => { pageReady.value = true; });
+				nextTick(observeBusinessItems);
 			}
 		});
+		onBeforeUnmount(() => businessObserver?.disconnect());
 
 		const money = (value) => Number(value || 0).toFixed(2);
 
@@ -103,6 +133,9 @@ export default {
 			loading,
 			loadError,
 			pageReady,
+			businessListRef,
+			observeBusinesses,
+			revealedBusinessIds,
 			money,
 			toBusinessInfo,
 			handleImageError,

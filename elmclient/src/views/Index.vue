@@ -256,8 +256,11 @@
             </div>
         </div>
 
-        <ul class="business-list home-motion home-motion-businesses" v-if="businessList && businessList.length > 0">
+        <ul ref="businessListRef" class="business-list home-motion home-motion-businesses"
+            :class="{ 'business-list-observe': observeBusinesses }" v-if="businessList && businessList.length > 0">
             <li v-for="(business, index) in visibleBusinessList" :key="business.id || business.businessId"
+                :class="{ 'is-visible': revealedBusinessIds.has(businessKey(business)) }"
+                :data-business-id="businessKey(business)"
                 :style="{ '--stagger-index': index }"
                 @click="toBusinessInfo(business.id || business.businessId)">
                 <div class="business-info">
@@ -292,7 +295,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed, nextTick, watch } from 'vue';
 import AiChatbot from '../components/AiChatbot.vue';
 import { useRouter } from 'vue-router';
 import request from '../utils/request';
@@ -316,10 +319,45 @@ export default {
         const originalBusinessList = ref([]); // 保存原始数据用于筛选和排序
         const currentPage = ref(1);
         const pageReady = ref(false);
+        const businessListRef = ref(null);
+        const observeBusinesses = ref(false);
+        const revealedBusinessIds = ref(new Set());
+        let businessObserver = null;
         const pageSize = 6;
         const suggestedBusinesses = computed(() => businessList.value.slice(0, 3));
         const visibleBusinessList = computed(() => businessList.value.slice(0, currentPage.value * pageSize));
         const hasMoreBusinesses = computed(() => visibleBusinessList.value.length < businessList.value.length);
+        const businessKey = (business) => String(business?.id || business?.businessId || '');
+        const revealBusiness = (element) => {
+            const id = element?.dataset?.businessId;
+            if (!id) return;
+            const next = new Set(revealedBusinessIds.value);
+            next.add(id);
+            revealedBusinessIds.value = next;
+            businessObserver?.unobserve(element);
+        };
+        const observeBusinessItems = () => {
+            const elements = businessListRef.value?.querySelectorAll('[data-business-id]');
+            if (!elements?.length) return;
+
+            if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+                revealedBusinessIds.value = new Set(
+                    [...elements].map(element => element.dataset.businessId).filter(Boolean)
+                );
+                observeBusinesses.value = false;
+                return;
+            }
+
+            observeBusinesses.value = true;
+            businessObserver ||= new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) revealBusiness(entry.target);
+                });
+            }, { root: document.querySelector('.content'), rootMargin: '0px 0px 24px', threshold: 0.08 });
+            elements.forEach(element => {
+                if (!revealedBusinessIds.value.has(element.dataset.businessId)) businessObserver.observe(element);
+            });
+        };
         const {
             displayLocation,
             showPicker,
@@ -466,12 +504,16 @@ export default {
 
             getBusinessList();
             requestAnimationFrame(() => { pageReady.value = true; });
+            nextTick(observeBusinessItems);
         });
 
         onBeforeUnmount(() => {
             scrollContainer?.removeEventListener('scroll', handleScroll);
             if (scrollFrame) cancelAnimationFrame(scrollFrame);
+            businessObserver?.disconnect();
         });
+
+        watch(visibleBusinessList, () => nextTick(observeBusinessItems), { flush: 'post' });
 
         const toBusinessList = (orderTypeId) => {
             router.push({ path: '/BusinessList', query: { orderTypeId } });
@@ -631,6 +673,10 @@ export default {
         return {
             fixedBox,
             pageReady,
+            businessListRef,
+            observeBusinesses,
+            revealedBusinessIds,
+            businessKey,
             toBusinessList,
             navigateToOrders,
             goToLChoose,
