@@ -2261,6 +2261,7 @@ export default {
 }
 
 .home-page .recommend {
+    justify-content: flex-start;
     min-height: 52px;
     margin-top: 2px;
     padding: 17px 14px 12px;
@@ -2268,6 +2269,7 @@ export default {
 }
 
 .home-page .recommend p {
+    margin: 0;
     color: #103c6c;
     font-size: 21px;
     font-weight: 800;
