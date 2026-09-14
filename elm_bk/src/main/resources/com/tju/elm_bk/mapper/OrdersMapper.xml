@@ -15,6 +15,7 @@
         <result property="orderState" column="order_state"/>
         <result property="orderTotal" column="order_total"/>
         <result property="serviceMode" column="service_mode"/>
+        <result property="remarks" column="remarks"/>
         <association property="business" resultMap="businessVOResultMap"/>
         <association property="customer" resultMap="customerUserVOResultMap"/>
         <association property="deliveryAddress" resultMap="addressVOResultMap"/>
@@ -97,6 +98,7 @@
                O.order_state,
                O.order_total,
                O.service_mode,
+               O.remarks,
                O.business_id,
                O.customer_id,
                O.address_id,
@@ -163,6 +165,7 @@
                O.order_state,
                O.order_total,
                O.service_mode,
+               O.remarks,
                O.business_id,
                O.customer_id,
                O.address_id,
@@ -219,8 +222,8 @@
 
 
     <insert id="insertOrder" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO orders (create_time, creator, is_deleted, update_time, updater, order_date, order_state, order_total, business_id, customer_id, address_id, delivery_price, address_snapshot, contact_name_snapshot, contact_sex_snapshot, contact_tel_snapshot, idempotency_key, service_mode)
-        VALUES (#{createTime}, #{creator}, #{isDeleted}, #{updateTime}, #{updater}, #{orderDate}, #{orderState}, #{orderTotal}, #{businessId}, #{customerId}, #{addressId}, #{deliveryPrice}, #{addressSnapshot}, #{contactNameSnapshot}, #{contactSexSnapshot}, #{contactTelSnapshot}, #{idempotencyKey}, COALESCE(#{serviceMode}, 'DELIVERY'))
+        INSERT INTO orders (create_time, creator, is_deleted, update_time, updater, order_date, order_state, order_total, business_id, customer_id, address_id, delivery_price, address_snapshot, contact_name_snapshot, contact_sex_snapshot, contact_tel_snapshot, idempotency_key, service_mode, remarks)
+        VALUES (#{createTime}, #{creator}, #{isDeleted}, #{updateTime}, #{updater}, #{orderDate}, #{orderState}, #{orderTotal}, #{businessId}, #{customerId}, #{addressId}, #{deliveryPrice}, #{addressSnapshot}, #{contactNameSnapshot}, #{contactSexSnapshot}, #{contactTelSnapshot}, #{idempotencyKey}, COALESCE(#{serviceMode}, 'DELIVERY'), #{remarks})
     </insert>
 
 </mapper>

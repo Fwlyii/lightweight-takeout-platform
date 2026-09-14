@@ -75,6 +75,7 @@ public class SecurityConfig {
                         // 写购物车、下单、收藏以及读取私人会话仍然要求登录。
                         .requestMatchers(HttpMethod.GET,
                                 "/api/businesses/{id}",
+                                "/api/businesses/{id}/summary",
                                 "/api/businesses/type",
                                 "/api/businesses/type/presentations",
                                 "/api/foods/list",

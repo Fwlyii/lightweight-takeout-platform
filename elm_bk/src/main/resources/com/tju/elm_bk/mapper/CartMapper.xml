@@ -8,4 +8,10 @@
         VALUES (#{createTime}, #{creator}, #{isDeleted}, #{updateTime}, #{updater}, #{quantity}, #{businessId}, #{customerId}, #{foodId})
     </insert>
 
+    <update id="updateCartRemarks">
+        UPDATE cart
+        SET remarks = #{remarks}, update_time = NOW()
+        WHERE customer_id = #{userId} AND business_id = #{businessId} AND is_deleted = 0
+    </update>
+
 </mapper>

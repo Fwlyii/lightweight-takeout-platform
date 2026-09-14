@@ -21,15 +21,26 @@
                 </div>
                 <p class="business-meta">{{ deliveryMode === 'pickup' ? '到店自取 · 无起送门槛' : `起送 ¥${formatMoney(business.startPrice)} · 配送 ¥${formatMoney(business.deliveryPrice)}` }}</p>
                 <p class="business-address"><i class="fa fa-map-marker"></i>{{ business.businessAddress || '校园周边配送' }}</p>
+                <div class="business-metrics">
+                    <span class="metric-score"><i class="fa fa-star"></i>{{ businessScoreText }}</span>
+                    <span class="metric-sep">|</span>
+                    <span>月售 {{ businessSummary ? businessSummary.salesCount || 0 : 0 }}</span>
+                    <span class="metric-sep">|</span>
+                    <span>{{ deliveryMode === 'pickup' ? '预计 15 分钟出餐' : `预计 ${deliveryEtaMinutes} 分钟送达` }}</span>
+                </div>
+                <div class="hero-reactions">
+                    <button type="button" :class="{ active: isLiked }" @click.stop="toggleLike"><i class="fa fa-thumbs-up"></i><span>{{ isLiked ? '已赞' : '点赞' }}</span></button>
+                    <button type="button" :class="{ active: isFavorited }" @click.stop="toggleFavorite"><i class="fa fa-star"></i><span>{{ isFavorited ? '已收藏' : '收藏' }}</span></button>
+                </div>
             </div>
-            <div class="hero-reactions">
-                <button type="button" :class="{ active: isLiked }" @click.stop="toggleLike"><i class="fa fa-thumbs-up"></i><span>{{ isLiked ? '已赞' : '点赞' }}</span></button>
-                <button type="button" :class="{ active: isFavorited }" @click.stop="toggleFavorite"><i class="fa fa-star"></i><span>{{ isFavorited ? '已收藏' : '收藏' }}</span></button>
-            </div>
+            <img class="hero-art" src="@/assets/store-card-art.png" alt="" aria-hidden="true" />
         </section>
 
         <div class="offer-strip" aria-label="商家优惠">
-            <span v-if="deliveryMode === 'pickup'">自取免配送费</span><template v-else><span v-if="Number(business.deliveryPrice || 0) === 0">免配送费</span><span v-else>配送 ¥{{ formatMoney(business.deliveryPrice) }}</span></template><span v-if="business.promotionThreshold && business.promotionDiscount">满{{ formatMoney(business.promotionThreshold) }}减{{ formatMoney(business.promotionDiscount) }}</span><span>品质保障</span><span v-if="business.dineInAvailable">支持自取</span>
+            <span class="offer-tag offer-delivery"><i class="fa" :class="deliveryMode === 'pickup' ? 'fa-shopping-bag' : 'fa-truck'"></i>{{ deliveryMode === 'pickup' || Number(business.deliveryPrice || 0) === 0 ? '免配送费' : `配送 ¥${formatMoney(business.deliveryPrice)}` }}</span>
+            <span v-if="business.promotionThreshold && business.promotionDiscount" class="offer-tag offer-promotion"><i class="fa fa-gift"></i>满{{ trimMoney(business.promotionThreshold) }}减{{ trimMoney(business.promotionDiscount) }}</span>
+            <span class="offer-tag offer-quality"><i class="fa fa-shield"></i>品质保障</span>
+            <span v-if="business.dineInAvailable" class="offer-tag offer-pickup"><i class="fa fa-shopping-bag"></i>支持自取</span>
         </div>
 
         <nav class="page-tabs" role="tablist" aria-label="商家内容">
@@ -46,6 +57,11 @@
                     <button type="button" @click="setDeliveryMode(deliveryMode === 'pickup' ? 'delivery' : 'pickup')">切换</button>
                 </div>
                 <div class="section-heading"><h2>菜单</h2><span>{{ foodArr.length }} 件商品</span></div>
+                <div class="ai-pick-card">
+                    <i class="fa fa-robot"></i>
+                    <div><strong>AI帮你搭配</strong><span>根据你的口味推荐更合适的美食</span></div>
+                    <button type="button" @click="router.push('/ai-chat/recommend')">去看看 <i class="fa fa-angle-right"></i></button>
+                </div>
                 <div v-if="loadingFoods" class="state-card">正在加载菜单…</div>
                 <div v-else-if="!foodArr.length" class="state-card">暂时没有可售商品</div>
                 <div v-else class="menu-layout">
@@ -122,6 +138,7 @@ import { toast } from '@/utils/toast';
 import { formatDate, formatMoney } from '@/utils/formatters';
 import { getToken, updateStoredUser } from '@/utils/auth';
 import { cartQuantityLimitMessage, isSoldOut, maxCartQuantity } from '@/utils/cartQuantityRules';
+import { getBusinessDeliveryMinutes } from '@/utils/businessPresentation';
 import { addCartItem, listCartItems, removeCartItem, setCartItemQuantity } from '@/services/cartService';
 import { getMyInteraction, updateMyInteraction } from '@/services/merchantInteractionService';
 export default {
@@ -145,6 +162,7 @@ export default {
             remarks: ""
         });
         const foodArr = ref([]);
+        const businessSummary = ref(null);
         const activeCategory = ref('');
         const cartItems = ref([]); // 购物车商品列表
         const loadingBusiness = ref(false);
@@ -211,8 +229,7 @@ export default {
             event.target.src = isFoodImage ? require('@/assets/food-default.png') : require('@/assets/business-default.png');
         };
 
-        const loadReviews = async () => {
-            if (!businessId.value || loadingReviews.value) return;
+        const loadReviews = async () => {            if (!businessId.value || loadingReviews.value) return;
             loadingReviews.value = true;
             try {
                 const response = await request.get(`/api/v1/reviews/business/${businessId.value}`);
@@ -538,6 +555,7 @@ export default {
                     };
                     const savedMode = localStorage.getItem(`businessServiceMode:${businessId.value}`) || 'delivery';
                     deliveryMode.value = savedMode === 'pickup' && response.data.dineInAvailable === false ? 'delivery' : savedMode;
+                    loadBusinessSummary();
                 } else {
                     const errorMsg = response.message || "获取商家信息失败";
                     console.error("商家信息API返回失败:", errorMsg);
@@ -550,9 +568,20 @@ export default {
             }
         };
 
+        // 店铺展示指标（评分/月售/人均/优惠标签），失败不影响点餐主流程。
+        const loadBusinessSummary = async () => {
+            if (!businessId.value) return;
+            try {
+                const response = await request.get(`/api/businesses/${businessId.value}/summary`);
+                businessSummary.value = response?.success ? (response.data || null) : null;
+            } catch (error) {
+                console.error('获取商家展示指标失败:', error);
+                businessSummary.value = null;
+            }
+        };
+
         // 获取食品列表
-        const fetchFoodList = async () => {
-            loadingFoods.value = true;
+        const fetchFoodList = async () => {            loadingFoods.value = true;
             try {
                 const response = await request.get("/api/foods/list", {
                     params: { businessId: businessId.value }
@@ -649,6 +678,15 @@ export default {
         });
         const isBusinessOpen = computed(() => (business.value.status === undefined || business.value.status === 1)
             && business.value.operatingStatus !== false);
+        /** 优惠文案去掉多余小数：30.00 -> 30。 */
+        const trimMoney = (value) => String(Number(value || 0));
+        /** 店内评分走与首页相同的展示口径，没有评分时直接显示“暂无评分”。 */
+        const businessScoreText = computed(() => {
+            const score = Number(businessSummary.value?.score);
+            return Number.isFinite(score) && score > 0 ? score.toFixed(1) : '暂无评分';
+        });
+        /** 预计送达时长与首页、商家列表共用同一口径。 */
+        const deliveryEtaMinutes = computed(() => getBusinessDeliveryMinutes(business.value));
         const orderButtonText = computed(() => {
             if (!isBusinessOpen.value) return '休息中';
             if (totalQuantity.value === 0) return '请选择餐品';
@@ -704,6 +742,10 @@ export default {
             totalSettle,
             canOrder,
             isBusinessOpen,
+            businessSummary,
+            businessScoreText,
+            deliveryEtaMinutes,
+            trimMoney,
             orderButtonText,
             isLiked,
             isFavorited,
@@ -1182,5 +1224,151 @@ export default {
     .wrapper .food li .food-left .food-left-info .food-explain { max-width: 32vw; }
     .wrapper .food li .food-right { gap: 4px; }
     .quantity-btn { width: 25px; height: 25px; font-size: 18px; }
+}
+
+/* ── 商家卡（对照店铺参考图：白底圆角卡 + 水印插画 + 评分/月售/送达）── */
+.store-hero {
+    position: relative;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 12px 14px 0;
+    padding: 12px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(39, 86, 114, .08);
+    overflow: hidden;
+}
+
+.store-hero .hero-art {
+    position: absolute;
+    top: 14px;
+    right: 10px;
+    width: 108px;
+    pointer-events: none;
+    user-select: none;
+    opacity: .95;
+}
+
+.store-hero .business-info {
+    position: relative;
+    z-index: 1;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-width: 0;
+    flex: 1;
+    padding-right: 96px;
+    color: #24405c;
+}
+
+.store-hero .business-info .business-title-row h1 { color: #103c6c; font-size: 17px; line-height: 1.3; }
+.store-hero .business-info p { color: #7a90a4; font-size: 12px; }
+.store-hero .business-info .business-meta { margin-top: 5px; color: #4e7fa6; }
+.store-hero .business-info .business-address { max-width: 100%; }
+
+.business-metrics {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 7px;
+    color: #6f8ba0;
+    font-size: 11px;
+}
+
+.business-metrics .metric-score {
+    color: #f27635;
+    font-weight: 700;
+}
+
+.business-metrics .metric-score i {
+    margin-right: 2px;
+}
+
+.business-metrics .metric-sep {
+    color: #ccd9e3;
+}
+
+.store-hero .hero-reactions {
+    position: static;
+    margin-top: 9px;
+    gap: 7px;
+}
+
+.store-hero .hero-reactions button {
+    border: 1px solid #dbe9f4;
+    background: #f6fbff;
+    color: #61809a;
+    border-radius: 13px;
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.store-hero .hero-reactions button.active {
+    border-color: #b6dcf7;
+    background: #e9f6ff;
+    color: #168bd1;
+}
+
+/* 优惠标签：配送 / 满减 / 品质保障 */
+.offer-strip {
+    gap: 8px;
+    padding: 10px 14px 12px;
+    background: transparent;
+}
+
+.offer-strip .offer-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 9px;
+    border: 0;
+    border-radius: 7px;
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+.offer-strip .offer-tag i { font-size: 11px; }
+.offer-tag.offer-delivery { color: #168bd1; background: #e9f6ff; }
+.offer-tag.offer-promotion { color: #e2604b; background: #fdeeea; }
+.offer-tag.offer-quality { color: #168bd1; background: #e9f6ff; }
+.offer-tag.offer-pickup { color: #3d9b69; background: #edfaf2; }
+
+/* 菜单上方的 AI 搭配入口 */
+.ai-pick-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 14px 12px;
+    padding: 11px 12px;
+    border: 1px solid #d9eaf8;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f2f9ff, #e8f4ff);
+}
+
+.ai-pick-card > i {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: #fff;
+    color: #168bd1;
+    font-size: 16px;
+    box-shadow: 0 3px 9px rgba(35, 113, 166, .12);
+}
+
+.ai-pick-card > div { min-width: 0; flex: 1; }
+.ai-pick-card strong { display: block; color: #103c6c; font-size: 14px; }
+.ai-pick-card span { display: block; margin-top: 2px; color: #7a90a4; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ai-pick-card button { flex: 0 0 auto; border: 0; background: transparent; color: #168bd1; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+@media (max-width: 520px) {
+    .store-hero { margin-left: 12px; margin-right: 12px; }
+    .offer-strip { padding-left: 12px; padding-right: 12px; }
+    .ai-pick-card { margin-left: 12px; margin-right: 12px; }
+    .store-hero .hero-art { width: 96px; top: 12px; right: 8px; }
+    .store-hero .business-info { padding-right: 78px; }
 }
 </style>

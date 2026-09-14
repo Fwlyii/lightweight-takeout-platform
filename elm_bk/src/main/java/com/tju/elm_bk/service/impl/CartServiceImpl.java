@@ -92,6 +92,18 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    public int updateRemarks(Long businessId, String remarks) {
+        if (businessId == null) throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
+        Long userId = currentUserService.requireUserId();
+        String normalized = remarks == null ? null : remarks.trim();
+        if (normalized != null && normalized.isEmpty()) normalized = null;
+        if (normalized != null && normalized.length() > 255) {
+            throw new APIException("备注不能超过 255 个字符");
+        }
+        return cartMapper.updateCartRemarks(userId, businessId, normalized);
+    }
+
+    @Override
     public Long addItem(Long foodId, Integer quantity) {
         Food food = foodMapper.selectFoodById(foodId);
         if (food == null) {

@@ -1,28 +1,34 @@
 <template>
-  <button
-    class="ai-chat-launcher"
-    type="button"
-    aria-label="打开AI点餐助手"
-    title="AI点餐助手"
-    @click="openAssistant"
-  >
-    <span class="launcher-halo" aria-hidden="true"></span>
-    <span class="launcher-icon" aria-hidden="true">
-      <i class="fa fa-robot"></i>
-    </span>
-    <span class="launcher-copy">
-      <strong>AI点餐</strong>
-      <small>帮你快速点单</small>
-    </span>
-    <i class="fa fa-angle-right launcher-arrow" aria-hidden="true"></i>
-  </button>
+  <div class="ai-chat-entry">
+    <button
+      class="ai-chat-launcher"
+      type="button"
+      aria-label="打开AI点餐助手"
+      title="AI点餐助手"
+      @click="openAssistant"
+    >
+      <span class="launcher-halo" aria-hidden="true"></span>
+      <span class="launcher-icon" aria-hidden="true">
+        <i class="fa fa-robot"></i>
+      </span>
+      <span class="launcher-copy">
+        <strong>AI点餐</strong>
+        <small>帮你快速点单</small>
+      </span>
+      <i class="fa fa-angle-right launcher-arrow" aria-hidden="true"></i>
+    </button>
+
+    <!-- 抽屉式助手：语音、图片、推荐都在抽屉内完成，不再跳整页 -->
+    <AiAssistantDrawer :open="drawerOpen" @close="drawerOpen = false" />
+  </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+import AiAssistantDrawer from './AiAssistantDrawer.vue'
 
-const router = useRouter()
-const openAssistant = () => router.push('/ai-chat')
+const drawerOpen = ref(false)
+const openAssistant = () => { drawerOpen.value = true }
 </script>
 
 <style scoped>

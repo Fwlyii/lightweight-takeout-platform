@@ -57,4 +57,7 @@ public class OrderVO {
 
     @Schema(description = "履约方式：DELIVERY 外送、PICKUP 自取")
     private String serviceMode;
+
+    @Schema(description = "顾客备注（口味/餐具等）")
+    private String remarks;
 }

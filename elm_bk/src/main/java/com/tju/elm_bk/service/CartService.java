@@ -16,6 +16,9 @@ public interface CartService {
 
     List<CartItemVO> getCartItemList(Long businessId);
 
+    /** 保存同一商家的备注（口味/餐具等），结算时写入订单。 */
+    int updateRemarks(Long businessId, String remarks);
+
     Long addItem(Long foodId,Integer quantity);
 
     Long updateItem(Long cartId,Integer quantity);

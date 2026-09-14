@@ -18,7 +18,7 @@ public interface CartMapper {
 
 
     @Select("""
-        select c.id,c.business_id,c.quantity,c.food_id,
+        select c.id,c.business_id,c.quantity,c.food_id,c.remarks,
            f.food_name,f.food_price,f.food_img,f.stock,f.category,f.purchase_limit,b.business_name
         from cart c
         join food f on f.id = c.food_id and f.is_deleted = 0
@@ -26,6 +26,10 @@ public interface CartMapper {
         where c.customer_id = #{userId} and c.is_deleted = 0 and c.business_id = #{businessId};
     """)
     List<CartItemVO> selectCartItems(@Param("userId") Long userId, @Param("businessId") Long businessId);
+
+    /** 同一商家下的备注统一写在顾客的购物车行上，下单时写入订单。 */
+    int updateCartRemarks(@Param("userId") Long userId, @Param("businessId") Long businessId,
+                          @Param("remarks") String remarks);
 
     @Select("select * from cart where id = #{cartId} and is_deleted = 0")
     Cart selectCartById(@Param("cartId") Long cartId);

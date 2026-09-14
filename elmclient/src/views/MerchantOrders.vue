@@ -60,6 +60,7 @@
               <p><span>地址:</span> {{ order.address || '-' }}</p>
             </template>
             <p v-else class="pickup-label"><span>履约:</span> 到店自取</p>
+            <p v-if="order.remarks" class="remark-line"><span>备注:</span> {{ order.remarks }}</p>
           </div>
 
           <div class="order-items">
@@ -970,6 +971,7 @@ export default {
 .order-list { margin-top: 184px; padding: 12px 16px 84px; box-sizing: border-box; }
 .order-item { border: 1px solid #e1edf7; border-radius: 10px; box-shadow: 0 2px 8px rgba(36,91,132,.06); }
 .order-item .order-content, .order-item .order-footer { min-width: 0; }
+.order-item .remark-line { color: #c2571f; }
 .order-item p, .order-item span { overflow-wrap: anywhere; }
 @media (max-width: 480px) {
   .top-background { height: 64px; }
