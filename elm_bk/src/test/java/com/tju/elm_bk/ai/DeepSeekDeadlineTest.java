@@ -19,6 +19,10 @@ class DeepSeekDeadlineTest {
         var executor = Executors.newSingleThreadExecutor();
         var server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         server.setExecutor(executor);
+        server.createContext("/warmup", exchange -> {
+            exchange.sendResponseHeaders(204, -1);
+            exchange.close();
+        });
         server.createContext("/chat/completions", exchange -> {
             requests.incrementAndGet();
             try {
@@ -40,6 +44,12 @@ class DeepSeekDeadlineTest {
             var request = new DeepSeekRequestDTO();
             request.setMessages(List.of(new DeepSeekRequestDTO.MessageDTO("user", "test")));
             var client = new DeepSeekApiClient(config, new ObjectMapper());
+            // Initialize the HTTP runtime before measuring the retry deadline.
+            config.setChatEndpoint("/warmup");
+            config.setTimeoutSeconds(10);
+            client.chatCompletionSync(request);
+            config.setChatEndpoint("/chat/completions");
+            config.setTimeoutSeconds(1);
             assertTimeoutPreemptively(Duration.ofSeconds(3),
                     () -> assertThrows(RuntimeException.class, () -> client.chatCompletionSync(request)));
             assertEquals(1, requests.get(), "总超时后不能继续发送重试请求");

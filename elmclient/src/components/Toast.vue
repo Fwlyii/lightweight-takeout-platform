@@ -67,40 +67,66 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 9999;
-  padding: 4vw 6vw;
-  border-radius: 2vw;
-  background: rgba(0, 0, 0, 0.75);
-  color: white;
-  font-size: 4vw;
-  max-width: 80vw;
-  box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.2);
+  width: min(360px, calc(100vw - 42px));
+  min-height: 74px;
+  padding: 14px 18px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, .92);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .94);
+  color: #173b60;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  font-size: 16px;
+  box-shadow: 0 18px 44px rgba(38, 86, 124, .2), 0 2px 10px rgba(255, 255, 255, .7) inset;
+  backdrop-filter: blur(18px) saturate(1.12);
+  -webkit-backdrop-filter: blur(18px) saturate(1.12);
 }
 
 .toast-content {
   display: flex;
   align-items: center;
-  gap: 2vw;
+  gap: 13px;
 }
 
 .toast-content i {
-  font-size: 5vw;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(145deg, #32aaf2, #1786dd);
+  font-size: 18px;
+  box-shadow: 0 0 0 6px #e8f4fc, 0 5px 12px rgba(22, 133, 220, .2);
+}
+
+.toast-content span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #173b60;
+  font-weight: 700;
 }
 
 /* 类型样式 */
-.success {
-  background: rgba(56, 202, 115, 0.9);
+.toast-wrapper.success .toast-content i {
+  background: linear-gradient(145deg, #32aaf2, #1786dd);
 }
 
-.error {
-  background: rgba(245, 108, 108, 0.9);
+.toast-wrapper.error .toast-content i {
+  background: linear-gradient(145deg, #ee7f87, #d95263);
+  box-shadow: 0 0 0 6px #fdecef, 0 5px 12px rgba(217, 82, 99, .18);
 }
 
-.warning {
-  background: rgba(255, 159, 67, 0.9);
+.toast-wrapper.warning .toast-content i {
+  background: linear-gradient(145deg, #f5b35d, #e88c35);
+  box-shadow: 0 0 0 6px #fff4e6, 0 5px 12px rgba(232, 140, 53, .18);
 }
 
-.info {
-  background: rgba(0, 151, 255, 0.9);
+.toast-wrapper.info .toast-content i {
+  background: linear-gradient(145deg, #32aaf2, #1786dd);
 }
 
 /* 动画效果 */
@@ -114,4 +140,19 @@ export default {
   opacity: 0;
   transform: translate(-50%, -30%);
 }
-</style> 
+
+@media (max-width: 420px) {
+  .toast-wrapper {
+    width: calc(100vw - 32px);
+    min-height: 68px;
+    padding: 13px 16px;
+    border-radius: 16px;
+    font-size: 15px;
+  }
+
+  .toast-content { gap: 12px; }
+  .toast-content i { width: 32px; height: 32px; flex-basis: 32px; font-size: 16px; box-shadow: 0 0 0 5px #e8f4fc, 0 4px 10px rgba(22, 133, 220, .18); }
+  .toast-wrapper.error .toast-content i { box-shadow: 0 0 0 5px #fdecef, 0 4px 10px rgba(217, 82, 99, .16); }
+  .toast-wrapper.warning .toast-content i { box-shadow: 0 0 0 5px #fff4e6, 0 4px 10px rgba(232, 140, 53, .16); }
+}
+</style>

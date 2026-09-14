@@ -1,0 +1,229 @@
+/*
+ * Interaction motion — pass 1.
+ * Inspired by the lightweight transform-feedback pattern used by Hover.css,
+ * but kept local to restaurant cards so no animation dependency is required.
+ */
+
+/* Smooth press feedback works on both mouse and touch devices. */
+.content .wrapper .business-list li,
+.content .guess-card {
+  transform-origin: center center;
+  transition:
+    transform 180ms cubic-bezier(.2, .7, .25, 1),
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.content .wrapper .business-list li:active,
+.content .guess-card:active {
+  transform: scale(.985);
+}
+
+/* Only lift cards on devices that actually have hover, avoiding sticky hover
+ * states on phones and tablets.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .content .wrapper .business-list li:hover {
+    transform: translateY(-3px);
+    border-color: #cfe5f2;
+    box-shadow: 0 9px 22px rgba(39, 86, 114, .11);
+  }
+
+  .content .guess-card:hover {
+    transform: translateY(-3px);
+    border-color: #cfe5f2;
+    box-shadow: 0 8px 18px rgba(39, 86, 114, .10);
+  }
+}
+
+/* Respect the user's OS-level reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  .content .wrapper .business-list li,
+  .content .guess-card {
+    transition: none;
+  }
+
+  .content .wrapper .business-list li:hover,
+  .content .wrapper .business-list li:active,
+  .content .guess-card:hover,
+  .content .guess-card:active {
+    transform: none;
+  }
+}
+
+/* Home content enters in small visual groups instead of moving as one page. */
+.content .home-page .home-motion {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.content .home-page.home-page-ready .home-motion {
+  animation: home-content-in 360ms cubic-bezier(.22, .61, .36, 1) forwards;
+}
+
+.content .home-page.home-page-ready .home-motion-header { animation-delay: 0ms; }
+.content .home-page.home-page-ready .home-motion-search { animation-delay: 50ms; }
+.content .home-page.home-page-ready .home-motion-categories { animation-delay: 100ms; }
+.content .home-page.home-page-ready .home-motion-offers { animation-delay: 150ms; }
+.content .home-page.home-page-ready .home-motion-recommend { animation-delay: 220ms; }
+
+.content .home-page .business-list.business-list-observe > li,
+.content .business-list-page .business-list.business-list-observe .business-item {
+  opacity: 0;
+  transform: translateY(20px);
+  will-change: transform, opacity;
+}
+
+.content .home-page .business-list.business-list-observe > li.is-visible,
+.content .business-list-page .business-list.business-list-observe .business-item.is-visible {
+  animation: restaurant-card-in 250ms cubic-bezier(.22, .61, .36, 1) both;
+  animation-delay: calc(var(--stagger-index, 0) * 50ms);
+}
+
+@keyframes home-content-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes restaurant-card-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content .home-page .home-motion,
+  .content .home-page .business-list.business-list-observe > li,
+  .content .business-list-page .business-list.business-list-observe .business-item {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+/* Detail pages reveal their fixed chrome and content in a short, quiet sequence. */
+.content .business-detail-page .store-header,
+.content .business-detail-page .store-hero,
+.content .business-detail-page .offer-strip,
+.content .business-detail-page .page-tabs,
+.content .business-detail-page .page-content,
+.content .business-detail-page > .cart {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.content .business-detail-page.business-detail-ready .store-header,
+.content .business-detail-page.business-detail-ready .store-hero,
+.content .business-detail-page.business-detail-ready .offer-strip,
+.content .business-detail-page.business-detail-ready .page-tabs,
+.content .business-detail-page.business-detail-ready .page-content,
+.content .business-detail-page.business-detail-ready > .cart {
+  animation: detail-section-in 320ms cubic-bezier(.22, .61, .36, 1) forwards;
+}
+
+.content .business-detail-page.business-detail-ready .store-header { animation-delay: 0ms; }
+.content .business-detail-page.business-detail-ready .store-hero { animation-delay: 35ms; }
+.content .business-detail-page.business-detail-ready .offer-strip { animation-delay: 70ms; }
+.content .business-detail-page.business-detail-ready .page-tabs { animation-delay: 105ms; }
+.content .business-detail-page.business-detail-ready .page-content { animation-delay: 140ms; }
+.content .business-detail-page.business-detail-ready > .cart { animation-delay: 170ms; }
+
+.cart-fly-dot {
+  position: fixed;
+  z-index: 10001;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  border-radius: 50%;
+  background: var(--tertiary-color, #0097ff);
+  box-shadow: 0 3px 10px rgba(0, 151, 255, .35);
+  will-change: transform;
+}
+
+.cart-bump {
+  animation: cart-bump 380ms cubic-bezier(.22, .8, .32, 1.25);
+}
+
+/* Keep the mobile navigation feedback tactile without moving the layout. */
+.content + .footer > li,
+.app-container > .footer > li {
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.content + .footer > li:active,
+.app-container > .footer > li:active {
+  transform: scale(.94);
+}
+
+.content + .footer > li.active,
+.app-container > .footer > li.active {
+  color: var(--tertiary-color, #0097ff);
+}
+
+.content + .footer > li.active i,
+.app-container > .footer > li.active i {
+  transform: translateY(-3px) scale(1.08);
+}
+
+.content + .footer > li i,
+.app-container > .footer > li i {
+  transition: transform 180ms ease;
+}
+
+/* Keep the personal center easy to scan by revealing its main groups in order. */
+.content .information-page:not(.information-page-ready) .user-card,
+.content .information-page:not(.information-page-ready) .menu-section {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.content .information-page.information-page-ready .user-card,
+.content .information-page.information-page-ready .menu-section {
+  animation: detail-section-in 320ms cubic-bezier(.22, .61, .36, 1) both;
+}
+
+.content .information-page.information-page-ready .user-card { animation-delay: 0ms; }
+.content .information-page.information-page-ready .menu-section { animation-delay: 80ms; }
+
+@keyframes detail-section-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cart-bump {
+  0%, 100% { transform: scale(1); }
+  38% { transform: scale(1.14); }
+  70% { transform: scale(.97); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content .business-detail-page .store-header,
+  .content .business-detail-page .store-hero,
+  .content .business-detail-page .offer-strip,
+  .content .business-detail-page .page-tabs,
+  .content .business-detail-page .page-content,
+  .content .business-detail-page > .cart {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .cart-fly-dot { display: none; }
+  .cart-bump { animation: none; }
+
+  .content + .footer > li,
+  .app-container > .footer > li,
+  .content + .footer > li i,
+  .app-container > .footer > li i {
+    transition: none;
+    transform: none;
+  }
+
+  .content .information-page:not(.information-page-ready) .user-card,
+  .content .information-page:not(.information-page-ready) .menu-section,
+  .content .information-page.information-page-ready .user-card,
+  .content .information-page.information-page-ready .menu-section {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

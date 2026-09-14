@@ -1,0 +1,62 @@
+/*
+ * Desktop shell alignment fixes.
+ * Keep the customer home shell, its bottom navigation, and restaurant detail
+ * sections on the same visual axis without changing API/data behavior.
+ */
+
+/* Customer bottom navigation should follow the 600px home-page shell instead
+ * of stretching across the entire desktop viewport. On phones it remains 100%.
+ */
+.app-container > .footer {
+  width: 100%;
+  max-width: 600px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  box-sizing: border-box;
+}
+
+/* The AI entry belongs to the customer shell as well. Keep it close to the
+ * right edge of the centred home page on desktop rather than the browser edge.
+ */
+@media (min-width: 700px) {
+  .content .ai-chat {
+    right: calc((100vw - 600px) / 2 + 16px);
+  }
+}
+
+/* Restaurant detail uses a 760px content/cart shell on desktop. The previous
+ * header / hero / offer / tabs were viewport-wide, which made the top and
+ * bottom look horizontally offset. Align all top sections to the same shell.
+ */
+@media (min-width: 700px) {
+  .content .store-header,
+  .content .store-hero,
+  .content .offer-strip,
+  .content .page-tabs {
+    width: 100%;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+  }
+
+  /* BusinessInfo.vue previously compensates for a full-width header with
+   * viewport-based padding. Once the header itself is centred, use local
+   * padding so controls line up with the rest of the 760px shell.
+   */
+  .content .store-header {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+@media (max-width: 699px) {
+  .app-container > .footer {
+    max-width: none;
+  }
+
+  .content .ai-chat {
+    right: 16px;
+  }
+}

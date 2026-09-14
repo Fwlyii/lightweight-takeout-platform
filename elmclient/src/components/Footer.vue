@@ -1,14 +1,14 @@
 <template>
 	<ul class="footer">
-	  <li @click="toIndex">
+	  <li :class="{ active: route.path === '/index' }" @click="toIndex">
 		<i class="fa fa-home"></i>
 		<p>首页</p>
 	  </li>
-	  <li @click="toOrderList">
+	  <li :class="{ active: route.path === '/orderList' }" @click="toOrderList">
 		<i class="fa fa-file-text-o"></i>
 		<p>订单</p>
 	  </li>
-	  <li @click="toMyInformation">
+	  <li :class="{ active: route.path === '/myInformation' }" @click="toMyInformation">
 		<i class="fa fa-user-o"></i>
 		<p>我的</p>
 	  </li>
@@ -17,11 +17,12 @@
   
   <script>
   import { defineComponent } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   export default defineComponent({
 	name: 'Footer',
 	setup() {
 	  const router = useRouter();
+	  const route = useRoute();
 	  const toIndex = () => {
 		router.push({ path: '/index' });
 	  };
@@ -33,6 +34,7 @@
 		router.push({ path: '/myInformation' });
 	  };
 	  return {
+		route,
 		toIndex,
 		toOrderList,
 		toMyInformation,
@@ -44,9 +46,11 @@
   <style scoped>
   .footer {
 	width: 100%;
-	height: 8vh; /* 使用视口高度单位，适应不同屏幕 */
-	border-top: solid 1px #ddd;
-	background-color: #fff;
+	height: 72px;
+	border-top: 1px solid rgba(180, 211, 230, .7);
+	background: rgba(255, 255, 255, .94);
+	box-shadow: 0 -8px 22px rgba(58, 112, 150, .08);
+	backdrop-filter: blur(14px);
   
 	position: fixed;
 	left: 0;
@@ -63,18 +67,34 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	color: #999;
+	color: #91a0aa;
 	user-select: none;
 	cursor: pointer;
 	flex: 1; /* 使每个 li 平均分配宽度 */
   }
   
   .footer > li p {
-	font-size: 1.8vh; /* 使用视口高度单位 */
+	margin-top: 4px;
+	font-size: 12px;
+	font-weight: 600;
   }
   
-  .footer > li i {
-	font-size: 3.5vh; /* 使用视口高度单位 */
-  }
-  </style>
-  
+	.footer > li i {
+	font-size: 25px;
+	line-height: 1;
+	transform-origin: center;
+	transition: transform 200ms cubic-bezier(.22, 1, .36, 1);
+	}
+
+	.footer > li.active {
+		color: #168fe4;
+	}
+
+	.footer > li.active i {
+		transform: translateY(-3px) scale(1.08);
+	}
+
+	.footer > li.active p {
+		font-weight: 800;
+	}
+</style>

@@ -66,3 +66,10 @@ deepseek:
   top-p: 0.9
   timeout-seconds: 10
   max-retries: 3
+
+# Optional image and speech provider; unavailable until both values are configured.
+multimodal-ai:
+  api-key: ${DASHSCOPE_API_KEY:}
+  base-url: ${DASHSCOPE_BASE_URL:}
+  vision-model: ${DASHSCOPE_VISION_MODEL:qwen-vl-plus}
+  speech-model: ${DASHSCOPE_SPEECH_MODEL:qwen3-asr-flash}

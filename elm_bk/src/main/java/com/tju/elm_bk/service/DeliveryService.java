@@ -6,6 +6,7 @@ import com.tju.elm_bk.entity.DeliveryException;
 import com.tju.elm_bk.entity.OrderStatusHistory;
 import com.tju.elm_bk.vo.DeliveryExceptionVO;
 import com.tju.elm_bk.vo.DeliveryTaskVO;
+import com.tju.elm_bk.vo.NavigationVO;
 
 import java.util.List;
 
@@ -16,10 +17,11 @@ public interface DeliveryService {
 
     DeliveryTaskVO getTask(Long taskId);
 
+    NavigationVO getNavigation(Long taskId);
+
     DeliveryTaskVO getOrderDelivery(Long orderId);
 
     DeliveryTaskVO merchantAcceptOrder(Long orderId);
-
     DeliveryTaskVO merchantReadyOrder(Long orderId);
 
     void merchantRejectOrder(Long orderId);

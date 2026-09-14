@@ -106,7 +106,7 @@
                             <button v-if="task.taskStatus === 'WAITING_RIDER'" class="accept"
                                 :disabled="actingId === task.id" @click="act(task, 'accept')">接取订单</button>
                             <template v-else-if="task.taskStatus === 'ACCEPTED'">
-                                <button class="ghost" @click="navigate(task.businessAddress)"><i
+                                <button class="ghost" @click="navigate(task)"><i
                                         class="fas fa-location-arrow"></i>
                                     导航去商家</button><button class="accept"
                                     @click="act(task, 'arrive-store')">我已到店</button>
@@ -116,7 +116,7 @@
                                     class="accept" @click="act(task, 'pickup')">确认取餐</button>
                             </template>
                             <template v-else-if="task.taskStatus === 'DELIVERING'">
-                                <button class="ghost" @click="navigate(task.deliveryAddress)"><i
+                                <button class="ghost" @click="navigate(task)"><i
                                         class="fas fa-location-arrow"></i>
                                     导航去顾客</button><button class="accept" @click="act(task, 'deliver')">确认送达</button>
                                 <button class="exception-link" @click="openException(task)">遇到配送问题？</button>
@@ -162,6 +162,7 @@ import request from '@/utils/request';
 import { toast } from '@/utils/toast';
 import { createRealtimeConnection } from '@/services/realtimeService';
 import { taskStatusText } from '@/utils/orderPresentation';
+import { openDeliveryNavigation } from '@/utils/deliveryNavigation';
 
 const route = useRoute();
 const router = useRouter();
@@ -209,7 +210,9 @@ const loadTasks = async () => {
 const refreshAll = async ({ silent = false } = {}) => { if (!silent) refreshing.value = true; try { await loadProfile(); if (profile.value?.auditStatus === 1) await loadTasks(); } catch (e) { if (!silent) toast.error(e.response?.data?.message || '数据同步失败'); } finally { if (!silent) refreshing.value = false; } };
 const toggleOnline = async () => { switching.value = true; try { const res = await request.patch('/api/v1/riders/me/online', { online: !profile.value.online }); profile.value = res.data; await loadTasks(); toast.success(profile.value.online ? '已上线，可以接单了' : '已安全下线'); } catch (e) { toast.error(e.response?.data?.message || '状态更新失败'); } finally { switching.value = false; } };
 const act = async (task, action) => { actingId.value = task.id; try { await request.post(`/api/v1/delivery-tasks/${task.id}/${action}`); toast.success(action === 'accept' ? '抢单成功，请安全前往商家' : '配送状态已更新'); activeTab.value = 'active'; await refreshAll(); } catch (e) { toast.error(e.response?.data?.message || '操作失败'); } finally { actingId.value = null; } };
-const navigate = keyword => window.open(`https://uri.amap.com/search?keyword=${encodeURIComponent(keyword || '')}`, '_blank');
+const navigate = task => openDeliveryNavigation(task.id, {
+    request, openWindow: () => window.open('about:blank', '_blank'), notify: message => toast.error(message)
+});
 const openException = task => { exceptionModal.value = task; exceptionForm.exceptionType = 'STORE_DELAY'; exceptionForm.description = ''; };
 const submitException = async () => { if (!exceptionForm.description) return toast.warning('请填写情况说明'); try { await request.post(`/api/v1/delivery-tasks/${exceptionModal.value.id}/exceptions`, exceptionForm); toast.success('异常已上报，调度员将尽快处理'); exceptionModal.value = null; await refreshAll(); } catch (e) { toast.error(e.response?.data?.message || '上报失败'); } };
 onMounted(async () => { try { await loadProfile(); if (!profile.value) { router.replace('/rider/apply'); return; } if (profile.value.auditStatus === 1) { await loadTasks(); realtimeConnection = createRealtimeConnection({ onMessage: message => { if (message.type === 'delivery_update') refreshAll({ silent: true }); }, onFallbackRefresh: () => refreshAll({ silent: true }) }); realtimeConnection.start(); } } catch (e) { toast.error(e.response?.data?.message || '加载失败'); } finally { loading.value = false; } });

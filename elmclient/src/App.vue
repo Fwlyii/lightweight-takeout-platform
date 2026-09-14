@@ -1,8 +1,19 @@
 <template>
   <div class="app-container">
+    <div
+      v-if="routeMotion.active"
+      class="route-wipe"
+      :class="{ settling: routeMotion.settling }"
+      :style="routeWipeStyle"
+      aria-hidden="true"
+    ></div>
     <BackButton v-if="showBackButton" />
     <div class="content">
-      <router-view />
+      <router-view v-slot="{ Component, route: viewRoute }">
+        <transition :name="viewRoute.name === 'Login' ? 'auth-route' : 'page-route'">
+          <component :is="Component" :key="viewRoute.path" />
+        </transition>
+      </router-view>
     </div>
     <Footer v-if="showFooter" />
     <BusinessFooter v-if="showBusinessFooter" />
@@ -22,16 +33,19 @@ import { useRoute } from 'vue-router';
 import request from './utils/request';
 import { applyTheme, getStoredTheme } from './utils/theme';
 import { getAuthRole, getToken } from './utils/auth';
+import { routeMotion } from './utils/routeMotion';
 
 const ROUTES_WITHOUT_GLOBAL_BACK = new Set([
-  'Index', 'MyInformation', 'SuccessfulPayment', 'BusinessInfo',
-  'UserAddress', 'AddUserAddress', 'EditUserAddress', 'Assets', 'Notifications', 'AiChat', 'Favorites', 'ListDetail', 'Login', 'Register'
+  'Index', 'Login', 'MyInformation', 'SuccessfulPayment', 'BusinessInfo',
+  'UserAddress', 'Assets', 'AiChat', 'AiRecommend', 'AiVoiceOrder',
+  'AiDishRecognition', 'Favorites', 'ListDetail'
 ]);
 
 const ROUTES_WITHOUT_CUSTOMER_FOOTER = new Set([
   'BusinessInfo', 'Payment', 'SuccessfulPayment', 'Cart', 'Favorites',
   'Notifications', 'UserAddress', 'AddUserAddress', 'ListDetail',
-  'Register', 'Login', 'EditUserAddress'
+  'Register', 'Login', 'EditUserAddress', 'AiChat', 'AiRecommend',
+  'AiVoiceOrder', 'AiDishRecognition'
 ]);
 
 export default {
@@ -45,14 +59,12 @@ export default {
   setup() {
     const route = useRoute();
 
-    // 路由切换时把应用自己的滚动容器归零，避免从长列表进入个人页时标题被“顶”到视口中间。
     watch(() => route.fullPath, () => {
       nextTick(() => {
         document.querySelector('.content')?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       });
     }, { immediate: true });
 
-    // 先应用本地主题避免刷新闪白；登录用户再从服务端恢复跨设备偏好。
     onMounted(async () => {
       applyTheme(getStoredTheme());
       if (!getToken() || getAuthRole() !== 'user') return;
@@ -60,7 +72,7 @@ export default {
         const preference = await request.get('/api/v1/preferences/me');
         if (preference?.success && preference.data?.theme) applyTheme(preference.data.theme);
       } catch (_) {
-        // 主题读取失败不应阻塞页面，保留本地主题继续使用。
+        // 主题读取失败不阻塞页面，继续使用本地主题。
       }
     });
 
@@ -97,10 +109,22 @@ export default {
     });
 
     const showRiderFooter = computed(() => isRiderContext.value);
-
     const showAdminFooter = computed(() => route.path.startsWith('/admin'));
 
-    return { showFooter, showBusinessFooter, showAdminFooter, showRiderFooter, showBackButton };
+    const routeWipeStyle = computed(() => ({
+      '--route-wipe-x': `${routeMotion.x}px`,
+      '--route-wipe-y': `${routeMotion.y}px`
+    }));
+
+    return {
+      showFooter,
+      showBusinessFooter,
+      showAdminFooter,
+      showRiderFooter,
+      showBackButton,
+      routeMotion,
+      routeWipeStyle
+    };
   },
 };
 </script>
@@ -140,13 +164,9 @@ body {
 }
 
 ul,
-ol {
-  list-style: none;
-}
+ol { list-style: none; }
+a { text-decoration: none; }
 
-a {
-  text-decoration: none;
-}
 .app-container {
   display: flex;
   flex-direction: column;
@@ -156,5 +176,89 @@ a {
 .content {
   flex: 1;
   overflow-y: auto;
+}
+
+.route-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 1;
+  background: var(--tertiary-color, #0097ff);
+  clip-path: circle(0 at var(--route-wipe-x) var(--route-wipe-y));
+  animation: route-wipe-expand .5s cubic-bezier(.22, .75, .2, 1) forwards;
+}
+
+.route-wipe.settling {
+  animation: route-wipe-expand .5s cubic-bezier(.22, .75, .2, 1) forwards,
+    route-wipe-fade .3s ease .02s forwards;
+}
+
+@keyframes route-wipe-expand {
+  to { clip-path: circle(150vmax at var(--route-wipe-x) var(--route-wipe-y)); }
+}
+
+@keyframes route-wipe-fade {
+  to { opacity: 0; }
+}
+
+.page-route-enter-active,
+.page-route-leave-active {
+  transition: opacity .16s ease, transform .16s ease;
+}
+
+.page-route-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.page-route-leave-to {
+  opacity: 0;
+  transform: translateY(-2px);
+}
+
+.auth-route-enter-active {
+  transition: opacity .24s ease, transform .24s cubic-bezier(.22, .61, .36, 1);
+}
+
+.auth-route-leave-active {
+  transition: opacity .14s ease, transform .14s ease;
+}
+
+.auth-route-enter-from {
+  opacity: 0;
+  transform: translateY(12px) scale(.992);
+}
+
+.auth-route-leave-to {
+  opacity: 0;
+  transform: scale(.995);
+}
+
+@media (max-width: 680px) {
+  .auth-route-enter-from {
+    opacity: 0;
+    transform: translateX(22px);
+  }
+
+  .auth-route-leave-to {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-wipe {
+    animation: none;
+    clip-path: none;
+    opacity: 0;
+  }
+
+  .page-route-enter-active,
+  .page-route-leave-active,
+  .auth-route-enter-active,
+  .auth-route-leave-active {
+    transition: none;
+  }
 }
 </style>

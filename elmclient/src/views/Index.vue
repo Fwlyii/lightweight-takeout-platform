@@ -1,8 +1,8 @@
 <template>
     <!-- 登录、注册部分 -->
-    <div class="wrapper">
+    <div class="wrapper home-page" :class="{ 'home-page-ready': pageReady }">
         <!-- header部分 -->
-        <header>
+        <header class="home-motion home-motion-header">
             <div class="icon-location-box">
                 <i class="fas fa-map-marker-alt"></i>
             </div>
@@ -34,7 +34,6 @@
                             </div>
 
                             <!-- 位置列表 -->
-                            <p v-if="locationError" role="alert">{{ locationError }}</p>
                             <div class="location-list-container">
                                 <div v-if="loading" class="loading-state">
                                     <i class="fa fa-spinner fa-spin"></i>
@@ -47,7 +46,7 @@
                                 </div>
 
                                 <div v-else class="location-items">
-                                    <div v-for="item in locationData" :key="item.adcode || item.name"
+                                    <div v-for="item in locationData" :key="item.id"
                                         :class="['location-item', { selected: isSelected(item) }]"
                                         @click="selectLocation(item)">
                                         <span class="item-name">{{ item.name }}</span>
@@ -88,7 +87,7 @@
             </div>
         </header>
         <!-- search部分 -->
-        <div class="search">
+        <div class="search home-motion home-motion-search">
             <div class="search-fixed-top" ref="fixedBox">
                 <div class="search-box">
                     <i class="fa fa-search"></i>
@@ -100,7 +99,7 @@
 
 
         <!-- 点餐分类部分 -->
-        <ul class="foodtype">
+        <ul class="foodtype home-motion home-motion-categories">
             <li @click="toBusinessList(1)">
                 <img src="@/assets/dcfl01.png" alt="美食">
                 <p>美食</p>
@@ -144,7 +143,7 @@
         </ul>
 
         <!-- 猜你喜欢：保留为轻量横向推荐，不再突出销量冠军或排名 -->
-        <section v-if="suggestedBusinesses.length" class="guess-section" aria-label="猜你喜欢">
+        <section v-if="suggestedBusinesses.length" class="guess-section home-motion home-motion-offers" aria-label="猜你喜欢">
             <div class="section-heading">
                 <div><h2>猜你喜欢</h2><span>附近口碑好店</span></div>
                 <button type="button" @click="scrollToRecommendations">更多 <i class="fa fa-angle-right"></i></button>
@@ -159,24 +158,25 @@
         </section>
 
         <!-- 推荐商家部分 -->
-        <div id="recommendations" class="recommend">
+        <div id="recommendations" class="recommend home-motion home-motion-recommend">
             <div class="recommend-line"></div>
             <p>推荐商家</p>
             <div class="recommend-line"></div>
         </div>
 
         <!-- 推荐方式部分 -->
-        <ul class="recommendtype">
-            <li :class="{ active: sortBy === 'default' }" @click="setSortBy('default')">
+        <ul ref="sortTabs" class="recommendtype home-motion home-motion-recommend">
+            <li :ref="element => setSortTabRef(element, 0)" :class="{ active: sortBy === 'default' }" @click="setSortBy('default')">
                 综合排序<i class="fa fa-caret-down"></i>
             </li>
 
-            <li :class="{ active: sortBy === 'sales' }" @click="setSortBy('sales')">
+            <li :ref="element => setSortTabRef(element, 1)" :class="{ active: sortBy === 'sales' }" @click="setSortBy('sales')">
                 销量最高
             </li>
-            <li :class="{ active: showFilter }" @click="toggleFilter">
+            <li :ref="element => setSortTabRef(element, 2)" :class="{ active: showFilter }" @click="toggleFilter">
                 筛选<i class="fa fa-filter"></i>
             </li>
+            <span class="sort-indicator" :style="sortIndicatorStyle" aria-hidden="true"></span>
         </ul>
 
         <!-- 筛选弹窗 -->
@@ -257,14 +257,19 @@
             </div>
         </div>
 
-        <ul class="business-list" v-if="businessList && businessList.length > 0">
-            <li v-for="business in visibleBusinessList" :key="business.id || business.businessId"
+        <ul ref="businessListRef" class="business-list home-motion home-motion-businesses"
+            :class="{ 'business-list-observe': observeBusinesses }" v-if="businessList && businessList.length > 0">
+            <li v-for="(business, index) in visibleBusinessList" :key="business.id || business.businessId"
+                :class="{ 'is-visible': revealedBusinessIds.has(businessKey(business)) }"
+                :data-business-id="businessKey(business)"
+                :style="{ '--stagger-index': index }"
                 @click="toBusinessInfo(business.id || business.businessId)">
                 <div class="business-info">
                     <img :src="business.businessImg || require('@/assets/business-default.png')"
-                        @error="handleImageError" :alt="business.businessName">
+                        @error="handleImageError" :alt="business.businessName"
+                        :style="{ viewTransitionName: `restaurant-image-${business.id || business.businessId}` }">
                     <div class="business-info-detail">
-                        <h3>{{ business.businessName || '未命名商铺'}} <small v-if="business.operatingStatus === false" class="closed-shop-tag">休息中</small></h3>
+                        <h3 :style="{ viewTransitionName: `restaurant-title-${business.id || business.businessId}` }">{{ business.businessName || '未命名商铺'}} <small v-if="business.operatingStatus === false" class="closed-shop-tag">休息中</small></h3>
                         <div class="business-info-rating">
                             <span class="rating-score">{{ formatBusinessRating(business.score) }}</span>
                             <span class="monthly-sales">月售 {{ business.salesCount || 0 }}</span>
@@ -291,7 +296,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed, nextTick, watch } from 'vue';
 import AiChatbot from '../components/AiChatbot.vue';
 import { useRouter } from 'vue-router';
 import request from '../utils/request';
@@ -304,6 +309,7 @@ import {
     hasConfiguredPromotion,
     supportsDineIn
 } from '../utils/businessPresentation';
+import { pushWithViewTransition } from '../utils/navigationMotion';
 export default {
     name: 'Index',
     setup() {
@@ -313,15 +319,50 @@ export default {
         const businessList = ref([]);
         const originalBusinessList = ref([]); // 保存原始数据用于筛选和排序
         const currentPage = ref(1);
+        const pageReady = ref(false);
+        const businessListRef = ref(null);
+        const observeBusinesses = ref(false);
+        const revealedBusinessIds = ref(new Set());
+        let businessObserver = null;
         const pageSize = 6;
         const suggestedBusinesses = computed(() => businessList.value.slice(0, 3));
         const visibleBusinessList = computed(() => businessList.value.slice(0, currentPage.value * pageSize));
         const hasMoreBusinesses = computed(() => visibleBusinessList.value.length < businessList.value.length);
+        const businessKey = (business) => String(business?.id || business?.businessId || '');
+        const revealBusiness = (element) => {
+            const id = element?.dataset?.businessId;
+            if (!id) return;
+            const next = new Set(revealedBusinessIds.value);
+            next.add(id);
+            revealedBusinessIds.value = next;
+            businessObserver?.unobserve(element);
+        };
+        const observeBusinessItems = () => {
+            const elements = businessListRef.value?.querySelectorAll('[data-business-id]');
+            if (!elements?.length) return;
+
+            if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+                revealedBusinessIds.value = new Set(
+                    [...elements].map(element => element.dataset.businessId).filter(Boolean)
+                );
+                observeBusinesses.value = false;
+                return;
+            }
+
+            observeBusinesses.value = true;
+            businessObserver ||= new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) revealBusiness(entry.target);
+                });
+            }, { root: document.querySelector('.content'), rootMargin: '0px 0px 24px', threshold: 0.08 });
+            elements.forEach(element => {
+                if (!revealedBusinessIds.value.has(element.dataset.businessId)) businessObserver.observe(element);
+            });
+        };
         const {
             displayLocation,
             showPicker,
             loading,
-            error: locationError,
             locationData,
             currentLevel,
             locationLevels,
@@ -343,6 +384,25 @@ export default {
         const searchKeyword = ref('');
         const sortBy = ref('default');
         const showFilter = ref(false);
+        const sortTabs = ref(null);
+        const sortTabElements = [];
+        const sortIndicatorStyle = ref({ width: '0px', transform: 'translateX(0)', opacity: 0 });
+        const setSortTabRef = (element, index) => {
+            if (element) sortTabElements[index] = element;
+        };
+        const updateSortIndicator = () => {
+            nextTick(() => {
+                const activeIndex = showFilter.value ? 2 : (sortBy.value === 'sales' ? 1 : 0);
+                const tab = sortTabElements[activeIndex];
+                const container = sortTabs.value;
+                if (!tab || !container) return;
+                sortIndicatorStyle.value = {
+                    width: `${tab.offsetWidth}px`,
+                    transform: `translateX(${tab.offsetLeft}px)`,
+                    opacity: 1
+                };
+            });
+        };
         const filters = ref({
             freeDelivery: false,
             startPrice: '0',
@@ -429,32 +489,55 @@ export default {
         const navigateToOrders = () => {
             router.push({ path: '/orderList' });
         };
+        let scrollFrame = 0;
+        let scrollContainer = null;
         const handleScroll = () => {
-            let scroll = window.scrollY || document.documentElement.scrollTop;
-            let width = document.documentElement.clientWidth;
-            let search = fixedBox.value;
+            if (scrollFrame) return;
+            scrollFrame = requestAnimationFrame(() => {
+                scrollFrame = 0;
+                const scroll = scrollContainer?.scrollTop || 0;
+                const width = document.documentElement.clientWidth;
+                const search = fixedBox.value;
+                const parallax = Math.min(scroll, 80);
 
-            if (scroll > width * 0.12) {
-                search.style.position = 'fixed';
-                search.style.left = '0';
-                search.style.top = '0';
-            } else {
-                search.style.position = 'static';
-            }
+                if (search) {
+                    if (scroll > width * 0.12) {
+                        search.style.position = 'fixed';
+                        search.style.left = '0';
+                        search.style.top = '0';
+                    } else {
+                        search.style.position = 'static';
+                    }
+                }
+
+                document.querySelector('.home-page')?.style.setProperty('--home-bg-shift', `${-Math.min(parallax * 0.1, 8)}px`);
+                document.querySelector('.home-page')?.style.setProperty('--home-text-shift', `${-Math.min(parallax * 0.0375, 3)}px`);
+            });
         };
         onMounted(() => {
             restoreSavedLocation();
             // 加载用户信息
             fetchUserInfo();
 
-            window.addEventListener('scroll', handleScroll);
+            scrollContainer = document.querySelector('.content');
+            scrollContainer?.addEventListener('scroll', handleScroll, { passive: true });
+            window.addEventListener('resize', updateSortIndicator);
 
             getBusinessList();
+            requestAnimationFrame(() => { pageReady.value = true; });
+            nextTick(observeBusinessItems);
+            updateSortIndicator();
         });
 
         onBeforeUnmount(() => {
-            window.removeEventListener('scroll', handleScroll);
+            scrollContainer?.removeEventListener('scroll', handleScroll);
+            if (scrollFrame) cancelAnimationFrame(scrollFrame);
+            window.removeEventListener('resize', updateSortIndicator);
+            businessObserver?.disconnect();
         });
+
+        watch(visibleBusinessList, () => nextTick(observeBusinessItems), { flush: 'post' });
+        watch([sortBy, showFilter], updateSortIndicator, { flush: 'post' });
 
         const toBusinessList = (orderTypeId) => {
             router.push({ path: '/BusinessList', query: { orderTypeId } });
@@ -540,7 +623,7 @@ export default {
 
         // 跳转到商家详情页
         const toBusinessInfo = (businessId) => {
-            router.push({
+            pushWithViewTransition(router, {
                 path: '/businessInfo',
                 query: { businessId }
             });
@@ -613,6 +696,11 @@ export default {
 
         return {
             fixedBox,
+            pageReady,
+            businessListRef,
+            observeBusinesses,
+            revealedBusinessIds,
+            businessKey,
             toBusinessList,
             navigateToOrders,
             goToLChoose,
@@ -631,7 +719,6 @@ export default {
             displayLocation,
             showPicker,
             loading,
-            locationError,
             locationData,
             currentLevel,
             locationLevels,
@@ -645,6 +732,9 @@ export default {
             getDisplayText,
             searchKeyword,
             sortBy,
+            sortTabs,
+            sortIndicatorStyle,
+            setSortTabRef,
             performSearch,
             setSortBy,
             showFilter,
@@ -1956,5 +2046,510 @@ export default {
     .wrapper { max-width: 600px; }
     .wrapper .search .search-fixed-top { max-width: 600px; margin: 0 auto; }
     .wrapper .business-list { padding-left: 0; padding-right: 0; }
+}
+
+/* Reference-led home polish: keep the supplied campus artwork visible in the
+ * first viewport while all controls and data remain live Vue elements. */
+.home-page {
+    --home-blue: #168fe4;
+    --home-deep-blue: #123f70;
+    --home-muted: #718aa4;
+    --home-surface: rgba(255, 255, 255, .92);
+    --home-border: rgba(157, 205, 238, .58);
+    position: relative;
+    min-height: 100vh;
+    background: #f3f9fd;
+    color: var(--home-deep-blue);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+    isolation: isolate;
+    --home-bg-shift: 0px;
+    --home-text-shift: 0px;
+}
+
+.home-page::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0 0 auto;
+    height: 220px;
+    pointer-events: none;
+    background:
+        linear-gradient(180deg, rgba(20, 142, 228, .08), rgba(243, 249, 253, .98) 94%),
+        url('../assets/home-reference.png') center var(--home-bg-shift) / 100% auto no-repeat;
+    filter: saturate(.98) blur(.15px);
+}
+
+.home-page header {
+    position: relative;
+    z-index: 2;
+    height: 112px;
+    padding: 43px 20px 0;
+    box-sizing: border-box;
+    align-items: flex-start;
+    justify-content: flex-start;
+    background:
+        linear-gradient(180deg, rgba(20, 145, 231, .08), rgba(20, 145, 231, .62)),
+        url('../assets/home-reference.png') center var(--home-bg-shift) / 100% auto no-repeat;
+    border: 0;
+}
+
+/* The supplied artwork contains a phone status bar and decorative copy.
+ * Cover the complete header so the browser's live controls never overlap it. */
+.home-page header::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: #2498e5;
+}
+
+.home-page header > * {
+    position: relative;
+    z-index: 1;
+    transform: translateY(var(--home-text-shift));
+}
+
+.home-page header .icon-location-box {
+    width: 19px;
+    height: 21px;
+    margin-right: 8px;
+    line-height: 21px;
+}
+
+.home-page header .icon-location-box i {
+    color: #fff;
+    font-size: 19px;
+    filter: drop-shadow(0 1px 2px rgba(12, 73, 124, .16));
+}
+
+.home-page header .location-text {
+    max-width: calc(100% - 112px);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 21px;
+    text-shadow: 0 1px 2px rgba(14, 74, 126, .2);
+}
+
+.home-page header .location-text .fa-caret-down {
+    margin-left: 7px;
+    font-size: 12px;
+}
+
+.home-page header .login-register {
+    position: absolute;
+    top: 41px;
+    right: 18px;
+    margin: 0;
+    gap: 5px;
+}
+
+.home-page header .login-register button {
+    min-width: 42px;
+    padding: 5px 9px;
+    border: 1px solid rgba(255, 255, 255, .55);
+    border-radius: 14px;
+    color: #fff;
+    background: rgba(255, 255, 255, .16);
+    font-size: 12px;
+    box-shadow: 0 3px 8px rgba(12, 78, 133, .08);
+    backdrop-filter: blur(8px);
+}
+
+.home-page header .login-register button:hover {
+    background: rgba(255, 255, 255, .28);
+}
+
+.home-page header .login-register .user-info {
+    width: 106px;
+    max-width: 106px;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, .52);
+    border-radius: 14px;
+    color: #fff;
+    background: rgba(255, 255, 255, .15);
+    font-size: 12px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+}
+
+.home-page .search {
+    position: relative;
+    z-index: 3;
+    height: 72px;
+}
+
+.home-page .search .search-fixed-top {
+    height: 72px;
+    padding: 11px 14px 15px;
+    box-sizing: border-box;
+    background: #2498e5;
+    backdrop-filter: none;
+}
+
+.home-page .search .search-fixed-top .search-box {
+    width: 100%;
+    height: 46px;
+    padding: 0 6px 0 16px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, .72);
+    border-radius: 25px;
+    background: rgba(255, 255, 255, .95);
+    color: #83a5c0;
+    box-shadow: 0 8px 18px rgba(35, 113, 166, .14);
+    font-family: inherit;
+    transform-origin: center;
+    transition: transform 180ms cubic-bezier(.22, 1, .36, 1), box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.home-page .search .search-fixed-top .search-box:focus-within {
+    transform: translateY(-2px) scale(1.01);
+    border-color: rgba(112, 194, 243, .95);
+    box-shadow: 0 12px 24px rgba(35, 113, 166, .19), 0 0 0 3px rgba(255, 255, 255, .22);
+}
+
+.home-page .search .search-fixed-top .search-box .fa-search {
+    margin-right: 9px;
+    color: var(--home-blue);
+    font-size: 20px;
+}
+
+.home-page .search .search-fixed-top .search-box input {
+    min-width: 0;
+    margin: 0 8px;
+    color: var(--home-deep-blue);
+    font-size: 14px;
+}
+
+.home-page .search .search-fixed-top .search-box input::placeholder {
+    color: #8fa8be;
+}
+
+.home-page .search .search-fixed-top .search-box .search-btn {
+    min-width: 70px;
+    padding: 9px 15px;
+    border-radius: 21px;
+    background: linear-gradient(135deg, #2aa9f1, #0f83dc);
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(18, 126, 207, .2);
+    transform-origin: center;
+    transition: transform 160ms cubic-bezier(.22, 1, .36, 1), filter 160ms ease, box-shadow 160ms ease;
+}
+
+.home-page .search .search-fixed-top .search-box .search-btn:active {
+    transform: scale(.94);
+    filter: brightness(.97);
+    box-shadow: 0 2px 6px rgba(18, 126, 207, .16);
+}
+
+.home-page .foodtype {
+    position: relative;
+    z-index: 2;
+    width: calc(100% - 24px);
+    height: auto;
+    margin: 13px auto 0;
+    padding: 17px 11px 13px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 13px 2px;
+    align-content: initial;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, .9);
+    border-radius: 19px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(58, 129, 177, .1), inset 0 1px 0 rgba(255, 255, 255, .8);
+    backdrop-filter: blur(14px);
+}
+
+.home-page .foodtype li {
+    width: auto;
+    height: 65px;
+    gap: 5px;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.home-page .foodtype li img {
+    width: 42px;
+    height: 38px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 5px rgba(45, 111, 155, .08));
+    transform-origin: center;
+    transition: transform 180ms cubic-bezier(.22, 1, .36, 1), filter 180ms ease;
+}
+
+.home-page .foodtype li p {
+    color: #244b73;
+    font-size: 12px;
+    font-weight: 600;
+    transition: color 180ms ease;
+}
+
+.home-page .foodtype li:active img {
+    animation: category-press 220ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.home-page .foodtype li:active p {
+    color: var(--home-blue);
+}
+
+.home-page .guess-section {
+    padding: 22px 14px 13px;
+    background: transparent;
+    border: 0;
+}
+
+.home-page .guess-section .section-heading {
+    margin: 0 1px 11px;
+}
+
+.home-page .guess-section .section-heading > div {
+    gap: 9px;
+}
+
+.home-page .guess-section .section-heading h2,
+.home-page .recommend p {
+    position: relative;
+    color: #103c6c;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.home-page .guess-section .section-heading h2 {
+    font-size: 21px;
+}
+
+.home-page .guess-section .section-heading h2::after,
+.home-page .recommend p::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -7px;
+    width: 34px;
+    height: 4px;
+    border-radius: 4px;
+    background: #168fe4;
+}
+
+.home-page .guess-section .section-heading span {
+    color: #829ab0;
+    font-size: 12px;
+}
+
+.home-page .guess-section .section-heading button {
+    color: #7592ad;
+    font-size: 12px;
+}
+
+.home-page .guess-scroll {
+    gap: 10px;
+    padding: 2px 1px 4px;
+}
+
+.home-page .guess-card {
+    flex-basis: 145px;
+    padding: 8px;
+    border: 1px solid var(--home-border);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 7px 16px rgba(59, 120, 161, .08);
+}
+
+.home-page .guess-card img {
+    height: 76px;
+    border-radius: 9px;
+    transform-origin: center;
+    transition: transform 180ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.home-page .guess-card:active {
+    transform: scale(.97);
+}
+
+.home-page .guess-card:active img {
+    transform: scale(1.03);
+}
+
+.home-page .guess-card strong {
+    color: #183f6c;
+    font-size: 13px;
+}
+
+.home-page .guess-card span {
+    color: #839bb0;
+    font-size: 10px;
+}
+
+.home-page .guess-card b {
+    color: #f27b3a;
+}
+
+.home-page .recommend {
+    justify-content: flex-start;
+    min-height: 52px;
+    margin-top: 2px;
+    padding: 17px 14px 12px;
+    background: transparent;
+}
+
+.home-page .recommend p {
+    margin: 0;
+    color: #103c6c;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.home-page .recommendtype {
+    position: relative;
+    height: 45px;
+    padding: 0 14px;
+    gap: 25px;
+    background: rgba(243, 249, 253, .88);
+    border-bottom: 1px solid rgba(174, 207, 228, .6);
+    backdrop-filter: blur(9px);
+}
+
+.home-page .recommendtype li {
+    height: 45px;
+    padding: 13px 0 10px;
+    border-radius: 0;
+    color: #718aa4;
+    font-size: 13px;
+    position: relative;
+}
+
+.home-page .recommendtype li.active {
+    color: var(--home-blue);
+    background: transparent;
+    border-bottom: 0;
+}
+
+.home-page .recommendtype .sort-indicator {
+    position: absolute;
+    left: 14px;
+    bottom: 0;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--home-blue);
+    pointer-events: none;
+    transition: transform 250ms cubic-bezier(.22, 1, .36, 1), width 250ms cubic-bezier(.22, 1, .36, 1), opacity 180ms ease;
+}
+
+.home-page .business-list {
+    padding: 12px 12px 88px;
+}
+
+.home-page .business-list li {
+    min-height: 122px;
+    margin-bottom: 11px;
+    padding: 12px;
+    border: 1px solid var(--home-border);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 7px 17px rgba(51, 111, 151, .08);
+}
+
+.home-page .business-list li .business-info {
+    gap: 12px;
+}
+
+.home-page .business-list li .business-info img {
+    width: 104px;
+    height: 104px;
+    flex-basis: 104px;
+    border-radius: 10px;
+}
+
+.home-page .business-list li .business-info .business-info-detail h3 {
+    margin-bottom: 0;
+    color: #103c6c;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.home-page .business-list li .business-info .business-info-rating {
+    gap: 8px;
+    margin-top: 7px;
+}
+
+.home-page .business-list li .business-info .business-info-rating .rating-score {
+    color: #f27635;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.home-page .business-list li .business-info .business-info-rating .monthly-sales,
+.home-page .business-list li .business-info .business-info-rating .average-price,
+.home-page .business-list li .business-info .business-info-delivery .start-price,
+.home-page .business-list li .business-info .business-info-delivery .delivery-fee {
+    color: #7893ac;
+    font-size: 11px;
+}
+
+.home-page .business-list li .business-info .business-info-delivery {
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.home-page .business-list li .business-info .business-info-delivery .free-delivery {
+    color: var(--home-blue);
+}
+
+.home-page .business-tags {
+    gap: 5px;
+    margin-top: 8px;
+}
+
+.home-page .business-tag {
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+}
+
+.home-page .load-more {
+    margin-bottom: 90px;
+    border-color: #b9dff4;
+    border-radius: 9px;
+    color: var(--home-blue);
+    background: rgba(255, 255, 255, .88);
+}
+
+@media (max-width: 380px) {
+    .home-page header { padding-left: 16px; padding-right: 14px; }
+    .home-page header .location-text { max-width: calc(100% - 96px); font-size: 14px; }
+    .home-page header .login-register { right: 14px; }
+    .home-page header .login-register button { min-width: 37px; padding-left: 7px; padding-right: 7px; }
+    .home-page .business-list li .business-info img { width: 92px; height: 92px; flex-basis: 92px; }
+}
+
+@keyframes category-press {
+    0% { transform: scale(1); }
+    38% { transform: scale(.9); }
+    72% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-page .search .search-fixed-top .search-box,
+    .home-page .search .search-fixed-top .search-box .search-btn,
+    .home-page .foodtype li img,
+    .home-page .foodtype li p,
+    .home-page .guess-card,
+    .home-page .guess-card img {
+        transition: none;
+    }
+
+    .home-page .foodtype li:active img {
+        animation: none;
+    }
+
+    .home-page .recommendtype .sort-indicator {
+        transition: none;
+    }
 }
 </style>

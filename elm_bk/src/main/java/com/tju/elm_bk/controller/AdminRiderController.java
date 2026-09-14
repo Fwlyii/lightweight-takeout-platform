@@ -57,4 +57,3 @@ public class AdminRiderController {
         return service;
     }
 }
-

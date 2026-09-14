@@ -43,6 +43,10 @@ services:
       APP_DEMO_ENABLED: "true"
       APP_UPLOAD_DIR: /app/uploads
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+      DASHSCOPE_BASE_URL: ${DASHSCOPE_BASE_URL:-}
+      DASHSCOPE_VISION_MODEL: ${DASHSCOPE_VISION_MODEL:-qwen-vl-plus}
+      DASHSCOPE_SPEECH_MODEL: ${DASHSCOPE_SPEECH_MODEL:-qwen3-asr-flash}
       TZ: Asia/Shanghai
     volumes:
       - ./runtime-uploads:/app/uploads
