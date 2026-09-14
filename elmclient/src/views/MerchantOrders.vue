@@ -559,6 +559,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 0 16px;
+  box-sizing: border-box;
   background: #c3ecfe;
   border-bottom: 1px solid #f0f0f0;
   overflow-x: auto;
@@ -966,7 +967,7 @@ export default {
 .tabs { top: 120px; height: 46px; background: #fff; box-shadow: none; border-radius: 0; border-bottom: 1px solid #dcebf7; }
 .tabs li { margin-right: 22px; padding: 12px 0; font-size: 13px; }
 .tabs li.active { color: #0879c7; }
-.order-list { margin-top: 184px; padding: 12px 16px 84px; }
+.order-list { margin-top: 184px; padding: 12px 16px 84px; box-sizing: border-box; }
 .order-item { border: 1px solid #e1edf7; border-radius: 10px; box-shadow: 0 2px 8px rgba(36,91,132,.06); }
 .order-item .order-content, .order-item .order-footer { min-width: 0; }
 .order-item p, .order-item span { overflow-wrap: anywhere; }
@@ -974,6 +975,6 @@ export default {
   .top-background { height: 64px; }
   .merchant-selector { top: 64px; }
   .tabs { top: 120px; left: 0; transform: none; max-width: 100vw; }
-  .order-list { margin-top: 184px; width: 100vw; max-width: 100vw; padding: 12px 12px 84px; }
+  .order-list { margin-top: 184px; width: 100vw; max-width: 100vw; padding: 12px 12px 84px; box-sizing: border-box; }
 }
 </style>

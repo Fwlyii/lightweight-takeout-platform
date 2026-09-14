@@ -21,9 +21,12 @@ public class BusinessRecommendationPolicy {
     private static final int MAX_VISIBLE_TAGS = 3;
     private static final int NEW_BUSINESS_DAYS = 30;
     private static final BigDecimal GOOD_REVIEW_SCORE = new BigDecimal("4.7");
+    private static final BigDecimal GUESS_BADGE_SCORE = new BigDecimal("4.5");
     private static final int GOOD_REVIEW_MIN_SALES = 200;
     private static final int LOVED_MIN_SALES = 500;
     private static final int POPULAR_MIN_SALES = 800;
+    /** 早餐类目在 order_type 表中的编号，用于“早餐优选”角标。 */
+    private static final int BREAKFAST_ORDER_TYPE_ID = 2;
 
     private final BusinessPricingPolicy pricingPolicy;
 
@@ -59,6 +62,9 @@ public class BusinessRecommendationPolicy {
         business.setRecommendationTags(candidates.stream().limit(MAX_VISIBLE_TAGS)
                 .map(RecommendationTag::label).toList());
 
+        business.setRecommendationReason(
+                resolveRecommendationReason(business, sales, score, newBusiness));
+
         double recommendation = (recentlyPurchased ? 120 : 0)
                 + (newBusiness ? 28 : 0)
                 + (validPromotion ? Math.min(24, business.getPromotionDiscount().doubleValue() * 3) : 0)
@@ -75,6 +81,19 @@ public class BusinessRecommendationPolicy {
         if (createTime == null) return false;
         long age = ChronoUnit.DAYS.between(createTime, LocalDateTime.now());
         return age >= 0 && age <= NEW_BUSINESS_DAYS;
+    }
+
+    /**
+     * 首页“猜你想吃”卡片角标的唯一口径：全部由真实字段推导，
+     * 没有匹配理由时返回 null，前端不显示角标而不是编一个标签。
+     */
+    private String resolveRecommendationReason(BusinessSearchVO business, int sales,
+                                               BigDecimal score, boolean newBusiness) {
+        if (sales >= POPULAR_MIN_SALES) return "人气推荐";
+        if (Integer.valueOf(BREAKFAST_ORDER_TYPE_ID).equals(business.getOrderTypeId())) return "早餐优选";
+        if (score.compareTo(GUESS_BADGE_SCORE) >= 0 && sales >= GOOD_REVIEW_MIN_SALES) return "口碑优选";
+        if (newBusiness) return "新店尝鲜";
+        return null;
     }
 
     private void add(List<RecommendationTag> tags, boolean condition, String label, int priority) {

@@ -1,12 +1,6 @@
 <template>
   <div class="assistant-page">
     <header class="ai-topbar">
-      <div class="device-status" aria-hidden="true">
-        <strong>9:41</strong>
-        <span class="device-signal"><i></i><i></i><i></i><i></i></span>
-        <i class="fa fa-wifi"></i>
-        <span class="device-battery"></span>
-      </div>
       <div class="topbar-row">
         <button class="topbar-icon" type="button" title="返回" @click="goBack"><i class="fa fa-arrow-left"></i></button>
         <div class="topbar-title">
@@ -737,33 +731,10 @@ button:disabled { cursor: not-allowed; opacity: .55; }
   box-shadow: none !important;
 }
 
-.device-status {
-  height: 27px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  color: #0d1e32;
-  font-size: 15px;
-  font-weight: 800;
-}
-
-.device-status strong { margin-right: auto; font-size: 16px; letter-spacing: 0; }
-.device-status > .fa-wifi { font-size: 15px; }
-.device-signal { display: inline-flex; align-items: end; gap: 2px; height: 15px; }
-.device-signal i { display: block; width: 3px; border-radius: 2px; background: #0d1e32; }
-.device-signal i:nth-child(1) { height: 5px; }
-.device-signal i:nth-child(2) { height: 8px; }
-.device-signal i:nth-child(3) { height: 11px; }
-.device-signal i:nth-child(4) { height: 14px; }
-.device-battery { position: relative; width: 29px; height: 13px; border: 2px solid #0d1e32; border-radius: 4px; }
-.device-battery::before { content: ""; position: absolute; inset: 2px; border-radius: 1px; background: #0d1e32; }
-.device-battery::after { content: ""; position: absolute; top: 3px; right: -5px; width: 3px; height: 6px; border-radius: 0 2px 2px 0; background: #0d1e32; }
-
 .topbar-row { display: flex; align-items: center; min-height: 48px; gap: 12px; }
 .topbar-icon { width: 36px !important; height: 36px !important; color: #1d5c91 !important; background: transparent !important; border: 0 !important; border-radius: 50% !important; font-size: 23px; }
 .topbar-icon:hover { background: rgba(22, 143, 233, .08) !important; }
-.topbar-title { text-align: center; }
+.topbar-title { flex: 1; min-width: 0; text-align: left; }
 .topbar-title h1,
 .assistant-page .topbar-title h1 { min-height: 0 !important; margin: 0 !important; color: var(--ai-ink) !important; font-size: 22px !important; line-height: 1.2 !important; font-weight: 800 !important; letter-spacing: 0 !important; }
 .assistant-page .topbar-title h1::after { content: none !important; display: none !important; }
@@ -868,7 +839,8 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 }
 
 @media (max-width: 430px) {
-  .ai-topbar { min-height: 103px !important; padding-left: 13px !important; padding-right: 13px !important; }
+  /* 去掉模拟状态栏后，顶栏只保留一行标题，不再为其预留 27px 高度 */
+  .ai-topbar { min-height: 64px !important; padding-left: 13px !important; padding-right: 13px !important; }
   .page-content { padding-left: 12px !important; padding-right: 12px !important; }
   .ai-hero { min-height: 223px; padding-top: 33px; }
   .ai-hero h2 { font-size: 31px; }

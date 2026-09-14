@@ -1053,7 +1053,16 @@ export default {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(32,86,120,.16);
     background: #edf5fa;
+    /* 共享元素兜底：不支持 View Transitions 时，大图从卡片缩略图放大落位 */
+    animation: shared-logo-settle 340ms cubic-bezier(.22, 1, .36, 1) both;
 }
+
+/* 卡片缩略图 → 详情页大图：圆角收平 + 轻微回落 */
+@keyframes shared-logo-settle {
+    from { border-radius: 20px; transform: scale(1.05); opacity: .82; }
+    to { border-radius: 12px; transform: scale(1); opacity: 1; }
+}
+
 .store-hero .business-info {
     width: auto;
     height: auto;
@@ -1159,7 +1168,7 @@ export default {
     .store-header { padding-left: 14px; padding-right: 14px; }
     .page-content { padding-bottom: 30px; }
     .wrapper { padding-bottom: 0; }
-    .wrapper .cart { left: 50%; width: 600px; max-width: 100%; transform: translateX(-50%); border-radius: 8px 8px 0 0; }
+    .wrapper .cart { left: calc(50% - 300px); width: 600px; max-width: 100%; transform: none; border-radius: 8px 8px 0 0; }
 }
 @media (max-width: 520px) {
     .page-content { padding-left: 0; padding-right: 0; }

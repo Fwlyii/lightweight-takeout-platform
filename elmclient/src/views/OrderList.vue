@@ -27,7 +27,7 @@
     </section>
 
     <template v-else-if="activeTab === 4">
-      <section v-if="displayedOrders.length" class="orders-content">
+      <section v-if="displayedOrders.length" :key="`orders-${activeTab}`" class="orders-content">
         <div v-for="group in groupedOrders" :key="group.key" class="month-block">
           <div class="month-summary">
             <strong>{{ group.label }}</strong>
@@ -64,7 +64,7 @@
       </section>
     </template>
 
-    <section v-else-if="displayedOrders.length" class="orders-content">
+    <section v-else-if="displayedOrders.length" :key="`orders-${activeTab}`" class="orders-content">
       <div v-for="group in groupedOrders" :key="group.key" class="month-block">
         <div class="month-summary">
           <strong>{{ group.label }}</strong>
@@ -154,7 +154,7 @@
       </section>
     </section>
 
-    <section v-else class="empty-orders">
+    <section v-else :key="`empty-${activeTab}`" class="empty-orders">
       <div class="empty-icon"><i class="fa fa-file-text-o"></i></div>
       <h2>暂无{{ tabs[activeTab].label }}订单</h2>
       <p>{{ activeTab === 1 ? '当前没有需要支付的订单' : '去首页逛逛，发现更多美味' }}</p>
@@ -463,11 +463,58 @@ export default defineComponent({
 :deep(.card-side) { display: flex; flex-direction: column; align-items: flex-end; min-width: 88px; gap: 8px; text-align: right; }:deep(.state-pill) { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 10px; border-radius: 11px; font-size: 13px; font-weight: 700; white-space: nowrap; }:deep(.state-pill .fa) { font-size: 15px; }:deep(.state-payment) { color: #f18b00; background: #fff5e5; }:deep(.state-ongoing) { color: #0585e8; background: #e7f5ff; }:deep(.state-completed) { color: #1caf58; background: #e7f9ec; }:deep(.state-cancelled) { color: #ef8b19; background: #fff3e5; }:deep(.card-side small) { color: #8195ae; font-size: 12px; white-space: nowrap; }:deep(.card-side > strong) { margin-top: auto; color: #0b2853; font-size: 21px; white-space: nowrap; }
 .payment-notice { display: flex; align-items: center; gap: 10px; margin: 0 14px 14px; padding: 12px 13px; border-radius: 12px; color: #e47b0c; background: #fff6e9; font-size: 13px; line-height: 1.35; }.payment-notice .fa { font-size: 18px; }.card-actions { display: flex; justify-content: flex-end; gap: 9px; margin: 0 14px; padding: 14px 0 16px; border-top: 1px solid #edf3f8; }.card-actions button, .after-sale-empty button { height: 40px; padding: 0 22px; border-radius: 11px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }.primary-button { border: 1px solid #128ef5; color: white; background: linear-gradient(135deg, #1c9dff, #087ff0); box-shadow: 0 6px 13px rgba(15,143,245,.16); }.outline-button { border: 1px solid #8bc6fb; color: #087fe5; background: #fff; }.card-actions .primary-button, .card-actions .outline-button { min-width: 104px; }.single-action .outline-button { min-width: 124px; }
 .rider-row { display: flex; align-items: center; gap: 10px; margin: 0 14px; padding: 13px 0; border-top: 1px solid #edf3f8; border-bottom: 1px solid #edf3f8; color: #3d587a; font-size: 14px; }.rider-row b { font-weight: 500; }.rider-avatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: #0788ef; background: #e8f5ff; font-size: 20px; }.call-rider { display: grid; place-items: center; width: 38px; height: 38px; margin-left: auto; border: 0; border-radius: 50%; color: #0788ef; background: #eef8ff; font-size: 17px; cursor: pointer; }.rider-arrow { margin-left: auto; color: #8aa0ba; font-size: 20px; }
-.progress-track { display: grid; grid-template-columns: repeat(4, 1fr); margin: 15px 14px 4px; }.progress-step { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; color: #8297b0; font-size: 11px; text-align: center; }.progress-step:not(:last-child)::after { content: ''; position: absolute; top: 8px; left: 61%; width: 78%; border-top: 3px dotted #ccd8e5; }.progress-step.completed, .progress-step.current { color: #18345d; }.progress-step.completed:not(:last-child)::after { border-top-style: solid; border-top-color: #168ff3; }.progress-dot { z-index: 1; display: grid; place-items: center; width: 16px; height: 16px; border: 3px solid #d8e2ee; border-radius: 50%; background: #fff; box-sizing: border-box; }.progress-step.completed .progress-dot, .progress-step.current .progress-dot { border-color: #138ef4; color: white; background: #138ef4; }.progress-dot .fa { font-size: 8px; }.progress-step small { min-height: 14px; color: #8195ad; font-size: 11px; }
+.progress-track { display: grid; grid-template-columns: repeat(4, 1fr); margin: 15px 14px 4px; }.progress-step { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; color: #8297b0; font-size: 11px; text-align: center; }.progress-step:not(:last-child)::after { content: ''; position: absolute; top: 8px; left: 61%; width: 78%; border-top: 3px dotted #ccd8e5; }.progress-step.completed, .progress-step.current { color: #18345d; }.progress-step.completed:not(:last-child)::after { border-top-style: solid; border-top-color: #168ff3; }.progress-dot { z-index: 1; position: relative; display: grid; place-items: center; width: 16px; height: 16px; border: 3px solid #d8e2ee; border-radius: 50%; background: #fff; box-sizing: border-box; }.progress-step.completed .progress-dot, .progress-step.current .progress-dot { border-color: #138ef4; color: white; background: #138ef4; }.progress-dot .fa { font-size: 8px; }.progress-step small { min-height: 14px; color: #8195ad; font-size: 11px; }
 .ongoing-help { display: grid; grid-template-columns: 1fr 1fr; margin-top: 16px; border-radius: 19px; background: rgba(255,255,255,.95); box-shadow: 0 7px 22px rgba(59,123,177,.07); }.ongoing-help button { display: flex; align-items: center; gap: 11px; min-width: 0; padding: 18px 14px; border: 0; color: #138be9; background: transparent; font: inherit; text-align: left; cursor: pointer; }.ongoing-help button + button { border-left: 1px solid #e5eef6; }.ongoing-help button > .fa:first-child { font-size: 25px; }.ongoing-help span { display: flex; flex-direction: column; min-width: 0; }.ongoing-help strong { color: #173560; font-size: 15px; }.ongoing-help small { margin-top: 4px; color: #8598b1; font-size: 11px; white-space: nowrap; }.ongoing-help button > .fa:last-child { margin-left: auto; color: #8aa0ba; }
 .recommend-section, .help-section, .after-sale-faq { margin-top: 18px; padding: 17px 14px; border-radius: 20px; background: rgba(255,255,255,.95); box-shadow: 0 7px 22px rgba(59,123,177,.07); }.recommend-heading { display: flex; align-items: center; justify-content: space-between; }.recommend-heading h2 { color: #112d59; font-size: 19px; }.recommend-heading h2 .fa { margin-right: 10px; color: #0e8bed; }.recommend-heading button { border: 0; color: #7d91ad; background: transparent; font: inherit; font-size: 13px; cursor: pointer; }.recommend-heading button .fa { margin-left: 4px; font-size: 15px; }.recommend-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }.recommend-card { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 9px; min-width: 0; padding: 9px; border-radius: 15px; background: #f8fcff; }.recommend-card > img { width: 78px; height: 104px; border-radius: 11px; object-fit: cover; }.recommend-card > div { min-width: 0; }.recommend-card strong { display: block; overflow: hidden; color: #172f56; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }.recommend-card p { overflow: hidden; margin-top: 7px; color: #8195ae; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }.recommend-card b { display: block; margin-top: 9px; color: #132f5b; font-size: 16px; }.recommend-card button { width: 100%; height: 32px; margin-top: 9px; border: 0; border-radius: 9px; color: #0787ec; background: #e5f4ff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .help-title { display: flex; align-items: center; gap: 12px; }.help-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: #0a88ef; background: #e2f2ff; font-size: 22px; }.help-title h2 { font-size: 19px; }.help-title p { margin-top: 4px; color: #8195ae; font-size: 13px; }.help-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }.help-actions button { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 13px 10px; border: 0; border-radius: 14px; color: #8498b1; background: #f2f8fd; font: inherit; text-align: left; cursor: pointer; }.help-actions button > span { display: grid; place-items: center; flex: 0 0 auto; width: 37px; height: 37px; border-radius: 50%; color: #0788ef; background: #e0f1ff; font-size: 18px; }.help-actions b { min-width: 0; color: #1b355c; font-size: 14px; }.help-actions b small { display: block; overflow: hidden; margin-top: 4px; color: #879ab2; font-size: 11px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }.help-actions > button > .fa:last-child { margin-left: auto; font-size: 20px; }
 .empty-orders { display: flex; flex-direction: column; align-items: center; margin-top: 50px; padding: 38px 20px; border-radius: 20px; background: rgba(255,255,255,.92); text-align: center; }.empty-icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; color: #148ff2; background: #e7f5ff; font-size: 30px; }.empty-orders h2 { margin-top: 16px; font-size: 20px; }.empty-orders p { margin: 8px 0 20px; color: #8397af; font-size: 13px; }.empty-orders .primary-button { height: 42px; padding: 0 29px; border-radius: 13px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+/* ── 任务7/9：订单状态与空态动效（全部为 transform / opacity，移动端开销极低）── */
+/* 切换状态标签时，列表淡入 + 上滑 */
+.orders-content, .after-sale-empty, .empty-orders { animation: order-switch-in 320ms cubic-bezier(.22, 1, .36, 1) both; }
+/* 时间线当前节点：蓝色圆点循环呼吸 */
+.progress-step.current .progress-dot { animation: dot-breathe 2s ease-in-out infinite; }
+.progress-step.current .progress-dot::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid rgba(19, 142, 244, .4); animation: dot-ring 2s ease-out infinite; }
+/* 状态牌（待付款 / 配送中 / 已完成）出现时轻微上浮 */
+:deep(.state-pill) { animation: state-pill-in 280ms cubic-bezier(.22, 1, .36, 1) both; }
+/* 空状态插画缓慢浮动，替代 Lottie，不引入额外依赖 */
+.empty-orders .empty-icon { animation: empty-float 2.4s ease-in-out infinite; }
+.after-sale-art { animation: empty-float 2.8s ease-in-out infinite; }
+
+@keyframes order-switch-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dot-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+@keyframes dot-ring {
+  0% { opacity: .55; transform: scale(.8); }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+
+@keyframes state-pill-in {
+  from { opacity: 0; transform: translateY(4px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes empty-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orders-content, .after-sale-empty, .empty-orders,
+  .progress-step.current .progress-dot,
+  .progress-step.current .progress-dot::after,
+  .empty-orders .empty-icon, .after-sale-art,
+  :deep(.state-pill) {
+    animation: none;
+  }
+}
 .after-sale-empty { display: flex; flex-direction: column; align-items: center; padding: 62px 18px 38px; border-radius: 20px; background: rgba(255,255,255,.95); text-align: center; }.after-sale-art { position: relative; width: 180px; height: 150px; margin-bottom: 17px; border-radius: 50%; color: #1693f4; background: linear-gradient(145deg, #eef7ff, #dcefff); }.after-sale-art .fa-file-text-o { position: absolute; left: 64px; top: 43px; padding: 19px 22px; border-radius: 8px; background: white; box-shadow: 5px 7px 0 #c5e2fb; font-size: 35px; transform: rotate(-8deg); }.after-sale-art .fa-heart { position: absolute; right: 23px; bottom: 25px; color: #fff; font-size: 40px; }.after-sale-art .fa-paper-plane { position: absolute; right: 4px; top: 13px; color: #8fc7fa; font-size: 23px; transform: rotate(-18deg); }.after-sale-empty h2 { font-size: 21px; }.after-sale-empty p { margin: 9px 0 23px; color: #8195ae; font-size: 14px; }.after-sale-empty button { width: min(100%, 290px); }.after-sale-empty .outline-button { margin-top: 11px; }
 .after-sale-faq h2 { display: flex; align-items: center; gap: 9px; padding-bottom: 8px; font-size: 19px; }.after-sale-faq h2 span { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: #fff; background: #1590f3; font-size: 16px; }.after-sale-faq button { display: flex; align-items: center; gap: 14px; width: 100%; height: 62px; padding: 0 7px; border: 0; border-bottom: 1px solid #edf3f8; color: #17345d; background: transparent; font: inherit; text-align: left; cursor: pointer; }.after-sale-faq button:last-child { border-bottom: 0; }.after-sale-faq button > .fa:first-child { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; color: #128ef3; background: #e6f4ff; font-size: 17px; }.after-sale-faq button:nth-of-type(2) > .fa:first-child { color: #f58a00; background: #fff3e4; }.after-sale-faq button:nth-of-type(3) > .fa:first-child { color: #15a956; background: #e7f8ed; }.after-sale-faq button strong { flex: 1; font-size: 15px; font-weight: 500; }.after-sale-faq button > .fa:last-child { color: #879bb4; font-size: 20px; }
 .modal-overlay { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 20px; background: rgba(15,39,74,.35); }.confirm-modal { position: relative; width: min(100%, 320px); padding: 26px 22px 20px; border-radius: 19px; background: #fff; box-shadow: 0 18px 50px rgba(22,56,97,.2); text-align: center; box-sizing: border-box; }.modal-close { position: absolute; top: 10px; right: 13px; border: 0; color: #9aaabd; background: transparent; font-size: 25px; cursor: pointer; }.modal-icon { display: grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 13px; border-radius: 50%; color: #138ef4; background: #e9f6ff; font-size: 20px; }.confirm-modal h3 { font-size: 18px; }.confirm-modal p { margin: 9px 0 20px; color: #8296af; font-size: 13px; }.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }.modal-actions button { height: 40px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }

@@ -154,6 +154,15 @@
     box-sizing: border-box;
   }
 
+  /* 商家“我的”的顶部栏是 sticky 定位。通用的 left:50% + translateX(-50%)
+   * 只适用于 fixed 条，用在 sticky 上会把它推出了手机舞台。
+   */
+  .app-container > .content > .container > .top-background {
+    left: auto;
+    right: auto;
+    transform: none;
+  }
+
   .app-container > .content > * .bottom-bar {
     right: calc((100vw - 600px) / 2 + 16px);
   }

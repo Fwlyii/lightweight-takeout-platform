@@ -42,6 +42,9 @@ public class BusinessSearchVO {
     /** 后端规则引擎生成的候选展示标签，前端只负责渲染。 */
     private List<String> recommendationTags;
 
+    /** 后端规则引擎生成的展示理由（如“人气推荐”），用于首页推荐卡片角标；无理由时为 null。 */
+    private String recommendationReason;
+
     /** 用于综合排序的后端推荐分，避免把业务门槛散落在前端。 */
     private BigDecimal recommendationScore;
 

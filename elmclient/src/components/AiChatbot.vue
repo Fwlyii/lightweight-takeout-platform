@@ -12,7 +12,7 @@
     </span>
     <span class="launcher-copy">
       <strong>AI点餐</strong>
-      <small>懂你想吃的</small>
+      <small>帮你快速点单</small>
     </span>
     <i class="fa fa-angle-right launcher-arrow" aria-hidden="true"></i>
   </button>
@@ -48,7 +48,7 @@ const openAssistant = () => router.push('/ai-chat')
   transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
   animation:
     launcher-enter .42s cubic-bezier(.22, .72, .28, 1) both,
-    launcher-breathe 5s ease-in-out 1.1s infinite;
+    launcher-breathe 2s ease-in-out 1.1s infinite;
 }
 
 .ai-chat-launcher:hover {
@@ -69,7 +69,7 @@ const openAssistant = () => router.push('/ai-chat')
   border-radius: 24px;
   border: 1px solid rgba(0, 151, 255, .2);
   opacity: 0;
-  animation: launcher-pulse 5s ease-out 1.1s infinite;
+  animation: launcher-pulse 2s ease-out 1.1s infinite;
 }
 
 .launcher-icon {
@@ -121,9 +121,8 @@ const openAssistant = () => router.push('/ai-chat')
 }
 
 @keyframes launcher-breathe {
-  0%, 84%, 100% { transform: scale(1); }
-  88% { transform: scale(1.03); }
-  92% { transform: scale(1.01); }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 @keyframes launcher-press {
@@ -133,10 +132,10 @@ const openAssistant = () => router.push('/ai-chat')
 }
 
 @keyframes launcher-pulse {
-  0%, 84% { opacity: 0; transform: scale(.96); }
-  88% { opacity: .15; transform: scale(1.02); }
-  94% { opacity: .06; transform: scale(1.08); }
-  100% { opacity: 0; transform: scale(1.12); }
+  0% { opacity: 0; transform: scale(.98); }
+  45% { opacity: .22; transform: scale(1.06); }
+  72% { opacity: .08; transform: scale(1.12); }
+  100% { opacity: 0; transform: scale(1.16); }
 }
 
 @media (max-width: 760px) {

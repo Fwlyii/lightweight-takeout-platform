@@ -202,17 +202,18 @@ a { text-decoration: none; }
 
 .page-route-enter-active,
 .page-route-leave-active {
-  transition: opacity .16s ease, transform .16s ease;
+  transition: opacity .24s ease, transform .24s cubic-bezier(.22, .61, .36, 1);
 }
 
+/* 路由切换：淡入 + 从下方滑入，切出时反向淡出 */
 .page-route-enter-from {
   opacity: 0;
-  transform: translateY(4px);
+  transform: translateY(20px);
 }
 
 .page-route-leave-to {
   opacity: 0;
-  transform: translateY(-2px);
+  transform: translateY(-8px);
 }
 
 .auth-route-enter-active {

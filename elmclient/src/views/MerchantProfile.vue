@@ -581,6 +581,7 @@ export default {
   min-height: 100vh;
   margin: 0 auto;
   padding: 0 16px 88px;
+  box-sizing: border-box;
   background: #f6f9fd;
   box-shadow: none;
   border-radius: 0;
@@ -612,6 +613,7 @@ export default {
   max-width: none;
   margin: 18px 0 14px;
   padding: 18px;
+  box-sizing: border-box;
   border: 1px solid #dfeaf5;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(51, 101, 150, .05);
@@ -632,6 +634,7 @@ export default {
 .merchant-entry-card {
   width: 100%;
   padding: 20px;
+  box-sizing: border-box;
   background: #fff;
   border: 1px solid #dfeaf5;
   border-radius: 12px;

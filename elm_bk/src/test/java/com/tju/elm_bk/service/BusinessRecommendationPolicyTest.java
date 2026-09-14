@@ -40,6 +40,23 @@ class BusinessRecommendationPolicyTest {
                 .anyMatch(tag -> tag.contains("\u597d\u8bc4") || tag.contains("\u7231\u4e0d\u91ca\u624b")));
     }
 
+    @Test
+    void recommendationReasonComesFromRealFields() {
+        BusinessSearchVO popular = business("4.80", 900);
+        policy.enrich(popular, false);
+        assertEquals("\u4eba\u6c14\u63a8\u8350", popular.getRecommendationReason());
+
+        BusinessSearchVO breakfast = business("4.20", 60);
+        breakfast.setOrderTypeId(2);
+        policy.enrich(breakfast, false);
+        assertEquals("\u65e9\u9910\u4f18\u9009", breakfast.getRecommendationReason());
+
+        BusinessSearchVO quiet = business("4.10", 30);
+        quiet.setOrderTypeId(10);
+        policy.enrich(quiet, false);
+        assertEquals(null, quiet.getRecommendationReason());
+    }
+
     private BusinessSearchVO business(String score, int sales) {
         BusinessSearchVO business = new BusinessSearchVO();
         business.setId(1L);
