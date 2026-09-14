@@ -1,37 +1,61 @@
 <template>
   <div class="container information-page" :class="{ 'information-page-ready': pageReady }">
-    <!-- 固定顶部栏 -->
     <div class="fixed-top">
       <div class="top-background">
-        <h1>{{ riderMode ? '骑手中心' : '个人信息' }}</h1>
+        <div class="hero-copy">
+          <p class="hero-eyebrow">轻松点餐 · 快乐生活</p>
+          <h1>{{ riderMode ? '骑手中心' : '个人信息' }}</h1>
+          <p class="hero-subtitle">美好生活，从一份美食开始</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <span class="hero-sun"></span>
+          <span class="hero-cloud hero-cloud-one"></span>
+          <span class="hero-cloud hero-cloud-two"></span>
+          <i class="fas fa-motorcycle hero-bike"></i>
+          <strong>好吃 · 更美好</strong>
+        </div>
       </div>
     </div>
 
     <div class="user-card">
-      <div class="avatar" @click="triggerFileInput">
-        <img :src="userInfo?.photo || defaultUserAvatar" alt="用户头像" @error="handleImageError">
-        <div class="avatar-overlay">
-          <i class="fas fa-camera"></i>
-          <span>更换头像</span>
+      <div class="profile-head">
+        <div class="avatar-wrap">
+          <div class="avatar" @click="triggerFileInput">
+            <img :src="userInfo?.photo || defaultUserAvatar" alt="用户头像" @error="handleImageError">
+            <div class="avatar-overlay">
+              <i class="fas fa-camera"></i>
+              <span>更换头像</span>
+            </div>
+          </div>
+          <button class="avatar-camera" type="button" aria-label="更换头像" @click="triggerFileInput">
+            <i class="fas fa-camera"></i>
+          </button>
         </div>
+        <div class="profile-heading">
+          <div class="user-name">{{ userInfo?.username || 'demo_user' }}</div>
+          <div class="profile-caption">校园外卖用户</div>
+        </div>
+        <button class="edit-button" type="button" @click="openEditModal">
+          <i class="fas fa-pen"></i>
+          <span>编辑</span>
+        </button>
       </div>
-      <div class="user-details">
-        <div class="user-name">
-          {{ userInfo?.username || '未设置昵称' }}
-          <i class="fas fa-pencil-alt edit-icon" @click="openEditModal"></i>
+
+      <div class="profile-info-list">
+        <div class="info-row">
+          <span class="info-row-icon icon-identity"><i class="fas fa-user-friends"></i></span>
+          <span class="info-label">身份角色</span>
+          <strong class="info-value">{{ riderMode ? '骑手用户' : '顾客演示' }}</strong>
         </div>
-        <div class="user-full-name">
-          <i class="fas fa-id-card-alt full-name-icon"></i>
-          <span class="last-name">{{ userInfo?.lastName || '未设置姓氏' }}</span>
-          <span class="first-name">{{ userInfo?.firstName || '未设置名字' }}</span>
+        <div class="info-row">
+          <span class="info-row-icon icon-phone"><i class="fas fa-phone-alt"></i></span>
+          <span class="info-label">手机号</span>
+          <strong class="info-value">{{ userInfo?.phone || '未绑定手机' }}</strong>
         </div>
-        <div class="user-phone">
-          <i class="fas fa-phone phone-icon"></i>
-          <span>{{ userInfo?.phone || '未设置手机号' }}</span>
-        </div>
-        <div class="user-email">
-          <i class="fas fa-envelope-open-text email-icon"></i>
-          <span>{{ userInfo?.email || '未设置邮箱' }}</span>
+        <div class="info-row">
+          <span class="info-row-icon icon-email"><i class="fas fa-envelope"></i></span>
+          <span class="info-label">邮箱</span>
+          <strong class="info-value">{{ userInfo?.email || '未设置邮箱' }}</strong>
         </div>
       </div>
       <div class="card-button-section">
@@ -39,7 +63,7 @@
           <i class="fas fa-route"></i> 返回配送工作台
         </button>
         <button class="logout-btn" @click="logout">
-          <i class="fas fa-sign-out-alt"></i>退出登录
+          <i class="fas fa-sign-out-alt"></i><span>退出登录</span>
         </button>
       </div>
     </div>
@@ -48,10 +72,13 @@
     <input type="file" ref="fileInput" style="display: none" accept="image/*" @change="handleFileUpload">
 
     <div v-if="!riderMode" class="menu-section">
-      <div class="section-title">常用功能</div>
+      <div class="section-heading">
+        <div class="section-title"><span></span><h2>常用功能</h2></div>
+        <p>让外卖生活更简单</p>
+      </div>
       <div class="menu-list">
         <div class="menu-item" @click="showAddressSection = !showAddressSection">
-          <div class="menu-icon">
+          <div class="menu-icon menu-icon-address">
             <i class="fas fa-map-marker-alt"></i>
           </div>
           <span class="menu-text">收货地址</span>
@@ -59,14 +86,14 @@
         </div>
         <AddressManager v-if="showAddressSection" :id="userInfo?.id" class="address-manager" />
         <div class="menu-item" @click="myfavorite">
-          <div class="menu-icon">
+          <div class="menu-icon menu-icon-favorite">
             <i class="fas fa-heart"></i>
           </div>
           <span class="menu-text">我的收藏</span>
           <i class="fas fa-chevron-right menu-arrow"></i>
         </div>
         <div class="menu-item message-item" @click="navigateTo('notifications')">
-          <div class="menu-icon">
+          <div class="menu-icon menu-icon-notification">
             <i class="fas fa-bell"></i>
           </div>
           <span class="menu-text">消息与通知</span>
@@ -76,12 +103,12 @@
           <i class="fas fa-chevron-right menu-arrow"></i>
         </div>
         <div class="menu-item" @click="navigateTo('assets')">
-          <div class="menu-icon"><i class="fas fa-wallet"></i></div>
+          <div class="menu-icon menu-icon-wallet"><i class="fas fa-wallet"></i></div>
           <span class="menu-text">钱包与优惠</span>
           <i class="fas fa-chevron-right menu-arrow"></i>
         </div>
         <div class="menu-item" @click="navigateTo('preferences')">
-          <div class="menu-icon"><i class="fas fa-palette"></i></div>
+          <div class="menu-icon menu-icon-preferences"><i class="fas fa-palette"></i></div>
           <span class="menu-text">偏好与外观</span>
           <i class="fas fa-chevron-right menu-arrow"></i>
         </div>
@@ -89,7 +116,10 @@
     </div>
 
     <div v-else class="menu-section rider-menu-section">
-      <div class="section-title">骑手工具</div>
+      <div class="section-heading">
+        <div class="section-title"><span></span><h2>骑手工具</h2></div>
+        <p>高效完成每一次配送</p>
+      </div>
       <div class="menu-list">
         <div class="menu-item" @click="goRiderTab('active')">
           <div class="menu-icon"><i class="fas fa-route"></i></div>
@@ -460,547 +490,710 @@ export default {
 </script>
 
 <style scoped>
-/* 保持原有的样式，只修改或新增以下部分 */
 .container {
   width: 100%;
   max-width: 600px;
-  background: #fff;
   min-height: 100vh;
   margin: 0 auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  border-radius: 0;
-  padding-bottom: calc(96px + env(safe-area-inset-bottom));
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  position: relative;
+  padding: 0 0 calc(96px + env(safe-area-inset-bottom));
   box-sizing: border-box;
-}
-
-/****************** 固定顶部栏 ******************/
-.fixed-top {
-  position: sticky;
-  top: 0;
-  left: auto;
-  width: 100%;
-  z-index: 1000;
-  max-width: none;
-  margin: 0;
-}
-
-.top-background {
-  width: 100%;
-  height: 72px;
-  background: #168bd1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(25, 104, 156, 0.14);
-  border-radius: 0;
   position: relative;
+  overflow: hidden;
+  color: #14213d;
+  background: #f4faff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
 
-.top-background h1 {
-  color: white;
-  font-size: 1.8rem;
-  font-weight: 600;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  letter-spacing: 1px;
-  margin: 0;
+.fixed-top {
+  position: relative;
+  width: 100%;
   z-index: 1;
 }
 
-/****************** 内容区域 ******************/
-.content-area {
-  margin-top: 100px;
-  /* 固定顶部栏的高度 */
+.top-background {
+  position: relative;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  height: 268px;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: max(30px, env(safe-area-inset-top)) 28px 0;
+  color: #fff;
+  background: linear-gradient(145deg, #58c5fb 0%, #269af1 57%, #1985e5 100%);
+  border-radius: 0 0 34px 34px;
+  isolation: isolate;
+}
+
+.top-background::before,
+.top-background::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.top-background::before {
+  width: 250px;
+  height: 250px;
+  right: -76px;
+  top: -118px;
+  background: rgba(255, 255, 255, .13);
+}
+
+.top-background::after {
+  width: 230px;
+  height: 116px;
+  left: -72px;
+  bottom: -68px;
+  background: rgba(255, 255, 255, .11);
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 3;
+  max-width: 355px;
+}
+
+.hero-eyebrow {
+  margin: 0 0 9px;
+  color: rgba(255, 255, 255, .82);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.top-background h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 38px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-shadow: 0 3px 10px rgba(18, 106, 180, .2);
+}
+
+.hero-subtitle {
+  margin: 13px 0 0;
+  color: rgba(255, 255, 255, .9);
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.hero-art {
+  position: absolute;
+  z-index: 2;
+  right: 9px;
+  bottom: 16px;
+  width: 190px;
+  height: 126px;
+  color: rgba(255, 255, 255, .72);
+  pointer-events: none;
+}
+
+.hero-art strong {
+  position: absolute;
+  right: 2px;
+  top: 6px;
+  color: rgba(255, 255, 255, .86);
+  font-family: "KaiTi", "STKaiti", cursive;
+  font-size: 17px;
+  font-weight: 600;
+  transform: rotate(-8deg);
+  white-space: nowrap;
+}
+
+.hero-art strong::after {
+  content: "";
+  position: absolute;
+  width: 110px;
+  height: 12px;
+  right: -5px;
+  bottom: -13px;
+  border-top: 2px solid rgba(255, 255, 255, .6);
+  border-radius: 50%;
+  transform: rotate(-7deg);
+}
+
+.hero-sun {
+  position: absolute;
+  right: 107px;
+  top: 35px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .28);
+}
+
+.hero-cloud {
+  position: absolute;
+  bottom: 7px;
+  width: 62px;
+  height: 25px;
+  border-radius: 15px 15px 8px 8px;
+  background: rgba(255, 255, 255, .3);
+}
+
+.hero-cloud::before,
+.hero-cloud::after {
+  content: "";
+  position: absolute;
+  bottom: 10px;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.hero-cloud::before {
+  left: 13px;
+  width: 29px;
+  height: 29px;
+}
+
+.hero-cloud::after {
+  left: 34px;
+  width: 22px;
+  height: 22px;
+}
+
+.hero-cloud-one { right: 73px; opacity: .72; }
+.hero-cloud-two { right: 10px; bottom: 1px; transform: scale(.7); opacity: .5; }
+
+.hero-bike {
+  position: absolute;
+  right: 47px;
+  bottom: 24px;
+  color: rgba(255, 255, 255, .68);
+  font-size: 59px;
+  transform: rotate(-4deg);
 }
 
 .user-card {
-  width: calc(100% - 32px);
-  max-width: 560px;
-  margin: 18px auto 0;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(31, 75, 122, 0.10);
-  padding: 20px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  gap: 16px;
   position: relative;
   z-index: 2;
-  flex-wrap: wrap;
-  justify-content: flex-start;
+  width: calc(100% - 32px);
+  max-width: 552px;
+  margin: -48px auto 0;
+  padding: 23px 18px 19px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, .96);
+  border-radius: 25px;
+  background: rgba(255, 255, 255, .97);
+  box-shadow: 0 16px 38px rgba(36, 128, 198, .14);
 }
 
-/* 新增：卡片内的按钮区域 */
-.card-button-section {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0;
-  /* 增加内边距，保持与卡片一致 */
-  box-sizing: border-box;
+.profile-head {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.avatar-wrap {
+  position: relative;
+  width: 86px;
+  height: 86px;
 }
 
 .avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
+  width: 86px;
+  height: 86px;
   overflow: hidden;
-  border: 3px solid white;
-  box-shadow: 0 6px 20px rgba(0, 151, 255, 0.3);
-  flex-shrink: 0;
-  background: #f8f9fa;
-  margin-left: 15px;
+  box-sizing: border-box;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  background: #eaf5ff;
+  box-shadow: 0 5px 18px rgba(31, 143, 232, .2);
+  cursor: pointer;
+  transition: transform .24s ease, box-shadow .24s ease;
+}
+
+.avatar:hover,
+.avatar:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(31, 143, 232, .28);
 }
 
 .avatar img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
 }
 
-.user-details {
-  flex: 1;
-  background-color: #f8f9fa;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e9ecef;
+.avatar-overlay {
+  position: absolute;
+  inset: 4px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-right: 15px;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: #fff;
+  background: rgba(22, 127, 218, .7);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity .2s ease;
 }
 
-.user-name,
-.user-full-name,
-.user-phone,
-.user-email {
-  font-size: 0.95rem;
-  color: #495057;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 10px;
-  display: flex;
-  align-items: center;
+.avatar:hover .avatar-overlay { opacity: 1; }
+.avatar-overlay i { font-size: 18px; }
+.avatar-overlay span { font-size: 10px; }
+
+.avatar-camera {
+  position: absolute;
+  right: -5px;
+  bottom: -2px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: #fff;
+  background: #208eeb;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(20, 130, 220, .25);
+  cursor: pointer;
+  transition: transform .2s ease, background .2s ease;
 }
+
+.avatar-camera:hover { background: #0874cb; transform: scale(1.06); }
+.avatar-camera i { font-size: 13px; }
+
+.profile-heading { min-width: 0; }
 
 .user-name {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.user-full-name .first-name {
-  margin-right: 5px;
-}
-
-.user-name .edit-icon,
-.user-full-name .full-name-icon,
-.user-phone .phone-icon,
-.user-email .email-icon {
-  margin-right: 8px;
-  color: #3498db;
-}
-
-.edit-icon {
-  margin-left: auto;
-  color: #3498db;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.menu-section {
-  width: calc(100% - 32px);
-  max-width: 560px;
-  margin: 24px auto 0;
-}
-
-.section-title {
-  font-size: 1.1rem;
-  color: #2c3e50;
-  margin-bottom: 15px;
-  padding-left: 10px;
-  font-weight: 600;
-  border-left: 4px solid #3498db;
-}
-
-.menu-list {
-  background: white;
-  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  color: #14213d;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.menu-item {
-  display:flex;
+.profile-caption {
+  margin-top: 7px;
+  color: #7f91aa;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.edit-button {
+  display: inline-flex;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid #f0f0f0;
+  justify-content: center;
+  gap: 7px;
+  min-width: 70px;
+  height: 42px;
+  padding: 0 12px;
+  color: #168ce9;
+  background: #edf7ff;
+  border: 0;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background .2s ease, transform .2s ease;
 }
 
-.menu-item:hover {
-  background-color: #f1f8ff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-}
+.edit-button:hover { background: #dcefff; transform: translateY(-1px); }
+.edit-button i { font-size: 14px; }
 
-.menu-item:last-child {
-  border-bottom: none;
-}
-
-.menu-icon {
-  width: 22px;
-  height: 22px;
-  margin-right: 15px;
-  color: #3498db;
+.profile-info-list {
   display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.menu-text {
-  flex: 1;
-  font-size: 0.95rem;
-  color: #34495e;
-  font-weight: 500;
-}
-
-.menu-arrow {
-  color: #bdc3c7;
-  font-size: 14px;
-}
-
-/* 移除 .button-section 样式，因为按钮已移动到 .user-card 中 */
-.loading {
-  text-align: center;
-  padding: 15px;
-  color: #3498db;
-  font-size: 1rem;
-}
-
-.error-message {
-  text-align: center;
-  padding: 10px;
-  background: #ffecec;
-  color: #e74c3c;
-  border-radius: 8px;
-  margin: 10px;
-  font-size: 0.9rem;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 400px;
-  width: 80%;
-  box-sizing: border-box;
-  text-align: center;
-}
-
-.modal-content h3 {
-  margin-top: 0;
-  color: #2c3e50;
-  margin-bottom: 20px;
-}
-
-.modal-item {
-  margin-bottom: 15px;
-  text-align: left;
-}
-
-.modal-item label {
-  display: block;
-  font-weight: 500;
-  color: #555;
-  margin-bottom: 5px;
-}
-
-.modal-content input,
-.modal-content textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 16px;
-  box-sizing: border-box;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
   margin-top: 20px;
 }
 
-.modal-buttons button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
+.info-row {
+  display: grid;
+  grid-template-columns: 34px 68px minmax(0, 1fr);
+  align-items: center;
+  min-height: 52px;
+  padding: 7px 12px;
+  box-sizing: border-box;
+  border-radius: 15px;
+  background: #f4f9fd;
 }
 
-.modal-buttons button:first-child {
-  background: #3498db;
-  color: white;
-  transition: background-color 0.3s;
-}
-
-.modal-buttons button:first-child:hover {
-  background: #2980b9;
-}
-
-.modal-buttons button:last-child {
-  background: #e0e0e0;
-  color: #333;
-  transition: background-color 0.3s;
-}
-
-.modal-buttons button:last-child:hover {
-  background: #c7c7c7;
-}
-
-.menu-item.message-item {
-  position: relative;
-}
-
-.rider-menu-section {
-  margin-top: 80px;
-}
-
-.rider-menu-section .menu-item {
-  min-height: 56px;
-}
-
-.notification-badge {
-  position: absolute;
-  top: 5px;
-  right: 35px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
-  background-color: #ff4d4f;
-  color: white;
-  border-radius: 9px;
-  font-size: 12px;
-  font-weight: bold;
-  display: flex;
+.info-row-icon {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  width: 28px;
+  height: 28px;
+  color: #208fe9;
+  font-size: 17px;
 }
 
-@media (max-width: 480px) {
-
-  .container,
-  .user-card,
-  .menu-section,
-  .card-button-section {
-    max-width: 100vw;
-  }
-
-  .container {
-    padding-bottom: calc(96px + env(safe-area-inset-bottom));
-  }
-
-  .top-background {
-    height: 68px;
-    border-radius: 0;
-  }
-
-  .user-card {
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 18px 14px;
-    margin: 14px 12px 0;
-    width: calc(100% - 24px);
-    border-radius: 14px;
-  }
-
-  .avatar {
-    width: 80px;
-    height: 80px;
-    margin-left: 0;
-  }
-
-  .user-details {
-    width: 100%;
-    padding: 10px;
-    gap: 6px;
-    margin-right: 0;
-  }
-
-  .menu-item {
-    padding: 14px 16px;
-  }
-
-  .card-button-section {
-    width: 100%;
-    padding: 0;
-    margin: 10px 0;
-  }
-
-  .menu-section {
-    width: calc(100% - 24px);
-  }
+.info-label {
+  color: #556981;
+  font-size: 15px;
+  font-weight: 600;
 }
 
-.avatar {
-  position: relative;
-  cursor: pointer;
-  transition: transform 0.3s ease;
+.info-value {
+  min-width: 0;
+  overflow: hidden;
+  color: #14213d;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.avatar:hover {
-  transform: scale(1.05);
-}
-
-.avatar-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
+.card-button-section {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.switch-btn,
+.logout-btn {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 18px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 17px;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
+}
+
+.switch-btn {
+  background: #159a78;
+  box-shadow: 0 9px 18px rgba(21, 154, 120, .2);
+}
+
+.logout-btn {
+  display: inline-flex;
   align-items: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  border-radius: 50%;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(100deg, #43b7fa 0%, #1589ed 100%);
+  box-shadow: 0 10px 20px rgba(24, 139, 231, .2);
 }
 
-.avatar:hover .avatar-overlay {
-  opacity: 1;
+.switch-btn:hover,
+.logout-btn:hover { transform: translateY(-2px); filter: saturate(1.08); }
+.logout-btn i { font-size: 20px; }
+
+.menu-section {
+  width: calc(100% - 32px);
+  max-width: 552px;
+  margin: 27px auto 0;
 }
 
-.avatar-overlay i {
-  font-size: 24px;
-  margin-bottom: 5px;
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 8px 13px;
 }
 
-.avatar-overlay span {
-  font-size: 12px;
+.section-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.section-title > span {
+  display: block;
+  width: 7px;
+  height: 28px;
+  flex: 0 0 auto;
+  border-radius: 5px;
+  background: #2399ef;
+}
+
+.section-title h2 {
+  margin: 0;
+  color: #14213d;
+  font-size: 23px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.section-heading p {
+  margin: 0 0 1px;
+  color: #9aaabd;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.menu-list {
+  overflow: hidden;
+  padding: 7px 18px;
+  border: 1px solid rgba(225, 237, 247, .92);
+  border-radius: 23px;
+  background: rgba(255, 255, 255, .97);
+  box-shadow: 0 13px 30px rgba(48, 104, 145, .08);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  min-height: 72px;
+  padding: 10px 0;
+  box-sizing: border-box;
+  border-bottom: 1px solid #edf2f6;
+  cursor: pointer;
+  transition: background .2s ease, padding .2s ease;
+}
+
+.menu-item:last-child { border-bottom: 0; }
+.menu-item:hover { padding-left: 4px; background: #fbfdff; }
+
+.menu-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  margin-right: 15px;
+  border-radius: 13px;
+  font-size: 20px;
+}
+
+.menu-icon-address { color: #297fe8; background: #edf4ff; }
+.menu-icon-favorite { color: #ed4e7a; background: #fff0f5; }
+.menu-icon-notification { color: #f3a42d; background: #fff7e9; }
+.menu-icon-wallet { color: #1dae7a; background: #ecfbf4; }
+.menu-icon-preferences { color: #7a67e8; background: #f2efff; }
+
+.menu-text {
+  min-width: 0;
+  flex: 1;
+  color: #172745;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.menu-arrow {
+  margin-left: 12px;
+  color: #aab6c4;
+  font-size: 17px;
+}
+
+.menu-item.message-item { position: relative; }
+
+.notification-badge {
+  min-width: 20px;
+  height: 20px;
+  margin-right: 9px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: #fa5870;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 3px 8px rgba(250, 88, 112, .2);
+}
+
+.rider-menu-section { margin-top: 27px; }
+.rider-menu-section .menu-icon { color: #198fda; background: #edf7ff; }
+
+.address-manager {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  transform: none;
+  border-bottom: 1px solid #edf2f6;
+}
+
+.menu-list > .address-manager {
+  padding: 12px 0 4px;
+  border-top: 1px solid #edf2f6;
+}
+
+.menu-list > .address-manager .section-title {
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+  color: #718399;
+  font-size: 13px;
+}
+
+.menu-list > .address-manager .menu-list {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.loading {
+  padding: 22px 15px;
+  color: #208fe9;
+  font-size: 14px;
+  text-align: center;
+}
+
+.error-message {
+  margin: 15px 16px;
+  padding: 12px 14px;
+  color: #d64a4a;
+  background: #fff0f0;
+  border-radius: 12px;
+  font-size: 13px;
   text-align: center;
 }
 
 .upload-loading {
   position: fixed;
-  top: 50%;
   left: 50%;
+  top: 50%;
+  z-index: 1100;
+  padding: 15px 18px;
+  color: #fff;
+  background: rgba(20, 42, 71, .86);
+  border-radius: 13px;
+  font-size: 14px;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 20px;
-  border-radius: 10px;
-  z-index: 1000;
+  box-sizing: border-box;
+  background: rgba(17, 43, 72, .42);
+  backdrop-filter: blur(5px);
 }
 
-/* 修改按钮的渐变色 */
-.switch-btn {
+.modal-content {
+  width: min(100%, 410px);
+  max-height: min(690px, calc(100vh - 40px));
+  overflow-y: auto;
+  padding: 23px 20px 20px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, .8);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(19, 67, 107, .24);
+}
+
+.modal-content h3 {
+  margin: 0 0 20px;
+  color: #14213d;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.modal-item { margin-bottom: 14px; }
+.modal-item label {
+  display: block;
+  margin: 0 0 7px;
+  color: #596d84;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.modal-content input,
+.modal-content textarea {
   width: 100%;
-  padding: 14px;
-  text-align: center;
-  background: #168bd1;
-  color: white;
-  font-weight: 600;
-  border-radius: 12px;
-  border: none;
-  font-size: 0.95rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 10px;
-}
-
-.switch-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-.rider-entry-btn {
-  background: #159a78;
-}
-
-.logout-btn {
-  width: 100%;
-  padding: 14px;
-  text-align: center;
-  background: #4f83b8;
-  color: white;
-  font-weight: 600;
-  border-radius: 12px;
-  border: none;
-  font-size: 0.95rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.logout-btn:hover {
-  background: #3d6f9f;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-}
-
-.logout-btn i {
-  margin-right: 8px;
-}
-
-.address-manager {
-  margin-top: -120px; /* 向上移动 */
-  transform: translateY(-20px); /* 进一步调整位置 */
-}
-
-/* 页面层级整理：固定顶部和底部导航不应遮挡内容。 */
-.menu-section { margin-top: 24px; }
-.rider-menu-section { margin-top: 24px; }
-.address-manager { margin-top: 16px; transform: none; }
-.menu-list > .address-manager {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  transform: none;
-  border-top: 1px solid #eef3f7;
-}
-.menu-list > .address-manager .section-title {
-  margin: 14px 16px 10px;
+  min-height: 44px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  border: 1px solid #dbe8f2;
+  border-radius: 11px;
+  outline: none;
+  color: #14213d;
+  background: #f8fbfe;
+  font: inherit;
   font-size: 15px;
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
-.menu-list > .address-manager .menu-list {
-  border-radius: 0;
-  box-shadow: none;
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+  border-color: #2b9bf0;
+  box-shadow: 0 0 0 3px rgba(43, 155, 240, .12);
+}
+
+.modal-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 21px;
+}
+
+.modal-buttons button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 11px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal-buttons button:first-child { color: #fff; background: #188fea; }
+.modal-buttons button:last-child { color: #53667b; background: #edf3f7; }
+
+@media (min-width: 601px) {
+  .container {
+    min-height: calc(100vh - 72px);
+    margin: 16px auto 0;
+    border-radius: 28px 28px 0 0;
+    box-shadow: 0 8px 32px rgba(42, 106, 150, .1);
+  }
+
+  .top-background { border-radius: 28px 28px 34px 34px; }
+}
+
+@media (max-width: 420px) {
+  .top-background { height: 250px; padding-left: 22px; padding-right: 22px; }
+  .top-background h1 { font-size: 34px; }
+  .hero-subtitle { font-size: 15px; }
+  .hero-art { right: -12px; bottom: 7px; transform: scale(.88); transform-origin: right bottom; }
+  .user-card { width: calc(100% - 24px); margin-top: -40px; padding: 19px 14px 16px; border-radius: 22px; }
+  .menu-section { width: calc(100% - 24px); }
+  .menu-list { padding-left: 15px; padding-right: 15px; border-radius: 21px; }
+  .section-heading { margin-left: 3px; margin-right: 3px; }
+  .section-title h2 { font-size: 21px; }
+  .section-heading p { font-size: 12px; }
+  .menu-item { min-height: 68px; }
+}
+
+@media (max-width: 360px) {
+  .profile-head { grid-template-columns: 76px minmax(0, 1fr) auto; gap: 10px; }
+  .avatar-wrap, .avatar { width: 76px; height: 76px; }
+  .user-name { font-size: 22px; }
+  .edit-button { min-width: 58px; padding: 0 9px; font-size: 13px; }
+  .info-row { grid-template-columns: 31px 60px minmax(0, 1fr); padding-left: 9px; padding-right: 9px; }
+  .info-label, .info-value { font-size: 13px; }
+  .menu-text { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar,
+  .avatar-camera,
+  .edit-button,
+  .switch-btn,
+  .logout-btn,
+  .menu-item { transition: none; }
 }
 </style>
