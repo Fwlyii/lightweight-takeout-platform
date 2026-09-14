@@ -125,7 +125,7 @@ export default {
 
     const logout = () => {
       clearAuth();
-      router.push({ path: '/index' });
+      router.replace({ path: '/login', query: { role: 'merchant' } });
     };
 
     const goToWorkbench = () => {

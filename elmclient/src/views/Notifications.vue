@@ -5,6 +5,7 @@
         <i class="fas fa-chevron-left"></i>
       </button>
       <h1 class="title">消息与通知</h1>
+      <RoleLogoutButton v-if="route.query.role === 'rider'" role="rider" />
       <div v-if="unreadCount > 0" class="unread-badge">{{ unreadCount }}</div>
     </div>
 
@@ -52,14 +53,16 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import request from '@/utils/request';
 import { toast } from '@/utils/toast';
 import { getStoredUser } from '@/utils/auth';
 import { createRealtimeConnection, REALTIME_STATE } from '@/services/realtimeService';
+import RoleLogoutButton from '@/components/RoleLogoutButton.vue';
 
 // 状态管理
 const messages = ref([]);
+const route = useRoute();
 const router = useRouter();
 const loading = ref(true);
 const historyError = ref('');

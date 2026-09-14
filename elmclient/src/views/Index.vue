@@ -503,10 +503,18 @@ export default {
                 if (search) {
                     if (scroll > width * 0.12) {
                         search.style.position = 'fixed';
-                        search.style.left = '0';
+                        search.style.left = '50%';
                         search.style.top = '0';
+                        search.style.width = '100%';
+                        search.style.maxWidth = '600px';
+                        search.style.transform = 'translateX(-50%)';
                     } else {
                         search.style.position = 'static';
+                        search.style.left = '';
+                        search.style.top = '';
+                        search.style.width = '';
+                        search.style.maxWidth = '';
+                        search.style.transform = '';
                     }
                 }
 
@@ -2075,7 +2083,7 @@ export default {
     pointer-events: none;
     background:
         linear-gradient(180deg, rgba(20, 142, 228, .08), rgba(243, 249, 253, .98) 94%),
-        url('../assets/home-reference.png') center var(--home-bg-shift) / 100% auto no-repeat;
+        url('../assets/home-reference.png') center calc(-132px + var(--home-bg-shift)) / 100% auto no-repeat;
     filter: saturate(.98) blur(.15px);
 }
 
@@ -2087,10 +2095,9 @@ export default {
     box-sizing: border-box;
     align-items: flex-start;
     justify-content: flex-start;
-    background:
-        linear-gradient(180deg, rgba(20, 145, 231, .08), rgba(20, 145, 231, .62)),
-        url('../assets/home-reference.png') center var(--home-bg-shift) / 100% auto no-repeat;
+    background: #2498e5;
     border: 0;
+    isolation: isolate;
 }
 
 /* The supplied artwork contains a phone status bar and decorative copy.
@@ -2189,6 +2196,26 @@ export default {
     box-sizing: border-box;
     background: #2498e5;
     backdrop-filter: none;
+}
+
+/* Keep location/filter dialogs centered inside the same phone-sized stage. */
+.home-page .location-modal,
+.home-page .filter-modal {
+    position: fixed;
+    left: 50%;
+    right: auto;
+    width: min(100vw, 600px);
+    max-width: 600px;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+}
+
+.home-page .modal-container,
+.home-page .filter-container {
+    width: calc(100% - 32px);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .home-page .search .search-fixed-top .search-box {

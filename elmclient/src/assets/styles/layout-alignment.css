@@ -35,7 +35,7 @@
   .content .offer-strip,
   .content .page-tabs {
     width: 100%;
-    max-width: 760px;
+    max-width: 600px;
     margin-left: auto;
     margin-right: auto;
     box-sizing: border-box;
@@ -49,6 +49,26 @@
     padding-left: 14px;
     padding-right: 14px;
   }
+
+  /* Customer-facing pages use the same centered phone shell on desktop. */
+  .content .business-detail-page,
+  .content .order-detail-page,
+  .content .business-list-page,
+  .content .assistant-page,
+  .content .assets-page,
+  .content .preferences-page {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .content .business-detail-page .page-content,
+  .content .business-detail-page .store-header,
+  .content .business-detail-page .store-hero,
+  .content .business-detail-page .offer-strip,
+  .content .business-detail-page .page-tabs {
+    max-width: 600px;
+  }
 }
 
 @media (max-width: 699px) {
@@ -58,5 +78,109 @@
 
   .content .ai-chat {
     right: 16px;
+  }
+}
+
+/*
+ * All routed screens share one phone-sized stage on desktop previews. The
+ * viewport itself remains responsive: once the viewport is narrower than the
+ * stage, the content simply occupies the available width.
+ */
+@media (min-width: 601px) {
+  .app-container > .content {
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+  }
+
+  .app-container > .content > * {
+    width: 100%;
+    max-width: 600px !important;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+  }
+
+  /* Fixed role navigation must use the same phone stage as routed content. */
+  .app-container > .role-footer,
+  .app-container > .bottom-nav {
+    width: 100%;
+    max-width: 600px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+  }
+
+  /* Legacy user pages use fixed full-width headers/bottom action bars. */
+  .app-container > .content > .wrapper > header,
+  .app-container > .content > .wrapper > .header,
+  .app-container > .content > .notifications-container > .header,
+  .app-container > .content > .favorites-page > .header {
+    width: 100%;
+    max-width: 600px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+  }
+
+  .app-container > .content > .wrapper > .order-bar,
+  .app-container > .content > .wrapper > .checkout-bar,
+  .app-container > .content > .wrapper > .payment-action {
+    width: 100%;
+    max-width: 600px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+  }
+
+  /* Shared fixed bars used by merchant/admin/rider screens. */
+  .app-container > .content > * .top-background,
+  .app-container > .content > * .merchant-selector,
+  .app-container > .content > * .status-tabs,
+  .app-container > .content > * .fixed-header,
+  .app-container > .content > * .merchant-tabs,
+  .app-container > .content > * .footer-nav,
+  .app-container > .content > * .footer-button-container {
+    width: 100%;
+    max-width: 600px !important;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+  }
+
+  .app-container > .content > * .bottom-bar {
+    right: calc((100vw - 600px) / 2 + 16px);
+  }
+
+  /* The rider application has a desktop split layout in its legacy styles;
+   * keep the actual page in the same single-column phone stage as every other
+   * routed screen. */
+  .app-container > .content > .apply-page:has(.hero) {
+    display: block;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-container > .content {
+    width: 100%;
+    max-width: none;
+  }
+
+  .app-container > .content > * {
+    max-width: none !important;
+  }
+
+  .app-container > .role-footer,
+  .app-container > .bottom-nav {
+    max-width: none;
+    left: 0;
+    right: 0;
+    transform: none;
   }
 }

@@ -1,27 +1,27 @@
 <template>
   <div class="assistant-page">
     <header class="ai-topbar">
-      <button class="topbar-icon" type="button" title="返回" @click="goBack"><i class="fa fa-arrow-left"></i></button>
-      <div class="topbar-title">
-        <h1>AI问答客服</h1>
-        <span v-if="activeTool !== 'chat'">{{ currentToolLabel }}</span>
+      <div class="device-status" aria-hidden="true">
+        <strong>9:41</strong>
+        <span class="device-signal"><i></i><i></i><i></i><i></i></span>
+        <i class="fa fa-wifi"></i>
+        <span class="device-battery"></span>
       </div>
-      <div class="topbar-actions">
-        <span class="service-status" :class="aiStatus.type"><i></i>{{ aiStatus.text }}</span>
-        <button class="topbar-icon" type="button" title="购物车" @click="router.push('/cart')"><i class="fa fa-shopping-cart"></i></button>
+      <div class="topbar-row">
+        <button class="topbar-icon" type="button" title="返回" @click="goBack"><i class="fa fa-arrow-left"></i></button>
+        <div class="topbar-title">
+          <h1>AI智能助手</h1>
+          <span v-if="activeTool !== 'chat'">{{ currentToolLabel }}</span>
+        </div>
+        <div class="topbar-actions">
+          <span class="service-status" :class="aiStatus.type"><i></i><span>AI在线</span></span>
+          <button class="topbar-icon cart-button" type="button" title="购物车" @click="router.push('/cart')"><i class="fa fa-shopping-cart"></i></button>
+        </div>
       </div>
     </header>
 
     <div class="page-content">
-      <nav v-if="activeTool === 'chat'" class="feature-bubbles" aria-label="AI功能入口">
-        <button v-for="tool in tools" :key="tool.key" type="button" @click="openTool(tool)">
-          <span class="feature-icon"><i :class="tool.icon"></i></span>
-          <span class="feature-copy"><b>{{ tool.label }}</b><small>{{ tool.description }}</small></span>
-          <i class="fa fa-chevron-right feature-arrow"></i>
-        </button>
-      </nav>
-
-      <nav v-else class="feature-switcher" aria-label="切换AI功能">
+      <nav v-if="activeTool !== 'chat'" class="feature-switcher" aria-label="切换AI功能">
         <button type="button" @click="router.push('/ai-chat')"><i class="fa fa-comments-o"></i><span>问答客服</span></button>
         <button v-for="tool in tools" :key="tool.key" type="button" :class="{ active: activeTool === tool.key }" @click="openTool(tool)">
           <i :class="tool.icon"></i><span>{{ tool.shortLabel }}</span>
@@ -96,8 +96,55 @@
       <main v-if="activeTool === 'chat'" class="chat-shell">
       <section ref="messagesContainer" class="message-list" aria-label="对话记录">
         <div v-if="messages.length === 0" class="empty-chat">
-          <i class="fa fa-commenting-o"></i><h2>文字助手</h2><p>可查询本人订单、平台规则和在售菜品</p>
-          <div class="quick-list"><button v-for="question in quickQuestions" :key="question" type="button" @click="askQuickQuestion(question)">{{ question }}</button></div>
+          <div class="ai-hero">
+            <div class="ai-hero-copy">
+              <h2>今天想吃什么？</h2>
+              <span class="hero-underline"></span>
+              <p>告诉我预算、口味和场景，我帮你从附近美食里挑</p>
+            </div>
+            <div class="ai-robot" aria-hidden="true">
+              <span class="robot-antenna"></span>
+              <span class="robot-head"><i class="robot-eye robot-eye-left"></i><i class="robot-eye robot-eye-right"></i><b></b></span>
+              <span class="robot-ear robot-ear-left"></span><span class="robot-ear robot-ear-right"></span>
+              <span class="robot-body"><i class="fa fa-cutlery"></i></span>
+              <span class="robot-ray ray-one"></span><span class="robot-ray ray-two"></span><span class="robot-ray ray-three"></span>
+            </div>
+          </div>
+          <div class="quick-grid" aria-label="快捷点餐需求">
+            <button v-for="action in quickActions" :key="action.label" type="button" :class="`quick-action quick-action-${action.tone}`" @click="runQuickAction(action)">
+              <span class="quick-action-icon"><i :class="action.icon"></i></span><strong>{{ action.label }}</strong>
+            </button>
+          </div>
+          <div class="assistant-welcome">
+            <div class="mini-robot"><i class="fa fa-robot"></i></div>
+            <p>Hi，我是你的美食助手！<br>我可以帮你推荐附近好吃的、查看菜品信息、对比价格，还能根据你的场景和口味做个性化推荐~</p>
+          </div>
+          <div class="sample-reply">
+            <span>20元以内推荐点什么？</span><i class="fa fa-user"></i>
+          </div>
+          <div class="recommendation-preview">
+            <div class="preview-message"><div class="mini-robot"><i class="fa fa-robot"></i></div><p>好的！我为你找到了一些高性价比美食，离你近、配送快、评价也很不错：</p></div>
+            <div class="landing-food-grid">
+              <article v-for="food in landingFoods" :key="food.foodId || food.foodName" class="landing-food-card">
+                <div class="landing-food-image">
+                  <img :src="food.foodImg" :alt="food.foodName" @error="handleLandingImageError">
+                  <span><i class="fa fa-map-marker"></i> {{ food.distance }}</span>
+                </div>
+                <div class="landing-food-info">
+                  <h3>{{ food.foodName }}</h3>
+                  <strong class="landing-food-price"><small>¥</small>{{ Number(food.price).toFixed(1) }}</strong>
+                  <div class="landing-food-meta"><span><i class="fa fa-star"></i> {{ food.rating }}</span><em>月售{{ food.sales }}+</em></div>
+                  <div class="landing-food-footer"><span>{{ food.businessName }}</span><button type="button" :aria-label="`加入${food.foodName}`" @click="addLandingFood(food)"><i class="fa fa-plus"></i></button></div>
+                </div>
+              </article>
+            </div>
+          </div>
+          <div class="filter-rail" aria-label="推荐筛选">
+            <button type="button" @click="runQuickAction({ mode: 'refresh', query: '推荐附近热门菜品' })"><i class="fa fa-refresh"></i>换一批</button>
+            <button type="button" @click="runQuickAction({ mode: 'chat', query: '请按评分从高到低推荐附近菜品' })"><i class="fa fa-star"></i>按评分排序</button>
+            <button type="button" @click="runQuickAction({ mode: 'chat', query: '只推荐品牌店铺' })"><i class="fa fa-shopping-bag"></i>只看品牌店</button>
+            <button type="button" @click="runQuickAction({ mode: 'recommend', query: '有优惠的菜品' })"><i class="fa fa-tag"></i>有优惠的</button>
+          </div>
         </div>
         <article v-for="(message, index) in messages" :key="index" class="message" :class="message.type">
           <div class="message-avatar"><i :class="message.type === 'user' ? 'fa fa-user' : 'fa fa-robot'"></i></div>
@@ -111,16 +158,27 @@
       </section>
 
       <footer class="chat-composer">
-        <textarea ref="messageInput" v-model="inputMessage" rows="1" maxlength="500" placeholder="输入问题，Enter 发送，Shift+Enter 换行" :disabled="isTyping" @keydown="handleKeyDown" @input="resizeComposer"></textarea>
+        <div class="composer-main">
+          <button class="composer-mic" type="button" title="语音点单" @click="router.push('/ai-chat/voice')"><i class="fa fa-microphone"></i></button>
+          <textarea ref="messageInput" v-model="inputMessage" rows="1" maxlength="500" placeholder="继续问问口味、预算或场景..." :disabled="isTyping" @keydown="handleKeyDown" @input="resizeComposer"></textarea>
+          <button class="send-button" type="button" :disabled="!inputMessage.trim() || isTyping" @click="sendMessage"><i class="fa fa-paper-plane"></i><span>发送</span></button>
+        </div>
         <div class="composer-actions">
           <span>{{ inputMessage.length }}/500</span>
           <button class="icon-button" type="button" title="历史记录" @click="openHistory"><i class="fa fa-history"></i></button>
+          <button class="icon-button image-shortcut" type="button" title="图片识别" @click="router.push('/ai-chat/image')"><i class="fa fa-image"></i></button>
           <button class="icon-button" type="button" title="清空当前对话" @click="clearChat"><i class="fa fa-trash"></i></button>
-          <button class="send-button" type="button" :disabled="!inputMessage.trim() || isTyping" @click="sendMessage"><i class="fa fa-paper-plane"></i><span>发送</span></button>
         </div>
       </footer>
       </main>
     </div>
+
+    <nav class="ai-bottom-nav" aria-label="底部导航">
+      <button type="button" @click="router.push('/index')"><i class="fa fa-home"></i><span>首页</span></button>
+      <button type="button" @click="router.push('/orderList')"><i class="fa fa-file-text-o"></i><span>订单</span></button>
+      <button class="active" type="button" @click="router.push('/ai-chat')"><i class="fa fa-robot"></i><span>AI助手</span></button>
+      <button type="button" @click="router.push('/myInformation')"><i class="fa fa-user"></i><span>我的</span></button>
+    </nav>
 
     <div v-if="showHistory" class="drawer-mask" @click.self="showHistory = false">
       <aside class="history-drawer">
@@ -171,6 +229,12 @@ const FoodCandidates = defineComponent({
       : [h('div', { class: 'candidate-empty' }, [h('i', { class: 'fa fa-search' }), h('span', props.emptyText)])])
   }
 })
+
+const defaultLandingFoods = [
+  { foodName: '番茄鸡蛋面', price: 16.8, rating: '4.8', sales: '2000', businessName: '张记·家常小馆', distance: '1.2km', foodImg: '/images/foods/35-tomato-eggs.jpg' },
+  { foodName: '黑椒鸡腿饭', price: 18.8, rating: '4.7', sales: '3000', businessName: '食光便当', distance: '800m', foodImg: '/images/foods/18-beef-rice.jpg' },
+  { foodName: '鸡胸肉沙拉', price: 17.9, rating: '4.6', sales: '1000', businessName: '轻食主义', distance: '1.5km', foodImg: '/images/foods/01-chicken-salad.jpg' }
+]
 
 export default defineComponent({
   name: 'AiChat',
@@ -223,6 +287,15 @@ export default defineComponent({
     const chatHistory = ref([])
     const loadingHistory = ref(false)
     const quickQuestions = ['推荐一些在售菜品', '查看我的最近订单', '配送一般需要多久', '会员有哪些权益']
+    const quickActions = [
+      { label: '20元内吃什么', tone: 'budget', icon: 'fa fa-jpy', mode: 'recommend', query: '20元以内推荐附近高性价比美食' },
+      { label: '附近评分高', tone: 'rating', icon: 'fa fa-thumbs-up', mode: 'chat', query: '请推荐附近评分高的美食' },
+      { label: '减脂轻食', tone: 'healthy', icon: 'fa fa-leaf', mode: 'recommend', query: '推荐减脂轻食' },
+      { label: '宿舍夜宵', tone: 'night', icon: 'fa fa-moon-o', mode: 'chat', query: '推荐适合宿舍夜宵的美食' },
+      { label: '帮我点奶茶', tone: 'drink', icon: 'fa fa-glass', mode: 'chat', query: '帮我推荐一杯附近好喝的奶茶' },
+      { label: '查看最近订单', tone: 'orders', icon: 'fa fa-file-text-o', mode: 'chat', query: '查看我的最近订单' }
+    ]
+    const landingFoods = ref(defaultLandingFoods.map(food => ({ ...food })))
     let mediaRecorder = null
     let mediaStream = null
     let recordingTimer = null
@@ -268,6 +341,64 @@ export default defineComponent({
       } finally {
         smartLoading.value = false
       }
+    }
+
+    const normalizeLandingFood = (food, index) => {
+      const fallback = defaultLandingFoods[index % defaultLandingFoods.length]
+      return {
+        ...food,
+        foodName: food.foodName || fallback.foodName,
+        price: Number(food.price ?? food.foodPrice ?? fallback.price),
+        rating: Number(food.rating ?? food.score ?? fallback.rating).toFixed(1),
+        sales: String(food.sales ?? food.monthlySales ?? food.salesCount ?? fallback.sales).replace('+', ''),
+        businessName: food.businessName || fallback.businessName,
+        distance: food.distance || food.distanceText || fallback.distance,
+        foodImg: food.foodImg || fallback.foodImg
+      }
+    }
+
+    const loadLandingFoods = async () => {
+      try {
+        const result = await request.post('/api/v1/recommendations', { query: '附近高性价比美食', budget: 25, usePreferences: true })
+        if (result.success && Array.isArray(result.data) && result.data.length) {
+          landingFoods.value = result.data.slice(0, 3).map(normalizeLandingFood)
+        }
+      } catch (_) {
+        // 首页展示保留本地菜品素材，推荐接口不可用时不影响 AI 页面打开。
+      }
+    }
+
+    const runQuickAction = async action => {
+      const query = action.query || action.label || '推荐一些附近美食'
+      if (action.mode === 'recommend') {
+        smartQuery.value = query
+        smartBudget.value = action.tone === 'budget' ? 20 : null
+        activeTool.value = 'recommend'
+        await router.push('/ai-chat/recommend')
+        await findSmartFoods()
+        return
+      }
+      if (action.mode === 'refresh') {
+        await runQuickAction({ mode: 'recommend', query: '推荐附近热门菜品' })
+        return
+      }
+      inputMessage.value = query
+      await sendMessage()
+    }
+
+    const addLandingFood = async food => {
+      if (food.foodId) {
+        await addFoodToCart(food)
+        return
+      }
+      await runQuickAction({ mode: 'chat', query: `我想了解${food.foodName}，请告诉我附近有没有类似的在售菜品` })
+    }
+
+    const handleLandingImageError = event => {
+      const image = event?.target
+      if (!image || image.dataset.fallbackApplied === 'true') return
+      image.dataset.fallbackApplied = 'true'
+      image.src = '/images/foods/04-noodles.jpg'
     }
 
     const addFoodToCart = async (food, quantity = 1) => {
@@ -467,7 +598,7 @@ export default defineComponent({
     const confidenceText = value => `${Math.round(Math.max(0, Math.min(1, Number(value) || 0)) * 100)}%`
 
     onMounted(async () => {
-      await Promise.all([loadCapabilities(), checkAiStatus()])
+      await Promise.all([loadCapabilities(), checkAiStatus(), loadLandingFoods()])
       messageInput.value?.focus()
     })
     onBeforeUnmount(() => {
@@ -480,7 +611,7 @@ export default defineComponent({
       router, route, tools, activeTool, currentToolLabel, openTool, goBack, capabilities, capabilitiesState, aiStatus, smartQuery, smartBudget, smartFoods, smartEmptyText, smartLoading,
       imageInput, imagePreview, imageResult, imageLoading, audioInput, voiceDraft, voiceLoading, isRecording,
       recordingSeconds, messages, inputMessage, isTyping, messagesContainer, messageInput, showHistory,
-      chatHistory, loadingHistory, quickQuestions, findSmartFoods, addFoodToCart, handleImageChange, searchKeyword,
+      chatHistory, loadingHistory, quickQuestions, quickActions, landingFoods, findSmartFoods, runQuickAction, addLandingFood, handleLandingImageError, addFoodToCart, handleImageChange, searchKeyword,
       toggleRecording, handleAudioFile, refreshVoiceCandidates, sendMessage, askQuickQuestion, handleKeyDown,
       resizeComposer, clearChat, openHistory, loadChatHistory, loadHistorySession, formatMessage, formatTime,
       truncateText, confidenceText, loadCapabilities
@@ -578,5 +709,194 @@ button:disabled { cursor: not-allowed; opacity: .55; }
   .tool-panel { margin: 0; }
   .tool-content { min-height: 0; padding: 15px; }
   .chat-shell { width: 100%; height: 560px; min-height: 0; margin: 0; padding-top: 0; }
+}
+</style>
+
+<style scoped>
+.assistant-page {
+  --ai-ink: #122d50;
+  --ai-muted: #6f849d;
+  --ai-blue: #168fe9;
+  width: min(100%, 600px);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding-bottom: calc(78px + env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  color: var(--ai-ink);
+  background: linear-gradient(180deg, #f5fbff 0%, #eef8fe 55%, #f9fcff 100%) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+.ai-topbar {
+  position: relative !important;
+  min-height: 109px !important;
+  padding: max(8px, env(safe-area-inset-top)) 18px 9px !important;
+  color: var(--ai-ink) !important;
+  background: linear-gradient(180deg, #e9f6ff 0%, #f3faff 100%) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.device-status {
+  height: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  color: #0d1e32;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.device-status strong { margin-right: auto; font-size: 16px; letter-spacing: 0; }
+.device-status > .fa-wifi { font-size: 15px; }
+.device-signal { display: inline-flex; align-items: end; gap: 2px; height: 15px; }
+.device-signal i { display: block; width: 3px; border-radius: 2px; background: #0d1e32; }
+.device-signal i:nth-child(1) { height: 5px; }
+.device-signal i:nth-child(2) { height: 8px; }
+.device-signal i:nth-child(3) { height: 11px; }
+.device-signal i:nth-child(4) { height: 14px; }
+.device-battery { position: relative; width: 29px; height: 13px; border: 2px solid #0d1e32; border-radius: 4px; }
+.device-battery::before { content: ""; position: absolute; inset: 2px; border-radius: 1px; background: #0d1e32; }
+.device-battery::after { content: ""; position: absolute; top: 3px; right: -5px; width: 3px; height: 6px; border-radius: 0 2px 2px 0; background: #0d1e32; }
+
+.topbar-row { display: flex; align-items: center; min-height: 48px; gap: 12px; }
+.topbar-icon { width: 36px !important; height: 36px !important; color: #1d5c91 !important; background: transparent !important; border: 0 !important; border-radius: 50% !important; font-size: 23px; }
+.topbar-icon:hover { background: rgba(22, 143, 233, .08) !important; }
+.topbar-title { text-align: center; }
+.topbar-title h1,
+.assistant-page .topbar-title h1 { min-height: 0 !important; margin: 0 !important; color: var(--ai-ink) !important; font-size: 22px !important; line-height: 1.2 !important; font-weight: 800 !important; letter-spacing: 0 !important; }
+.assistant-page .topbar-title h1::after { content: none !important; display: none !important; }
+.topbar-title span { color: #7890a8 !important; font-size: 11px !important; }
+.topbar-actions { margin-left: auto; gap: 4px !important; }
+.service-status { min-height: 34px !important; padding: 0 11px !important; gap: 7px !important; color: #246896 !important; background: rgba(255, 255, 255, .72) !important; border: 1px solid #d5eafb !important; border-radius: 999px !important; font-size: 12px !important; font-weight: 700; box-shadow: 0 3px 9px rgba(67, 139, 190, .06); }
+.service-status::after { content: none !important; }
+.service-status i { width: 8px !important; height: 8px !important; background: #17ba88 !important; box-shadow: 0 0 0 4px rgba(23, 186, 136, .12); }
+.cart-button { display: none !important; }
+
+.page-content { width: 100% !important; margin: 0 !important; padding: 0 16px 24px !important; }
+.page-content:has(.empty-chat) { display: block !important; min-height: 0 !important; }
+.chat-shell,
+.page-content:has(.empty-chat) .chat-shell { width: 100% !important; height: auto !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; }
+.message-list,
+.page-content:has(.empty-chat) .message-list { display: block !important; min-height: 0 !important; overflow: visible !important; padding: 0 !important; }
+.empty-chat,
+.page-content:has(.empty-chat) .empty-chat { width: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; display: block !important; color: var(--ai-muted) !important; text-align: left !important; }
+.assistant-page .page-content:has(.empty-chat) .empty-chat { display: block !important; align-content: initial !important; justify-items: initial !important; }
+.assistant-page .page-content:has(.empty-chat) .empty-chat .ai-hero h2 { margin: 0 !important; color: var(--ai-ink) !important; font-size: 36px !important; line-height: 1.2 !important; }
+.assistant-page .page-content:has(.empty-chat) .empty-chat .ai-hero h2::after { content: none !important; display: none !important; }
+.assistant-page .page-content:has(.empty-chat) .empty-chat .ai-hero p { margin: 0 !important; color: #6e819b !important; font-size: 15px !important; line-height: 1.6 !important; }
+.assistant-page .page-content:has(.empty-chat) .empty-chat .ai-hero p::after { content: none !important; display: none !important; }
+
+.ai-hero { position: relative; min-height: 238px; padding: 39px 5px 0; box-sizing: border-box; overflow: hidden; }
+.ai-hero-copy { position: relative; z-index: 2; max-width: 410px; }
+.ai-hero h2 { margin: 0; color: var(--ai-ink); font-size: 36px; line-height: 1.2; font-weight: 850; letter-spacing: 0; }
+.hero-underline { display: block; width: 198px; height: 8px; margin: 5px 0 13px 10px; border-top: 5px solid #1599f1; border-radius: 50%; transform: rotate(-2deg); }
+.ai-hero p { margin: 0; color: #6e819b; font-size: 15px; line-height: 1.6; font-weight: 500; }
+
+.ai-robot { position: absolute; right: 2px; bottom: 8px; width: 180px; height: 166px; z-index: 1; }
+.robot-antenna { position: absolute; left: 88px; top: 0; width: 4px; height: 32px; border-radius: 3px; background: #75c9fa; transform: rotate(13deg); }
+.robot-antenna::after { content: ""; position: absolute; top: -6px; left: -4px; width: 12px; height: 12px; border-radius: 50%; background: #51b8f3; box-shadow: 0 0 0 5px rgba(81, 184, 243, .13); }
+.robot-head { position: absolute; left: 27px; top: 28px; width: 127px; height: 91px; border: 9px solid #d9f4ff; border-radius: 47% 47% 43% 43%; background: linear-gradient(145deg, #fff 12%, #d5f3ff 100%); box-shadow: inset 0 -8px 11px rgba(40, 156, 224, .2), 0 12px 20px rgba(66, 159, 215, .18); }
+.robot-head::before { content: ""; position: absolute; left: 17px; top: 25px; width: 92px; height: 48px; border-radius: 24px; background: #092b52; box-shadow: inset 0 4px 10px rgba(40, 154, 222, .5); }
+.robot-eye { position: absolute; z-index: 2; top: 42px; width: 11px; height: 9px; border-top: 3px solid #72e7ff; border-radius: 50%; }
+.robot-eye-left { left: 40px; transform: rotate(8deg); }.robot-eye-right { right: 40px; transform: rotate(-8deg); }
+.robot-head b { position: absolute; z-index: 2; left: 52px; top: 53px; width: 22px; height: 9px; border-bottom: 3px solid #72e7ff; border-radius: 50%; }
+.robot-ear { position: absolute; z-index: 3; top: 57px; width: 23px; height: 53px; border-radius: 13px; background: linear-gradient(180deg, #1bb5fa, #65d8ff); box-shadow: 0 7px 11px rgba(40, 156, 224, .16); }
+.robot-ear-left { left: 8px; transform: rotate(5deg); }.robot-ear-right { right: 8px; transform: rotate(-5deg); }
+.robot-body { position: absolute; left: 61px; bottom: 0; width: 64px; height: 46px; display: grid; place-items: center; color: #fff; border-radius: 25px 25px 10px 10px; background: linear-gradient(180deg, #bdeeff, #45bff4); box-shadow: 0 8px 14px rgba(35, 147, 208, .16); }
+.robot-body i { width: 34px; height: 26px; display: grid; place-items: center; color: #ff9a10; border-radius: 50%; background: #fff7d5; font-size: 15px; }
+.robot-ray { position: absolute; width: 7px; height: 30px; border-radius: 6px; background: #ffd51a; transform-origin: bottom center; }
+.ray-one { left: 13px; top: 22px; transform: rotate(-38deg); }.ray-two { left: 42px; top: 7px; height: 25px; transform: rotate(-18deg); }.ray-three { left: 3px; top: 51px; height: 22px; transform: rotate(-67deg); }
+
+.quick-grid { position: relative; z-index: 3; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin: -2px 0 20px; padding: 13px 10px; border: 1px solid rgba(255, 255, 255, .84); border-radius: 25px; background: rgba(255, 255, 255, .9); box-shadow: 0 12px 28px rgba(61, 126, 170, .09); }
+.quick-action { min-width: 0; min-height: 67px; padding: 8px 5px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid rgba(220, 234, 244, .76); border-radius: 17px; color: #183657; background: #f8fcff; font-size: 14px; font-weight: 700; text-align: left; transition: transform .2s ease, box-shadow .2s ease; }
+.quick-action:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(62, 131, 178, .1); }
+.quick-action-icon { width: 33px; height: 33px; flex: 0 0 33px; display: grid; place-items: center; border-radius: 50%; font-size: 17px; }
+.quick-action-budget .quick-action-icon { color: #fff; background: #fdb21e; }.quick-action-rating .quick-action-icon { color: #fff; background: #f45f5d; }.quick-action-healthy .quick-action-icon { color: #fff; background: #2fc995; }.quick-action-night .quick-action-icon { color: #fff; background: #8b70eb; }.quick-action-drink .quick-action-icon { color: #fff; background: #8969e9; }.quick-action-orders .quick-action-icon { color: #fff; background: #28a4ee; }
+.quick-action-budget { background: #fffafb; }.quick-action-rating { background: #fffafa; }.quick-action-healthy { background: #f7fffb; }.quick-action-night, .quick-action-drink { background: #faf9ff; }.quick-action-orders { background: #f5fbff; }
+
+.assistant-welcome { display: flex; align-items: flex-start; gap: 10px; margin: 0 4px 16px; }
+.mini-robot { width: 54px; height: 54px; flex: 0 0 54px; display: grid; place-items: center; color: #159cf1; border: 5px solid #d5f2ff; border-radius: 50%; background: #fafdff; box-shadow: 0 4px 12px rgba(43, 155, 218, .12); }
+.mini-robot i { font-size: 25px; }
+.assistant-welcome p { margin: 0; padding: 15px 17px; color: #1d3b5e; background: rgba(255, 255, 255, .94); border-radius: 22px; box-shadow: 0 7px 18px rgba(57, 119, 161, .07); font-size: 15px; line-height: 1.55; }
+.sample-reply { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin: 0 3px 18px; }
+.sample-reply span { padding: 14px 19px; color: #fff; background: linear-gradient(135deg, #12a0fa, #188dea); border-radius: 21px 6px 21px 21px; box-shadow: 0 8px 18px rgba(17, 141, 228, .15); font-size: 15px; font-weight: 700; }
+.sample-reply i { width: 47px; height: 47px; display: grid; place-items: center; color: #fff; background: #f09aa9; border-radius: 50%; font-size: 21px; }
+.recommendation-preview { margin: 0 0 16px; }
+.preview-message { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 13px; }
+.preview-message .mini-robot { width: 48px; height: 48px; flex-basis: 48px; border-width: 4px; }.preview-message .mini-robot i { font-size: 21px; }
+.preview-message p { margin: 0; padding: 13px 16px; color: #1d3b5e; background: rgba(255, 255, 255, .94); border-radius: 21px; box-shadow: 0 7px 18px rgba(57, 119, 161, .06); font-size: 14px; line-height: 1.55; }
+
+.landing-food-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.landing-food-card { min-width: 0; overflow: hidden; border-radius: 18px; background: #fff; box-shadow: 0 7px 18px rgba(48, 102, 142, .1); }
+.landing-food-image { position: relative; height: 117px; overflow: hidden; }
+.landing-food-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.landing-food-image > span { position: absolute; left: 7px; bottom: 7px; padding: 3px 7px; color: #fff; background: rgba(53, 47, 40, .56); border-radius: 10px; font-size: 11px; }
+.landing-food-info { padding: 9px 9px 8px; }
+.landing-food-info h3 { overflow: hidden; margin: 0 0 4px; color: #17385d; font-size: 15px; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+.landing-food-price { display: block; color: #f03d39; font-size: 22px; line-height: 1.1; }.landing-food-price small { margin-right: 2px; font-size: 12px; }
+.landing-food-meta { display: flex; align-items: center; gap: 7px; margin-top: 4px; font-size: 12px; }.landing-food-meta span { color: #f39a16; }.landing-food-meta em { overflow: hidden; color: #9aaabd; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
+.landing-food-footer { display: flex; align-items: center; gap: 4px; margin-top: 6px; }.landing-food-footer span { min-width: 0; overflow: hidden; flex: 1; color: #90a2b2; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }.landing-food-footer button { width: 29px; height: 29px; flex: 0 0 29px; display: grid; place-items: center; color: #fff; background: #1497ef; border: 0; border-radius: 50%; font-size: 13px; cursor: pointer; }
+
+.filter-rail { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin: 0 0 18px; }
+.filter-rail button { min-height: 40px; padding: 0 5px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; color: #137bc7; background: rgba(255, 255, 255, .84); border: 1px solid #d9ecfa; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.filter-rail button:hover { background: #fff; border-color: #a9dafa; }
+
+.chat-composer { position: relative; z-index: 4; margin: 0 0 12px; padding: 8px !important; border: 1px solid #d7e9f4 !important; border-radius: 23px !important; background: rgba(255, 255, 255, .97) !important; box-shadow: 0 11px 28px rgba(53, 112, 151, .1) !important; }
+.composer-main { display: grid; grid-template-columns: 34px minmax(0, 1fr) 48px; align-items: center; min-height: 53px; gap: 5px; }
+.composer-mic { width: 32px; height: 32px; color: #174b7b; background: transparent; border: 0; font-size: 21px; cursor: pointer; }
+.chat-composer textarea { min-height: 45px !important; max-height: 105px !important; padding: 10px 5px !important; color: #1a3a5c !important; border: 0 !important; background: transparent !important; box-shadow: none !important; font-size: 15px !important; }
+.chat-composer textarea:focus { box-shadow: none !important; }
+.composer-main .send-button { width: 48px !important; min-width: 48px !important; height: 48px !important; padding: 0 !important; border-radius: 50% !important; font-size: 19px; }
+.composer-main .send-button span { display: none; }
+.composer-actions { min-height: 0 !important; padding: 0 !important; }
+.composer-actions > span, .composer-actions button[title="历史记录"], .composer-actions button[title="清空当前对话"] { display: none !important; }
+.composer-actions .image-shortcut { position: absolute; right: 62px; top: 17px; width: 34px !important; height: 34px !important; color: #1d5c91 !important; background: transparent !important; border: 0 !important; font-size: 20px; }
+
+.ai-bottom-nav { position: fixed; left: 50%; bottom: 0; z-index: 40; width: min(100%, 600px); min-height: 70px; padding: 7px 10px max(7px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(4, 1fr); box-sizing: border-box; transform: translateX(-50%); background: rgba(255, 255, 255, .96); border-top: 1px solid rgba(213, 229, 240, .76); box-shadow: 0 -7px 22px rgba(46, 105, 145, .08); backdrop-filter: blur(14px); }
+.ai-bottom-nav button { position: relative; min-width: 0; padding: 3px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #a5b3c0; background: transparent; border: 0; font-size: 12px; font-weight: 650; cursor: pointer; }
+.ai-bottom-nav button i { font-size: 23px; line-height: 1; }.ai-bottom-nav button.active { color: #168fe9; }.ai-bottom-nav button.active::after { content: ""; width: 21px; height: 4px; margin-top: 2px; border-radius: 4px; background: #168fe9; }
+
+.page-content:not(:has(.empty-chat)) .chat-shell { min-height: calc(100dvh - 220px) !important; height: calc(100dvh - 220px) !important; padding-bottom: 0 !important; border: 1px solid #d7e9f4 !important; border-radius: 22px !important; background: rgba(255, 255, 255, .9) !important; box-shadow: 0 12px 30px rgba(53, 112, 151, .08) !important; overflow: hidden !important; }
+.page-content:not(:has(.empty-chat)) .message-list { overflow-y: auto !important; padding: 16px !important; }
+.feature-switcher { margin: 0 0 12px !important; }
+
+@media (min-width: 741px) {
+  .assistant-page { margin: 16px auto 0; border-radius: 29px 29px 0 0; box-shadow: 0 9px 32px rgba(42, 106, 150, .1); }
+  .ai-topbar { border-radius: 29px 29px 0 0; }
+}
+
+@media (max-width: 430px) {
+  .ai-topbar { min-height: 103px !important; padding-left: 13px !important; padding-right: 13px !important; }
+  .page-content { padding-left: 12px !important; padding-right: 12px !important; }
+  .ai-hero { min-height: 223px; padding-top: 33px; }
+  .ai-hero h2 { font-size: 31px; }
+  .ai-hero p { max-width: 260px; font-size: 13px; }
+  .hero-underline { width: 167px; margin-bottom: 11px; }
+  .ai-robot { right: -12px; bottom: 2px; transform: scale(.86); transform-origin: right bottom; }
+  .quick-grid { gap: 7px; margin-bottom: 16px; padding: 10px 8px; border-radius: 21px; }
+  .quick-action { min-height: 61px; gap: 5px; border-radius: 14px; font-size: 12px; }
+  .quick-action-icon { width: 29px; height: 29px; flex-basis: 29px; font-size: 14px; }
+  .assistant-welcome p { padding: 12px 13px; font-size: 13px; }
+  .mini-robot { width: 47px; height: 47px; flex-basis: 47px; }.mini-robot i { font-size: 20px; }
+  .sample-reply span { padding: 12px 15px; font-size: 13px; }
+  .sample-reply i { width: 42px; height: 42px; font-size: 18px; }
+  .preview-message p { padding: 11px 13px; font-size: 12px; }
+  .landing-food-grid { gap: 6px; }
+  .landing-food-image { height: 94px; }
+  .landing-food-image > span { left: 4px; bottom: 4px; padding: 2px 5px; font-size: 9px; }
+  .landing-food-info { padding: 7px 6px 6px; }
+  .landing-food-info h3 { font-size: 12px; }.landing-food-price { font-size: 18px; }.landing-food-meta { gap: 3px; font-size: 10px; }.landing-food-footer span { font-size: 9px; }.landing-food-footer button { width: 25px; height: 25px; flex-basis: 25px; font-size: 11px; }
+  .filter-rail { gap: 4px; }.filter-rail button { min-height: 35px; font-size: 10px; }
+  .chat-composer { border-radius: 20px !important; }.composer-main { grid-template-columns: 29px minmax(0, 1fr) 44px; }.composer-main .send-button { width: 44px !important; min-width: 44px !important; height: 44px !important; }.composer-actions .image-shortcut { right: 56px; top: 15px; }
+}
+
+@media (max-width: 360px) {
+  .ai-hero h2 { font-size: 28px; }.ai-hero p { font-size: 12px; }.quick-action { font-size: 11px; }.quick-action-icon { width: 26px; height: 26px; flex-basis: 26px; }.landing-food-image { height: 82px; }.landing-food-meta em { display: none; }.filter-rail button { font-size: 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assistant-page *, .assistant-page *::before, .assistant-page *::after { animation: none !important; transition: none !important; }
 }
 </style>

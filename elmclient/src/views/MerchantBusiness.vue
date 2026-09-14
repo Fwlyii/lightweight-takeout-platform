@@ -2,6 +2,7 @@
   <div class="shop-management-page">
     <div class="top-background">
       <h1>经营工作台</h1>
+      <MerchantLogoutButton />
     </div>
 
     <div class="workbench-summary">
@@ -67,9 +68,11 @@ import { useRouter } from 'vue-router';
 import { toast } from '../utils/toast';
 import { clearAuth, getToken } from '../utils/auth';
 import { listMyBusinesses } from '../services/businessService';
+import MerchantLogoutButton from '../components/MerchantLogoutButton.vue';
 
 export default {
   name: 'MyApplication',
+  components: { MerchantLogoutButton },
   setup() {
     const router = useRouter();
     const shops = ref([]);

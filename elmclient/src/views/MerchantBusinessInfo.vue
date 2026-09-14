@@ -5,7 +5,7 @@
         <i class="fa fa-angle-left" @click="$router.back()"></i>
       </div>
       <p>商家信息</p>
-      <div></div>
+      <MerchantLogoutButton />
     </header>
 
     <div class="business-info-card">
@@ -81,9 +81,11 @@ import Swal from 'sweetalert2';
 import request from '../utils/request';
 import businessDefaultImg from '@/assets/business-default.png';
 import foodDefaultImg from '@/assets/food-default.png';
+import MerchantLogoutButton from '../components/MerchantLogoutButton.vue';
 
 export default {
   name: "BusinessInfo",
+  components: { MerchantLogoutButton },
   setup() {
     const route = useRoute();
     const businessId = ref();

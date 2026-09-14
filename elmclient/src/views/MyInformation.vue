@@ -377,7 +377,7 @@ export default {
     };
     const logout = () => {
       clearAuth();
-      router.push({ path: '/index' });
+      router.replace({ path: '/login', query: { role: riderMode.value ? 'rider' : 'user' } });
     };
     const backToRiderDashboard = () => {
       router.push({ path: '/rider/dashboard', query: { tab: 'available' } });

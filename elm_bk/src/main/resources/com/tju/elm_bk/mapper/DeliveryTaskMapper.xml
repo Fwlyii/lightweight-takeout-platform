@@ -10,7 +10,7 @@
         b.business_name, b.business_address,
         u.username AS customer_name,
         da.address AS delivery_address, da.contact_name, da.contact_tel,
-        rp.real_name AS rider_name
+        rp.real_name AS rider_name, rp.phone AS rider_phone
     </sql>
 
     <sql id="taskViewJoins">

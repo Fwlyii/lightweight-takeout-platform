@@ -3,6 +3,7 @@
     <div class="container">
       <div class="top-background">
         <h1>管理员管理平台</h1>
+        <RoleLogoutButton role="admin" />
       </div>
 
       <div class="user-card">
@@ -220,6 +221,7 @@ import { toast } from '../utils/toast';
 import { createRealtimeConnection } from '@/services/realtimeService';
 import { clearAuth, getStoredUser, updateStoredUser } from '@/utils/auth';
 import { DEFAULT_USER_AVATAR } from '@/utils/profileDefaults';
+import RoleLogoutButton from '@/components/RoleLogoutButton.vue';
 
 // 路由实例
 const router = useRouter();
@@ -1101,6 +1103,7 @@ const getShopTypeName = (typeId) => {
 .admin-container .top-background h1 { font-size: 20px; letter-spacing: 0; text-shadow: none; }
 .admin-container .logout-btn { background: #0097ff; box-shadow: none; border-radius: 7px; transform: none; }
 .admin-container .logout-btn:hover { background: #087dcc; box-shadow: none; }
+.admin-container .container > .logout-btn { display: none; }
 @media (max-width: 480px) {
   .admin-container .container { padding-top: 78px; }
   .admin-container .top-background { height: 64px; }

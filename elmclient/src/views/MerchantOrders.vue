@@ -3,6 +3,7 @@
     <!-- 顶部蓝色栏 -->
     <div class="top-background">
       <h1>商家订单管理</h1>
+      <MerchantLogoutButton />
     </div>
 
     <!-- 商铺选择栏 -->
@@ -145,9 +146,11 @@ import { toast } from '../utils/toast';
 import { createRealtimeConnection } from '../services/realtimeService';
 import { MERCHANT_ORDER_GROUPS, ORDER_STATUS, orderStatusClass, orderStatusText } from '../utils/orderPresentation';
 import { formatDateTime } from '../utils/formatters';
+import MerchantLogoutButton from '../components/MerchantLogoutButton.vue';
 
 export default {
   name: 'BusinessOrderManage',
+  components: { MerchantLogoutButton },
   setup() {
     const router = useRouter();
     const route = useRoute();

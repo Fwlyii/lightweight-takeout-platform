@@ -6,6 +6,7 @@
         <button class="user-side" @click="$router.push('/index')"><i class="fas fa-home"></i> 顾客端</button>
         <button class="avatar" @click="$router.push('/myInformation?role=rider')">{{ profile?.realName?.slice(0,1) || '骑' }}</button>
       </div>
+      <RoleLogoutButton role="rider" />
     </header>
 
     <section v-if="loading" class="loading-card"><span class="spinner"></span>正在同步配送网络…</section>
@@ -105,6 +106,7 @@ import request from '@/utils/request';
 import { toast } from '@/utils/toast';
 import { createRealtimeConnection } from '@/services/realtimeService';
 import { taskStatusText } from '@/utils/orderPresentation';
+import RoleLogoutButton from '@/components/RoleLogoutButton.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -182,7 +184,7 @@ onUnmounted(()=>{realtimeConnection?.stop();});
 
 /* 与用户首页一致的克制蓝白工作台。功能状态用颜色表达，视觉不再依赖渐变和发光。 */
 .rider-page{background:#f6f9fd;color:#253b55;padding-bottom:78px}
-.topbar{height:64px;padding:0 max(20px,calc((100% - 1120px)/2));background:#fff;color:#173b62;border-bottom:1px solid #e5eef8;box-shadow:0 1px 6px rgba(40,92,145,.05)}
+.topbar{position:relative;height:64px;padding:0 max(20px,calc((100% - 1120px)/2));background:#fff;color:#173b62;border-bottom:1px solid #e5eef8;box-shadow:0 1px 6px rgba(40,92,145,.05)}
 .brand{gap:10px}.brand .logo{width:34px;height:34px;border-radius:8px;background:#e7f4ff;color:#0097ff}.brand b{font-size:16px;font-weight:700}.brand small{color:#7890aa;font-size:10px;letter-spacing:.5px;margin-top:2px}
 .top-actions{gap:10px}.user-side{border:1px solid #d5e7f8;background:#fff;color:#287bc0;border-radius:6px;padding:8px 12px}.avatar{width:34px;height:34px;background:#e8f4ff;color:#1778c1;border-radius:50%}
 .hero-card,.stat-grid,.workspace,.loading-card{width:min(calc(100% - 32px),1120px)}

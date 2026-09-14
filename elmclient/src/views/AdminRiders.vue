@@ -3,6 +3,7 @@
     <header class="page-head">
       <div><p>平台管理</p><h1>骑手与配送调度</h1><span>审核骑手资质，处理配送异常</span></div>
       <button @click="loadAll"><i class="fas fa-sync-alt" :class="{spin:loading}"></i> 刷新数据</button>
+      <RoleLogoutButton role="admin" />
     </header>
     <section class="kpis">
       <article><i class="fas fa-user-clock amber"></i><div><small>待审核申请</small><b>{{ pendingApplications.length }}</b></div></article>
@@ -40,7 +41,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';import request from '@/utils/request';import { toast } from '@/utils/toast';
+import { computed, onMounted, ref } from 'vue';import request from '@/utils/request';import { toast } from '@/utils/toast';import RoleLogoutButton from '@/components/RoleLogoutButton.vue';
 const applications=ref([]),exceptions=ref([]),loading=ref(false),tab=ref('applications'),applicationFilter=ref('all'),exceptionFilter=ref('all'),modal=ref(null);
 const pendingApplications=computed(()=>applications.value.filter(x=>x.auditStatus===0));const approvedCount=computed(()=>applications.value.filter(x=>x.auditStatus===1).length);const openExceptions=computed(()=>exceptions.value.filter(x=>x.status===0));const resolvedCount=computed(()=>exceptions.value.filter(x=>x.status===1).length);
 const filteredApplications=computed(()=>applicationFilter.value==='all'?applications.value:applications.value.filter(x=>x.auditStatus===Number(applicationFilter.value)));const filteredExceptions=computed(()=>exceptionFilter.value==='all'?exceptions.value:exceptions.value.filter(x=>x.status===Number(exceptionFilter.value)));
@@ -57,7 +58,7 @@ const vehicleName=v=>({E_BIKE:'电动车',BIKE:'自行车',WALK:'步行'}[v]||v)
 
 /* 调度端与其余工作台使用同一套蓝白视觉 */
 .admin-page { background: #f5f9fd; color: #24405c; }
-.page-head { padding: 24px 28px; border-radius: 10px; color: #173b60; background: #eaf5ff; border: 1px solid #d5e9f8; }
+.page-head { position: relative; padding: 24px 28px; border-radius: 10px; color: #173b60; background: #eaf5ff; border: 1px solid #d5e9f8; }
 .page-head p { color: #4b86ae; letter-spacing: 1px; }
 .page-head h1 { color: #173b60; }
 .page-head span { color: #637f97; }

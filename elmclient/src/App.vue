@@ -58,7 +58,6 @@ export default {
   },
   setup() {
     const route = useRoute();
-
     watch(() => route.fullPath, () => {
       nextTick(() => {
         document.querySelector('.content')?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -110,7 +109,6 @@ export default {
 
     const showRiderFooter = computed(() => isRiderContext.value);
     const showAdminFooter = computed(() => route.path.startsWith('/admin'));
-
     const routeWipeStyle = computed(() => ({
       '--route-wipe-x': `${routeMotion.x}px`,
       '--route-wipe-y': `${routeMotion.y}px`

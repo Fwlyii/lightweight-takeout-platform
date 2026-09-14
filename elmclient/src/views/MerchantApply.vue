@@ -1,6 +1,6 @@
 <template>
   <main class="apply-page">
-    <header><button type="button" aria-label="返回" @click="router.back()">‹</button><h1>申请成为商家</h1></header>
+    <header><button type="button" aria-label="返回" @click="router.back()">‹</button><h1>申请成为商家</h1><MerchantLogoutButton /></header>
     <section class="apply-card">
       <div class="store-icon"><i class="fas fa-store"></i></div>
       <h2>开启你的店铺</h2>
@@ -24,6 +24,7 @@ import { useRouter } from 'vue-router';
 import request from '../utils/request';
 import { toast } from '../utils/toast';
 import { isAuthenticated } from '../utils/auth';
+import MerchantLogoutButton from '../components/MerchantLogoutButton.vue';
 
 const router = useRouter();
 const submitting = ref(false);

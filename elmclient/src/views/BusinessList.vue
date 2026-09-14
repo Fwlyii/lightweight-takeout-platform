@@ -619,7 +619,7 @@ export default {
 }
 
 @media (min-width: 700px) {
-	.business-list-page { max-width: 760px; }
+	.business-list-page { max-width: 600px; }
 	.business-list-page .business-list { padding-left: 18px; padding-right: 18px; }
 }
 

@@ -1,5 +1,5 @@
 <template>
-	<div class="wrapper">
+	<div class="wrapper order-detail-page">
 		<!-- 固定顶部栏 -->
 		<div class="fixed-top">
 			<div class="header">
@@ -294,15 +294,15 @@ export default {
 </script>
 
 <style scoped>
-.wrapper{width:100%;max-width:720px;margin:0 auto;min-height:100vh;background:#f5f7fa;color:#2d4354}
-.fixed-top{position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(100%,720px);height:56px;z-index:1000;background:#0097ff}
+.wrapper{width:100%;max-width:600px;margin:0 auto;min-height:100vh;background:#f5f7fa;color:#2d4354}
+.fixed-top{position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(100%,600px);height:56px;z-index:1000;background:#0097ff}
 .header{width:100%;height:56px;background:#0097ff;color:#fff;font-size:18px;font-weight:600;position:relative;display:flex;justify-content:center;align-items:center}
 .header-back{position:absolute;left:12px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#fff;font-size:32px;line-height:1;padding:4px 8px;cursor:pointer}
 .content-area{padding:70px 0 28px}.loading,.error{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:80px 20px;font-size:15px;color:#667b8b}.error button{margin-top:16px;padding:9px 22px;background:#409eff;color:#fff;border:0;border-radius:6px;cursor:pointer}
 .order-status{display:flex;align-items:center;padding:22px 18px;background:#fff;margin:0 16px 10px;border:1px solid #e5edf3;border-radius:10px}.status-icon{width:62px;height:62px;border-radius:50%;display:flex;justify-content:center;align-items:center;margin-right:16px;font-size:30px;flex:0 0 62px}.status-unpaid{background:#fff0f0;color:#ff4d4f}.status-pending{background:#e6f7ff;color:#1890ff}.status-accepted{background:#f6ffed;color:#52c41a}.status-done,.status-canceled{background:#f9f9f9;color:#999}.status-unknown{background:#f9f9f9;color:#666}.status-info h3{font-size:19px;color:#333;margin-bottom:5px;font-weight:700}.status-info p{font-size:13px;color:#667b8b;margin:3px 0}
 .info-section{background:#fff;margin:0 16px 10px;padding:16px 18px;border:1px solid #e5edf3;border-radius:10px}.section-title{font-size:17px;color:#333;margin-bottom:12px;font-weight:700;border-bottom:1px solid #edf1f4;padding-bottom:9px}.info-content p{font-size:14px;color:#333;margin:9px 0;display:flex;line-height:1.55}.info-content span{color:#6c7d8a;margin-right:10px;min-width:88px}.pickup-detail{display:flex;align-items:center;gap:10px;padding:12px 14px;color:#168bd1;background:#f5fbff;border:1px solid #d9ecf8;border-radius:10px}.pickup-detail i{font-size:20px}
 .items-list,.price-details{border-top:1px solid #edf1f4}.item-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #edf1f4}.item-info{flex:1;min-width:0}.item-name,.item-price{font-size:14px;color:#333}.item-price{font-weight:500;white-space:nowrap}.item-quantity{font-size:13px;color:#666;margin-left:8px}.price-details{padding-top:12px}.price-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:14px;color:#333}.price-row.total{border-top:1px solid #edf1f4;margin-top:8px;padding-top:12px;font-weight:700;font-size:17px;color:#ff6b00}
-.action-buttons{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,720px);box-sizing:border-box;background:#fff;padding:12px 16px;display:flex;justify-content:flex-end;gap:12px;border-top:1px solid #edf1f4}.btn{padding:9px 22px;border-radius:6px;font-size:14px;cursor:pointer;border:0}.cancel-btn{background:#fff;color:#666;border:1px solid #ddd}.pay-btn{background:#409eff;color:#fff}
+.action-buttons{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,600px);box-sizing:border-box;background:#fff;padding:12px 16px;display:flex;justify-content:flex-end;gap:12px;border-top:1px solid #edf1f4}.btn{padding:9px 22px;border-radius:6px;font-size:14px;cursor:pointer;border:0}.cancel-btn{background:#fff;color:#666;border:1px solid #ddd}.pay-btn{background:#409eff;color:#fff}
 @media(max-width:480px){.order-status{padding:17px 14px}.status-icon{width:52px;height:52px;flex-basis:52px;font-size:25px}.info-section{padding:14px}.info-content p{font-size:13px}.info-content span{min-width:76px}.item-row{align-items:flex-start}.item-name,.item-price{font-size:13px}}
 </style>
 

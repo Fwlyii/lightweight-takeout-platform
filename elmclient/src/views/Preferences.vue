@@ -156,7 +156,7 @@ onMounted(loadPreference);
 .page-header{height:56px;background:#168bd1;color:#fff;display:flex;align-items:center;padding:0 16px 0 64px;gap:12px;position:sticky;top:0;z-index:2;box-shadow:0 2px 8px rgba(25,104,156,.12)}
 .back-button{border:0;background:none;color:#fff;font-size:30px;line-height:1;padding:0 4px;cursor:pointer}
 .page-header h1{font-size:18px;margin:0;font-weight:600}
-.preferences-content{max-width:640px;margin:auto;padding:18px 16px 104px}
+.preferences-content{width:100%;max-width:600px;margin:auto;padding:18px 16px 104px;box-sizing:border-box}
 .settings-card{background:#fff;border:1px solid #e0ebf4;border-radius:12px;padding:18px 20px;margin-bottom:12px;box-shadow:0 3px 12px rgba(45,95,130,.06)}
 .card-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
 .card-heading h2{font-size:16px;margin:0 0 5px;color:#29445d}

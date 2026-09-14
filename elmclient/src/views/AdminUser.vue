@@ -3,6 +3,7 @@
     <div class="container">
       <div class="top-background">
         <h1>用户管理</h1>
+        <RoleLogoutButton role="admin" />
       </div>
 
       <div class="search-section">
@@ -109,6 +110,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import request from '../utils/request';
 import { toast } from '../utils/toast';
+import RoleLogoutButton from '../components/RoleLogoutButton.vue';
 
 // 路由实例
 const router = useRouter();

@@ -3,6 +3,7 @@
     <BackButton />
     <div class="header">
             <p>商铺管理 - {{ businessName || '商家' }}</p>
+            <RoleLogoutButton role="admin" />
         </div>
 	  <div class="content">
 		<ul class="store-list">
@@ -131,10 +132,11 @@ import { useRoute } from 'vue-router';
 import request from '@/utils/request';
 import { toast } from '@/utils/toast';
 import BackButton from '../components/BackButton.vue';
+import RoleLogoutButton from '../components/RoleLogoutButton.vue';
 
 export default {
   name: 'ManageShop',
-  components: { BackButton },
+  components: { BackButton, RoleLogoutButton },
   setup() {
     const route = useRoute();
     const ownerId = ref(null);

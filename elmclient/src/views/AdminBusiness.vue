@@ -2,6 +2,7 @@
 	<div class="wrapper">
 		<div class="top-background">
 			<h1>商铺管理</h1>
+			<RoleLogoutButton role="admin" />
 		</div>
 		<div class="content">
 			<ul class="business-list">
@@ -27,8 +28,10 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import request from '../utils/request';
 import { DEFAULT_USER_AVATAR } from '../utils/profileDefaults';
+import RoleLogoutButton from '../components/RoleLogoutButton.vue';
 export default {
     name: 'ManageBusiness',
+    components: { RoleLogoutButton },
     setup() {
         const businessList = ref([]);
         const defaultImg = DEFAULT_USER_AVATAR;

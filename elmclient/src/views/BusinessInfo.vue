@@ -1154,10 +1154,12 @@ export default {
 .wrapper .cart .cart-right .cart-right-item.ready { background: #168bd1; cursor: pointer; }
 .wrapper .cart .cart-right .cart-right-item:disabled { opacity: 1; }
 @media (min-width: 700px) {
-    .store-header { padding-left: calc((100% - 760px) / 2 + 14px); padding-right: calc((100% - 760px) / 2 + 14px); }
+    .business-detail-page { max-width: 600px; margin-left: auto; margin-right: auto; }
+    .store-header, .store-hero, .offer-strip, .page-tabs, .page-content { width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
+    .store-header { padding-left: 14px; padding-right: 14px; }
     .page-content { padding-bottom: 30px; }
     .wrapper { padding-bottom: 0; }
-    .wrapper .cart { left: 50%; width: 760px; transform: translateX(-50%); border-radius: 8px 8px 0 0; }
+    .wrapper .cart { left: 50%; width: 600px; max-width: 100%; transform: translateX(-50%); border-radius: 8px 8px 0 0; }
 }
 @media (max-width: 520px) {
     .page-content { padding-left: 0; padding-right: 0; }

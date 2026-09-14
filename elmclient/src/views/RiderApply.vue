@@ -2,6 +2,7 @@
   <main class="apply-page">
     <section class="hero">
       <button class="back" @click="$router.push('/index')">← 返回首页</button>
+      <RoleLogoutButton role="rider" />
       <div class="hero-icon"><i class="fas fa-motorcycle"></i></div>
       <p class="eyebrow">ELEM 即时配送网络</p>
       <h1>把每一份热乎，准时送达</h1>
@@ -79,6 +80,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import request from '@/utils/request';
 import { toast } from '@/utils/toast';
+import RoleLogoutButton from '@/components/RoleLogoutButton.vue';
 
 const router = useRouter();
 const loading = ref(true);
