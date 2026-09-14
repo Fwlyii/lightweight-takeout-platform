@@ -3,7 +3,7 @@
 		<!-- 固定顶部栏 -->
 		<div class="fixed-top">
 			<div class="header">
-				<button type="button" class="header-back" aria-label="返回" @click="router.back()">‹</button>
+				<button type="button" class="header-back" aria-label="返回" @click="navigateBack($router, $route)">‹</button>
 				<p>订单详情</p>
 			</div>
 		</div>
@@ -106,6 +106,7 @@
 </template>
 
 <script>
+import { navigateBack } from '../utils/backNavigation';
 import { ref, onMounted, computed, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import request from '../utils/request';
@@ -271,6 +272,7 @@ export default {
 		});
 
 		return {
+			navigateBack,
 			orderId,
 			orderDetail,
 			loading,

@@ -2,7 +2,7 @@
   <div class="wrapper">
     <header>
       <div class="header-icon">
-        <i class="fa fa-angle-left" @click="$router.back()"></i>
+        <i class="fa fa-angle-left" @click="navigateBack($router, $route)"></i>
       </div>
       <p>商家信息</p>
       <div></div>
@@ -75,6 +75,7 @@
 </template>
 
 <script>
+import { navigateBack } from '../utils/backNavigation';
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import Swal from 'sweetalert2';
@@ -916,6 +917,7 @@ export default {
     };
 
     return {
+      navigateBack,
       business,
       favoriteCount,
       foodArr,

@@ -117,6 +117,7 @@
 <script>
 import { ref, onMounted, computed, watch, onErrorCaptured } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { navigateBack } from '../utils/backNavigation';
 import request from "@/utils/request";
 import { toast } from '@/utils/toast';
 import { formatDate, formatMoney } from '@/utils/formatters';
@@ -202,7 +203,7 @@ export default {
             activeTab.value = 'order';
             window.setTimeout(() => document.querySelector('.menu-layout')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
         };
-        const goBack = () => router.back();
+        const goBack = () => navigateBack(router, route);
         const handleImageError = (event) => {
             // 远程图片失效时使用本地占位图，避免详情页出现破图图标和拥挤的替代文字。
             if (event.target.dataset.fallbackApplied) return;

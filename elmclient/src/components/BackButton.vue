@@ -5,13 +5,15 @@
 </template>
 
 <script>
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { navigateBack } from '../utils/backNavigation';
 
 export default {
   name: 'BackButton',
   setup() {
     const router = useRouter();
-    const goBack = () => router.back();
+    const route = useRoute();
+    const goBack = () => navigateBack(router, route);
     return { goBack };
   }
 };

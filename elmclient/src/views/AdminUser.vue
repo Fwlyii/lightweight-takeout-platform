@@ -87,12 +87,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { navigateBack } from '../utils/backNavigation';
 import request from '../utils/request';
 import { toast } from '../utils/toast';
 
 // 路由实例
 const router = useRouter();
+const route = useRoute();
 
 // 状态定义（完全对应原data）
 const searchKeyword = ref('');
@@ -213,7 +215,7 @@ const formatDate = (dateStr) => {
 };
 
 const goBack = () => {
-    router.back();
+    return navigateBack(router, route);
 };
 
 const setFilter = (filter) => {

@@ -9,7 +9,7 @@
 		<div class="empty-cart" v-if="cartItems.length === 0">
 			<img src="../assets/empty-cart.png" alt="购物车为空">
 			<p>您的购物车空空如也</p>
-			<button @click="goBack">返回商家</button>
+			<button @click="goBack">继续选购</button>
 		</div>
 
 		<!-- 购物车列表部分 -->
@@ -66,6 +66,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { toast } from '../utils/toast';
 import { cartQuantityLimitMessage, maxCartQuantity } from '../utils/cartQuantityRules';
 import { listCartItems, removeCartItem, setCartItemQuantity } from '../services/cartService';
+import { returnToMerchant } from '../utils/backNavigation';
 
 export default {
 	name: 'Cart',
@@ -182,7 +183,7 @@ export default {
 
 		// 返回商家页面
 		const goBack = () => {
-			router.go(-1);
+			return returnToMerchant(router, route);
 		};
 
 		const handleImageError = (event) => {

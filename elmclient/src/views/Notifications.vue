@@ -1,7 +1,7 @@
 <template>
   <div class="notifications-container">
     <div class="header">
-      <button class="header-back" type="button" aria-label="返回" @click="router.back()">
+      <button class="header-back" type="button" aria-label="返回" @click="navigateBack($router, $route)">
         <i class="fa fa-chevron-left" aria-hidden="true"></i>
       </button>
       <h1 class="title">消息与通知</h1>
@@ -51,6 +51,7 @@
 </template>
 
 <script setup>
+import { navigateBack } from '../utils/backNavigation';
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import request from '@/utils/request';

@@ -22,7 +22,7 @@
       </nav>
 
       <nav v-else class="feature-switcher" aria-label="切换AI功能">
-        <button type="button" @click="router.push('/ai-chat')"><i class="fa fa-comments-o"></i><span>问答客服</span></button>
+        <button type="button" @click="router.replace('/ai-chat')"><i class="fa fa-comments-o"></i><span>问答客服</span></button>
         <button v-for="tool in tools" :key="tool.key" type="button" :class="{ active: activeTool === tool.key }" @click="openTool(tool)">
           <i :class="tool.icon"></i><span>{{ tool.shortLabel }}</span>
         </button>
@@ -144,6 +144,7 @@ import aiChatService from '../services/aiChatService'
 import { addCartItem } from '../services/cartService'
 import request from '../utils/request'
 import { formatSafeMessage } from '../utils/safeMessage'
+import { navigateAssistantBack } from '../utils/backNavigation'
 
 const FoodCandidates = defineComponent({
   name: 'FoodCandidates',
@@ -187,12 +188,9 @@ export default defineComponent({
     const currentToolLabel = computed(() => tools.find(tool => tool.key === activeTool.value)?.label || '在线问答')
     const openTool = tool => {
       activeTool.value = tool.key
-      router.push(tool.path)
+      router.replace(tool.path)
     }
-    const goBack = () => {
-      if (activeTool.value !== 'chat') router.push('/ai-chat')
-      else router.back()
-    }
+    const goBack = () => navigateAssistantBack(router, route)
     watch(() => route.meta.aiTool, value => {
       activeTool.value = typeof value === 'string' ? value : 'chat'
     }, { immediate: true })
@@ -314,7 +312,7 @@ export default defineComponent({
     const searchKeyword = keyword => {
       smartQuery.value = keyword
       activeTool.value = 'recommend'
-      router.push('/ai-chat/recommend')
+      router.replace('/ai-chat/recommend')
       findSmartFoods()
     }
 
