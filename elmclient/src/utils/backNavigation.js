@@ -1,4 +1,14 @@
 const isAssistant = path => path === '/ai-chat' || path.startsWith('/ai-chat/');
+const PORTAL_HOME = Object.freeze({ admin: '/admin/home', merchant: '/merchant/business', rider: '/rider/dashboard' });
+const CUSTOMER_PARENT = Object.freeze({
+  '/listDetail': '/orderList',
+  '/assets': '/myInformation',
+  '/notifications': '/myInformation',
+  '/preferences': '/myInformation',
+  '/addUserAddress': '/userAddress',
+  '/editUserAddress': '/userAddress'
+});
+const NON_RETURNABLE = new Set(['/login', '/register', '/payment', '/successfulPayment']);
 const portal = route => route.path.startsWith('/admin') ? 'admin'
   : route.path.startsWith('/merchant') ? 'merchant'
     : route.path.startsWith('/rider') || (['/myInformation', '/notifications'].includes(route.path) && route.query.role === 'rider')
@@ -6,16 +16,7 @@ const portal = route => route.path.startsWith('/admin') ? 'admin'
 
 function fallbackFor(route) {
   if (route.path === '/merchant/apply') return '/index';
-  if (route.path.startsWith('/admin')) return '/admin/home';
-  if (route.path.startsWith('/merchant')) return '/merchant/business';
-  if (portal(route) === 'rider') return '/rider/dashboard';
-  if (route.path === '/listDetail') return '/orderList';
-  if (route.path === '/assets') return '/myInformation';
-  if (route.path === '/notifications') return '/myInformation';
-  if (route.path === '/preferences') return '/myInformation';
-  if (route.path === '/addUserAddress') return '/userAddress';
-  if (route.path === '/editUserAddress') return '/userAddress';
-  return '/index';
+  return PORTAL_HOME[portal(route)] || CUSTOMER_PARENT[route.path] || '/index';
 }
 
 function usablePrevious(router, route, previous, excludeAssistant) {
@@ -25,7 +26,7 @@ function usablePrevious(router, route, previous, excludeAssistant) {
     const target = router.resolve(previous);
     if (!target.matched.length || target.matched.some(record => record.redirect)
       || target.fullPath === route.fullPath
-      || ['/login', '/register', '/payment', '/successfulPayment'].includes(target.path)
+      || NON_RETURNABLE.has(target.path)
       || (excludeAssistant && isAssistant(target.path))) return false;
     const role = target.meta.role || (target.query.role === 'rider' ? 'rider' : null);
     return !role || role === portal(route);
