@@ -70,13 +70,57 @@
     gap: 4px;
     flex: 1;
     height: 100%;
+    transition: color 180ms ease;
   }
 
   .nav-item i {
     font-size: 1.2rem;
+    transform-origin: center;
+    transition: color 180ms ease;
+  }
+
+  .nav-item span {
+    opacity: .78;
+    transform: translateY(2px);
+    transition: opacity 180ms ease, transform 180ms ease;
   }
 
   .nav-item.active {
-    color: var(--skin-brand, #0097ff);
+    color: var(--admin-nav-active, #2196F3);
+  }
+
+  .nav-item.active i {
+    animation: admin-nav-icon-pop 320ms cubic-bezier(.22, .61, .36, 1) both;
+  }
+
+  .nav-item.active span {
+    opacity: 1;
+    transform: translateY(0);
+    animation: admin-nav-label-in 240ms ease-out both;
+  }
+
+  @keyframes admin-nav-icon-pop {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  @keyframes admin-nav-label-in {
+    from { opacity: .35; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-item,
+    .nav-item i,
+    .nav-item span {
+      transition: none;
+      animation: none;
+      transform: none;
+    }
+
+    .nav-item span,
+    .nav-item.active span {
+      opacity: 1;
+    }
   }
   </style>

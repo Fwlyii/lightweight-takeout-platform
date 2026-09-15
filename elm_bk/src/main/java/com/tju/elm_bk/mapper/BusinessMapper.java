@@ -52,6 +52,10 @@ public interface BusinessMapper {
     @Select("SELECT COUNT(*) FROM business WHERE is_deleted = 0 AND status = 1")
     Integer count();
 
+    @Select("SELECT COUNT(*) FROM business WHERE is_deleted = 0 AND status = 1 AND create_time >= #{from} AND create_time < #{to}")
+    int countCreatedBetween(@Param("from") java.time.LocalDateTime from,
+                            @Param("to") java.time.LocalDateTime to);
+
     @Select("SELECT * FROM business WHERE status = 0 AND is_deleted = 0")
     List<BusinessPermissionVO> listNotAudited();
 

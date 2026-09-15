@@ -32,6 +32,10 @@ public interface UserMapper {
     void update(User user);
     @Select("SELECT COUNT(*) FROM users WHERE is_deleted = 0")
     int count();
+
+    @Select("SELECT COUNT(*) FROM users WHERE is_deleted = 0 AND create_time >= #{from} AND create_time < #{to}")
+    int countCreatedBetween(@Param("from") java.time.LocalDateTime from,
+                            @Param("to") java.time.LocalDateTime to);
     @Insert("INSERT INTO user_authority (user_id, authority_name) VALUES (#{userId}, #{authorityName})")
     void insertUserAuthority(@Param("userId") Long userId, @Param("authorityName") String authorityName);
 

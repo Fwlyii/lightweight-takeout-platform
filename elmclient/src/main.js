@@ -8,6 +8,7 @@ import './assets/styles/global.css';
 import './assets/styles/ai-assistant.css';
 import './assets/styles/layout-alignment.css';
 import './assets/styles/interaction-motion.css';
+import './assets/styles/admin-motion.css';
 import './assets/styles/fwl-alignment.css';
 import './assets/styles/merchant-redesign.css';
 

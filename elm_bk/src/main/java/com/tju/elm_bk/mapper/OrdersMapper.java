@@ -16,6 +16,14 @@ import com.tju.elm_bk.vo.CustomerStatsVO;
 public interface OrdersMapper {
     @Select("SELECT COUNT(*) orderCount, SUM(CASE WHEN order_state=7 THEN 1 ELSE 0 END) completedCount, SUM(CASE WHEN order_state=8 THEN 1 ELSE 0 END) cancelledCount, SUM(CASE WHEN order_state=9 THEN 1 ELSE 0 END) exceptionCount, COALESCE(SUM(CASE WHEN order_state=7 THEN order_total ELSE 0 END),0) revenue FROM orders WHERE is_deleted=0 AND order_date >= #{from} AND order_date < #{to}")
     Map<String,Object> aggregateStats(@Param("from") java.time.LocalDateTime from, @Param("to") java.time.LocalDateTime to);
+
+    @Select("SELECT DATE_FORMAT(order_date, '%Y-%m-%d') day, "
+            + "COALESCE(SUM(CASE WHEN order_state = 7 THEN order_total ELSE 0 END), 0) revenue, "
+            + "SUM(CASE WHEN order_state = 7 THEN 1 ELSE 0 END) completedCount "
+            + "FROM orders WHERE is_deleted = 0 AND order_date >= #{from} AND order_date < #{to} "
+            + "GROUP BY DATE_FORMAT(order_date, '%Y-%m-%d') ORDER BY DATE_FORMAT(order_date, '%Y-%m-%d')")
+    List<Map<String, Object>> dailyRevenueStats(@Param("from") java.time.LocalDateTime from,
+                                                @Param("to") java.time.LocalDateTime to);
     @Select("SELECT id FROM orders WHERE order_state = 0 AND is_deleted = 0 AND order_date < DATE_SUB(NOW(), INTERVAL 15 MINUTE)")
     List<Long> findExpiredWaitingPaymentIds();
 

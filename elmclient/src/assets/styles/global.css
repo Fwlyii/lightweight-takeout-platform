@@ -1,6 +1,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
+  --skin-brand-soft: #45b6ee; --skin-brand-rgb: 22,139,209; --skin-brand-strong-rgb: 8,109,169;
   --skin-brand: #168bd1; --skin-brand-strong: #086da9; --skin-surface: #f4f7fb; --skin-border: #e1e8f0; --skin-ink: #253b50; --skin-ink-rgb: 37,59,80; --skin-muted: #718294;
   /* 主要颜色 */
   --primary-color: #3a7bd5; /* 深蓝色 */

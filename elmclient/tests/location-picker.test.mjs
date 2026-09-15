@@ -2,181 +2,123 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { useLocationPicker } from '../src/composables/useLocationPicker.js';
 
-const province = { name: '天津市', adcode: '120000' };
-const city = { name: '天津市', adcode: '120100' };
-const district = { name: '津南区', adcode: '120112' };
-const savedLocation = { province: '天津市', city: '天津市', district: '津南区' };
-
-function fixture(overrides = {}) {
+function fixture(options = {}) {
   const values = new Map();
-  const calls = [];
-  const storage = {
-    getItem: key => values.get(key) ?? null,
-    setItem: (key, value) => values.set(key, value)
-  };
-  const http = {
-    async get(url, options) {
-      calls.push({ url, options });
-      const children = { '中国': [province], '120000': [city], '天津市': [city], '120100': [district] };
-      return { data: { status: '1', districts: [{ districts: children[options.params.keywords] ?? [] }] } };
-    }
-  };
-  return { values, calls, picker: useLocationPicker({ http, storage, apiKey: 'test-key', ...overrides }) };
+  const storage = { getItem: key => values.get(key), setItem: (key, value) => values.set(key, value) };
+  return { values, storage, picker: useLocationPicker({ storage, ...options }) };
 }
-
-async function chooseDistrict(picker) {
-  await picker.showLocationPicker();
-  await picker.selectLocation(province);
-  await picker.selectLocation(city);
-  await picker.selectLocation(district);
+function choose(picker, names = ['浙江省', '杭州市', '西湖区']) {
+  picker.showLocationPicker();
+  for (const name of names) {
+    const option = picker.locationData.value.find(item => item.name === name);
+    assert.ok(option, `missing ${name}`);
+    picker.selectLocation(option);
+  }
 }
-
-test('selection changes the displayed location only after confirmation', async () => {
-  const { picker, calls, values } = fixture();
-  const initial = picker.displayLocation.value;
-  await chooseDistrict(picker);
-  assert.deepEqual(picker.pendingLocation.value, savedLocation, 'dialog can display the uncommitted selection');
-  assert.equal(picker.displayLocation.value, initial);
-  assert.equal(picker.currentLevel.value, 2);
-  assert.equal(picker.isSelected(district), true);
+test('default is Tianjin Jinnan and all province entries are available without a map key', () => {
+  const { picker } = fixture({ apiKey: '', http: { get() { assert.fail('must not request a map API'); } } });
+  assert.equal(picker.displayLocation.value, '天津市津南区');
+  picker.showLocationPicker();
+  assert.equal(picker.locationData.value.length, 34);
+  assert.equal(picker.loading.value, false);
+  assert.equal(picker.error.value, '');
+});
+test('selection only changes the header after confirmation and persists across reload', () => {
+  const { picker, storage, values } = fixture();
+  choose(picker);
+  assert.equal(picker.displayLocation.value, '天津市津南区');
   assert.equal(picker.confirmLocation(), true);
+  assert.equal(picker.displayLocation.value, '浙江省杭州市西湖区');
   assert.equal(picker.showPicker.value, false);
-  assert.equal(picker.displayLocation.value, '天津市 津南区');
-  assert.deepEqual(JSON.parse(values.get('userLocation')), savedLocation);
   assert.equal(values.get('userLocationSource'), 'manual');
-  assert.equal(values.get('userLocationVersion'), '2');
-  assert.equal(calls.length, 3);
-  assert.equal(calls[0].url, 'https://restapi.amap.com/v3/config/district');
-  assert.equal(calls[0].options.params.key, 'test-key');
-  assert.equal(calls[0].options.headers?.Authorization, undefined);
-  assert.ok(calls[0].options.timeout > 0);
+  const fresh = useLocationPicker({ storage });
+  fresh.restoreSavedLocation();
+  assert.equal(fresh.displayLocation.value, '浙江省杭州市西湖区');
 });
-
-test('cancel discards the pending selection and keeps the saved location', async () => {
+test('municipalities are not repeated in the displayed region', () => {
   const { picker } = fixture();
-  await chooseDistrict(picker);
-  picker.confirmLocation();
-  await picker.showLocationPicker();
-  await picker.selectLocation({ name: '河北省', adcode: '130000' });
-  picker.hideLocationPicker();
-  assert.deepEqual(picker.selectedLocation.value, savedLocation);
-  assert.equal(picker.displayLocation.value, '天津市 津南区');
+  choose(picker, ['天津市', '天津市', '津南区']);
+  assert.equal(picker.confirmLocation(), true);
+  assert.equal(picker.displayLocation.value, '天津市津南区');
 });
-
-test('incomplete selections cannot be persisted', async () => {
+test('cancel discards pending changes', () => {
   const { picker, values } = fixture();
-  await picker.showLocationPicker();
-  assert.equal(picker.confirmLocation(), false);
-  assert.match(picker.error.value, /省份/);
-  await picker.selectLocation(province);
-  assert.equal(picker.confirmLocation(), false);
-  assert.match(picker.error.value, /城市/);
-  await picker.selectLocation(city);
-  assert.equal(picker.confirmLocation(), false);
-  assert.match(picker.error.value, /区域/);
+  choose(picker);
+  picker.hideLocationPicker();
+  assert.equal(picker.displayLocation.value, '天津市津南区');
+  assert.equal(values.size, 0);
+  assert.equal(picker.pendingLocation.value.province, '');
+});
+test('each missing level prevents confirmation and selecting clears validation errors', () => {
+  const { picker, values } = fixture();
+  picker.showLocationPicker();
+  for (const [label, name] of [['省份', '浙江省'], ['城市', '杭州市'], ['区域', '西湖区']]) {
+    assert.equal(picker.confirmLocation(), false);
+    assert.ok(picker.error.value.includes(label));
+    picker.selectLocation(picker.locationData.value.find(item => item.name === name));
+    assert.equal(picker.error.value, '');
+  }
   assert.equal(values.size, 0);
 });
-
-test('returning to the province level invalidates the previously selected city and district', async () => {
+test('switching parents resets descendants and filters options', () => {
   const { picker } = fixture();
-  await chooseDistrict(picker);
-  await picker.switchLevel(0);
-  assert.equal(picker.currentLevel.value, 0);
-  assert.equal(picker.confirmLocation(), false);
+  choose(picker);
+  picker.switchLevel(1);
+  assert.deepEqual({ ...picker.pendingLocation.value }, { province: '浙江省', city: '', district: '' });
+  assert.ok(picker.locationData.value.every(item => item.adcode.startsWith('33')));
+  picker.switchLevel(0);
+  picker.selectLocation(picker.locationData.value.find(item => item.name === '天津市'));
+  assert.equal(picker.pendingLocation.value.district, '');
+  assert.ok(picker.locationData.value.every(item => item.adcode.startsWith('12')));
 });
-
-test('missing map configuration does not send a request with an empty key', async () => {
-  const { picker, calls } = fixture({ apiKey: '' });
-  await picker.showLocationPicker();
-  assert.equal(calls.length, 0);
-  assert.equal(picker.loading.value, false);
-  assert.match(picker.error.value, /配置/);
+test('province-direct counties can be selected', () => {
+  const { picker } = fixture();
+  choose(picker, ['海南省', '省直辖县', '琼海市']);
+  assert.equal(picker.confirmLocation(), true);
+  assert.equal(picker.displayLocation.value, '海南省琼海市');
 });
-
-test('network failures and malformed map responses leave the picker usable', async () => {
-  for (const get of [
-    async () => { throw new Error('network unavailable'); },
-    async () => ({ data: { status: '0', info: 'INVALID_USER_KEY' } }),
-    async () => ({ data: { status: '1', districts: [] } })
-  ]) {
-    const { picker } = fixture({ http: { get } });
-    await picker.showLocationPicker();
-    assert.equal(picker.loading.value, false);
-    assert.ok(picker.error.value);
-    assert.deepEqual(picker.locationData.value, []);
-  }
-});
-
-test('closing the picker invalidates an in-flight request', async () => {
-  let resolve;
-  const { picker } = fixture({ http: { get: () => new Promise(done => { resolve = done; }) } });
-  const pending = picker.showLocationPicker();
-  assert.equal(picker.loading.value, true);
+test('closed dialog ignores selections and confirmations', () => {
+  const { picker } = fixture();
+  choose(picker);
   picker.hideLocationPicker();
-  resolve({ data: { status: '1', districts: [{ districts: [province] }] } });
-  await pending;
-  assert.equal(picker.showPicker.value, false);
-  assert.equal(picker.loading.value, false);
+  picker.selectLocation({ name: '津南区', adcode: '120112' });
+  assert.equal(picker.confirmLocation(), false);
   assert.deepEqual(picker.locationData.value, []);
 });
-
-test('out-of-order responses cannot overwrite the latest picker request', async () => {
-  const resolvers = [];
-  const { picker } = fixture({ http: { get: () => new Promise(done => resolvers.push(done)) } });
-  const first = picker.showLocationPicker();
-  const second = picker.showLocationPicker();
-  resolvers[1]({ data: { status: '1', districts: [{ districts: [province] }] } });
-  await second;
-  resolvers[0]({ data: { status: '1', districts: [{ districts: [city] }] } });
-  await first;
-  assert.deepEqual(picker.locationData.value, [province]);
+test('invalid and unrelated options or levels are ignored', () => {
+  const { picker } = fixture();
+  picker.showLocationPicker();
+  for (const option of [null, {}, { name: '伪造地区', adcode: '120000' }, { name: '津南区', adcode: '120112' }]) picker.selectLocation(option);
+  for (const level of [-1, 1, 20, '0', NaN]) picker.switchLevel(level);
+  assert.equal(picker.currentLevel.value, 0);
+  assert.equal(picker.pendingLocation.value.province, '');
 });
-
-test('restoration validates stored data and recomputes its display text', () => {
-  const { picker, values } = fixture();
-  values.set('userLocationSource', 'manual');
-  values.set('userLocationVersion', '2');
-  values.set('userLocation', JSON.stringify({ ...savedLocation, userId: 99 }));
-  values.set('userLocationDisplay', 'untrusted stale label');
-  picker.restoreSavedLocation();
-  assert.deepEqual(picker.selectedLocation.value, savedLocation);
-  assert.equal(picker.displayLocation.value, '天津市 津南区');
-});
-
-test('old versions, corrupt JSON and incomplete locations are ignored', () => {
-  for (const value of ['broken', 'null', '{}', '{"province":"","city":"","district":""}']) {
+test('restoration rejects corrupt, incomplete and mismatched administrative paths', () => {
+  for (const saved of ['broken', 'null', '{}', JSON.stringify({ province: '天津市', city: '杭州市', district: '西湖区' })]) {
     const { picker, values } = fixture();
-    const initial = picker.displayLocation.value;
     values.set('userLocationSource', 'manual');
     values.set('userLocationVersion', '2');
-    values.set('userLocation', value);
-    assert.doesNotThrow(() => picker.restoreSavedLocation());
-    assert.equal(picker.displayLocation.value, initial);
+    values.set('userLocation', saved);
+    picker.restoreSavedLocation();
+    assert.equal(picker.selectedLocation.value.province, '');
   }
+});
+test('old location versions are ignored and stored labels are recomputed', () => {
   const { picker, values } = fixture();
-  values.set('userLocationSource', 'manual');
-  values.set('userLocationVersion', '1');
-  values.set('userLocation', JSON.stringify(savedLocation));
+  choose(picker);
+  picker.confirmLocation();
+  values.set('userLocationDisplay', 'stale label');
   picker.restoreSavedLocation();
-  assert.notEqual(picker.displayLocation.value, '天津市 津南区');
+  assert.equal(picker.displayLocation.value, '浙江省杭州市西湖区');
+  values.set('userLocationVersion', '1');
+  const fresh = useLocationPicker({ storage: { getItem: key => values.get(key) } });
+  fresh.restoreSavedLocation();
+  assert.equal(fresh.selectedLocation.value.province, '');
 });
-
-test('blocked storage does not crash restoration or an otherwise valid selection', async () => {
-  const { picker } = fixture({ storage: {
-    getItem() { throw new Error('storage disabled'); },
-    setItem() { throw new Error('storage disabled'); }
-  } });
+test('disabled local storage does not prevent selection', () => {
+  const { picker } = fixture({ storage: { getItem() { throw Error('disabled'); }, setItem() { throw Error('disabled'); } } });
   assert.doesNotThrow(() => picker.restoreSavedLocation());
-  await chooseDistrict(picker);
+  choose(picker);
   assert.equal(picker.confirmLocation(), true);
-  assert.equal(picker.displayLocation.value, '天津市 津南区');
-});
-
-test('invalid selection values and levels do not trigger network requests', async () => {
-  const { picker, calls } = fixture();
-  await picker.showLocationPicker();
-  const count = calls.length;
-  for (const item of [null, {}, { name: '', adcode: '1' }]) await picker.selectLocation(item);
-  for (const level of [-1, 1, 20, '0', NaN]) await picker.switchLevel(level);
-  assert.equal(calls.length, count);
+  assert.equal(picker.displayLocation.value, '浙江省杭州市西湖区');
 });

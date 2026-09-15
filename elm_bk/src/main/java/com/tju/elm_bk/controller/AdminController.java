@@ -16,7 +16,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.time.temporal.ChronoUnit;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -52,7 +56,18 @@ public class AdminController {
             @RequestParam(required = false) LocalDate to) {
         LocalDate start = from == null ? LocalDate.now().minusDays(30) : from;
         LocalDate end = to == null ? LocalDate.now().plusDays(1) : to.plusDays(1);
-        return HttpResult.success(ordersMapper.aggregateStats(start.atStartOfDay(), end.atStartOfDay()));
+        Map<String, Object> summary = ordersMapper.aggregateStats(start.atStartOfDay(), end.atStartOfDay());
+        Map<String, Object> data = new LinkedHashMap<>(summary == null ? Map.of() : summary);
+        Map<String, Object> today = ordersMapper.aggregateStats(LocalDate.now().atStartOfDay(),
+                LocalDate.now().plusDays(1).atStartOfDay());
+        long periodDays = Math.max(1, ChronoUnit.DAYS.between(start, end));
+        LocalDate previousStart = start.minusDays(periodDays);
+        Map<String, Object> previous = ordersMapper.aggregateStats(previousStart.atStartOfDay(), start.atStartOfDay());
+        data.put("today", today == null ? Map.of() : today);
+        data.put("averageOrderValue", averageOrderValue(summary));
+        data.put("trend", ordersMapper.dailyRevenueStats(start.atStartOfDay(), end.atStartOfDay()));
+        data.put("growth", growth(start, end, previousStart, summary, previous));
+        return HttpResult.success(data);
     }
 
     @GetMapping(value = "/statistics/export", produces = "text/csv;charset=UTF-8")
@@ -71,5 +86,36 @@ public class AdminController {
 
     private Object value(Map<String, Object> data, String key) {
         return data.getOrDefault(key, 0);
+    }
+
+    private BigDecimal averageOrderValue(Map<String, Object> data) {
+        if (data == null) return BigDecimal.ZERO.setScale(1, RoundingMode.HALF_UP);
+        Number completed = (Number) data.get("completedCount");
+        Number revenue = (Number) data.get("revenue");
+        if (completed == null || completed.longValue() == 0 || revenue == null) {
+            return BigDecimal.ZERO.setScale(1, RoundingMode.HALF_UP);
+        }
+        return BigDecimal.valueOf(revenue.doubleValue())
+                .divide(BigDecimal.valueOf(completed.longValue()), 1, RoundingMode.HALF_UP);
+    }
+
+    private Map<String, Object> growth(LocalDate start, LocalDate end, LocalDate previousStart,
+            Map<String, Object> current, Map<String, Object> previous) {
+        int users = userMapper.countCreatedBetween(start.atStartOfDay(), end.atStartOfDay());
+        int previousUsers = userMapper.countCreatedBetween(previousStart.atStartOfDay(), start.atStartOfDay());
+        int businesses = businessMapper.countCreatedBetween(start.atStartOfDay(), end.atStartOfDay());
+        int previousBusinesses = businessMapper.countCreatedBetween(previousStart.atStartOfDay(), start.atStartOfDay());
+        Number previousRevenue = previous == null ? null : (Number) previous.get("revenue");
+        Number currentRevenue = current == null ? null : (Number) current.get("revenue");
+        BigDecimal revenueRate = null;
+        if (previousRevenue != null && previousRevenue.doubleValue() > 0 && currentRevenue != null) {
+            revenueRate = BigDecimal.valueOf((currentRevenue.doubleValue() - previousRevenue.doubleValue())
+                    / previousRevenue.doubleValue() * 100).setScale(1, RoundingMode.HALF_UP);
+        }
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("users", users - previousUsers);
+        result.put("businesses", businesses - previousBusinesses);
+        result.put("revenueRate", revenueRate);
+        return result;
     }
 }

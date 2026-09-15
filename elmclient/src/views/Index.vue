@@ -5,11 +5,11 @@
         <div class="home-hero">
         <!-- header部分：动画只加在头部子块上，避免 header 成为 fixed 弹窗的包含块 -->
         <header class="home-header">
-            <div class="location-text home-motion home-motion-header" @click="showLocationPicker">
+            <button type="button" class="location-text home-motion home-motion-header" aria-label="选择省市区" aria-haspopup="dialog" :aria-expanded="showPicker" @click="showLocationPicker">
                 <i class="fas fa-map-marker-alt"></i>
                 <span class="location-display">{{ displayLocation }}</span>
                 <i class="fa fa-caret-down"></i>
-            </div>
+            </button>
 
             <!-- 漂亮的位置选择弹窗 -->
             <Teleport to="body">
@@ -17,7 +17,7 @@
                 <div v-if="showPicker" class="location-modal" @click.self="hideLocationPicker" @keydown.esc="hideLocationPicker" @keydown.tab="trapLocationFocus">
                     <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="location-dialog-title">
                         <div class="modal-header">
-                            <h3 id="location-dialog-title">选择位置</h3>
+                            <h3 id="location-dialog-title">选择省市区</h3>
                             <button type="button" class="close-btn" aria-label="关闭位置选择" @click="hideLocationPicker">
                                 <i class="fa fa-times"></i>
                             </button>
@@ -26,16 +26,16 @@
                         <div class="modal-content">
                             <!-- 位置层级导航 -->
                             <div class="location-nav">
-                                <div v-for="(level, index) in locationLevels" :key="index"
+                                <button type="button" v-for="(level, index) in locationLevels" :key="index" :disabled="index > currentLevel"
                                     :class="['nav-item', { active: currentLevel === index, disabled: index > currentLevel }]"
                                     @click="switchLevel(index)">
                                     {{ level }}
-                                </div>
+                                </button>
                             </div>
 
                             <!-- 位置列表 -->
                             <p v-if="locationError" class="location-error" role="status">{{ locationError }}</p>
-                            <div v-else class="location-list-container">
+                            <div class="location-list-container">
                                 <div v-if="loading" class="loading-state">
                                     <i class="fa fa-spinner fa-spin"></i>
                                     <span>加载中...</span>
@@ -47,12 +47,12 @@
                                 </div>
 
                                 <div v-else class="location-items">
-                                    <div v-for="item in locationData" :key="item.adcode || item.name"
+                                    <button type="button" v-for="item in locationData" :key="item.adcode || item.name" :aria-pressed="isSelected(item)"
                                         :class="['location-item', { selected: isSelected(item) }]"
                                         @click="selectLocation(item)">
                                         <span class="item-name">{{ item.name }}</span>
                                         <i v-if="isSelected(item)" class="fa fa-check selected-icon"></i>
-                                    </div>
+                                    </button>
                                 </div>
                             </div>
 
@@ -1644,6 +1644,10 @@ export default {
 }
 
 .nav-item {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    font: inherit;
     padding: 12px 20px;
     cursor: pointer;
     border-bottom: 3px solid transparent;
@@ -1696,6 +1700,11 @@ export default {
 }
 
 .location-item {
+    width: 100%;
+    background: white;
+    color: inherit;
+    font: inherit;
+    text-align: left;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1979,6 +1988,10 @@ export default {
 }
 
 .home-page .home-header .location-text {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    font-family: inherit;
     display: inline-flex;
     align-items: center;
     gap: 5px;
