@@ -1,8 +1,8 @@
 # 部署文档
 
-可以在本地运行完整系统，也可以直接访问文末的公网演示。下面先介绍本地部署，需求和业务流程见 [SRS.pdf](SRS.pdf)。
+本文介绍完整系统的本地部署步骤，需求和业务流程见 [SRS.pdf](SRS.pdf)。
 
-## 一、本地部署
+## 本地部署
 
 ### 1. 环境准备
 
@@ -150,31 +150,3 @@ npm run serve
 ```
 
 前端开发地址以终端输出为准，默认端口为 `8080`；默认连接本机 `18080` 的后端。如果修改后端地址，可通过 `VUE_APP_API_BASE_URL` 配置前端连接。
-
-## 二、公网访问
-
-当前唯一正式评测入口：
-
-**[https://elm-demo.pages.dev/index](https://elm-demo.pages.dev/index)**
-
-该入口对应本仓库 `main` 的已发布应用版本。前端由 Cloudflare Pages 托管，通过同源代理连接云端 Railway 后端；公网访问不需要评测人员启动本机 Docker。
-
-评测人员直接打开以上链接即可。普通顾客可通过注册入口创建账号；商家、骑手和管理员的受限流程建议使用前述本地环境验证，不在公开文档中提供公网管理账号或密钥。
-
-公网为课程演示环境，不接入真实支付。AI、图片、语音能力取决于部署配置、外部服务及可用额度。若公网暂时不可达，可按本文第一部分独立运行完整项目。
-
-`localhost` 地址仅供本地部署，不是公网评测入口；历史对比站和临时预览地址不用于本次提交。
-
-### 公网部署文件的用途
-
-`scripts/deploy-cloudflare-pages.sh` 用于发布前端。`scripts/cloudflare-pages/_worker.template.js` 是随前端一起发布的代理程序：将 `/api` 等请求转发给后端，同时处理页面刷新时的路由回退和浏览器安全响应头。它是运行代码，不是部署说明。
-
-需要维护公网版本时，将同目录的 `.env.example` 复制为 `.env.local`，填写 `PAGES_PROJECT`、`PUBLIC_DEMO_URL` 和 `BACKEND_ORIGIN`。当前站点使用 `PAGES_PROJECT=elm-demo`、`PUBLIC_DEMO_URL=https://elm-demo.pages.dev/index`；后端源站地址由维护者在本地配置，不需要评测人员填写。
-
-在安装 Node.js、zsh 和 curl，并通过 Wrangler 登录对应 Cloudflare 账号后，从仓库根目录执行：
-
-```bash
-./scripts/deploy-cloudflare-pages.sh main
-```
-
-设置 `BACKEND_ORIGIN` 后，脚本检查云端后端、构建前端并发布到已有 Pages 项目；这条命令不会更新 Railway 后端或数据库。不设置该值会使用本机 Docker 和临时隧道，仅适合本地演示分享。`.env.local` 只留在维护者本机，不提交到 Git。

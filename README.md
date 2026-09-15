@@ -4,7 +4,7 @@
 
 前端使用 Vue 3，后端使用 Spring Boot 3 和 MyBatis，数据库使用 MySQL 8。
 
-[在线体验](https://elm-demo.pages.dev/index) · [本地部署](docs/DEPLOYMENT.md) · [需求规格说明书](docs/SRS.pdf)
+[本地部署](docs/DEPLOYMENT.md) · [需求规格说明书](docs/SRS.pdf)
 
 ## 先运行起来
 
@@ -20,7 +20,7 @@ docker compose -f docker-compose.demo.yml up -d --build
 
 启动完成后，打开 [http://localhost:18081/index](http://localhost:18081/index)。首次构建需要下载依赖，可能需要等待几分钟。
 
-没有 zsh 的配置方法、各角色演示账号和常见问题都放在[部署文档](docs/DEPLOYMENT.md)中。只想体验系统，也可以直接打开上方的在线地址。
+没有 zsh 的配置方法、各角色演示账号和常见问题都放在[部署文档](docs/DEPLOYMENT.md)中。
 
 ## 可以体验什么
 
@@ -42,10 +42,10 @@ elmclient/                    前端页面、组件和测试
 elm_bk/                       后端接口、业务逻辑、数据库脚本和测试
 docs/
   SRS.pdf                     需求规格说明书
-  DEPLOYMENT.md               本地部署与公网访问
+  DEPLOYMENT.md               本地部署说明
   source/                     需求文档的 LaTeX 源码和配图
 scripts/
-  cloudflare-pages/           公网代理程序和配置示例
+  cloudflare-pages/           部署代理程序和配置示例
   tests/                      部署脚本测试
   *.sh / *.mjs                启动、部署和检查工具
 docker-compose.demo.yml       本地运行配置
@@ -92,7 +92,7 @@ bash scripts/check-architecture.sh
 node --test scripts/tests/*.test.mjs
 ```
 
-后端测试使用独立测试数据库，不需要修改公网数据。修改数据库结构前请先备份，并查看对应迁移脚本的适用条件。
+后端测试使用独立测试数据库。修改数据库结构前请先备份，并查看对应迁移脚本的适用条件。
 
 ## 修改文档
 
