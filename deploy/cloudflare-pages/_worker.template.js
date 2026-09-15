@@ -72,7 +72,7 @@ const proxyToBackend = async (request) => {
         return Response.json(
             {
                 code: 503,
-                message: "演示服务暂时离线，请确认演示电脑与 Docker 已启动。",
+                message: "服务暂时不可用，请稍后重试。",
             },
             { status: 503 },
         );

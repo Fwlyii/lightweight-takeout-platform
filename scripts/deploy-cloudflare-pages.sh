@@ -11,12 +11,17 @@ if [[ -f "$LOCAL_CONFIG" ]]; then
 fi
 PAGES_PROJECT="${PAGES_PROJECT:-}"
 PUBLIC_DEMO_URL="${PUBLIC_DEMO_URL:-}"
+BACKEND_ORIGIN="${BACKEND_ORIGIN:-}"
 if [[ -z "$PAGES_PROJECT" || ! "$PAGES_PROJECT" =~ '^[a-z0-9][a-z0-9-]*$' ]]; then
   print -u2 "请在本地配置或环境变量中显式设置合法的 PAGES_PROJECT。"
   exit 1
 fi
 if [[ -n "$PUBLIC_DEMO_URL" && "$PUBLIC_DEMO_URL" != https://* ]]; then
   print -u2 "PUBLIC_DEMO_URL 必须使用 HTTPS。"
+  exit 1
+fi
+if [[ -n "$BACKEND_ORIGIN" && ! "$BACKEND_ORIGIN" =~ '^https://[A-Za-z0-9.-]+(:[0-9]+)?$' ]]; then
+  print -u2 "BACKEND_ORIGIN 必须是 HTTPS 源站地址，不含路径、查询参数或末尾斜杠。"
   exit 1
 fi
 WRANGLER_VERSION="4.129.0"
@@ -29,13 +34,23 @@ if [[ ! "$BRANCH" =~ '^[A-Za-z0-9._/-]+$' ]]; then
   exit 1
 fi
 
-for required_command in docker npm curl dig rg sed; do
+for required_command in npm curl sed; do
   if ! command -v "$required_command" >/dev/null 2>&1; then
     print -u2 "缺少命令：$required_command"
     exit 1
   fi
 done
 
+if [[ -n "$BACKEND_ORIGIN" ]]; then
+  # A configured cloud backend must never silently fall back to this computer.
+  curl -fsS --max-time 20 "$BACKEND_ORIGIN/api/businesses/search" >/dev/null
+else
+for required_command in docker dig rg; do
+  if ! command -v "$required_command" >/dev/null 2>&1; then
+    print -u2 "缺少命令：$required_command"
+    exit 1
+  fi
+done
 if ! docker info >/dev/null 2>&1; then
   print -u2 "Docker Desktop 尚未启动。"
   exit 1
@@ -84,6 +99,7 @@ done
 if [[ -z "$BACKEND_ORIGIN" ]]; then
   print -u2 "未能取得可用的后端隧道，请查看 tunnel 容器日志。"
   exit 1
+fi
 fi
 
 print "后端出口已就绪：$BACKEND_ORIGIN"
