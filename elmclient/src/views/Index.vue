@@ -252,8 +252,9 @@
         <div v-if="!businessList || businessList.length === 0" class="empty-business-list">
             <div class="empty-state">
                 <i class="fa fa-store"></i>
-                <p>暂无商家数据</p>
-                <p class="empty-hint">请稍后再试或检查网络连接</p>
+                <p>{{ businessLoading ? '正在加载商家…' : businessLoadError ? '商家加载失败' : '暂无符合条件的商家' }}</p>
+                <p class="empty-hint">{{ businessLoadError ? '请检查网络连接后重试' : businessLoading ? '请稍候' : '试试调整筛选条件' }}</p>
+                <button v-if="businessLoadError && !businessLoading" @click="getBusinessList">重新加载</button>
             </div>
         </div>
 
@@ -317,6 +318,8 @@ export default {
         const router = useRouter();
         const userInfo = ref(null);
         const businessList = ref([]);
+        const businessLoading = ref(false);
+        const businessLoadError = ref(false);
         const originalBusinessList = ref([]); // 保存原始数据用于筛选和排序
         const currentPage = ref(1);
         const pageReady = ref(false);
@@ -600,10 +603,13 @@ export default {
 
         // 获取商家列表
         const getBusinessList = async () => {
+            businessLoading.value = true;
+            businessLoadError.value = false;
             try {
                 const response = await request.get('/api/businesses/search', {
                     params: { keyword: '', isScore: 0, isSales: 0 }
                 });
+                if (!response?.success && !Array.isArray(response)) throw new Error(response?.message || '商家加载失败');
                 const businessData = response?.success && Array.isArray(response.data)
                     ? response.data
                     : (Array.isArray(response) ? response : []);
@@ -611,8 +617,11 @@ export default {
                 applyFiltersAndSort();
             } catch (error) {
                 console.error('获取商家列表失败:', error);
+                businessLoadError.value = true;
                 originalBusinessList.value = [];
                 businessList.value = [];
+            } finally {
+                businessLoading.value = false;
             }
         };
 
@@ -709,6 +718,9 @@ export default {
             isuser: computed(() => !!userInfo.value),
             navigateToSearch,
             businessList,
+            businessLoading,
+            businessLoadError,
+            getBusinessList,
             visibleBusinessList,
             hasMoreBusinesses,
             loadMoreBusinesses,

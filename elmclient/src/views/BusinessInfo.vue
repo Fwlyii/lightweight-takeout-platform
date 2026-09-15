@@ -216,7 +216,7 @@ export default {
             if (!businessId.value || loadingReviews.value) return;
             loadingReviews.value = true;
             try {
-                const response = await request.get(`/api/v1/reviews/business/${businessId.value}`);
+                const response = await request.get(`/api/v1/reviews/public/business/${businessId.value}`);
                 if (response?.success) reviews.value = response.data || [];
             } catch (error) {
                 console.error('获取商家评价失败:', error);
@@ -518,7 +518,7 @@ export default {
         const fetchBusinessInfo = async () => {
             loadingBusiness.value = true;
             try {
-                const response = await request.get(`/api/businesses/${businessId.value}`);
+                const response = await request.get(`/api/businesses/public/${businessId.value}`);
 
                 if (response.success === true) {
                     business.value = {

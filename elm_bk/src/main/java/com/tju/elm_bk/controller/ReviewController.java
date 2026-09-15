@@ -16,6 +16,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReviewController {
     private final ReviewService reviewService;
+    private final com.tju.elm_bk.service.BusinessService businessService;
+
+    @GetMapping("/public/business/{businessId}")
+    public HttpResult<List<com.tju.elm_bk.vo.PublicReviewVO>> publicReviews(@PathVariable Long businessId) {
+        com.tju.elm_bk.vo.PublicBusinessVO.from(businessService.getBusinessById(businessId));
+        return HttpResult.success(reviewService.listByBusiness(businessId).stream()
+                .filter(review -> !Boolean.TRUE.equals(review.getHidden()))
+                .map(com.tju.elm_bk.vo.PublicReviewVO::from).toList());
+    }
 
     @PostMapping
     @PreAuthorize("hasAuthority('USER')")

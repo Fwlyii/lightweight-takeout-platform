@@ -166,6 +166,19 @@ public class BusinessController {
         return HttpResult.success(businesses);
     }
 
+    @GetMapping("/public/{id}")
+    public HttpResult<com.tju.elm_bk.vo.PublicBusinessVO> publicBusiness(@PathVariable Long id) {
+        return HttpResult.success(com.tju.elm_bk.vo.PublicBusinessVO.from(businessService.getBusinessById(id)));
+    }
+
+    @GetMapping("/type/presentations")
+    public HttpResult<List<BusinessSearchVO>> categoryPresentations(@RequestParam(required = false) Integer type) {
+        // Reuse the active-store query and recommendation rules used by the homepage.
+        return HttpResult.success(businessService.getBusinessesBySearch(null, false, false).stream()
+                .filter(business -> type == null || type.equals(business.getOrderTypeId()))
+                .toList());
+    }
+
     @GetMapping("/id_list")
     @Operation(summary = "获取当前商家用户商铺id列表")
     @PreAuthorize("hasAnyAuthority('BUSINESS','ADMIN')")
