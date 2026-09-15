@@ -194,42 +194,6 @@ html[data-theme="warm"] body, html[data-theme="mint"] body {
 }
 input, select, textarea { accent-color: var(--primary-color); }
 
-/* 登录海报是固定蓝色位图。彩色皮肤使用已存在的文字层和主题背景，
- * 不给商品照片或整页套色相滤镜，也不让海报内嵌蓝色文字漏出。 */
-html:is([data-theme="warm"], [data-theme="mint"]) .login-page .background-layer { display: none; }
-html:is([data-theme="warm"], [data-theme="mint"]) .login-page .hero-copy,
-html:is([data-theme="warm"], [data-theme="mint"]) .login-page .login-footer { visibility: visible; }
-html:is([data-theme="warm"], [data-theme="mint"]) .login-page {
-  background: linear-gradient(180deg, var(--skin-surface), #fff);
-}
-html:is([data-theme="warm"], [data-theme="mint"]) .login-page .hero-side {
-  min-height: 210px;
-  display: grid;
-  align-items: center;
-  padding: 28px 0 14px;
-}
-html:is([data-theme="warm"], [data-theme="mint"]) .login-page .hero-copy {
-  width: 100%;
-  min-width: 0;
-  padding: 0;
-  transform: none;
-}
-html:is([data-theme="warm"], [data-theme="mint"]) .login-page .hero-description {
-  max-width: 100%;
-  white-space: normal;
-}
-html:is([data-theme="warm"], [data-theme="mint"]) .login-page .hero-description br { display: initial; }
-
 /* 通知库通过 JS 建立的控件也遵循当前皮肤，不覆盖成功/错误图标的语义色。 */
 .swal2-popup { --swal2-confirm-button-background-color: var(--primary-color); }
 .swal2-confirm { background-color: var(--primary-color) !important; }
-
-
-/* 首页搜索栏切换为 fixed 后，仍与 600px 主内容区保持同宽并居中。 */
-#app .wrapper .search .search-fixed-top {
-  max-width: 600px;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  box-sizing: border-box;
-}

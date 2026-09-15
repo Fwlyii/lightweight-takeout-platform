@@ -15,12 +15,14 @@ export const THEME_OPTIONS = [
 const THEME_VALUES = new Set(THEME_OPTIONS.map(option => option.value));
 export const normalizeTheme = (theme) => THEME_VALUES.has(theme) ? theme : 'light';
 
-export const applyTheme = (theme) => {
+export const themeForRoute = (path, theme) => ['/login', '/register'].includes(path) ? 'light' : normalizeTheme(theme);
+
+export const applyTheme = (theme, { persist = true } = {}) => {
   const normalized = normalizeTheme(theme);
   if (typeof document !== 'undefined') {
     document.documentElement.dataset.theme = normalized;
   }
-  if (typeof localStorage !== 'undefined') {
+  if (persist && typeof localStorage !== 'undefined') {
     try {
       localStorage.setItem(THEME_STORAGE_KEY, normalized);
     } catch (_) {

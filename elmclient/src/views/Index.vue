@@ -520,19 +520,7 @@ export default {
             scrollFrame = requestAnimationFrame(() => {
                 scrollFrame = 0;
                 const scroll = scrollContainer?.scrollTop || 0;
-                const width = document.documentElement.clientWidth;
-                const search = fixedBox.value;
                 const parallax = Math.min(scroll, 80);
-
-                if (search) {
-                    if (scroll > width * 0.12) {
-                        search.style.position = 'fixed';
-                        search.style.left = '0';
-                        search.style.top = '0';
-                    } else {
-                        search.style.position = 'static';
-                    }
-                }
 
                 document.querySelector('.home-page')?.style.setProperty('--home-bg-shift', `${-Math.min(parallax * 0.1, 8)}px`);
                 document.querySelector('.home-page')?.style.setProperty('--home-text-shift', `${-Math.min(parallax * 0.0375, 3)}px`);
@@ -2087,7 +2075,6 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
 .load-more:active { background: var(--skin-surface, #f1faff); }
 @media (min-width: 700px) {
     .wrapper { max-width: 600px; }
-    .wrapper .search .search-fixed-top { max-width: 600px; margin: 0 auto; }
     .wrapper .business-list { padding-left: 0; padding-right: 0; }
 }
 
@@ -2221,12 +2208,19 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
 }
 
 .home-page .search {
-    position: relative;
-    z-index: 3;
+    position: sticky;
+    top: 0;
+    z-index: 25;
     height: 72px;
 }
 
 .home-page .search .search-fixed-top {
+    position: relative;
+    inset: auto;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    margin: 0;
     height: 72px;
     padding: 11px 14px 15px;
     box-sizing: border-box;

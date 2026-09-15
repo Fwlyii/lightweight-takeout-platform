@@ -1,6 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { applyTheme, getStoredTheme, normalizeTheme, THEME_OPTIONS } from '../src/utils/theme.js';
+import { applyTheme, getStoredTheme, normalizeTheme, themeForRoute, THEME_OPTIONS } from '../src/utils/theme.js';
+
+test('auth routes use default colors without overwriting the chosen skin', () => {
+  const values = new Map();
+  globalThis.document = { documentElement: { dataset: {} } };
+  globalThis.localStorage = { getItem: key => values.get(key), setItem: (key, value) => values.set(key, value) };
+  try {
+    for (const { value } of THEME_OPTIONS) {
+      applyTheme(value);
+      for (const path of ['/login', '/register']) {
+        applyTheme(themeForRoute(path, getStoredTheme()), { persist: false });
+        assert.equal(document.documentElement.dataset.theme, 'light');
+        assert.equal(getStoredTheme(), value);
+      }
+      applyTheme(themeForRoute('/index', getStoredTheme()), { persist: false });
+      assert.equal(document.documentElement.dataset.theme, value);
+    }
+  } finally {
+    delete globalThis.document;
+    delete globalThis.localStorage;
+  }
+});
 
 test('every offered theme is accepted and unknown values fall back to light', () => {
   for (const { value } of THEME_OPTIONS) assert.equal(normalizeTheme(value), value);

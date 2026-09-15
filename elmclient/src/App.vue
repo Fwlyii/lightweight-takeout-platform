@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container" :class="{ 'admin-area': showAdminFooter }">
+  <div class="app-container" :class="{ 'admin-area': showAdminFooter, 'auth-area': isAuthPage }">
     <div
       v-if="routeMotion.active"
       class="route-wipe"
@@ -28,10 +28,10 @@ import Footer from './components/Footer.vue';
 import BusinessFooter from './components/BusinessFooter.vue';
 import AdminFooter from './components/AdminFooter.vue';
 import RiderFooter from './components/RiderFooter.vue';
-import { computed, onMounted, nextTick, watch } from 'vue';
+import { computed, nextTick, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import request from './utils/request';
-import { applyTheme, getStoredTheme } from './utils/theme';
+import { applyTheme, getStoredTheme, themeForRoute } from './utils/theme';
 import { getAuthRole, getToken } from './utils/auth';
 import { routeMotion } from './utils/routeMotion';
 
@@ -59,23 +59,24 @@ export default {
   },
   setup() {
     const route = useRoute();
+    const isAuthPage = computed(() => ['Login', 'Register'].includes(route.name));
 
     watch(() => route.fullPath, () => {
+      applyTheme(themeForRoute(route.path, getStoredTheme()), { persist: false });
       nextTick(() => {
         document.querySelector('.content')?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       });
     }, { immediate: true });
 
-    onMounted(() => applyTheme(getStoredTheme()));
     let preferenceSession = null;
     watch(() => route.fullPath, async () => {
       const token = getToken();
-      if (!token || getAuthRole() !== 'user') { preferenceSession = null; return; }
+      if (isAuthPage.value || !token || getAuthRole() !== 'user') { preferenceSession = null; return; }
       if (token === preferenceSession) return;
       preferenceSession = token;
       try {
         const preference = await request.get('/api/v1/preferences/me');
-        if (getToken() === token && preference?.success && preference.data?.theme) applyTheme(preference.data.theme);
+        if (getToken() === token && !isAuthPage.value && preference?.success && preference.data?.theme) applyTheme(preference.data.theme);
       } catch (_) {
         // 主题读取失败不阻塞页面，继续使用本地主题。
       }
@@ -122,6 +123,7 @@ export default {
     }));
 
     return {
+      isAuthPage,
       showFooter,
       showBusinessFooter,
       showAdminFooter,

@@ -1,6 +1,6 @@
 <template>
   <main class="payment-page">
-    <PageHeader title="确认支付" back-to="/orderList" />
+    <header class="payment-masthead"><button type="button" aria-label="返回" @click="router.push('/orderList')">‹</button><h1>在线支付</h1></header>
     <div v-if="loading" class="payment-unavailable" role="status">正在核对订单…</div>
     <div v-else-if="loadError" class="payment-unavailable" role="alert">
       <h2>暂时无法加载订单</h2><p>{{ loadError }}</p>
@@ -12,41 +12,42 @@
       <button @click="router.replace({path:'/listDetail',query:{orderId}})">查看订单</button>
     </div>
     <div v-else class="payment-content" :aria-busy="paying">
-      <section class="payment-hero"><p>{{ orderDetail.businessName || '我的订单' }}</p><strong>¥{{ payableAmount }}</strong><small>待支付 · 订单 {{ orderId }}</small></section>
+      <section class="payment-hero"><div class="payment-summary"><h2>{{ orderDetail.businessName || '我的订单' }}</h2><div><small>待支付金额</small><strong>¥{{ payableAmount }}</strong></div></div>
       <div class="fulfilment-note"><i :class="orderDetail.serviceMode === 'PICKUP' ? 'fa fa-shopping-bag' : 'fa fa-map-marker'" aria-hidden="true"></i>
-        <span v-if="orderDetail.serviceMode === 'PICKUP'"><strong>到店自取</strong><small>商家备餐完成后，请凭取餐信息到店领取。</small></span>
+        <span v-if="orderDetail.serviceMode === 'PICKUP'"><strong>到店自取</strong><small>商家备餐完成后到店取餐，无需配送地址</small></span>
         <span v-else><strong>{{ orderDetail.address || '配送地址以订单信息为准' }}</strong><small>{{ orderDetail.contactName }} · {{ orderDetail.contactTel }}</small></span>
       </div>
+      </section>
       <section class="section"><h3>订单详情</h3>
+        <button type="button" class="payment-merchant" @click="router.push({path:'/listDetail',query:{orderId}})"><img :src="orderDetail.businessImg || require('../assets/business-default.png')" alt="商家图片" @error="handleImageError"><strong>{{ orderDetail.businessName || '我的订单' }}</strong><span aria-hidden="true">›</span></button>
         <div v-for="(item,index) in orderDetail.foodList || []" :key="item.id || index" class="detail-item">
-          <span class="item-name">{{ item.foodName }}<small>¥{{ Number(item.foodPrice || 0).toFixed(2) }} × {{ item.quantity }}</small></span><span class="item-price">¥{{ (Number(item.foodPrice || 0)*Number(item.quantity || 0)).toFixed(2) }}</span>
+          <span class="item-name">{{ item.foodName }} <small>×{{ item.quantity }}</small></span><span class="item-price">¥{{ (Number(item.foodPrice || 0)*Number(item.quantity || 0)).toFixed(2) }}</span>
         </div>
         <div v-if="orderDetail.serviceMode !== 'PICKUP'" class="detail-item"><span>配送费</span><span>¥{{ Number(orderDetail.deliveryPrice || 0).toFixed(2) }}</span></div>
         <div v-if="merchantDiscount > 0" class="detail-item coupon-discount"><span>商家及会员优惠</span><span>−¥{{ merchantDiscount.toFixed(2) }}</span></div>
-        <div v-if="couponDiscount > 0" class="detail-item coupon-discount"><span>红包抵扣</span><span>−¥{{ couponDiscount.toFixed(2) }}</span></div>
+        <div v-if="couponDiscount > 0" class="detail-item coupon-discount"><span>{{ selectedCoupon.name || '红包抵扣' }}</span><span>−¥{{ couponDiscount.toFixed(2) }}</span></div>
         <div v-if="appliedPoints > 0" class="detail-item coupon-discount"><span>积分抵扣</span><span>−¥{{ (appliedPoints/100).toFixed(2) }}</span></div>
-        <div class="detail-item"><strong>合计</strong><strong>¥{{ payableAmount }}</strong></div>
+        <div class="detail-item payment-subtotal"><strong>应付金额</strong><strong>¥{{ payableAmount }}</strong></div>
       </section>
-      <section class="section" aria-label="红包优惠"><div class="coupon-panel-header"><h3>红包优惠</h3><span v-if="couponDiscount">已省 ¥{{ couponDiscount.toFixed(2) }}</span></div>
+      <section class="section" aria-label="红包优惠"><div class="coupon-panel-header"><h3>红包 / 优惠券</h3></div>
         <div v-if="couponLoading" class="coupon-empty">正在查找可用红包…</div>
         <template v-else-if="usableCoupons.length">
-          <button class="coupon-option" :class="{active:selectedCouponId === null}" :disabled="paying" :aria-pressed="selectedCouponId === null" @click="selectCoupon(null)"><span>不使用红包</span><i v-if="selectedCouponId === null" class="fa fa-check-circle"></i></button>
-          <button v-for="coupon in usableCoupons" :key="coupon.id" class="coupon-option" :class="{active:selectedCouponId === coupon.id}" :disabled="paying" :aria-pressed="selectedCouponId === coupon.id" @click="selectCoupon(coupon.id)"><span><b>{{ coupon.name || '红包' }} · 减 ¥{{ Number(coupon.discountAmount || 0).toFixed(2) }}</b><small>满 ¥{{ Number(coupon.minOrderAmount || 0).toFixed(2) }} 可用 · {{ formatCouponExpiry(coupon.expiresAt) }}到期</small></span><i v-if="selectedCouponId === coupon.id" class="fa fa-check-circle"></i></button>
+          <button class="coupon-option" :class="{active:selectedCouponId === null}" :disabled="paying" :aria-pressed="selectedCouponId === null" @click="selectCoupon(null)"><i class="coupon-radio" aria-hidden="true"></i><span><b>不使用红包</b><small>保留本次红包</small></span></button>
+          <button v-for="coupon in usableCoupons" :key="coupon.id" class="coupon-option" :class="{active:selectedCouponId === coupon.id}" :disabled="paying" :aria-pressed="selectedCouponId === coupon.id" @click="selectCoupon(coupon.id)"><i class="coupon-radio" aria-hidden="true"></i><span><b>{{ coupon.name || '红包' }} - 减 <em>¥{{ Number(coupon.discountAmount || 0).toFixed(2) }}</em></b><small>满 ¥{{ Number(coupon.minOrderAmount || 0).toFixed(2) }} 可用 · {{ formatCouponExpiry(coupon.expiresAt) }}到期</small></span></button>
         </template><p v-else class="coupon-empty">本单暂无可用红包</p>
       </section>
-      <section class="section"><h3>支付方式</h3>
-        <label v-for="method in [{id:'alipay',label:'支付宝',icon:'支'},{id:'wechat',label:'微信支付',icon:'微'},{id:'wallet',label:'钱包余额',icon:'¥'}]" :key="method.id" class="payment-option"><span class="method-icon" :class="method.id">{{ method.icon }}</span><span class="method-copy"><strong>{{ method.label }}</strong><small v-if="method.id === 'wallet'">{{ assetInfo ? '可用 ¥' + Number(assetInfo.balance || 0).toFixed(2) : '余额暂不可用' }}</small></span><input type="radio" name="payment-method" :value="method.id" v-model="selectedPayment" :disabled="paying || (method.id === 'wallet' && !assetInfo)"></label>
-        <p class="payment-channel-note">未接入真实支付</p>
-        <div v-if="assetInfo && maxPoints > 0" class="asset-pay-hint"><label>积分抵扣<input v-model.number="pointsToUse" aria-label="抵扣积分" type="number" min="0" step="100" :max="maxPoints" :disabled="paying" @change="normalizePoints" @blur="normalizePoints"></label><small>100 积分抵 ¥1，本单最多 {{ maxPoints }} 积分</small></div>
+      <section class="section"><h3>选择支付方式</h3>
+        <div class="payment-options"><label v-for="method in [{id:'alipay',label:'支付宝'},{id:'wechat',label:'微信支付'},{id:'wallet',label:'钱包余额'}]" :key="method.id" class="payment-option" :class="{active:selectedPayment === method.id}"><span v-if="method.id !== 'wallet'" class="payment-provider"><span class="brand-mark"><img :src="method.id === 'alipay' ? require('../assets/alipay.png') : require('../assets/wechat.png')" alt=""></span><span>{{ method.label }}</span></span><span v-else class="wallet-brand"><i class="fa fa-credit-card" aria-hidden="true"></i>钱包余额</span><input type="radio" name="payment-method" :aria-label="method.label" :value="method.id" v-model="selectedPayment" :disabled="paying || (method.id === 'wallet' && !assetInfo)"></label></div>
+        <p class="payment-channel-note"><i class="fa fa-info-circle" aria-hidden="true"></i> 未接入真实支付，支付结果仅供体验</p>
+        <div v-if="assetInfo" class="asset-pay-hint"><p>钱包余额 ¥{{ Number(assetInfo.balance || 0).toFixed(2) }} · 可用积分 {{ assetInfo.points || 0 }}</p><div v-if="maxPoints > 0" class="points-row"><label>积分抵扣<input v-model.number="pointsToUse" aria-label="抵扣积分" type="number" min="0" step="100" :max="maxPoints" :disabled="paying" @change="normalizePoints" @blur="normalizePoints"></label><small>本单最多可抵 {{ maxPoints }} 积分（应付金额的20%）</small></div></div>
       </section>
-      <div class="payment-action"><div class="pay-total"><small>实付款</small><strong>¥{{ payableAmount }}</strong></div><button class="pay-button" :disabled="paying || couponLoading" @click="handlePayment">{{ paying ? '正在支付…' : '确认支付' }}</button></div>
+      <div class="payment-action"><div class="pay-total"><div>待支付 <strong>¥{{ payableAmount }}</strong></div><small>已优惠 ¥{{ (merchantDiscount + couponDiscount + appliedPoints / 100).toFixed(2) }}</small></div><button class="pay-button" :disabled="paying || couponLoading" @click="handlePayment">{{ paying ? '正在支付…' : '确认支付' }}</button></div>
     </div>
   </main>
 </template>
 
 <script>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
-import PageHeader from '../components/PageHeader.vue';
 import '../assets/styles/payment.css';
 import { useRoute, useRouter } from 'vue-router';
 import request from '../utils/request';
@@ -56,7 +57,6 @@ import { positiveId } from '../utils/checkout';
 
 export default {
 	name: 'Payment',
- components: { PageHeader },
 	setup() {
 		let active = true;
 		onBeforeUnmount(() => { active = false; });

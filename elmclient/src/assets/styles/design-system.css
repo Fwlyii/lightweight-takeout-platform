@@ -3,12 +3,14 @@
 body { background: var(--skin-surface); }
 #app { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; color: var(--skin-ink); }
 #app .app-container { width: min(100%,var(--app-width)); margin-inline: auto; border-inline: 1px solid var(--skin-border); background: var(--skin-surface); container-type: inline-size; }
+#app .app-container.auth-area { width:100%; border:0; container-type:normal; --skin-brand:initial; --skin-brand-strong:initial; --skin-surface:initial; --skin-border:initial; --skin-ink:initial; --skin-muted:initial; --skin-ink-rgb:initial; }
 #app .app-container > .content > :is(.wrapper,.profile-page,.assets-page,.preferences-page,.ai-page,.order-detail-page) { width: 100%; max-width: none; margin-inline: auto; }
 #app .app-container > .content { scroll-padding-bottom: 112px; }
 #app .app-container > :is(.footer,.role-footer,.bottom-nav),
 #app .business-detail-page > .cart,
-#app .wrapper > :is(.payment-action,.checkout-bar),
-#app .wrapper .search .search-fixed-top { width: min(100%,var(--app-width)); max-width: var(--app-width); left: 50%; right: auto; transform: translateX(-50%); }
+#app .wrapper > :is(.payment-action,.checkout-bar) { width: min(100%,var(--app-width)); max-width: var(--app-width); left: 50%; right: auto; transform: translateX(-50%); }
+#app .home-page > .search { position: sticky; top: 0; z-index: 25; }
+#app .home-page .search .search-fixed-top { position: relative; width: 100%; max-width: none; left: auto; right: auto; top: auto; transform: none; margin: 0; }
 #app .app-container > .back-button { left: max(12px,calc((100vw - var(--app-width))/2 + 20px)); top: 14px; width: 40px; height: 40px; border-radius: 12px; box-shadow: none; }
 #app .unified-page-header { display: grid; height: auto; min-height: 68px; padding: 12px 20px; background: #fff; color: var(--skin-ink); z-index: 30; }
 #app .unified-page-header > button { width:40px; height:40px; min-height:40px; color: var(--skin-ink); background: var(--skin-surface); border: 1px solid var(--skin-border); font: 30px/1 Arial,sans-serif; padding: 0; }
