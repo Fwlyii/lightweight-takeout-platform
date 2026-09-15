@@ -10,6 +10,11 @@
 			<p>加载中...</p>
 		</div>
 
+		<div v-else-if="loadError" class="payment-unavailable" role="alert">
+			<h2>订单加载失败</h2><p>{{ loadError }}</p>
+			<button @click="fetchOrderDetails">重新加载</button>
+			<button @click="router.replace('/orderList')">返回订单列表</button>
+		</div>
 		<template v-else>
 			<div v-if="!canPay" class="payment-unavailable">
 				<i class="fa fa-check-circle"></i>
@@ -33,7 +38,7 @@
 						</div>
 						<div class="info-item">
 							<i class="fa fa-user"></i>
-							<span>{{ orderDetail.contactName }} {{ orderDetail.contactSex === 1 ? '先生' : '女士' }}</span>
+							<span>{{ orderDetail.contactName }} {{ orderDetail.contactSex === 1 ? '先生' : orderDetail.contactSex === 0 ? '女士' : '' }}</span>
 						</div>
 						<div class="info-item">
 							<i class="fa fa-phone"></i>
@@ -128,7 +133,7 @@
 
 				<!-- 支付按钮 -->
 				<div class="payment-action">
-					<button class="pay-button" @click="handlePayment">
+					<button class="pay-button" :disabled="paying || couponLoading" @click="handlePayment">
 						<span v-if="paying">支付中...</span>
 						<span v-else>确认支付 &#165;{{ payableAmount }}</span>
 					</button>
@@ -146,6 +151,7 @@ import { useRoute, useRouter } from 'vue-router';
 import request from '../utils/request';
 import { toast } from '../utils/toast';
 import { ORDER_STATUS } from '../utils/orderPresentation';
+import { positiveId } from '../utils/checkout';
 
 export default {
 	name: 'Payment',
@@ -156,6 +162,7 @@ export default {
 		const router = useRouter();
 		const orderId = ref();
 		const loading = ref(true);
+		const loadError = ref('');
 		const selectedPayment = ref('alipay');
 		const paying = ref(false);
 		const assetInfo = ref(null);
@@ -187,24 +194,23 @@ export default {
 
 		// 获取订单详情
 		const fetchOrderDetails = async () => {
+			loading.value = true; loadError.value = '';
 			try {
+				if (!positiveId(orderId.value)) throw new Error('缺少有效订单编号，请从订单列表重新进入');
 				// 使用动态的orderId，而不是硬编码的24
 				const response = await request.get("/api/orders/detail", {
 					params: { orderId: orderId.value }
 				});
 				
-					if (response.success) {
+					if (response.success && response.data) {
 					// 正确的数据访问方式
 					orderDetail.value = response.data;
 				} else {
-					console.error('获取订单详情失败:', response.data?.message);
-					toast.error("获取订单信息失败，请重试！");
-					router.push({ path: '/userAddress' });
+					throw new Error(response?.message || '获取订单信息失败，请重试');
 				}
 			} catch (error) {
 				console.error('请求错误:', error);
-				toast.error("获取订单信息失败，请重试！");
-				router.push({ path: '/userAddress' });
+				loadError.value = error?.response?.data?.message || error.message || '订单信息加载失败';
 			} finally {
 				loading.value = false;
 			}
@@ -235,7 +241,7 @@ export default {
 				toast.warning('订单状态已变化，无需再次支付');
 				return;
 			}
-			if (paying.value) return;
+			if (paying.value || couponLoading.value) return;
 			paying.value = true;
 			try {
 				const response = await request.put('/api/orders/status', null, { params: {
@@ -247,16 +253,16 @@ export default {
 				} });
 				if (response.success) {
 					// 支付成功，跳转到成功页面
-					router.push({
+					router.replace({
 						path: '/successfulPayment',
 						query: { orderId: orderId.value }
 					});
 				} else {
-					toast.error("支付失败" + response.data.message);
+					toast.error(response?.message || '支付失败，请重试');
 				}
 			} catch (error) {
 				console.error('支付失败:', error);
-				toast.error("支付失败，请重试！");
+				toast.error(error?.response?.data?.message || error.message || '支付失败，请重试');
 			} finally {
 				paying.value = false;
 			}
@@ -295,6 +301,7 @@ export default {
 			detailetShow,
 			handlePayment,
 			loading,
+			loadError, fetchOrderDetails,
 			selectedPayment,
 			selectPayment,
 			paying,

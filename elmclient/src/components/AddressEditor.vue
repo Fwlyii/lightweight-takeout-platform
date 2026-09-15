@@ -1,7 +1,7 @@
 <template>
   <ProfilePage
     :title="id ? '编辑收货地址' : '新增收货地址'"
-    back-to="/userAddress"
+    :back-to="returnTo"
   >
     <p v-if="loading" role="status">正在加载地址…</p>
     <p v-if="error" class="notice error" role="alert">{{ error }}</p>
@@ -45,14 +45,15 @@
         </button>
       </fieldset>
     </form>
-    <router-link v-if="!loading && !ready" class="action-link" to="/userAddress"
+    <router-link v-if="!loading && !ready" class="action-link" :to="returnTo"
       >返回地址列表</router-link
     >
   </ProfilePage>
 </template>
 <script setup>
-import { onMounted, reactive, ref } from "vue";
-import { useRouter } from "vue-router";
+import { computed, onMounted, reactive, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { addressReturnLocation } from '../utils/checkout';
 import ProfilePage from "./ProfilePage.vue";
 import {
   getMyAddress,
@@ -61,6 +62,8 @@ import {
 } from "../services/addressService";
 const props = defineProps({ id: { type: String, default: "" } }),
   router = useRouter();
+const route = useRoute();
+const returnTo = computed(() => addressReturnLocation(route.query));
 const form = reactive({
   contactName: "",
   contactSex: null,
@@ -92,7 +95,7 @@ async function save() {
   try {
     if (props.id) await updateMyAddress(props.id, { ...form });
     else await createMyAddress({ ...form });
-    await router.replace("/userAddress");
+    await router.replace(returnTo.value);
   } catch (e) {
     error.value = e.response?.data?.message || "保存失败，请重试";
   } finally {

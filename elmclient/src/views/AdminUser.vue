@@ -134,8 +134,8 @@ const filterStatus = computed(() => {
 
 const getPersonList = async () => {
     try {
-        const res = await request.get('/api/persons', {
-            params: { status: filterStatus.value }
+        const res = await request.get('/api/admin/users', {
+            params: { status: filterStatus.value, keyword: searchKeyword.value }
         });
 
         if (res.success) {
@@ -167,9 +167,8 @@ const getPersonList = async () => {
 
 const handleSearch = async () => {
     try {
-        const res = await request.post('/api/persons/search', {
-            keyword: searchKeyword.value,
-            status: filterStatus.value
+        const res = await request.get('/api/admin/users', {
+            params: { keyword: searchKeyword.value, status: filterStatus.value }
         });
         if (res.success) {
             users.value = res.data.map(item => ({
@@ -192,19 +191,21 @@ const confirmToggle = async () => {
     if (!selectedUser.value) return;
 
     try {
-        const username = selectedUser.value.username;
+        const userId = selectedUser.value.userId;
         const targetActivated = selectedUser.value.disabled;
 
-        await request.put(`/api/${username}/status`, null, {
+        const result = await request.put(`/api/admin/users/${userId}/status`, null, {
             params: { activated: targetActivated }
         });
+
+        if (!result.success) throw new Error(result.message || '操作失败');
 
         selectedUser.value.disabled = !selectedUser.value.disabled;
         showConfirmModal.value = false;
         toast.success(`用户已${selectedUser.value.disabled ? '禁用' : '启用'}`);
     } catch (error) {
         console.error('切换用户状态失败：', error);
-        toast.error('操作失败，请重试');
+        toast.error(error.response?.data?.message || error.message || '操作失败，请重试');
     }
 };
 

@@ -12,7 +12,7 @@
 import { useRouter } from "vue-router";
 const props = defineProps({
   title: String,
-  backTo: { type: String, default: "/myInformation" },
+  backTo: { type: [String, Object], default: "/myInformation" },
 });
 const router = useRouter();
 const back = () => router.push(props.backTo);

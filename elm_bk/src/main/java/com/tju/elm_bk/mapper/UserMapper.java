@@ -11,6 +11,14 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
+    @Select("<script>SELECT u.id,u.username,u.activated,u.create_time,p.phone,p.email,p.photo " +
+            "FROM users u LEFT JOIN person p ON p.id=u.id WHERE u.is_deleted=0 " +
+            "<if test='status == 1'>AND u.activated=1 </if>" +
+            "<if test='status == 2'>AND u.activated=0 </if>" +
+            "<if test='keyword != null and keyword != &quot;&quot;'>" +
+            "AND (u.username LIKE CONCAT('%',#{keyword},'%') OR p.phone LIKE CONCAT('%',#{keyword},'%') " +
+            "OR p.email LIKE CONCAT('%',#{keyword},'%')) </if>ORDER BY u.id</script>")
+    List<com.tju.elm_bk.vo.AdminUserVO> listAdminUsers(@Param("status") int status, @Param("keyword") String keyword);
     @org.apache.ibatis.annotations.Select("SELECT id FROM users WHERE id=#{id} FOR UPDATE")
     Long lockAccount(Long id);
     @Select("SELECT * FROM users WHERE id = #{id} AND is_deleted = 0")

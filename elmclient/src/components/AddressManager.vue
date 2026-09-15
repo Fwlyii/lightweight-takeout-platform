@@ -18,13 +18,13 @@
       <button
         v-if="selectable"
         type="button"
-        :disabled="busy"
+        :disabled="busy || disabled"
         @click="$emit('select', address)"
       >
-        使用此地址
+        {{ selectedId === address.id ? '已选择此地址' : '使用此地址' }}
       </button>
       <button
-        v-if="!address.isDefault"
+        v-if="!disabled && !address.isDefault"
         type="button"
         :disabled="busy"
         @click="makeDefault(address.id)"
@@ -32,11 +32,13 @@
         设为默认
       </button>
       <router-link
+        v-if="!disabled"
         class="action-link"
-        :to="{ path: '/editUserAddress', query: { id: address.id } }"
+        :to="{ path: '/editUserAddress', query: { ...checkoutQuery, id: address.id } }"
         >编辑</router-link
       >
       <button
+        v-if="!disabled"
         type="button"
         :disabled="busy"
         @click="pendingDelete = address.id"
@@ -56,7 +58,7 @@
       </div>
     </div>
   </article>
-  <router-link class="action-link primary wide" to="/addUserAddress"
+  <router-link v-if="!disabled" class="action-link primary wide" :to="{ path: '/addUserAddress', query: checkoutQuery }"
     >新增收货地址</router-link
   >
 </template>
@@ -67,8 +69,8 @@ import {
   setMyDefaultAddress,
   removeMyAddress,
 } from "../services/addressService";
-defineProps({ selectable: Boolean });
-defineEmits(["select"]);
+defineProps({ selectable: Boolean, disabled: Boolean, selectedId: Number, checkoutQuery: { type: Object, default: () => ({}) } });
+const emit = defineEmits(["select", "loaded"]);
 const addresses = ref([]),
   loading = ref(true),
   busy = ref(false),
@@ -79,6 +81,7 @@ async function load() {
   error.value = "";
   try {
     addresses.value = await listMyAddresses();
+    emit('loaded', addresses.value);
   } catch (e) {
     error.value = e.response?.data?.message || "地址加载失败";
   } finally {

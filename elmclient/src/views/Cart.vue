@@ -6,7 +6,11 @@
 		</header>
 
 		<!-- 购物车为空提示 -->
-		<div class="empty-cart" v-if="cartItems.length === 0">
+		<div v-if="loading || loadError" class="empty-cart" role="status">
+			<p>{{ loading ? '正在加载购物车…' : loadError }}</p>
+			<button v-if="!loading" @click="listCart">重新加载</button>
+		</div>
+		<div class="empty-cart" v-else-if="cartItems.length === 0">
 			<img src="../assets/empty-cart.png" alt="购物车为空">
 			<p>您的购物车空空如也</p>
 			<button @click="goBack">继续选购</button>
@@ -18,6 +22,10 @@
 			<div class="business-info">
 				<div class="business-info-title"><h3>{{ businessName }}</h3><button class="select-all" @click="toggleSelectAll">{{ allSelected ? '取消全选' : '全选' }}</button></div>
 				<p class="selection-hint">已选 {{ selectedItems.length }} 份商品，可分批结算</p>
+				<div v-if="merchants.length > 1" class="merchant-choices">
+					<p>不同商家需要分别下单，请选择一家：</p>
+					<button v-for="merchant in merchants" :key="merchant.id" @click="selectMerchant(merchant.id)">{{ merchant.name }}</button>
+				</div>
 			</div>
 
 			<ul class="cart">
@@ -30,6 +38,7 @@
 					</div>
 					<div class="cart-info">
 						<h3>{{ item.foodName }}</h3>
+						<small v-if="merchants.length > 1">{{ item.businessName }}</small>
 						<small v-if="item.purchaseLimit" class="food-meta">每单最多 {{ item.purchaseLimit }} 份</small>
 						<p>&#165;{{ Number(item.foodPrice || 0).toFixed(2) }} / 份</p>
 						<small v-if="Number(item.stock || 0) <= 0" class="stock-hint">当前已售罄</small>
@@ -51,7 +60,7 @@
 				<div class="total-price">
 					<p style="color: black;">总计:  <span style="color:crimson;">&#165; {{ totalPrice }}</span></p>
 				</div>
-				<button class="checkout-btn" :disabled="selectedItems.length === 0" @click="checkout">去下单</button>
+				<button class="checkout-btn" :disabled="selectedItems.length === 0 || selectedBusinessIds.length !== 1 || updatingCartIds.size > 0" @click="checkout">{{ selectedBusinessIds.length > 1 ? '请按商家分别结算' : '去下单' }}</button>
 			</div>
 		</div>
 
@@ -67,6 +76,7 @@ import { toast } from '../utils/toast';
 import { cartQuantityLimitMessage, maxCartQuantity } from '../utils/cartQuantityRules';
 import { listCartItems, removeCartItem, setCartItemQuantity } from '../services/cartService';
 import { returnToMerchant } from '../utils/backNavigation';
+import { positiveId } from '../utils/checkout';
 
 export default {
 	name: 'Cart',
@@ -78,11 +88,15 @@ export default {
 		const businessId = ref(null);
 		const selectedFoodIds = ref([]);
 		const updatingCartIds = ref(new Set());
+		const loading = ref(true), loadError = ref('');
 		// const businessId = ref(null);
 		const businessName = ref('');
 
 		onMounted(() => {
-			businessId.value = parseInt(route.query.businessId);
+			businessId.value = route.query.businessId === undefined ? null : positiveId(route.query.businessId);
+			if (route.query.businessId !== undefined && !businessId.value) {
+				loadError.value = '商家编号无效，请返回首页重新进入购物车'; loading.value = false; return;
+			}
 			const cachedUser = localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
 			try { userInfo.value = cachedUser ? JSON.parse(cachedUser) : null; } catch (_) { userInfo.value = null; }
 
@@ -95,18 +109,23 @@ export default {
 		});
 
 		const listCart = () => {
+			loading.value = true; loadError.value = '';
 			listCartItems(businessId.value)
 				.then(items => {
 					cartItems.value = Array.isArray(items) ? items : [];
-					businessName.value = cartItems.value[0]?.businessName || '当前商家';
+					businessName.value = businessId.value ? cartItems.value[0]?.businessName || '当前商家' : '我的购物车';
 					selectedFoodIds.value = [...new Set(cartItems.value.map(item => item.foodId).filter(Boolean))];
 				}).catch(error => {
 					console.error('获取购物车失败:', error);
-			});
+					loadError.value = error?.response?.data?.message || error.message || '购物车加载失败';
+				}).finally(() => { loading.value = false; });
 		};
 
 		// 计算总价
 		const selectedItems = computed(() => cartItems.value.filter(item => selectedFoodIds.value.includes(item.foodId)));
+		const selectedBusinessIds = computed(() => [...new Set(selectedItems.value.map(item => positiveId(item.businessId)).filter(Boolean))]);
+		const merchants = computed(() => [...new Map(cartItems.value.map(item => [Number(item.businessId), { id: Number(item.businessId), name: item.businessName }])).values()]);
+		const selectMerchant = id => { selectedFoodIds.value = cartItems.value.filter(item => Number(item.businessId) === id).map(item => item.foodId); };
 		const allSelected = computed(() => cartItems.value.length > 0 && selectedItems.value.length === cartItems.value.length);
 		const totalPrice = computed(() => {
 			return selectedItems.value.reduce((total, item) => {
@@ -166,17 +185,22 @@ export default {
 
 		// 结算
 		const checkout = () => {
+			if (updatingCartIds.value.size > 0) return;
 			if (selectedItems.value.length === 0) {
 				toast.warning('请先选择要结算的商品');
 				return;
 			}
+			if (selectedBusinessIds.value.length !== 1) {
+				toast.warning('不同商家需要分别下单，请只选择一家商家的商品'); return;
+			}
+			const checkoutBusinessId = selectedBusinessIds.value[0];
 			// 跳转到结算页面
 				router.push({
 					path: '/userAddress',
 					query: {
-						businessId: businessId.value,
+						businessId: checkoutBusinessId,
 						foodIds: selectedFoodIds.value.join(','),
-						serviceMode: route.query.serviceMode || localStorage.getItem(`businessServiceMode:${businessId.value}`) || 'delivery',
+						serviceMode: route.query.serviceMode || localStorage.getItem(`businessServiceMode:${checkoutBusinessId}`) || 'delivery',
 					}
 			});
 		};
@@ -195,6 +219,7 @@ export default {
 
 		return {
 			cartItems,
+			loading, loadError, listCart, merchants, selectMerchant, selectedBusinessIds,
 			businessName,
 			selectedFoodIds,
 			selectedItems,

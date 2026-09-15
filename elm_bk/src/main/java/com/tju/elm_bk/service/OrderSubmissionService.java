@@ -130,9 +130,13 @@ public class OrderSubmissionService {
         if (selectedFoodIds == null || selectedFoodIds.isEmpty()) return allItems;
         if (allItems == null) return Collections.emptyList();
         Set<Long> selected = new HashSet<>(selectedFoodIds);
-        return allItems.stream()
+        List<CartItemVO> matching = allItems.stream()
                 .filter(item -> item.getFoodId() != null && selected.contains(item.getFoodId()))
                 .toList();
+        if (matching.stream().map(CartItemVO::getFoodId).distinct().count() != selected.size()) {
+            throw new APIException("部分待结算商品已变化，请返回购物车重新选择");
+        }
+        return matching;
     }
 
     private void validateCart(List<CartItemVO> items) {

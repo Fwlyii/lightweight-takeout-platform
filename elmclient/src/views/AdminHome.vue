@@ -330,13 +330,10 @@ const getPersonInfo = async (userId) => {
 
     loadingPersonInfo.value = true;
     try {
-        // 调用接口，传入用户ID作为query参数
-        const res = await request.get('/api/personInfo', {
-            params: { id: userId },
-        });
+        const res = await request.get('/api/user');
 
-        if (res.success && res.data) {
-            currentPersonInfo.value = res.data;
+        if (res && res.id) {
+            currentPersonInfo.value = res;
         } else {
             toast.warning('获取用户信息失败');
             currentPersonInfo.value = null;

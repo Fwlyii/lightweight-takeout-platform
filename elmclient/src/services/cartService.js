@@ -5,10 +5,14 @@ const ensureSuccess = (response, fallbackMessage) => {
   return response.data;
 };
 
-export const listCartItems = async businessId => ensureSuccess(
-  await request.get('/api/carts/list', { params: { businessId } }),
-  '获取购物车失败'
-);
+export const listCartItems = async businessId => {
+  if (businessId != null && (!Number.isSafeInteger(Number(businessId)) || Number(businessId) <= 0)) {
+    throw new Error('商家编号无效');
+  }
+  return ensureSuccess(await request.get('/api/carts/list', {
+    params: businessId == null ? {} : { businessId }
+  }), '获取购物车失败');
+};
 
 export const addCartItem = async (foodId, quantity = 1) => ensureSuccess(
   await request.post('/api/carts/items', { foodId, quantity }),

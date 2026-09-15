@@ -93,7 +93,7 @@ export default {
     const loadMerchantData = async () => {
       loading.value = true;
       try {
-        const data = await request.get('/api/person');
+        const data = await request.get('/api/user');
         
         if (data && data.id) {
           merchant.value = {

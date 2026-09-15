@@ -23,7 +23,9 @@ public interface CartMapper {
         from cart c
         join food f on f.id = c.food_id and f.is_deleted = 0
         join business b on c.business_id = b.id and b.is_deleted = 0
-        where c.customer_id = #{userId} and c.is_deleted = 0 and c.business_id = #{businessId};
+        where c.customer_id = #{userId} and c.is_deleted = 0
+          and (#{businessId} IS NULL OR c.business_id = #{businessId})
+        order by c.business_id, c.id;
     """)
     List<CartItemVO> selectCartItems(@Param("userId") Long userId, @Param("businessId") Long businessId);
 

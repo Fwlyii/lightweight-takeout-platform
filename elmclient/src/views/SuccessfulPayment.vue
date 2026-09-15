@@ -2,7 +2,7 @@
   <div class="container">
     <div class="card">
       <div class="header-section">
-        <div class="icon-section">
+        <div v-if="receiptState === 'paid'" class="icon-section">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -17,23 +17,26 @@
             <polyline points="22 4 12 14.01 9 11.01"></polyline>
           </svg>
         </div>
-        <h2 class="title">支付成功</h2>
+        <h2 class="title">{{ loading ? '正在核实订单…' : receiptState === 'paid' ? '支付成功' : receiptState === 'unpaid' ? '订单尚未支付' : receiptState === 'cancelled' ? '订单已取消' : '无法确认支付结果' }}</h2>
+        <p v-if="error" role="alert">{{ error }}</p>
       </div>
-      <div class="details">
+      <div v-if="!loading && !error" class="details">
         <div class="detail-item">
           <span class="label">商家名称</span>
-          <span class="value">{{ paymentDetails.business?.businessName || '未知商家' }}</span>
+          <span class="value">{{ paymentDetails.businessName || '未知商家' }}</span>
         </div>
         <div class="detail-item">
-          <span class="label">支付金额</span>
-          <span class="value amount">¥{{ paymentDetails.orderTotal }}</span>
+          <span class="label">{{ receiptState === 'paid' ? '支付金额' : '订单金额' }}</span>
+          <span class="value amount">¥{{ Number(paymentDetails.orderTotal || 0).toFixed(2) }}</span>
         </div>
         <div class="detail-item">
-          <span class="label">支付时间</span>
+          <span class="label">下单时间</span>
           <span class="value">{{ paymentDetails.orderDate }}</span>
         </div>
       </div>
       <div class="actions">
+        <button v-if="error" @click="load" class="btn-back" :disabled="loading">重新查询</button>
+        <button v-if="receiptState === 'unpaid'" @click="router.replace({ path: '/payment', query: { orderId } })" class="btn-back">继续支付</button>
         <button @click="goBack" class="btn-back">去查看订单</button>
       </div>
     </div>
@@ -44,43 +47,35 @@
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import request from '@/utils/request';
+import { loadPaymentReceipt } from '../utils/paymentReceipt';
 
 export default {
   setup() {
     const route = useRoute();
     const router = useRouter();
     const paymentDetails = ref({});
+    const loading = ref(true), error = ref(''), receiptState = ref('');
     
     const orderId = ref(route.query.orderId);
 
-    onMounted(async () => {
-      if (!orderId.value) {
-        console.error('缺少订单ID参数，无法查询支付详情。');
-        return;
-      }
-      
+    const load = async () => {
+      loading.value = true; error.value = ''; receiptState.value = '';
       try {
-        const response = await request.get(`/api/orders/${orderId.value}`);
-        if (response.success && response.data) {
-          paymentDetails.value = {
-            business: response.data.business,
-            orderTotal: response.data.orderTotal,
-            orderDate: response.data.orderDate
-          };
-        } else {
-          console.error('API 请求失败或返回数据格式不正确', response.message);
-        }
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      }
-    });
+        const receipt = await loadPaymentReceipt(request, orderId.value);
+        paymentDetails.value = receipt.order;
+        receiptState.value = receipt.state;
+      } catch (e) { error.value = e.response?.data?.message || e.message || '订单查询失败'; }
+      finally { loading.value = false; }
+    };
+    onMounted(load);
 
     const goBack = () => {
-      router.push('/orderList');
+      router.replace('/orderList');
     };
 
     return {
       paymentDetails,
+      loading, error, receiptState, load, router, orderId,
       goBack,
     };
   }

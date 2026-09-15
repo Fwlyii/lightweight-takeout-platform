@@ -4,6 +4,7 @@ import com.tju.elm_bk.mapper.BusinessMapper;
 import com.tju.elm_bk.mapper.OrdersMapper;
 import com.tju.elm_bk.mapper.UserMapper;
 import com.tju.elm_bk.result.HttpResult;
+import com.tju.elm_bk.exception.APIException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,32 @@ public class AdminController {
     private final UserMapper userMapper;
     private final BusinessMapper businessMapper;
     private final OrdersMapper ordersMapper;
+    private final com.tju.elm_bk.service.CurrentUserService currentUser;
+
+    @GetMapping("/users")
+    public HttpResult<java.util.List<com.tju.elm_bk.vo.AdminUserVO>> users(
+            @RequestParam(defaultValue = "0") int status,
+            @RequestParam(defaultValue = "") String keyword) {
+        currentUser.requireUser();
+        if (status < 0 || status > 2 || keyword.length() > 100) throw new APIException("查询条件无效");
+        return HttpResult.success(userMapper.listAdminUsers(status, keyword.trim()));
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/users/{userId}/status")
+    @org.springframework.transaction.annotation.Transactional
+    public HttpResult<Void> updateStatus(@org.springframework.web.bind.annotation.PathVariable Long userId,
+            @RequestParam boolean activated) {
+        Long operatorId = currentUser.requireUserId();
+        userMapper.lockAccount(userId);
+        var account = userMapper.findByUserIdWithAuthorities(userId);
+        if (account == null || Boolean.TRUE.equals(account.getIsDeleted())) throw new APIException("用户不存在");
+        if (!activated && (operatorId.equals(userId) || currentUser.isAdmin(account))) {
+            throw new APIException("不能禁用自己或管理员账户");
+        }
+        account.setActivated(activated);
+        userMapper.updateActivated(account);
+        return HttpResult.success();
+    }
 
     @GetMapping("/countUser")
     @Operation(summary = "获取总用户数", description = "获取总用户数")

@@ -87,6 +87,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<CartItemVO> getCartItemList(Long businessId) {
+        if (businessId != null && businessId <= 0) throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
         Long userId = currentUserService.requireUserId();
         return cartMapper.selectCartItems(userId, businessId);
     }

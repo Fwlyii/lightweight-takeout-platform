@@ -34,8 +34,8 @@ public class CartController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "获取用户在指定商家的购物车商品列表")
-    public HttpResult<List<CartItemVO>> addCartItem(@RequestParam Long businessId) {
+    @Operation(summary = "获取当前用户购物车，可按商家筛选")
+    public HttpResult<List<CartItemVO>> addCartItem(@RequestParam(required = false) Long businessId) {
         return HttpResult.success(cartService.getCartItemList(businessId));
     }
 
