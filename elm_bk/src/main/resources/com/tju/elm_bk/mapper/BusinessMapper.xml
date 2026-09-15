@@ -109,12 +109,20 @@
             <if test="updateDto.dineInAvailable != null">
                 dine_in_available = #{updateDto.dineInAvailable},
             </if>
+            <choose>
+            <when test="updateDto.promotionEnabled != null and !updateDto.promotionEnabled">
+                promotion_threshold = NULL,
+                promotion_discount = NULL,
+            </when>
+            <otherwise>
             <if test="updateDto.promotionThreshold != null">
                 promotion_threshold = #{updateDto.promotionThreshold},
             </if>
             <if test="updateDto.promotionDiscount != null">
                 promotion_discount = #{updateDto.promotionDiscount},
             </if>
+            </otherwise>
+            </choose>
             <if test="updateDto.operatingStatus != null">
                 operating_status = #{updateDto.operatingStatus},
             </if>
@@ -266,12 +274,12 @@
               WHERE r.business_id = b.id AND r.is_hidden = 0),
             b.demo_rating
         ) as score,
-        (COALESCE(b.demo_sales_count, 0) +
-            (SELECT COUNT(*)
+        (SELECT COUNT(*)
                FROM orders completed_order
               WHERE completed_order.business_id = b.id
                 AND completed_order.order_state = 7
-                AND completed_order.is_deleted = 0)) as salesCount,
+                AND completed_order.is_deleted = 0
+                AND completed_order.order_date >= TIMESTAMPADD(DAY, -30, CURRENT_TIMESTAMP)) as salesCount,
         b.create_time as createTime,
         (SELECT COALESCE(AVG(o.order_total), b.start_price)
            FROM orders o

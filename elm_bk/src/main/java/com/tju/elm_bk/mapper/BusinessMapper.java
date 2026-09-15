@@ -28,7 +28,7 @@ public interface BusinessMapper {
     List<Authority> selectAuthoritiesByUserId(@Param("userId") Long userId);
 
     // 逻辑删除商户并返回删除前的信息
-    @Update("UPDATE business SET is_deleted = 1 WHERE id = #{id} AND is_deleted = 0")
+    @Update("UPDATE business SET is_deleted = 1 WHERE id = #{id} AND is_deleted = 0 AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.business_id = #{id} AND o.is_deleted = 0 AND o.order_state NOT IN (7, 8))")
     int deleteBusiness(@Param("id") Long id);
 
     int insertBusiness(@Param("businessDto") BusinessDTO businessDto);
@@ -40,6 +40,9 @@ public interface BusinessMapper {
 
     @Select("SELECT b.* FROM business b WHERE b.id = #{businessId} AND b.is_deleted = 0")
     Business selectBusinessById(@Param("businessId") Long businessId);
+
+    @Select("SELECT * FROM business WHERE id = #{businessId} AND is_deleted = 0 FOR UPDATE")
+    Business lockBusinessById(@Param("businessId") Long businessId);
 
     @Update("UPDATE business SET status = #{status},update_time=#{updateTime},updater=#{updater} WHERE id = #{id} AND status = 0 AND is_deleted = 0")
     int updateBusinessStatus(BusinessPermissionDTO businessPermissionDTO);

@@ -26,6 +26,9 @@ public interface FoodMapper {
     @Select("SELECT * FROM food WHERE is_deleted = 0 AND id = #{id}")
     Food selectFoodById(@Param("id") Long id);
 
+    @Select("SELECT * FROM food WHERE is_deleted = 0 AND id = #{id} FOR UPDATE")
+    Food lockFoodById(@Param("id") Long id);
+
     @Update("update food set update_time = #{food.updateTime}, updater = #{food.updater}, food_explain = #{food.foodExplain}, food_img =#{food.foodImg}, food_name = #{food.foodName}, food_price = #{food.foodPrice}, remarks = #{food.remarks}, category = #{food.category}, purchase_limit = #{food.purchaseLimit} where id = #{foodId}")
     void updateFood(@Param("food") Food food, @Param("foodId") Long foodId);
 
@@ -86,10 +89,10 @@ public interface FoodMapper {
                    b.operating_status, f.stock, f.purchase_limit,
                    COALESCE((SELECT ROUND(AVG(r.rating), 2) FROM review r
                               WHERE r.business_id = b.id AND r.is_hidden = 0), b.demo_rating, 0) AS business_score,
-                   (COALESCE(b.demo_sales_count, 0) +
-                     (SELECT COUNT(*) FROM orders completed_order
+                   (SELECT COUNT(*) FROM orders completed_order
                        WHERE completed_order.business_id = b.id AND completed_order.order_state = 7
-                         AND completed_order.is_deleted = 0)) AS business_sales_count,
+                         AND completed_order.is_deleted = 0
+                         AND completed_order.order_date >= TIMESTAMPADD(DAY, -30, CURRENT_TIMESTAMP)) AS business_sales_count,
                    COALESCE(SUM(CASE WHEN o.id IS NOT NULL THEN od.quantity ELSE 0 END), 0) AS sales_count,
                    COALESCE(SUM(CASE WHEN o.customer_id = #{userId} THEN od.quantity ELSE 0 END), 0) AS user_purchase_count
             FROM food f

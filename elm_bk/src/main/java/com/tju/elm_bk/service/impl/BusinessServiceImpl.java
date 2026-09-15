@@ -88,10 +88,11 @@ public class BusinessServiceImpl implements BusinessService {
         if(!isSelf&&!isAdmin){
             throw new APIException(ResultCodeEnum.NOT_ENOUGH_PERMISSION);//权限不足
         }
+        if (businessMapper.lockBusinessById(id) == null) throw new APIException(ResultCodeEnum.BUSINESS_MISSED);
         BusinessVO businessVo =businessMapper.getBusinessById(id);
         int result =businessMapper.deleteBusiness(id);
         if (result == 0) {
-            throw new APIException(ResultCodeEnum.BUSINESS_MISSED);//商铺不存在
+            throw new APIException("店铺仍有未完成订单，请处理完成后再删除");
         }
         return businessVo;
 
@@ -359,16 +360,20 @@ public class BusinessServiceImpl implements BusinessService {
     }
 
     private void validateBusinessPricing(BusinessUpdateDTO updateDto, Business existing) {
+        if (Boolean.FALSE.equals(updateDto.getPromotionEnabled())) {
+            updateDto.setPromotionThreshold(null);
+            updateDto.setPromotionDiscount(null);
+        }
         BigDecimal startPrice = updateDto.getStartPrice() == null
                 ? existing.getStartPrice()
                 : updateDto.getStartPrice();
         BigDecimal deliveryPrice = updateDto.getDeliveryPrice() == null
                 ? existing.getDeliveryPrice()
                 : updateDto.getDeliveryPrice();
-        BigDecimal threshold = updateDto.getPromotionThreshold() == null
+        BigDecimal threshold = Boolean.FALSE.equals(updateDto.getPromotionEnabled()) ? null : updateDto.getPromotionThreshold() == null
                 ? existing.getPromotionThreshold()
                 : updateDto.getPromotionThreshold();
-        BigDecimal discount = updateDto.getPromotionDiscount() == null
+        BigDecimal discount = Boolean.FALSE.equals(updateDto.getPromotionEnabled()) ? null : updateDto.getPromotionDiscount() == null
                 ? existing.getPromotionDiscount()
                 : updateDto.getPromotionDiscount();
         businessPricingPolicy.validate(startPrice, deliveryPrice, threshold, discount);

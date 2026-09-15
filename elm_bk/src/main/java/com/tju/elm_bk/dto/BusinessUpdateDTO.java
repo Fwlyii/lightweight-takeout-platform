@@ -60,6 +60,8 @@ public class BusinessUpdateDTO {
     private BigDecimal promotionThreshold;
     @Schema(description = "满减优惠金额")
     private BigDecimal promotionDiscount;
+    @Schema(description = "false明确取消满减；未传时保持原有部分更新语义")
+    private Boolean promotionEnabled;
     @Schema(description = "营业状态：true营业中，false休息中")
     private Boolean operatingStatus;
 }

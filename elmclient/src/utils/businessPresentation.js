@@ -23,17 +23,12 @@ export const hasConfiguredPromotion = business => {
 
 export const supportsDineIn = business => [true, 1, '1', 'true'].includes(business?.dineInAvailable);
 
-/**
- * 商家展示用的距离（km）与预计送达时长（分钟）。
- * 后端一旦下发 distanceKm / deliveryMinutes 就直接使用；否则按商家 id 稳定推导，
- * 保证首页与商家列表对同一家店展示的数值完全一致（口径集中在这里，页面不再各写一份）。
- */
-export const getBusinessDistanceKm = (business, fallbackIndex = 0) =>
-  Number(business?.distanceKm || business?.distance
-    || (0.6 + ((Number(business?.id || fallbackIndex) % 4) * 0.2)));
-
-export const getBusinessDeliveryMinutes = (business, fallbackIndex = 0) =>
-  Number(business?.deliveryMinutes || (15 + ((Number(business?.id || fallbackIndex) % 4) * 3)));
+const nonNegative = value => value === null || value === undefined || value === ''
+  || !Number.isFinite(Number(value)) || Number(value) < 0 ? null : Number(value);
+export const getBusinessDistanceKm = business => nonNegative(business?.distanceKm ?? business?.distance);
+export const getBusinessDeliveryMinutes = business => nonNegative(business?.deliveryMinutes);
+export const compareBusinessDistance = (a, b) =>
+  (getBusinessDistanceKm(a) ?? Infinity) - (getBusinessDistanceKm(b) ?? Infinity) || 0;
 
 export const getBusinessAveragePrice = business =>
   Number(business?.averagePrice || business?.startPrice || 0);

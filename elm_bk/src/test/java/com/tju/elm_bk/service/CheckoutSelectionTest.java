@@ -17,7 +17,7 @@ class CheckoutSelectionTest {
         FoodMapper foods = mock(FoodMapper.class);
         CurrentUserService users = mock(CurrentUserService.class);
         Business business = new Business(); business.setStatus(1); business.setDineInAvailable(true);
-        when(businesses.selectBusinessById(1L)).thenReturn(business);
+        when(businesses.lockBusinessById(1L)).thenReturn(business);
         when(users.requireUserId()).thenReturn(11L);
         CartItemVO item = new CartItemVO(); item.setFoodId(21L);
         when(carts.selectCartItems(11L, 1L)).thenReturn(List.of(item));

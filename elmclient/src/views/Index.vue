@@ -310,8 +310,8 @@
                         </div>
                     </div>
                     <div class="business-side">
-                        <span class="business-distance">{{ getBusinessDistanceKm(business, index).toFixed(1) }}km</span>
-                        <span class="business-eta">{{ getBusinessDeliveryMinutes(business, index) }}分钟送达</span>
+                        <span class="business-distance">{{ getBusinessDistanceKm(business) === null ? '距离暂无' : getBusinessDistanceKm(business).toFixed(1) + 'km' }}</span>
+                        <span class="business-eta">{{ getBusinessDeliveryMinutes(business) === null ? '送达时间暂无' : getBusinessDeliveryMinutes(business) + '分钟送达' }}</span>
                         <i class="fa fa-angle-right business-chevron" aria-hidden="true"></i>
                     </div>
                 </div>
@@ -336,6 +336,7 @@ import {
     getBusinessAveragePrice,
     getBusinessDeliveryMinutes,
     getBusinessDistanceKm,
+    compareBusinessDistance,
     getBusinessTags,
     getGuessBadge,
     getRecommendationScore,
@@ -558,7 +559,7 @@ export default {
 
                 case 'distance':
                     // 距离排序：与商家卡片使用同一距离口径，保证排序和展示一致。
-                    sortedList.sort((a, b) => getBusinessDistanceKm(a) - getBusinessDistanceKm(b));
+                    sortedList.sort(compareBusinessDistance);
                     break;
 
                 case 'score':

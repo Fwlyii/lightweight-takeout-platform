@@ -62,8 +62,8 @@
 						</div>
 					</div>
 					<div class="business-distance">
-						<strong>{{ distanceText(business, index) }}km</strong>
-						<span>约{{ deliveryMinutes(business, index) }}分钟送达</span>
+                        <strong>{{ distanceText(business) }}</strong>
+                        <span>{{ deliveryMinutes(business) }}</span>
 					</div>
 				</div>
 			</article>
@@ -76,6 +76,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import request from "@/utils/request";
+import { getBusinessDistanceKm, getBusinessDeliveryMinutes, compareBusinessDistance } from '@/utils/businessPresentation';
 import { pushWithViewTransition } from "@/utils/navigationMotion";
 export default {
 	name: "BusinessList",
@@ -99,7 +100,7 @@ export default {
 		}[Number(route.query.orderTypeId)] || '附近美食'));
 		const sortedBusinesses = computed(() => [...businessArr.value].sort((a, b) => {
 			if (sortMode.value === 'sales') return Number(b.salesCount || 0) - Number(a.salesCount || 0);
-			if (sortMode.value === 'distance') return Number(distanceText(a, 0)) - Number(distanceText(b, 0));
+            if (sortMode.value === 'distance') return compareBusinessDistance(a, b);
 			return Number(b.recommendationScore || b.score || 0) - Number(a.recommendationScore || a.score || 0);
 		}));
 		const displayedBusinesses = computed(() => sortedBusinesses.value.filter((business) => {
@@ -110,8 +111,8 @@ export default {
 		const setSortMode = (mode) => { sortMode.value = mode; };
 		const formatScore = (score) => score === null || score === undefined || score === '' ? '暂无' : Number(score).toFixed(1);
 		const averagePrice = (business) => money(business.averagePrice || business.startPrice || 20);
-		const distanceText = (business, index) => Number(business.distanceKm || business.distance || (0.6 + ((Number(business.id || index) % 4) * 0.2))).toFixed(1);
-		const deliveryMinutes = (business, index) => Number(business.deliveryMinutes || (15 + ((Number(business.id || index) % 4) * 3)));
+        const distanceText = business => getBusinessDistanceKm(business) === null ? '距离暂无' : `${getBusinessDistanceKm(business).toFixed(1)}km`;
+        const deliveryMinutes = business => getBusinessDeliveryMinutes(business) === null ? '送达时间暂无' : `约${getBusinessDeliveryMinutes(business)}分钟送达`;
 		const businessTags = (business) => {
 			if (Array.isArray(business.recommendationTags) && business.recommendationTags.length) return business.recommendationTags.slice(0, 3);
 			const tags = [];

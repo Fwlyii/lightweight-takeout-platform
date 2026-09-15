@@ -43,7 +43,8 @@
 
 				<div v-if="orderDetail.orderState === ORDER_STATUS.COMPLETED" ref="reviewSection" class="info-section review-section">
 					<h3 class="section-title">订单评价</h3>
-					<div v-if="review" class="review-exists">
+                    <div v-if="review" class="review-exists">
+                        <p v-if="review.hidden" role="status">该评价已被隐藏，不能重复提交。</p>
 						<div class="stars">{{ '★'.repeat(review.rating) }}<span>{{ '★'.repeat(5-review.rating) }}</span></div>
 						<p>{{ review.content || '用户未填写文字评价' }}</p>
 						<p v-if="review.merchantReply" class="merchant-reply">商家回复：{{ review.merchantReply }}</p>

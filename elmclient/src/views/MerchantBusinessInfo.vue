@@ -405,7 +405,8 @@ export default {
             orderTypeId: formValues.orderTypeId,
             dineInAvailable: formValues.dineInAvailable,
             promotionThreshold: formValues.promotionThreshold,
-            promotionDiscount: formValues.promotionDiscount
+            promotionDiscount: formValues.promotionDiscount,
+            promotionEnabled: formValues.promotionThreshold !== null
           };
 
           const response = await request.patch(`/api/businesses/own/${businessId.value}`, updateData);

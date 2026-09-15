@@ -87,7 +87,7 @@ public class OrderSubmissionService {
     }
 
     private Business requireOrderableBusiness(Long businessId) {
-        Business business = businessMapper.selectBusinessById(businessId);
+        Business business = businessMapper.lockBusinessById(businessId);
         if (business == null) throw new APIException(ResultCodeEnum.BUSINESS_MISSED);
         if (business.getStatus() != null && business.getStatus() != 1) {
             throw new APIException("商家当前未营业或尚未通过审核");

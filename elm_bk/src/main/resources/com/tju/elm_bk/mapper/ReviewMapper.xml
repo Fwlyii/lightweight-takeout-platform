@@ -20,7 +20,7 @@
         SELECT r.*, u.username customer_name, b.business_name
         FROM review r JOIN users u ON u.id=r.customer_id
         JOIN business b ON b.id=r.business_id
-        WHERE r.order_id=#{orderId} AND r.is_hidden=0 LIMIT 1
+        WHERE r.order_id=#{orderId} LIMIT 1
     </select>
     <select id="selectById" resultMap="reviewMap">
         SELECT r.*, u.username customer_name, b.business_name

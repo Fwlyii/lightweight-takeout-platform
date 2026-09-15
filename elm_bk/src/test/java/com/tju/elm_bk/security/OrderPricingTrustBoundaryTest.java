@@ -96,7 +96,7 @@ class OrderPricingTrustBoundaryTest {
         business.setStatus(1);
         business.setStartPrice(BigDecimal.ZERO);
         business.setDeliveryPrice(new BigDecimal("3.00"));
-        when(businessMapper.selectBusinessById(1L)).thenReturn(business);
+        when(businessMapper.lockBusinessById(1L)).thenReturn(business);
 
         DeliveryAddress address = new DeliveryAddress();
         address.setId(9L);

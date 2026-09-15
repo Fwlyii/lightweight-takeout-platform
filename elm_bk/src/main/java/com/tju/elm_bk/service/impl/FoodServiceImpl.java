@@ -200,7 +200,7 @@ public class FoodServiceImpl implements FoodService {
         if (foodUpdateDTO == null || foodUpdateDTO.getFoodId() == null) {
             throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
         }
-        Food food = foodMapper.selectFoodById(foodUpdateDTO.getFoodId());
+        Food food = foodMapper.lockFoodById(foodUpdateDTO.getFoodId());
         if (food == null) {
             throw new APIException(ResultCodeEnum.FOOD_MISSED);
         }
@@ -236,7 +236,7 @@ public class FoodServiceImpl implements FoodService {
                 || foodUpdateDTO.getStock() < 0 || foodUpdateDTO.getStock() > 1_000_000) {
             throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
         }
-        Food food = foodMapper.selectFoodById(foodUpdateDTO.getFoodId());
+        Food food = foodMapper.lockFoodById(foodUpdateDTO.getFoodId());
         if (food == null) throw new APIException(ResultCodeEnum.FOOD_MISSED);
         Business business = businessMapper.selectBusinessById(food.getBusinessId());
         if (business == null) throw new APIException(ResultCodeEnum.BUSINESS_MISSED);

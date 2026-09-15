@@ -95,6 +95,8 @@ export default {
     const selectedOrder = computed(() => orders.value.find(order => order.id === selectId.value));
 
     let realtimeConnection = null;
+    let orderRequest = 0;
+    let disposed = false;
 
     // 获取商铺列表
     const fetchMerchantList = async () => {
@@ -120,6 +122,9 @@ export default {
 
     // 选择商铺
     const selectMerchant = (merchantId) => {
+      if (submitting.value) return;
+      orders.value = [];
+      closeModal();
       selectedMerchantId.value = merchantId;
       businessId.value = merchantId;
       fetchOrders(); // 重新加载该商铺的订单
@@ -128,22 +133,24 @@ export default {
     // 获取订单列表
     const fetchOrders = async ({ silent = false } = {}) => {
       if (!selectedMerchantId.value) return;
-
+      const requestId = ++orderRequest;
+      const requestedBusinessId = businessId.value;
       if (!silent) loading.value = true;
       try {
         const response = await request.get("/api/orders/list/business", {
-          params: { businessId: businessId.value }
+          params: { businessId: requestedBusinessId }
         });
-
+        if (disposed || requestId !== orderRequest || requestedBusinessId !== businessId.value) return;
         if (response.success) {
           orders.value = response.data || [];
         } else {
           if (!silent) toast.error("获取订单列表失败");
         }
       } catch (error) {
+        if (disposed || requestId !== orderRequest) return;
         if (!silent) toast.error("获取订单列表失败");
       } finally {
-        if (!silent) loading.value = false;
+        if (!disposed && requestId === orderRequest) loading.value = false;
       }
     };
 
@@ -308,6 +315,8 @@ export default {
       });
     });
     onUnmounted(() => {
+      disposed = true;
+      orderRequest++;
       realtimeConnection?.stop();
     });
 
