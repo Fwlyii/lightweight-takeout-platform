@@ -11,7 +11,8 @@ const withBrowserSecurityHeaders = (response, noCache = false) => {
     headers.set("X-Content-Type-Options", "nosniff");
     headers.set("X-Frame-Options", "SAMEORIGIN");
     headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-    headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    // Voice ordering is first-party only; the browser still requires user consent.
+    headers.set("Permissions-Policy", "camera=(), microphone=(self), geolocation=()");
     if (noCache) {
         headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
     }
