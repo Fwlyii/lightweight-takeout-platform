@@ -1,0 +1,25 @@
+/* Keep routed administrator pages visually connected without changing layout. */
+.app-container.admin-area > .content > *:not(.admin-home) {
+  animation: admin-route-content-enter 500ms cubic-bezier(.22, .61, .36, 1) both;
+  will-change: opacity, transform;
+}
+
+@keyframes admin-route-content-enter {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-container.admin-area > .content > *:not(.admin-home) {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+}
