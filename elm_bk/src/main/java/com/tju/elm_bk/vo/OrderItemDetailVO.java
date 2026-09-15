@@ -59,12 +59,14 @@ public class OrderItemDetailVO {
 
     @Schema(description = "联系人性别")
     private Integer contactSex;
-
     @Schema(description = "联系人姓名")
     private String contactName;
 
     @Schema(description = "联系方式")
     private String contactTel;
+
+    @Schema(description = "顾客备注（口味/餐具等）")
+    private String remarks;
 
     @Schema(description = "订单商品列表")
     private List<OrderFoodVO> foodList;

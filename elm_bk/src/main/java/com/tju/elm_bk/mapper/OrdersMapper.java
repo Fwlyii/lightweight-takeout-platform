@@ -37,7 +37,7 @@ public interface OrdersMapper {
 
     @Select("""
         <script>
-            select o.id,o.order_total,o.order_state,o.order_date,o.business_id,o.delivery_price,o.service_mode,b.business_name,b.business_img
+            select o.id,o.order_total,o.order_state,o.order_date,o.business_id,o.delivery_price,o.service_mode,o.remarks,b.business_name,b.business_img
             from orders o
             left join business b on b.id = o.business_id
             <where>

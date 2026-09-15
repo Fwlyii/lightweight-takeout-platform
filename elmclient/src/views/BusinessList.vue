@@ -71,7 +71,7 @@
 		<div v-else-if="businessArr.length > 0 && !loading && !loadError" class="list-state filtered-empty">没有符合条件的商家</div>
 	</div>
 </template>
-  
+
 <script>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -215,7 +215,7 @@ export default {
 	},
 };
 </script>
-  
+
 <style scoped>
 /* 保持原有的样式不变 */
 .wrapper {
@@ -619,7 +619,7 @@ export default {
 }
 
 @media (min-width: 700px) {
-	.business-list-page { max-width: 760px; }
+	.business-list-page { max-width: 600px; }
 	.business-list-page .business-list { padding-left: 18px; padding-right: 18px; }
 }
 

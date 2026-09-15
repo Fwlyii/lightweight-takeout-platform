@@ -52,6 +52,21 @@ public class BusinessServiceImpl implements BusinessService {
         return businessMapper.getBusinessById(id);
     }
 
+    /**
+     * 单家店铺的展示指标，复用首页列表的 SQL 口径与推荐标签规则，避免两处阈值不一致。
+     */
+    @Override
+    public BusinessSearchVO getBusinessSummary(Long id) {
+        Business business = businessMapper.selectBusinessById(id);
+        if (business == null || !Objects.equals(business.getStatus(), 1)) {
+            throw new APIException(ResultCodeEnum.BUSINESS_MISSED);
+        }
+        BusinessSearchVO summary = businessMapper.getBusinessSummaryById(id);
+        if (summary == null) throw new APIException(ResultCodeEnum.BUSINESS_MISSED);
+        presentation.enrich(List.of(summary));
+        return summary;
+    }
+
     @Override
     public BusinessVO updateBusiness(Long id, BusinessUpdateDTO updateDto) {
         return patchBusiness(id, updateDto);

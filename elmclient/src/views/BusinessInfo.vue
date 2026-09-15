@@ -21,15 +21,26 @@
                 </div>
                 <p class="business-meta">{{ deliveryMode === 'pickup' ? '到店自取 · 无起送门槛' : `起送 ¥${formatMoney(business.startPrice)} · 配送 ¥${formatMoney(business.deliveryPrice)}` }}</p>
                 <p class="business-address"><i class="fa fa-map-marker"></i>{{ business.businessAddress || '校园周边配送' }}</p>
+                <div class="business-metrics">
+                    <span class="metric-score"><i class="fa fa-star"></i>{{ businessScoreText }}</span>
+                    <span class="metric-sep">|</span>
+                    <span>月售 {{ businessSummary ? businessSummary.salesCount || 0 : 0 }}</span>
+                    <span class="metric-sep">|</span>
+                    <span>{{ deliveryMode === 'pickup' ? '预计 15 分钟出餐' : `预计 ${deliveryEtaMinutes} 分钟送达` }}</span>
+                </div>
+                <div class="hero-reactions">
+                    <button type="button" :class="{ active: isLiked }" @click.stop="toggleLike"><i class="fa fa-thumbs-up"></i><span>{{ isLiked ? '已赞' : '点赞' }}</span></button>
+                    <button type="button" :class="{ active: isFavorited }" @click.stop="toggleFavorite"><i class="fa fa-star"></i><span>{{ isFavorited ? '已收藏' : '收藏' }}</span></button>
+                </div>
             </div>
-            <div class="hero-reactions">
-                <button type="button" :class="{ active: isLiked }" @click.stop="toggleLike"><i class="fa fa-thumbs-up"></i><span>{{ isLiked ? '已赞' : '点赞' }}</span></button>
-                <button type="button" :class="{ active: isFavorited }" @click.stop="toggleFavorite"><i class="fa fa-star"></i><span>{{ isFavorited ? '已收藏' : '收藏' }}</span></button>
-            </div>
+            <img class="hero-art" src="@/assets/store-card-art.png" alt="" aria-hidden="true" />
         </section>
 
         <div class="offer-strip" aria-label="商家优惠">
-            <span v-if="deliveryMode === 'pickup'">自取免配送费</span><template v-else><span v-if="Number(business.deliveryPrice || 0) === 0">免配送费</span><span v-else>配送 ¥{{ formatMoney(business.deliveryPrice) }}</span></template><span v-if="business.promotionThreshold && business.promotionDiscount">满{{ formatMoney(business.promotionThreshold) }}减{{ formatMoney(business.promotionDiscount) }}</span><span>品质保障</span><span v-if="business.dineInAvailable">支持堂食</span>
+            <span class="offer-tag offer-delivery"><i class="fa" :class="deliveryMode === 'pickup' ? 'fa-shopping-bag' : 'fa-truck'"></i>{{ deliveryMode === 'pickup' || Number(business.deliveryPrice || 0) === 0 ? '免配送费' : `配送 ¥${formatMoney(business.deliveryPrice)}` }}</span>
+            <span v-if="business.promotionThreshold && business.promotionDiscount" class="offer-tag offer-promotion"><i class="fa fa-gift"></i>满{{ trimMoney(business.promotionThreshold) }}减{{ trimMoney(business.promotionDiscount) }}</span>
+            <span class="offer-tag offer-quality"><i class="fa fa-shield"></i>品质保障</span>
+            <span v-if="business.dineInAvailable" class="offer-tag offer-pickup"><i class="fa fa-shopping-bag"></i>支持自取</span>
         </div>
 
         <nav class="page-tabs" role="tablist" aria-label="商家内容">
@@ -46,6 +57,11 @@
                     <button type="button" @click="setDeliveryMode(deliveryMode === 'pickup' ? 'delivery' : 'pickup')">切换</button>
                 </div>
                 <div class="section-heading"><h2>菜单</h2><span>{{ foodArr.length }} 件商品</span></div>
+                <div class="ai-pick-card">
+                    <i class="fa fa-robot"></i>
+                    <div><strong>AI帮你搭配</strong><span>根据你的口味推荐更合适的美食</span></div>
+                    <button type="button" @click="router.push('/ai-chat/recommend')">去看看 <i class="fa fa-angle-right"></i></button>
+                </div>
                 <div v-if="loadingFoods" class="state-card">正在加载菜单…</div>
                 <div v-else-if="!foodArr.length" class="state-card">暂时没有可售商品</div>
                 <div v-else class="menu-layout">
@@ -116,13 +132,14 @@
 
 <script>
 import { ref, onMounted, computed, watch, onErrorCaptured } from "vue";
-import { useRoute, useRouter } from "vue-router";
 import { navigateBack } from '../utils/backNavigation';
+import { useRoute, useRouter } from "vue-router";
 import request from "@/utils/request";
 import { toast } from '@/utils/toast';
 import { formatDate, formatMoney } from '@/utils/formatters';
 import { getToken, updateStoredUser } from '@/utils/auth';
 import { cartQuantityLimitMessage, isSoldOut, maxCartQuantity } from '@/utils/cartQuantityRules';
+import { getBusinessDeliveryMinutes } from '@/utils/businessPresentation';
 import { addCartItem, listCartItems, removeCartItem, setCartItemQuantity } from '@/services/cartService';
 import { getMyInteraction, updateMyInteraction } from '@/services/merchantInteractionService';
 export default {
@@ -146,6 +163,7 @@ export default {
             remarks: ""
         });
         const foodArr = ref([]);
+        const businessSummary = ref(null);
         const activeCategory = ref('');
         const cartItems = ref([]); // 购物车商品列表
         const loadingBusiness = ref(false);
@@ -209,8 +227,7 @@ export default {
             event.target.src = isFoodImage ? require('@/assets/food-default.png') : require('@/assets/business-default.png');
         };
 
-        const loadReviews = async () => {
-            if (!businessId.value || loadingReviews.value) return;
+        const loadReviews = async () => {            if (!businessId.value || loadingReviews.value) return;
             loadingReviews.value = true;
             try {
                 const response = await request.get(`/api/v1/reviews/public/business/${businessId.value}`);
@@ -536,6 +553,7 @@ export default {
                     };
                     const savedMode = localStorage.getItem(`businessServiceMode:${businessId.value}`) || 'delivery';
                     deliveryMode.value = savedMode === 'pickup' ? 'pickup' : 'delivery';
+                    loadBusinessSummary();
                 } else {
                     const errorMsg = response.message || "获取商家信息失败";
                     console.error("商家信息API返回失败:", errorMsg);
@@ -548,9 +566,20 @@ export default {
             }
         };
 
+        // 店铺展示指标（评分/月售/人均/优惠标签），失败不影响点餐主流程。
+        const loadBusinessSummary = async () => {
+            if (!businessId.value) return;
+            try {
+                const response = await request.get(`/api/businesses/${businessId.value}/summary`);
+                businessSummary.value = response?.success ? (response.data || null) : null;
+            } catch (error) {
+                console.error('获取商家展示指标失败:', error);
+                businessSummary.value = null;
+            }
+        };
+
         // 获取食品列表
-        const fetchFoodList = async () => {
-            loadingFoods.value = true;
+        const fetchFoodList = async () => {            loadingFoods.value = true;
             try {
                 const response = await request.get("/api/foods/list", {
                     params: { businessId: businessId.value }
@@ -646,6 +675,15 @@ export default {
         });
         const isBusinessOpen = computed(() => (business.value.status === undefined || business.value.status === 1)
             && business.value.operatingStatus !== false);
+        /** 优惠文案去掉多余小数：30.00 -> 30。 */
+        const trimMoney = (value) => String(Number(value || 0));
+        /** 店内评分走与首页相同的展示口径，没有评分时直接显示“暂无评分”。 */
+        const businessScoreText = computed(() => {
+            const score = Number(businessSummary.value?.score);
+            return Number.isFinite(score) && score > 0 ? score.toFixed(1) : '暂无评分';
+        });
+        /** 预计送达时长与首页、商家列表共用同一口径。 */
+        const deliveryEtaMinutes = computed(() => getBusinessDeliveryMinutes(business.value));
         const orderButtonText = computed(() => {
             if (!isBusinessOpen.value) return '休息中';
             if (totalQuantity.value === 0) return '请选择餐品';
@@ -701,6 +739,10 @@ export default {
             totalSettle,
             canOrder,
             isBusinessOpen,
+            businessSummary,
+            businessScoreText,
+            deliveryEtaMinutes,
+            trimMoney,
             orderButtonText,
             isLiked,
             isFavorited,
@@ -734,7 +776,7 @@ export default {
 </script>
 
 <style scoped>
-.stock-label{font-size:12px;color:var(--skin-muted, #8aa0b2);margin-left:8px}.fa-plus-circle.disabled{color:var(--skin-subtle, #b8c6d1);cursor:not-allowed}
+.stock-label{font-size:12px;color:var(--fwl-muted, #8aa0b2);margin-left:8px}.fa-plus-circle.disabled{color:var(--fwl-subtle, #b8c6d1);cursor:not-allowed}
 /* 样式部分保持不变 */
 /****************** 总容器 ******************/
 .wrapper {
@@ -760,7 +802,7 @@ export default {
 .wrapper .header {
 	width: 100%;
   height: 12vw;
-  background-color: var(--skin-brand, #0097ff);
+  background-color: var(--fwl-brand, #0097ff);
   color: #fff;
   font-size: 4.8vw;
   position: fixed;
@@ -899,7 +941,7 @@ export default {
 
 .wrapper .food li .food-right .fa-plus-circle {
     font-size: 5.5vw;
-    color: var(--skin-brand, #0097ef);
+    color: var(--fwl-brand, #0097ef);
     cursor: pointer;
 }
 
@@ -925,7 +967,7 @@ export default {
     box-sizing: border-box;
     border: solid 1.6vw #444;
     border-radius: 8vw;
-    background-color: var(--skin-brand, #3190e8);
+    background-color: var(--fwl-brand, #3190e8);
     font-size: 7vw;
     color: #fff;
     display: flex;
@@ -984,10 +1026,9 @@ export default {
 /* 商家详情页：保持简洁的蓝白外卖平台视觉 */
 .wrapper {
     min-height: 100vh;
-    background: var(--skin-surface, #f5f8fb);
-    color: var(--skin-ink, #263f52);
-    padding-bottom: calc(104px + env(safe-area-inset-bottom));
-    height: auto;
+    background: var(--fwl-surface, #f5f8fb);
+    color: var(--fwl-ink, #263f52);
+    padding-bottom: 18vw;
 }
 .store-header {
     height: 58px;
@@ -999,7 +1040,7 @@ export default {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: var(--skin-brand, #168bd1);
+    background: var(--fwl-brand, #168bd1);
     color: #fff;
 }
 .back-button,
@@ -1032,14 +1073,14 @@ export default {
     font-size: 14px;
     cursor: pointer;
 }
-.service-switch button.active { background: #fff; color: var(--skin-brand, #167fbd); font-weight: 600; }
+.service-switch button.active { background: #fff; color: var(--fwl-brand, #167fbd); font-weight: 600; }
 .store-hero {
     position: relative;
     display: flex;
     align-items: center;
     gap: 14px;
     padding: 18px 16px 20px;
-    background: var(--skin-brand, #168bd1);
+    background: var(--fwl-brand, #168bd1);
 }
 .store-hero .business-logo {
     flex: 0 0 auto;
@@ -1049,9 +1090,18 @@ export default {
     object-fit: cover;
     border: 3px solid #fff;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(var(--skin-brand-strong-rgb, 32, 86, 120), 0.16);
-    background: var(--skin-surface, #edf5fa);
+    box-shadow: 0 4px 12px rgba(var(--fwl-brand-strong-rgb, 32, 86, 120), 0.16);
+    background: var(--fwl-surface, #edf5fa);
+    /* 共享元素兜底：不支持 View Transitions 时，大图从卡片缩略图放大落位 */
+    animation: shared-logo-settle 340ms cubic-bezier(.22, 1, .36, 1) both;
 }
+
+/* 卡片缩略图 → 详情页大图：圆角收平 + 轻微回落 */
+@keyframes shared-logo-settle {
+    from { border-radius: 20px; transform: scale(1.05); opacity: .82; }
+    to { border-radius: 12px; transform: scale(1); opacity: 1; }
+}
+
 .store-hero .business-info {
     width: auto;
     height: auto;
@@ -1064,98 +1114,100 @@ export default {
 .business-title-row { display: flex; align-items: center; gap: 8px; }
 .store-hero .business-info .business-title-row h1 { color: #fff; font-size: 21px; line-height: 1.3; }
 .open-badge { border: 1px solid rgba(255,255,255,.8); border-radius: 4px; padding: 2px 5px; color: #fff; font-size: 11px; }
-.open-badge.closed { background:var(--skin-surface, #f2f4f6); border-color:var(--skin-border, #dce3e9); color:var(--skin-muted, #7d8b98); }
+.open-badge.closed { background:var(--fwl-surface, #f2f4f6); border-color:var(--fwl-border, #dce3e9); color:var(--fwl-muted, #7d8b98); }
 .store-hero .business-info p { margin-top: 6px; color: rgba(255,255,255,.9); font-size: 13px; }
 .store-hero .business-info .business-address { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 58vw; }
 .business-address i { margin-right: 4px; }
 .hero-reactions { position: absolute; right: 14px; bottom: 22px; display: flex; gap: 6px; }
-.hero-reactions button { border: 0; background: #fff; color: var(--skin-muted, #7891a2); border-radius: 14px; padding: 5px 8px; font-size: 11px; cursor: pointer; }
+.hero-reactions button { border: 0; background: #fff; color: var(--fwl-muted, #7891a2); border-radius: 14px; padding: 5px 8px; font-size: 11px; cursor: pointer; }
 .hero-reactions button i { margin-right: 3px; }
-.hero-reactions button.active { color: var(--skin-brand, #168bd1); }
-.offer-strip { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 12px; background: var(--skin-surface, #f5f8fb); scrollbar-width: none; }
+.hero-reactions button.active { color: var(--fwl-brand, #168bd1); }
+.offer-strip { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 12px; background: var(--fwl-surface, #f5f8fb); scrollbar-width: none; }
 .offer-strip::-webkit-scrollbar { display: none; }
-.offer-strip span { flex: 0 0 auto; border: 1px solid var(--skin-border, #cfe3f0); border-radius: 4px; background: #fff; color: var(--skin-muted, #4e88aa); padding: 5px 9px; font-size: 12px; }
-.page-tabs { display: flex; gap: 28px; padding: 0 18px; background: #fff; border-bottom: 1px solid var(--skin-border, #e4edf3); }
-.page-tabs button { position: relative; border: 0; padding: 14px 1px 12px; background: transparent; color: var(--skin-muted, #7891a2); font-size: 16px; cursor: pointer; }
-.page-tabs button.active { color: var(--skin-brand, #168bd1); font-weight: 600; }
-.page-tabs button.active::after { content: ''; position: absolute; left: 3px; right: 3px; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--skin-brand, #168bd1); }
-.page-tabs small { margin-left: 3px; color: var(--skin-subtle, #9db0bd); font-size: 11px; }
+.offer-strip span { flex: 0 0 auto; border: 1px solid var(--fwl-border, #cfe3f0); border-radius: 4px; background: #fff; color: var(--fwl-muted, #4e88aa); padding: 5px 9px; font-size: 12px; }
+.page-tabs { display: flex; gap: 28px; padding: 0 18px; background: #fff; border-bottom: 1px solid var(--fwl-border, #e4edf3); }
+.page-tabs button { position: relative; border: 0; padding: 14px 1px 12px; background: transparent; color: var(--fwl-muted, #7891a2); font-size: 16px; cursor: pointer; }
+.page-tabs button.active { color: var(--fwl-brand, #168bd1); font-weight: 600; }
+.page-tabs button.active::after { content: ''; position: absolute; left: 3px; right: 3px; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--fwl-brand, #168bd1); }
+.page-tabs small { margin-left: 3px; color: var(--fwl-subtle, #9db0bd); font-size: 11px; }
 .page-content { max-width: 760px; margin: 0 auto; padding: 14px 14px 26px; }
-.mode-hint { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 11px 12px; border: 1px solid var(--skin-border, #d8e9f3); border-radius: 8px; background: #fff; }
-.mode-hint > i { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--skin-surface, #e6f3fb); color: var(--skin-brand, #168bd1); }
+.mode-hint { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 11px 12px; border: 1px solid var(--fwl-border, #d8e9f3); border-radius: 8px; background: #fff; }
+.mode-hint > i { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--fwl-surface, #e6f3fb); color: var(--fwl-brand, #168bd1); }
 .mode-hint div { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.mode-hint strong { color: var(--skin-ink, #315c75); font-size: 14px; }
-.mode-hint span { color: var(--skin-muted, #8aa0af); font-size: 12px; }
-.mode-hint button { border: 0; background: transparent; color: var(--skin-brand, #168bd1); font-size: 12px; cursor: pointer; }
+.mode-hint strong { color: var(--fwl-ink, #315c75); font-size: 14px; }
+.mode-hint span { color: var(--fwl-muted, #8aa0af); font-size: 12px; }
+.mode-hint button { border: 0; background: transparent; color: var(--fwl-brand, #168bd1); font-size: 12px; cursor: pointer; }
 .section-heading { display: flex; align-items: baseline; justify-content: space-between; margin: 2px 2px 8px; }
-.section-heading h2 { color: var(--skin-ink, #2f526a); font-size: 18px; }
-.section-heading span { color: var(--skin-subtle, #9aadb9); font-size: 12px; }
-.state-card { padding: 52px 12px; text-align: center; color: var(--skin-muted, #93a7b4); background: #fff; border: 1px solid var(--skin-border, #e1edf4); border-radius: 8px; }
-.menu-layout { display: grid; grid-template-columns: 108px minmax(0, 1fr); align-items: start; border: 1px solid var(--skin-border, #e1edf4); border-radius: 8px; overflow: hidden; background: #fff; }
-.category-sidebar { display: flex; flex-direction: column; align-self: stretch; background: var(--skin-surface, #eef3f7); }
-.category-sidebar button { min-height: 52px; padding: 10px 8px; border: 0; border-bottom: 1px solid var(--skin-border, #e2e9ee); background: transparent; color: var(--skin-muted, #607b8d); font-size: 13px; line-height: 1.35; cursor: pointer; }
-.category-sidebar button.active { position: relative; background: #fff; color: var(--skin-brand, #168bd1); font-weight: 600; }
-.category-sidebar button.active::before { content: ''; position: absolute; left: 0; top: 13px; bottom: 13px; width: 3px; border-radius: 0 3px 3px 0; background: var(--skin-brand, #168bd1); }
+.section-heading h2 { color: var(--fwl-ink, #2f526a); font-size: 18px; }
+.section-heading span { color: var(--fwl-subtle, #9aadb9); font-size: 12px; }
+.state-card { padding: 52px 12px; text-align: center; color: var(--fwl-muted, #93a7b4); background: #fff; border: 1px solid var(--fwl-border, #e1edf4); border-radius: 8px; }
+.menu-layout { display: grid; grid-template-columns: 108px minmax(0, 1fr); align-items: start; border: 1px solid var(--fwl-border, #e1edf4); border-radius: 8px; overflow: hidden; background: #fff; }
+.category-sidebar { display: flex; flex-direction: column; align-self: stretch; background: var(--fwl-surface, #eef3f7); }
+.category-sidebar button { min-height: 52px; padding: 10px 8px; border: 0; border-bottom: 1px solid var(--fwl-border, #e2e9ee); background: transparent; color: var(--fwl-muted, #607b8d); font-size: 13px; line-height: 1.35; cursor: pointer; }
+.category-sidebar button.active { position: relative; background: #fff; color: var(--fwl-brand, #168bd1); font-weight: 600; }
+.category-sidebar button.active::before { content: ''; position: absolute; left: 0; top: 13px; bottom: 13px; width: 3px; border-radius: 0 3px 3px 0; background: var(--fwl-brand, #168bd1); }
 .category-content { min-width: 0; background: #fff; }
-.category-title { padding: 12px 12px 8px; color: var(--skin-ink, #385b72); font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--skin-surface, #eef3f6); }
-.wrapper .food { width: auto; margin: 0; padding: 0; background: #fff; border: 1px solid var(--skin-border, #e1edf4); border-radius: 8px; overflow: hidden; }
+.category-title { padding: 12px 12px 8px; color: var(--fwl-ink, #385b72); font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--fwl-surface, #eef3f6); }
+.wrapper .food { width: auto; margin: 0; padding: 0; background: #fff; border: 1px solid var(--fwl-border, #e1edf4); border-radius: 8px; overflow: hidden; }
 .menu-layout .food { border: 0; border-radius: 0; }
-.wrapper .food li { width: 100%; min-height: 98px; padding: 13px 12px; box-sizing: border-box; border-bottom: 1px solid var(--skin-surface, #eef3f6); }
+.wrapper .food li { width: 100%; min-height: 98px; padding: 13px 12px; box-sizing: border-box; border-bottom: 1px solid var(--fwl-surface, #eef3f6); }
 .wrapper .food li:last-child { border-bottom: 0; }
-.wrapper .food li .food-left img { width: 82px; height: 82px; flex: 0 0 82px; object-fit: cover; border-radius: 7px; background: var(--skin-surface, #f0f5f8); }
+.wrapper .food li .food-left img { width: 82px; height: 82px; flex: 0 0 82px; object-fit: cover; border-radius: 7px; background: var(--fwl-surface, #f0f5f8); }
 .wrapper .food li .food-left .food-left-info { min-width: 0; margin-left: 11px; }
-.wrapper .food li .food-left .food-left-info h3 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--skin-ink, #31556d); font-size: 15px; }
-.wrapper .food li .food-left .food-left-info p { margin-top: 6px; color: var(--skin-muted, #91a3ae); font-size: 12px; font-weight: 400; }
+.wrapper .food li .food-left .food-left-info h3 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fwl-ink, #31556d); font-size: 15px; }
+.wrapper .food li .food-left .food-left-info p { margin-top: 6px; color: var(--fwl-muted, #91a3ae); font-size: 12px; font-weight: 400; }
 .wrapper .food li .food-left .food-left-info .food-explain { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 47vw; }
 .wrapper .food li .food-left .food-left-info .food-price { display: flex; align-items: baseline; gap: 7px; color: #e76c48; font-size: 16px; font-weight: 600; }
 .wrapper .food li .food-left .food-left-info .food-limit { color: #e05252; font-size: 10px; font-weight: 500; white-space: nowrap; }
-.sold-out-label { margin-left: 8px; color: var(--skin-muted, #96a8b4); font-size: 11px; font-weight: 400; }
-.stock-label { color: var(--skin-subtle, #9aacb7); font-size: 11px; font-weight: 400; }
+.sold-out-label { margin-left: 8px; color: var(--fwl-muted, #96a8b4); font-size: 11px; font-weight: 400; }
+.stock-label { color: var(--fwl-subtle, #9aacb7); font-size: 11px; font-weight: 400; }
 .wrapper .food li .food-right { width: auto; gap: 7px; }
-.quantity-btn { width: 27px; height: 27px; padding: 0; border-radius: 50%; border: 1px solid var(--skin-brand, #168bd1); background: #fff; color: var(--skin-brand, #168bd1); font-size: 20px; line-height: 22px; cursor: pointer; }
-.quantity-btn.plus-btn { background: var(--skin-brand, #168bd1); color: #fff; }
-.quantity-btn.disabled { border-color: var(--skin-subtle, #cbd9e1); background: var(--skin-surface, #eef3f6); color: var(--skin-subtle, #a9bac5); cursor: not-allowed; }
-.quantity { min-width: 16px; text-align: center; color: var(--skin-muted, #496578); font-size: 14px; }
-.rating-summary { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 16px; background: #fff; border: 1px solid var(--skin-border, #e1edf4); border-radius: 8px; }
+.quantity-btn { width: 27px; height: 27px; padding: 0; border-radius: 50%; border: 1px solid var(--fwl-brand, #168bd1); background: #fff; color: var(--fwl-brand, #168bd1); font-size: 20px; line-height: 22px; cursor: pointer; }
+.quantity-btn.plus-btn { background: var(--fwl-brand, #168bd1); color: #fff; }
+.quantity-btn.disabled { border-color: var(--fwl-subtle, #cbd9e1); background: var(--fwl-surface, #eef3f6); color: var(--fwl-subtle, #a9bac5); cursor: not-allowed; }
+.quantity { min-width: 16px; text-align: center; color: var(--fwl-muted, #496578); font-size: 14px; }
+.rating-summary { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 16px; background: #fff; border: 1px solid var(--fwl-border, #e1edf4); border-radius: 8px; }
 .rating-score { color: #e77a45; font-size: 28px; font-weight: 600; }
 .rating-stars, .review-stars { color: #f3b34d; letter-spacing: 1px; font-size: 13px; }
-.rating-summary span, .rating-count { color: var(--skin-muted, #93a5b2); font-size: 12px; }
+.rating-summary span, .rating-count { color: var(--fwl-muted, #93a5b2); font-size: 12px; }
 .rating-count { margin-left: auto; }
-.review-card { padding: 14px; margin-bottom: 10px; background: #fff; border: 1px solid var(--skin-border, #e1edf4); border-radius: 8px; }
+.review-card { padding: 14px; margin-bottom: 10px; background: #fff; border: 1px solid var(--fwl-border, #e1edf4); border-radius: 8px; }
 .review-head { display: flex; align-items: center; gap: 8px; }
-.review-head strong { color: var(--skin-ink, #385b75); font-size: 14px; }
-.review-head time { margin-left: auto; color: var(--skin-subtle, #a0b0ba); font-size: 11px; }
-.review-card p { margin: 10px 0 0; color: var(--skin-muted, #536d7e); line-height: 1.6; font-size: 13px; }
-.merchant-reply { margin-top: 10px; padding: 8px 10px; border-left: 3px solid var(--skin-brand, #168bd1); background: var(--skin-surface, #f2f8fc); color: var(--skin-muted, #5e7b8e); font-size: 12px; line-height: 1.5; }
-.story-card { padding: 22px 18px; background: linear-gradient(135deg, var(--skin-surface, #eaf6fd), #fff); border: 1px solid var(--skin-border, #d7eaf4); border-radius: 8px; }
-.story-label { color: var(--skin-brand, #168bd1); font-size: 10px; letter-spacing: 1.5px; }
-.story-card h2 { margin-top: 8px; color: var(--skin-ink, #2f526a); font-size: 21px; }
-.story-card p { margin-top: 12px; color: var(--skin-muted, #587386); line-height: 1.8; font-size: 14px; }
-.store-details { margin-top: 12px; padding: 16px; background: #fff; border: 1px solid var(--skin-border, #e1edf4); border-radius: 8px; }
-.store-details h3 { margin-bottom: 5px; color: var(--skin-ink, #31556d); font-size: 16px; }
-.store-details > div { display: flex; gap: 11px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--skin-surface, #eef3f6); }
+.review-head strong { color: var(--fwl-ink, #385b75); font-size: 14px; }
+.review-head time { margin-left: auto; color: var(--fwl-subtle, #a0b0ba); font-size: 11px; }
+.review-card p { margin: 10px 0 0; color: var(--fwl-muted, #536d7e); line-height: 1.6; font-size: 13px; }
+.merchant-reply { margin-top: 10px; padding: 8px 10px; border-left: 3px solid var(--fwl-brand, #168bd1); background: var(--fwl-surface, #f2f8fc); color: var(--fwl-muted, #5e7b8e); font-size: 12px; line-height: 1.5; }
+.story-card { padding: 22px 18px; background: linear-gradient(135deg, var(--fwl-surface, #eaf6fd), #fff); border: 1px solid var(--fwl-border, #d7eaf4); border-radius: 8px; }
+.story-label { color: var(--fwl-brand, #168bd1); font-size: 10px; letter-spacing: 1.5px; }
+.story-card h2 { margin-top: 8px; color: var(--fwl-ink, #2f526a); font-size: 21px; }
+.story-card p { margin-top: 12px; color: var(--fwl-muted, #587386); line-height: 1.8; font-size: 14px; }
+.store-details { margin-top: 12px; padding: 16px; background: #fff; border: 1px solid var(--fwl-border, #e1edf4); border-radius: 8px; }
+.store-details h3 { margin-bottom: 5px; color: var(--fwl-ink, #31556d); font-size: 16px; }
+.store-details > div { display: flex; gap: 11px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--fwl-surface, #eef3f6); }
 .store-details > div:last-child { border-bottom: 0; }
-.store-details > div > i { width: 18px; margin-top: 2px; color: var(--skin-brand, #168bd1); text-align: center; }
+.store-details > div > i { width: 18px; margin-top: 2px; color: var(--fwl-brand, #168bd1); text-align: center; }
 .store-details > div span { display: flex; flex-direction: column; gap: 4px; }
-.store-details b { color: var(--skin-muted, #557286); font-size: 13px; font-weight: 500; }
-.store-details em { color: var(--skin-muted, #93a5b2); font-size: 12px; font-style: normal; }
-.wrapper .cart { height: 64px; background: #fff; box-shadow: 0 -2px 10px rgba(var(--skin-ink-rgb, 44, 76, 96), 0.12); }
-.wrapper .cart .cart-left { flex: 1; background: #fff; color: var(--skin-ink, #31556d); cursor: pointer; }
-.wrapper .cart .cart-left .cart-left-icon { width: 49px; height: 49px; margin: -11px 9px 0 14px; border: 0; border-radius: 50%; background: var(--skin-subtle, #b6c3ca); font-size: 22px; box-shadow: 0 2px 7px rgba(var(--skin-ink-rgb, 57, 95, 114), 0.22); }
-.wrapper .cart .cart-left .cart-left-icon.filled { background: var(--skin-brand, #168bd1); }
+.store-details b { color: var(--fwl-muted, #557286); font-size: 13px; font-weight: 500; }
+.store-details em { color: var(--fwl-muted, #93a5b2); font-size: 12px; font-style: normal; }
+.wrapper .cart { height: 64px; background: #fff; box-shadow: 0 -2px 10px rgba(var(--fwl-ink-rgb, 44, 76, 96), 0.12); }
+.wrapper .cart .cart-left { flex: 1; background: #fff; color: var(--fwl-ink, #31556d); cursor: pointer; }
+.wrapper .cart .cart-left .cart-left-icon { width: 49px; height: 49px; margin: -11px 9px 0 14px; border: 0; border-radius: 50%; background: var(--fwl-subtle, #b6c3ca); font-size: 22px; box-shadow: 0 2px 7px rgba(var(--fwl-ink-rgb, 57, 95, 114), 0.22); }
+.wrapper .cart .cart-left .cart-left-icon.filled { background: var(--fwl-brand, #168bd1); }
 .wrapper .cart .cart-left .cart-left-icon-quantity { width: 18px; height: 18px; border-radius: 50%; right: -4px; top: -4px; background: #e85d4a; font-size: 11px; }
 .wrapper .cart .cart-left .cart-left-info { min-width: 0; }
-.wrapper .cart .cart-left .cart-left-info p:first-child { margin-top: 8px; color: var(--skin-ink, #31556d); font-size: 17px; font-weight: 600; }
-.wrapper .cart .cart-left .cart-left-info span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--skin-muted, #93a5b2); font-size: 11px; }
+.wrapper .cart .cart-left .cart-left-info p:first-child { margin-top: 8px; color: var(--fwl-ink, #31556d); font-size: 17px; font-weight: 600; }
+.wrapper .cart .cart-left .cart-left-info span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fwl-muted, #93a5b2); font-size: 11px; }
 .wrapper .cart .cart-right { flex: 0 0 125px; }
-.wrapper .cart .cart-right .cart-right-item { height: 64px; width: 100%; border: 0; background: var(--skin-subtle, #b8c5cc); color: #fff; font-size: 15px; font-weight: 600; cursor: not-allowed; }
-.wrapper .cart .cart-right .cart-right-item.ready { background: var(--skin-brand, #168bd1); cursor: pointer; }
+.wrapper .cart .cart-right .cart-right-item { height: 64px; width: 100%; border: 0; background: var(--fwl-subtle, #b8c5cc); color: #fff; font-size: 15px; font-weight: 600; cursor: not-allowed; }
+.wrapper .cart .cart-right .cart-right-item.ready { background: var(--fwl-brand, #168bd1); cursor: pointer; }
 .wrapper .cart .cart-right .cart-right-item:disabled { opacity: 1; }
 @media (min-width: 700px) {
+    .business-detail-page { max-width: 600px; margin-left: auto; margin-right: auto; }
+    .store-header, .store-hero, .offer-strip, .page-tabs, .page-content { width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
     .store-header { padding-left: 14px; padding-right: 14px; }
     .page-content { padding-bottom: 30px; }
-    .wrapper { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
-    .wrapper .cart { left: 50%; width: min(100%, 760px); transform: translateX(-50%); border-radius: 8px 8px 0 0; }
+    .wrapper { padding-bottom: 0; }
+    .wrapper .cart { left: calc(50% - 300px); width: 600px; max-width: 100%; transform: none; border-radius: 8px 8px 0 0; }
 }
 @media (max-width: 520px) {
     .page-content { padding-left: 0; padding-right: 0; }
@@ -1169,5 +1221,151 @@ export default {
     .wrapper .food li .food-left .food-left-info .food-explain { max-width: 32vw; }
     .wrapper .food li .food-right { gap: 4px; }
     .quantity-btn { width: 25px; height: 25px; font-size: 18px; }
+}
+
+/* ── 商家卡（对照店铺参考图：白底圆角卡 + 水印插画 + 评分/月售/送达）── */
+.store-hero {
+    position: relative;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 12px 14px 0;
+    padding: 12px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(var(--fwl-brand-strong-rgb, 39, 86, 114), 0.08);
+    overflow: hidden;
+}
+
+.store-hero .hero-art {
+    position: absolute;
+    top: 14px;
+    right: 10px;
+    width: 108px;
+    pointer-events: none;
+    user-select: none;
+    opacity: .95;
+}
+
+.store-hero .business-info {
+    position: relative;
+    z-index: 1;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-width: 0;
+    flex: 1;
+    padding-right: 96px;
+    color: var(--fwl-ink, #24405c);
+}
+
+.store-hero .business-info .business-title-row h1 { color: var(--fwl-brand-strong, #103c6c); font-size: 17px; line-height: 1.3; }
+.store-hero .business-info p { color: var(--fwl-muted, #7a90a4); font-size: 12px; }
+.store-hero .business-info .business-meta { margin-top: 5px; color: var(--fwl-muted, #4e7fa6); }
+.store-hero .business-info .business-address { max-width: 100%; }
+
+.business-metrics {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 7px;
+    color: var(--fwl-muted, #6f8ba0);
+    font-size: 11px;
+}
+
+.business-metrics .metric-score {
+    color: #f27635;
+    font-weight: 700;
+}
+
+.business-metrics .metric-score i {
+    margin-right: 2px;
+}
+
+.business-metrics .metric-sep {
+    color: var(--fwl-border, #ccd9e3);
+}
+
+.store-hero .hero-reactions {
+    position: static;
+    margin-top: 9px;
+    gap: 7px;
+}
+
+.store-hero .hero-reactions button {
+    border: 1px solid var(--fwl-border, #dbe9f4);
+    background: var(--fwl-surface, #f6fbff);
+    color: var(--fwl-muted, #61809a);
+    border-radius: 13px;
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.store-hero .hero-reactions button.active {
+    border-color: var(--fwl-border, #b6dcf7);
+    background: var(--fwl-surface, #e9f6ff);
+    color: var(--fwl-brand, #168bd1);
+}
+
+/* 优惠标签：配送 / 满减 / 品质保障 */
+.offer-strip {
+    gap: 8px;
+    padding: 10px 14px 12px;
+    background: transparent;
+}
+
+.offer-strip .offer-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 9px;
+    border: 0;
+    border-radius: 7px;
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+.offer-strip .offer-tag i { font-size: 11px; }
+.offer-tag.offer-delivery { color: var(--fwl-brand, #168bd1); background: var(--fwl-surface, #e9f6ff); }
+.offer-tag.offer-promotion { color: #e2604b; background: #fdeeea; }
+.offer-tag.offer-quality { color: var(--fwl-brand, #168bd1); background: var(--fwl-surface, #e9f6ff); }
+.offer-tag.offer-pickup { color: #3d9b69; background: #edfaf2; }
+
+/* 菜单上方的 AI 搭配入口 */
+.ai-pick-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 14px 12px;
+    padding: 11px 12px;
+    border: 1px solid var(--fwl-border, #d9eaf8);
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--fwl-surface, #f2f9ff), var(--fwl-surface, #e8f4ff));
+}
+
+.ai-pick-card > i {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: #fff;
+    color: var(--fwl-brand, #168bd1);
+    font-size: 16px;
+    box-shadow: 0 3px 9px rgba(var(--fwl-brand-rgb, 35, 113, 166), 0.12);
+}
+
+.ai-pick-card > div { min-width: 0; flex: 1; }
+.ai-pick-card strong { display: block; color: var(--fwl-brand-strong, #103c6c); font-size: 14px; }
+.ai-pick-card span { display: block; margin-top: 2px; color: var(--fwl-muted, #7a90a4); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ai-pick-card button { flex: 0 0 auto; border: 0; background: transparent; color: var(--fwl-brand, #168bd1); font-size: 12px; font-weight: 700; cursor: pointer; }
+
+@media (max-width: 520px) {
+    .store-hero { margin-left: 12px; margin-right: 12px; }
+    .offer-strip { padding-left: 12px; padding-right: 12px; }
+    .ai-pick-card { margin-left: 12px; margin-right: 12px; }
+    .store-hero .hero-art { width: 96px; top: 12px; right: 8px; }
+    .store-hero .business-info { padding-right: 78px; }
 }
 </style>

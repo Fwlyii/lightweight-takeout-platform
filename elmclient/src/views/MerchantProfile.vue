@@ -56,7 +56,7 @@
 <script>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { toast } from '../utils/toast'; 
+import { toast } from '../utils/toast';
 import request from '../utils/request';
 import { listMyBusinesses } from '../services/businessService';
 import { DEFAULT_AVATAR_URL } from '../utils/profileDefaults';
@@ -70,7 +70,7 @@ export default {
 
     const merchant = ref(null);
     const stores = ref([]); // 仅保留门店数量与状态摘要，明细统一在工作台维护
-    
+
     const loading = ref(false);
     const approvedStoreCount = computed(() => stores.value.filter(store => store.status === 1).length);
     const pendingStoreCount = computed(() => stores.value.filter(store => store.status === 0).length);
@@ -94,7 +94,7 @@ export default {
       loading.value = true;
       try {
         const data = await request.get('/api/user');
-        
+
         if (data && data.id) {
           merchant.value = {
             id: data.id,
@@ -112,7 +112,7 @@ export default {
         loading.value = false;
       }
     };
-    
+
     // “我的”只显示门店摘要，门店明细统一由经营工作台负责
     const loadMerchantStores = async () => {
       try {
@@ -125,7 +125,7 @@ export default {
 
     const logout = () => {
       clearAuth();
-      router.push({ path: '/index' });
+      router.replace({ path: '/login', query: { role: 'merchant' } });
     };
 
     const goToWorkbench = () => {
@@ -289,7 +289,7 @@ export default {
   color: #333;
   margin-bottom: 8px;
 }
-.user-name .user-icon, 
+.user-name .user-icon,
 .user-phone .phone-icon {
   margin-right: 8px;
   color: var(--skin-brand, #3498db);
@@ -632,6 +632,7 @@ export default {
 .merchant-entry-card {
   width: 100%;
   padding: 20px;
+  box-sizing: border-box;
   background: #fff;
   border: 1px solid var(--skin-border, #dfeaf5);
   border-radius: 12px;

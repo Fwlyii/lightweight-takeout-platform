@@ -45,6 +45,12 @@ public class CartController {
         return HttpResult.success(cartService.updateItem(cartId, quantity));
     }
 
+    @PutMapping("/remarks")
+    @Operation(summary = "保存同一商家的备注", description = "口味、餐具等备注在结算时写入订单")
+    public HttpResult<Integer> updateRemarks(@RequestParam Long businessId, @RequestParam(required = false) String remarks) {
+        return HttpResult.success(cartService.updateRemarks(businessId, remarks));
+    }
+
     @DeleteMapping
     @Operation(summary = "清空用户在指定商家的购物车")
     public HttpResult<Long> clearCart(@RequestParam Long businessId) {

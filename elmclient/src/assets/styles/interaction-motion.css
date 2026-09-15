@@ -69,14 +69,14 @@
 .content .home-page .business-list.business-list-observe > li,
 .content .business-list-page .business-list.business-list-observe .business-item {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(30px);
   will-change: transform, opacity;
 }
 
 .content .home-page .business-list.business-list-observe > li.is-visible,
 .content .business-list-page .business-list.business-list-observe .business-item.is-visible {
-  animation: restaurant-card-in 250ms cubic-bezier(.22, .61, .36, 1) both;
-  animation-delay: calc(var(--stagger-index, 0) * 50ms);
+  animation: restaurant-card-in 300ms cubic-bezier(.22, .61, .36, 1) both;
+  animation-delay: calc(var(--stagger-index, 0) * 80ms);
 }
 
 @keyframes home-content-in {
@@ -84,9 +84,32 @@
   to { opacity: 1; }
 }
 
+/* 卡片依次上浮出现，阴影同步淡入 */
 @keyframes restaurant-card-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+    box-shadow: 0 0 0 rgba(var(--fwl-brand-rgb, 51, 111, 151), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    box-shadow: 0 7px 17px rgba(var(--fwl-brand-rgb, 51, 111, 151), 0.08);
+  }
+}
+
+/* 首页卡片 → 商家详情的共享元素（View Transitions API）：
+ * 浏览器会把卡片缩略图/标题的快照形变到详情页对应元素，这里统一时长与缓动。
+ */
+::view-transition-group(*) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(.22, 1, .36, 1);
+}
+
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(.22, 1, .36, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {

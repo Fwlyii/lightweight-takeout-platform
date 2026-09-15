@@ -3,6 +3,7 @@
     <!-- 顶部蓝色栏 -->
     <div class="top-background">
       <h1>商家订单管理</h1>
+      <MerchantLogoutButton />
     </div>
 
     <!-- 商铺选择栏 -->
@@ -59,6 +60,7 @@
               <p><span>地址:</span> {{ order.address || '-' }}</p>
             </template>
             <p v-else class="pickup-label"><span>履约:</span> 到店自取</p>
+            <p v-if="order.remarks" class="remark-line"><span>备注:</span> {{ order.remarks }}</p>
           </div>
 
           <div class="order-items">
@@ -77,7 +79,7 @@
               <br><span class="items-title pickup-label">无需配送费 · 到店自取</span>
             </template>
           </div>
-          
+
           <div class="order-footer">
             <span class="order-time">下单时间: {{ formatTime(order.orderDate) }}</span>
             <span class="order-total">总计: ¥ {{ Number(order.orderTotal || 0).toFixed(2) }}</span>
@@ -145,16 +147,18 @@ import { toast } from '../utils/toast';
 import { createRealtimeConnection } from '../services/realtimeService';
 import { MERCHANT_ORDER_GROUPS, ORDER_STATUS, orderStatusClass, orderStatusText } from '../utils/orderPresentation';
 import { formatDateTime } from '../utils/formatters';
+import MerchantLogoutButton from '../components/MerchantLogoutButton.vue';
 
 export default {
   name: 'BusinessOrderManage',
+  components: { MerchantLogoutButton },
   setup() {
     const router = useRouter();
     const route = useRoute();
     const loading = ref(false);
     const orders = ref([]);
     const businessId = ref(1);
-    
+
     // 新增：商铺列表和选中状态
     const merchantList = ref([]);
     const selectedMerchantId = ref(null);
@@ -203,7 +207,7 @@ export default {
     // 获取订单列表
     const fetchOrders = async ({ silent = false } = {}) => {
       if (!selectedMerchantId.value) return;
-      
+
       if (!silent) loading.value = true;
       try {
         const response = await request.get("/api/orders/list/business", {
@@ -917,33 +921,33 @@ export default {
     max-width: 100vw;
     width: 100vw;
   }
-  
+
   .top-background {
     height: 90px;
     border-radius: 0;
     max-width: 100vw;
   }
-  
+
   .merchant-selector {
     top: 90px;
     max-width: 100vw;
     transform: none;
     left: 0;
   }
-  
+
   .tabs {
     top: calc(90px + 17vw);
     max-width: 100vw;
     transform: none;
     left: 0;
   }
-  
+
   .order-list {
     margin-top: calc(90px + 17vw + 14vw + 4vw);
     max-width: 100vw;
     width: 100vw;
   }
-  
+
   .loading, .empty-state {
     margin-top: calc(90px + 17vw + 14vw + 7vw);
     max-width: 100vw;
@@ -966,11 +970,12 @@ export default {
 .order-list { margin-top: 184px; padding: 12px 16px 84px; }
 .order-item { border: 1px solid var(--skin-border, #e1edf7); border-radius: 10px; box-shadow: 0 2px 8px rgba(var(--skin-brand-strong-rgb, 36, 91, 132), 0.06); }
 .order-item .order-content, .order-item .order-footer { min-width: 0; }
+.order-item .remark-line { color: #c2571f; }
 .order-item p, .order-item span { overflow-wrap: anywhere; }
 @media (max-width: 480px) {
   .top-background { height: 64px; }
   .merchant-selector { top: 64px; }
   .tabs { top: 120px; left: 0; transform: none; max-width: 100vw; }
-  .order-list { margin-top: 184px; width: 100vw; max-width: 100vw; padding: 12px 12px 84px; }
+  .order-list { margin-top: 184px; width: 100vw; max-width: 100vw; padding: 12px 12px 84px; box-sizing: border-box; }
 }
 </style>

@@ -1,16 +1,15 @@
 <template>
     <!-- 登录、注册部分 -->
     <div class="wrapper home-page" :class="{ 'home-page-ready': pageReady }">
-        <!-- header部分 -->
-        <header class="home-motion home-motion-header">
-            <div class="icon-location-box">
+        <!-- 顶部插画区：位置、天气、问候、消息与搜索都是活元素，插画只作为背景 -->
+        <div class="home-hero">
+        <!-- header部分：动画只加在头部子块上，避免 header 成为 fixed 弹窗的包含块 -->
+        <header class="home-header">
+            <div class="location-text home-motion home-motion-header" @click="showLocationPicker">
                 <i class="fas fa-map-marker-alt"></i>
-            </div>
-            <!-- <div class="location-text">天津大学北洋园校区<i class="fa fa-caret-down"></i></div> -->
-            <button type="button" class="location-text" aria-label="选择位置" @click="showLocationPicker">
                 <span class="location-display">{{ displayLocation }}</span>
                 <i class="fa fa-caret-down"></i>
-            </button>
+            </div>
 
             <!-- 漂亮的位置选择弹窗 -->
             <Teleport to="body">
@@ -75,177 +74,199 @@
             </transition>
             </Teleport>
 
-            <div class="login-register">
+            <div class="hero-actions home-motion home-motion-header">
                 <template v-if="!userInfo">
-                    <button @click="goToLChoose">登录</button>
-                    <button @click="goToRChoose">注册</button>
+                    <button class="hero-pill" @click="goToLChoose">登录</button>
+                    <button class="hero-pill" @click="goToRChoose">注册</button>
                 </template>
-                <template v-else>
-                    <div class="user-info">
-                        <div class="scroll-text">
-                            <span>{{ userInfo.username }} ，您好！</span>
-                        </div>
-                    </div>
-                </template>
+                <span v-else class="hero-user">{{ userInfo.username }}，您好！</span>
+                <button type="button" class="hero-bell" aria-label="消息通知" @click="goToNotifications">
+                    <i class="fa fa-bell-o"></i>
+                    <em class="hero-bell-dot" aria-hidden="true"></em>
+                </button>
+            </div>
+
+            <div class="hero-bottom home-motion home-motion-header">
+                <p class="hero-slogan">在校园<br>也能吃到好味道！</p>
             </div>
         </header>
-        <!-- search部分 -->
-        <div class="search home-motion home-motion-search">
+        </div>
+        <!-- search部分：不参与入场动画，避免 transform 影响滚动时吸顶定位 -->
+        <div class="search">
             <div class="search-fixed-top" ref="fixedBox">
                 <div class="search-box">
                     <i class="fa fa-search"></i>
-                    <input v-model="searchKeyword" type="text" placeholder="搜索饿了么商家" @keyup.enter="performSearch" />
+                    <input v-model="searchKeyword" type="text" :placeholder="searchPlaceholder" @keyup.enter="performSearch"
+                        @focus="searchFocused = true" @blur="searchFocused = false" />
                     <button @click="performSearch" class="search-btn">搜索</button>
                 </div>
             </div>
         </div>
-
-
         <!-- 点餐分类部分 -->
         <ul class="foodtype home-motion home-motion-categories">
             <li @click="toBusinessList(1)">
-                <img src="@/assets/dcfl01.png" alt="美食">
+                <span class="foodtype-icon"><img src="@/assets/dcfl01.png" alt="美食"></span>
                 <p>美食</p>
             </li>
             <li @click="toBusinessList(2)">
-                <img src="@/assets/dcfl02.png" alt="早餐">
+                <span class="foodtype-icon"><img src="@/assets/dcfl02.png" alt="早餐"></span>
                 <p>早餐</p>
             </li>
             <li @click="toBusinessList(3)">
-                <img src="@/assets/dcfl03.png" alt="跑腿代购">
+                <span class="foodtype-icon"><img src="@/assets/dcfl03.png" alt="跑腿代购"></span>
                 <p>跑腿代购</p>
             </li>
             <li @click="toBusinessList(4)">
-                <img src="@/assets/dcfl04.png" alt="汉堡披萨">
+                <span class="foodtype-icon"><img src="@/assets/dcfl04.png" alt="汉堡披萨"></span>
                 <p>汉堡披萨</p>
             </li>
             <li @click="toBusinessList(5)">
-                <img src="@/assets/dcfl05.png" alt="甜品饮品">
+                <span class="foodtype-icon"><img src="@/assets/dcfl05.png" alt="甜品饮品"></span>
                 <p>甜品饮品</p>
             </li>
             <li @click="toBusinessList(6)">
-                <img src="@/assets/dcfl06.png" alt="速食简餐">
+                <span class="foodtype-icon"><img src="@/assets/dcfl06.png" alt="速食简餐"></span>
                 <p>速食简餐</p>
             </li>
             <li @click="toBusinessList(7)">
-                <img src="@/assets/dcfl07.png" alt="地方小吃">
+                <span class="foodtype-icon"><img src="@/assets/dcfl07.png" alt="地方小吃"></span>
                 <p>地方小吃</p>
             </li>
             <li @click="toBusinessList(8)">
-                <img src="@/assets/dcfl08.png" alt="米粉面馆">
+                <span class="foodtype-icon"><img src="@/assets/dcfl08.png" alt="米粉面馆"></span>
                 <p>米粉面馆</p>
             </li>
             <li @click="toBusinessList(9)">
-                <img src="@/assets/dcfl09.png" alt="包子粥铺">
+                <span class="foodtype-icon"><img src="@/assets/dcfl09.png" alt="包子粥铺"></span>
                 <p>包子粥铺</p>
             </li>
             <li @click="toBusinessList(10)">
-                <img src="@/assets/dcfl10.png" alt="炸鸡炸串">
+                <span class="foodtype-icon"><img src="@/assets/dcfl10.png" alt="炸鸡炸串"></span>
                 <p>炸鸡炸串</p>
             </li>
         </ul>
 
-        <!-- 猜你喜欢：保留为轻量横向推荐，不再突出销量冠军或排名 -->
-        <section v-if="suggestedBusinesses.length" class="guess-section home-motion home-motion-offers" aria-label="猜你喜欢">
+        <!-- 猜你想吃：保留为轻量横向推荐，不再突出销量冠军或排名 -->
+        <section v-if="suggestedBusinesses.length" class="guess-section home-motion home-motion-offers" aria-label="猜你想吃">
             <div class="section-heading">
-                <div><h2>猜你喜欢</h2><span>附近口碑好店</span></div>
-                <button type="button" @click="scrollToRecommendations">更多 <i class="fa fa-angle-right"></i></button>
+                <div>
+                    <h2>猜你想吃 <span class="section-spark" aria-hidden="true">✦</span></h2>
+                    <span>根据你的口味推荐</span>
+                </div>
+                <button type="button" @click="scrollToRecommendations">查看更多 <i class="fa fa-angle-right"></i></button>
             </div>
             <div class="guess-scroll">
                 <button v-for="business in suggestedBusinesses" :key="business.id || business.businessId" type="button" class="guess-card" @click="toBusinessInfo(business.id || business.businessId)">
-                    <img :src="business.businessImg || require('@/assets/business-default.png')" :alt="business.businessName" @error="handleImageError">
+                    <span class="guess-card-media">
+                        <img :src="business.businessImg || require('@/assets/business-default.png')" :alt="business.businessName" @error="handleImageError">
+                        <em v-if="getGuessBadge(business)" :class="['guess-badge', `guess-badge-${getGuessBadge(business).tone}`]">{{ getGuessBadge(business).label }}</em>
+                    </span>
                     <strong>{{ business.businessName || '附近好店' }}</strong>
-                    <span><b>{{ hasBusinessRating(business.score) ? `★ ${Number(business.score).toFixed(1)}` : '暂无评分' }}</b> · 人均 ¥{{ formatMoney(business.averagePrice || business.avgPrice || 20) }}</span>
+                    <span class="guess-card-meta">
+                        <b>{{ hasBusinessRating(business.score) ? `★ ${Number(business.score).toFixed(1)}` : '暂无评分' }}</b>
+                        <span>月售 {{ business.salesCount || 0 }}</span>
+                    </span>
+                    <span class="guess-card-price">人均 ¥{{ formatMoney(getBusinessAveragePrice(business)) }}</span>
                 </button>
             </div>
         </section>
 
         <!-- 推荐商家部分 -->
         <div id="recommendations" class="recommend home-motion home-motion-recommend">
-            <div class="recommend-line"></div>
-            <p>推荐商家</p>
-            <div class="recommend-line"></div>
+            <div class="section-heading">
+                <div>
+                    <h2>推荐商家</h2>
+                    <span>优质商家·美味送到你身边</span>
+                </div>
+            </div>
         </div>
 
         <!-- 推荐方式部分 -->
-        <ul ref="sortTabs" class="recommendtype home-motion home-motion-recommend">
-            <li :ref="element => setSortTabRef(element, 0)" :class="{ active: sortBy === 'default' }" @click="setSortBy('default')">
-                综合排序<i class="fa fa-caret-down"></i>
+        <ul class="recommendtype home-motion home-motion-recommend">
+            <li :class="{ active: sortBy === 'default' }" @click="setSortBy('default')">
+                综合排序<i class="fa fa-angle-down"></i>
             </li>
-
-            <li :ref="element => setSortTabRef(element, 1)" :class="{ active: sortBy === 'sales' }" @click="setSortBy('sales')">
+            <li :class="{ active: sortBy === 'sales' }" @click="setSortBy('sales')">
                 销量最高
             </li>
-            <li :ref="element => setSortTabRef(element, 2)" :class="{ active: showFilter }" @click="toggleFilter">
+            <li :class="{ active: sortBy === 'distance' }" @click="setSortBy('distance')">
+                距离最近
+            </li>
+            <li class="recommendtype-filter" :class="{ active: showFilter }" @click="toggleFilter">
                 筛选<i class="fa fa-filter"></i>
             </li>
-            <span class="sort-indicator" :style="sortIndicatorStyle" aria-hidden="true"></span>
         </ul>
 
-        <!-- 筛选弹窗 -->
-        <transition name="fade">
-            <div v-if="showFilter" class="filter-modal" @click.self="hideFilter">
-                <div class="filter-container">
+        <!-- 筛选面板：底部弹出的多维度筛选 -->
+        <transition name="sheet">
+            <div v-if="showFilter" class="filter-sheet-mask" @click.self="hideFilter">
+                <div class="filter-sheet" role="dialog" aria-label="筛选">
+                    <span class="sheet-handle" aria-hidden="true"></span>
                     <div class="filter-header">
-                        <h3>筛选条件</h3>
-                        <button class="close-btn" @click="hideFilter">
+                        <div>
+                            <h3>筛选</h3>
+                            <p>多维度筛选，快速找到心仪美食</p>
+                        </div>
+                        <button class="close-btn" @click="hideFilter" aria-label="关闭筛选">
                             <i class="fa fa-times"></i>
                         </button>
                     </div>
 
                     <div class="filter-content">
-                        <!-- 免配送费筛选 -->
+                        <!-- 排序方式 -->
                         <div class="filter-section">
-                            <h4>配送费</h4>
-                            <label class="filter-option">
-                                <input type="checkbox" v-model="filters.freeDelivery" @change="applyFilters">
-                                <span>免配送费</span>
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" v-model="filters.promotionOnly" @change="applyFilters">
-                                <span>有满减活动</span>
-                            </label>
+                            <h4><i class="fa fa-sort" aria-hidden="true"></i>排序方式</h4>
+                            <div class="filter-options">
+                                <button v-for="option in sortOptions" :key="option.value" type="button"
+                                    :class="['filter-chip', { active: sortBy === option.value }]"
+                                    @click="setSortBy(option.value)">{{ option.label }}</button>
+                            </div>
                         </div>
 
+                        <!-- 配送与优惠 -->
                         <div class="filter-section">
-                            <h4>到店方式</h4>
-                            <label class="filter-option">
-                                <input type="checkbox" v-model="filters.dineIn" @change="applyFilters">
-                                <span>支持堂食</span>
-                            </label>
+                            <h4><i class="fa fa-truck" aria-hidden="true"></i>配送与优惠</h4>
+                            <div class="filter-options">
+                                <button v-for="option in deliveryOptions" :key="option.key" type="button"
+                                    :class="['filter-chip', { active: filters[option.key] }]"
+                                    @click="toggleSwitchFilter(option.key)">{{ option.label }}</button>
+                            </div>
                         </div>
 
-                        <!-- 起送价筛选 -->
+                        <!-- 起送价 -->
                         <div class="filter-section">
-                            <h4>起送价</h4>
-                            <div class="price-range">
-                                <label class="filter-option">
-                                    <input type="radio" name="startPrice" value="0" v-model="filters.startPrice"
-                                        @change="applyFilters">
-                                    <span>不限</span>
-                                </label>
-                                <label class="filter-option">
-                                    <input type="radio" name="startPrice" value="20" v-model="filters.startPrice"
-                                        @change="applyFilters">
-                                    <span>20元以下</span>
-                                </label>
-                                <label class="filter-option">
-                                    <input type="radio" name="startPrice" value="30" v-model="filters.startPrice"
-                                        @change="applyFilters">
-                                    <span>30元以下</span>
-                                </label>
-                                <label class="filter-option">
-                                    <input type="radio" name="startPrice" value="50" v-model="filters.startPrice"
-                                        @change="applyFilters">
-                                    <span>50元以下</span>
-                                </label>
+                            <h4><i class="fa fa-jpy" aria-hidden="true"></i>起送价</h4>
+                            <div class="filter-options">
+                                <button v-for="option in startPriceOptions" :key="option.value" type="button"
+                                    :class="['filter-chip', { active: filters.startPrice === option.value }]"
+                                    @click="setRadioFilter('startPrice', option.value)">{{ option.label }}</button>
+                            </div>
+                        </div>
+
+                        <!-- 人均预算 -->
+                        <div class="filter-section">
+                            <h4><i class="fa fa-user-o" aria-hidden="true"></i>人均预算</h4>
+                            <div class="filter-options">
+                                <button v-for="option in budgetOptions" :key="option.value" type="button"
+                                    :class="['filter-chip', { active: filters.budget === option.value }]"
+                                    @click="setRadioFilter('budget', option.value)">{{ option.label }}</button>
+                            </div>
+                        </div>
+
+                        <!-- 口味偏好：按商家的真实经营类目筛选 -->
+                        <div class="filter-section">
+                            <h4><i class="fa fa-cutlery" aria-hidden="true"></i>口味偏好</h4>
+                            <div class="filter-options">
+                                <button v-for="option in tasteOptions" :key="option.value" type="button"
+                                    :class="['filter-chip', { active: filters.taste === option.value }]"
+                                    @click="setRadioFilter('taste', option.value)">{{ option.label }}</button>
                             </div>
                         </div>
                     </div>
 
                     <div class="filter-footer">
                         <button class="btn-reset" @click="resetFilters">重置</button>
-                        <button class="btn-confirm" @click="confirmFilters">确定</button>
+                        <button class="btn-confirm" @click="confirmFilters">查看 {{ businessList.length }} 家商家</button>
                     </div>
                 </div>
             </div>
@@ -255,9 +276,8 @@
         <div v-if="!businessList || businessList.length === 0" class="empty-business-list">
             <div class="empty-state">
                 <i class="fa fa-store"></i>
-                <p>{{ businessLoading ? '正在加载商家…' : businessLoadError ? '商家加载失败' : '暂无符合条件的商家' }}</p>
-                <p class="empty-hint">{{ businessLoadError ? '请检查网络连接后重试' : businessLoading ? '请稍候' : '试试调整筛选条件' }}</p>
-                <button v-if="businessLoadError && !businessLoading" @click="getBusinessList">重新加载</button>
+                <p>暂无商家数据</p>
+                <p class="empty-hint">请稍后再试或检查网络连接</p>
             </div>
         </div>
 
@@ -275,19 +295,24 @@
                     <div class="business-info-detail">
                         <h3 :style="{ viewTransitionName: `restaurant-title-${business.id || business.businessId}` }">{{ business.businessName || '未命名商铺'}} <small v-if="business.operatingStatus === false" class="closed-shop-tag">休息中</small></h3>
                         <div class="business-info-rating">
-                            <span class="rating-score">{{ formatBusinessRating(business.score) }}</span>
+                            <span class="rating-score">★ {{ formatBusinessScore(business.score) }}</span>
                             <span class="monthly-sales">月售 {{ business.salesCount || 0 }}</span>
-                            <span class="average-price">人均 ¥{{ formatMoney(business.averagePrice || business.startPrice || 0) }}</span>
+                            <span class="average-price">人均 ¥{{ formatMoney(getBusinessAveragePrice(business)) }}</span>
                         </div>
                         <div class="business-info-delivery">
                             <span class="start-price">起送 ¥{{ (business.startPrice || 0).toFixed(2) }}</span>
                             <span class="delivery-fee" :class="{ 'free-delivery': (business.deliveryPrice || 0) === 0 }">
-                                {{ (business.deliveryPrice || 0) === 0 ? '免配送费' : `配送 ¥${(business.deliveryPrice || 0).toFixed(2)}` }}
+                                {{ (business.deliveryPrice || 0) === 0 ? '免配送费' : `配送费 ¥${(business.deliveryPrice || 0).toFixed(2)}` }}
                             </span>
                         </div>
                         <div class="business-tags">
                             <span v-for="tag in getBusinessTags(business)" :key="tag.label" :class="['business-tag', `tag-${tag.tone || 'neutral'}`]">{{ tag.label }}</span>
                         </div>
+                    </div>
+                    <div class="business-side">
+                        <span class="business-distance">{{ getBusinessDistanceKm(business, index).toFixed(1) }}km</span>
+                        <span class="business-eta">{{ getBusinessDeliveryMinutes(business, index) }}分钟送达</span>
+                        <i class="fa fa-angle-right business-chevron" aria-hidden="true"></i>
                     </div>
                 </div>
             </li>
@@ -308,12 +333,54 @@ import { formatMoney, formatRating } from '../utils/formatters';
 import { clearAuth, getStoredUser, getToken, updateStoredUser } from '../utils/auth';
 import { useLocationPicker } from '../composables/useLocationPicker';
 import {
+    getBusinessAveragePrice,
+    getBusinessDeliveryMinutes,
+    getBusinessDistanceKm,
     getBusinessTags,
+    getGuessBadge,
     getRecommendationScore,
     hasConfiguredPromotion,
+    isBusinessOpen,
     supportsDineIn
 } from '../utils/businessPresentation';
 import { pushWithViewTransition } from '../utils/navigationMotion';
+
+/** 筛选面板的选项口径集中在这里，模板只负责渲染。 */
+const SORT_OPTIONS = [
+    { value: 'default', label: '综合排序' },
+    { value: 'sales', label: '销量最高' },
+    { value: 'distance', label: '距离最近' },
+    { value: 'score', label: '评分优先' }
+];
+const DELIVERY_OPTIONS = [
+    { key: 'freeDelivery', label: '免配送费' },
+    { key: 'promotionOnly', label: '满减活动' },
+    { key: 'dineIn', label: '支持堂食' },
+    { key: 'openOnly', label: '营业中' }
+];
+const START_PRICE_OPTIONS = [
+    { value: '0', label: '不限' },
+    { value: '20', label: '20元以下' },
+    { value: '30', label: '30元以下' },
+    { value: '50', label: '50元以下' }
+];
+const BUDGET_OPTIONS = [
+    { value: '0', label: '不限' },
+    { value: '20', label: '20元以下' },
+    { value: '20-30', label: '20-30元' },
+    { value: '30-40', label: '30-40元' },
+    { value: '40', label: '40元以上' }
+];
+/** 口味偏好按商家真实的经营类目（orderTypeId）筛选，而不是编造标签。 */
+const TASTE_OPTIONS = [
+    { value: '0', label: '不限' },
+    { value: '1', label: '美食' },
+    { value: '2', label: '早餐' },
+    { value: '4', label: '汉堡披萨' },
+    { value: '8', label: '米粉面馆' },
+    { value: '5', label: '甜品饮品' }
+];
+
 export default {
     name: 'Index',
     setup() {
@@ -321,8 +388,6 @@ export default {
         const router = useRouter();
         const userInfo = ref(null);
         const businessList = ref([]);
-        const businessLoading = ref(false);
-        const businessLoadError = ref(false);
         const originalBusinessList = ref([]); // 保存原始数据用于筛选和排序
         const currentPage = ref(1);
         const pageReady = ref(false);
@@ -406,32 +471,21 @@ export default {
         };
 
         const searchKeyword = ref('');
+        const searchFocused = ref(false);
+        /** 聚焦时提示可回车搜索，属于纯展示文案，不参与业务逻辑。 */
+        const searchPlaceholder = computed(() => searchFocused.value
+            ? '输入商家或菜品名，回车搜索'
+            : '搜索商家、菜品');
         const sortBy = ref('default');
         const showFilter = ref(false);
-        const sortTabs = ref(null);
-        const sortTabElements = [];
-        const sortIndicatorStyle = ref({ width: '0px', transform: 'translateX(0)', opacity: 0 });
-        const setSortTabRef = (element, index) => {
-            if (element) sortTabElements[index] = element;
-        };
-        const updateSortIndicator = () => {
-            nextTick(() => {
-                const activeIndex = showFilter.value ? 2 : (sortBy.value === 'sales' ? 1 : 0);
-                const tab = sortTabElements[activeIndex];
-                const container = sortTabs.value;
-                if (!tab || !container) return;
-                sortIndicatorStyle.value = {
-                    width: `${tab.offsetWidth}px`,
-                    transform: `translateX(${tab.offsetLeft}px)`,
-                    opacity: 1
-                };
-            });
-        };
         const filters = ref({
             freeDelivery: false,
-            startPrice: '0',
             promotionOnly: false,
-            dineIn: false
+            dineIn: false,
+            openOnly: false,
+            startPrice: '0',
+            budget: '0',
+            taste: '0'
         });
         const fetchUserInfo = async () => {
             const storedUser = getStoredUser();
@@ -459,7 +513,7 @@ export default {
 
         const hasBusinessRating = (score) => formatRating(score) !== null;
         const numericBusinessRating = (score) => Number(formatRating(score) || 0);
-        const formatBusinessRating = (score) => formatRating(score) ? `${formatRating(score)}分` : '暂无评分';
+        const formatBusinessScore = (score) => (hasBusinessRating(score) ? formatRating(score) : '暂无');
 
         // 排序商家列表
         const sortBusinessList = (list, sortType) => {
@@ -502,6 +556,20 @@ export default {
                     });
                     break;
 
+                case 'distance':
+                    // 距离排序：与商家卡片使用同一距离口径，保证排序和展示一致。
+                    sortedList.sort((a, b) => getBusinessDistanceKm(a) - getBusinessDistanceKm(b));
+                    break;
+
+                case 'score':
+                    // 评分优先：评分降序，评分相同再比销量。
+                    sortedList.sort((a, b) => {
+                        const scoreDiff = numericBusinessRating(b.score) - numericBusinessRating(a.score);
+                        if (Math.abs(scoreDiff) >= 0.01) return scoreDiff;
+                        return parseInt(b.salesCount || 0) - parseInt(a.salesCount || 0);
+                    });
+                    break;
+
                 default:
                     // 默认不排序，保持原有顺序
                     break;
@@ -513,48 +581,29 @@ export default {
         const navigateToOrders = () => {
             router.push({ path: '/orderList' });
         };
-        let scrollFrame = 0;
-        let scrollContainer = null;
-        const handleScroll = () => {
-            if (scrollFrame) return;
-            scrollFrame = requestAnimationFrame(() => {
-                scrollFrame = 0;
-                const scroll = scrollContainer?.scrollTop || 0;
-                const parallax = Math.min(scroll, 80);
-
-                document.querySelector('.home-page')?.style.setProperty('--home-bg-shift', `${-Math.min(parallax * 0.1, 8)}px`);
-                document.querySelector('.home-page')?.style.setProperty('--home-text-shift', `${-Math.min(parallax * 0.0375, 3)}px`);
-            });
+        const goToNotifications = () => {
+            router.push({ path: '/notifications' });
         };
         onMounted(() => {
             restoreSavedLocation();
             // 加载用户信息
             fetchUserInfo();
 
-            scrollContainer = document.querySelector('.content');
-            scrollContainer?.addEventListener('scroll', handleScroll, { passive: true });
-            window.addEventListener('resize', updateSortIndicator);
-
             getBusinessList();
             requestAnimationFrame(() => { pageReady.value = true; });
             nextTick(observeBusinessItems);
-            updateSortIndicator();
         });
 
         onBeforeUnmount(() => {
             const shell = document.querySelector('.app-container');
             if (shell) shell.inert = false;
-            scrollContainer?.removeEventListener('scroll', handleScroll);
-            if (scrollFrame) cancelAnimationFrame(scrollFrame);
-            window.removeEventListener('resize', updateSortIndicator);
             businessObserver?.disconnect();
         });
 
         watch(visibleBusinessList, () => nextTick(observeBusinessItems), { flush: 'post' });
-        watch([sortBy, showFilter], updateSortIndicator, { flush: 'post' });
 
         const toBusinessList = (orderTypeId) => {
-            router.push({ path: '/businessList', query: { orderTypeId } });
+            router.push({ path: '/BusinessList', query: { orderTypeId } });
         };
         const goToLChoose = () => {
             // 跳转到登录页面
@@ -614,13 +663,10 @@ export default {
 
         // 获取商家列表
         const getBusinessList = async () => {
-            businessLoading.value = true;
-            businessLoadError.value = false;
             try {
                 const response = await request.get('/api/businesses/search', {
                     params: { keyword: '', isScore: 0, isSales: 0 }
                 });
-                if (!response?.success && !Array.isArray(response)) throw new Error(response?.message || '商家加载失败');
                 const businessData = response?.success && Array.isArray(response.data)
                     ? response.data
                     : (Array.isArray(response) ? response : []);
@@ -628,11 +674,8 @@ export default {
                 applyFiltersAndSort();
             } catch (error) {
                 console.error('获取商家列表失败:', error);
-                businessLoadError.value = true;
                 originalBusinessList.value = [];
                 businessList.value = [];
-            } finally {
-                businessLoading.value = false;
             }
         };
 
@@ -677,6 +720,10 @@ export default {
                 filteredList = filteredList.filter(supportsDineIn);
             }
 
+            if (filters.value.openOnly) {
+                filteredList = filteredList.filter(isBusinessOpen);
+            }
+
             // 起送价筛选
             if (filters.value.startPrice !== '0') {
                 const maxPrice = parseInt(filters.value.startPrice);
@@ -686,20 +733,56 @@ export default {
                 });
             }
 
+            // 人均预算筛选
+            filteredList = filteredList.filter(business => matchBudget(business, filters.value.budget));
+
+            // 口味偏好筛选：仅使用商家真实的经营类目
+            if (filters.value.taste !== '0') {
+                const orderTypeId = Number(filters.value.taste);
+                filteredList = filteredList.filter(business => Number(business.orderTypeId) === orderTypeId);
+            }
+
             businessList.value = sortBusinessList(filteredList, sortBy.value);
             currentPage.value = 1;
+        };
+
+        /** 人均预算区间：'0' 不限，'20' 20元以下，'20-30' 区间，'40' 40元以上。 */
+        const matchBudget = (business, budget) => {
+            if (budget === '0') return true;
+            const price = getBusinessAveragePrice(business);
+            if (budget === '40') return price >= 40;
+            if (budget.includes('-')) {
+                const [min, max] = budget.split('-').map(Number);
+                return price >= min && price <= max;
+            }
+            return price <= Number(budget);
         };
 
         const applyFilters = () => {
             applyFiltersAndSort();
         };
 
+        /** 配送与优惠是开关型筛选，点一下即时生效。 */
+        const toggleSwitchFilter = (key) => {
+            filters.value = { ...filters.value, [key]: !filters.value[key] };
+            applyFiltersAndSort();
+        };
+
+        /** 排序方式 / 起送价 / 人均预算 / 口味偏好都是单选。 */
+        const setRadioFilter = (key, value) => {
+            filters.value = { ...filters.value, [key]: value };
+            applyFiltersAndSort();
+        };
+
         const resetFilters = () => {
             filters.value = {
                 freeDelivery: false,
-                startPrice: '0',
                 promotionOnly: false,
-                dineIn: false
+                dineIn: false,
+                openOnly: false,
+                startPrice: '0',
+                budget: '0',
+                taste: '0'
             };
             sortBy.value = 'default'; // 重置排序为默认
             applyFiltersAndSort();
@@ -723,22 +806,31 @@ export default {
             businessKey,
             toBusinessList,
             navigateToOrders,
+            goToNotifications,
             goToLChoose,
             goToRChoose,
             userInfo,
             isuser: computed(() => !!userInfo.value),
             navigateToSearch,
             businessList,
-            businessLoading,
-            businessLoadError,
-            getBusinessList,
             visibleBusinessList,
             hasMoreBusinesses,
             loadMoreBusinesses,
             toBusinessInfo,
             handleImageError,
-            formatBusinessRating,
+            formatBusinessScore,
             hasBusinessRating,
+            sortOptions: SORT_OPTIONS,
+            deliveryOptions: DELIVERY_OPTIONS,
+            startPriceOptions: START_PRICE_OPTIONS,
+            budgetOptions: BUDGET_OPTIONS,
+            tasteOptions: TASTE_OPTIONS,
+            getGuessBadge,
+            getBusinessAveragePrice,
+            getBusinessDistanceKm,
+            getBusinessDeliveryMinutes,
+            toggleSwitchFilter,
+            setRadioFilter,
             displayLocation,
             showPicker,
             loading,
@@ -757,10 +849,9 @@ export default {
             confirmLocation,
             getDisplayText,
             searchKeyword,
+            searchFocused,
+            searchPlaceholder,
             sortBy,
-            sortTabs,
-            sortIndicatorStyle,
-            setSortTabRef,
             performSearch,
             setSortBy,
             showFilter,
@@ -789,14 +880,14 @@ export default {
 /****************** 总容器 ******************/
 .wrapper {
     width: 100%;
-    height: auto;
+    height: 100%;
 }
 
 /****************** header ******************/
 .wrapper header {
     width: 100%;
     height: 12vw;
-    background-color: var(--skin-brand, #0097ff);
+    background-color: var(--fwl-brand, #0097ff);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -829,87 +920,6 @@ export default {
     margin-left: 1vw;
 }
 
-.user-info {
-    width: 150px;
-    /* 你可以根据右上角区域宽度调整 */
-    overflow: hidden;
-    white-space: nowrap;
-    position: relative;
-}
-
-.scroll-text {
-    display: inline-block;
-    padding-left: 100%;
-    /* 给动画留出空白 */
-    animation: scroll-text 10s linear infinite;
-}
-
-@keyframes scroll-text {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-
-/****************** 登录、注册部分 ******************/
-.wrapper .login-register {
-    display: flex;
-    gap: 2vw;
-    align-items: center;
-    margin-left: 5vw;
-    flex-grow: 1;
-    justify-content: flex-end;
-    /* 关键修改：此属性是解决 Flexbox 布局中子元素溢出问题的关键 */
-    min-width: 0;
-}
-
-.wrapper .login-register .user-info {
-    /* 删除 max-width: 100%，以确保容器可以根据内容宽度进行溢出 */
-    font-size: 4vw;
-    font-weight: 500;
-    color: #fff;
-    white-space: nowrap;
-    /* 强制文本不换行 */
-
-    /* 核心修改：允许水平滚动 */
-    overflow-x: auto;
-    /* 在水平方向上允许滚动 */
-    overflow-y: hidden;
-    /* 隐藏垂直方向的滚动条 */
-    -webkit-overflow-scrolling: touch;
-    /* 针对 iOS 设备实现更流畅的滚动 */
-
-    /* 隐藏滚动条但保留滚动功能，让界面更美观 */
-    scrollbar-width: none;
-    /* 针对 Firefox */
-    -ms-overflow-style: none;
-    /* 针对 Internet Explorer 和 Edge */
-}
-
-/* 针对 Chrome, Safari 等 Webkit 内核浏览器隐藏滚动条 */
-.wrapper .login-register .user-info::-webkit-scrollbar {
-    display: none;
-}
-
-.wrapper .login-register button {
-    padding: 1.5vw 3vw;
-    border: none;
-    background-color: white;
-    color: var(--skin-brand, #0097ff);
-    cursor: pointer;
-    border-radius: 1vw;
-    transition: background-color 0.3s;
-    font-size: 3.5vw;
-    flex-shrink: 0;
-}
-
-.wrapper .login-register button:hover {
-    background-color: #f0f0f0;
-}
 
 /****************** search ******************/
 .wrapper .search {
@@ -920,7 +930,7 @@ export default {
 .wrapper .search .search-fixed-top {
     width: 100%;
     height: 13vw;
-    background-color: var(--skin-brand, #0097FF);
+    background-color: var(--fwl-brand, #0097FF);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -962,7 +972,7 @@ export default {
 }
 
 .wrapper .search .search-fixed-top .search-box .search-btn {
-    background: var(--skin-brand, #0097ff);
+    background: var(--fwl-brand, #0097ff);
     color: white;
     border: none;
     padding: 1.5vw 3vw;
@@ -973,7 +983,7 @@ export default {
 }
 
 .wrapper .search .search-fixed-top .search-box .search-btn:hover {
-    background: var(--skin-brand, #0080e0);
+    background: var(--fwl-brand, #0080e0);
 }
 
 .wrapper .search .search-fixed-top .search-box .fa-search {
@@ -984,7 +994,7 @@ export default {
 .sort-options {
     width: 100%;
     padding: 3vw;
-    background-color: var(--skin-surface, #f8f9fa);
+    background-color: var(--fwl-surface, #f8f9fa);
     border-bottom: 1px solid #e0e0e0;
 }
 
@@ -1008,14 +1018,14 @@ export default {
 }
 
 .sort-buttons button:hover {
-    border-color: var(--skin-brand, #0097ff);
-    color: var(--skin-brand, #0097ff);
+    border-color: var(--fwl-brand, #0097ff);
+    color: var(--fwl-brand, #0097ff);
 }
 
 .sort-buttons button.active {
-    background-color: var(--skin-brand, #0097ff);
+    background-color: var(--fwl-brand, #0097ff);
     color: white;
-    border-color: var(--skin-brand, #0097ff);
+    border-color: var(--fwl-brand, #0097ff);
 }
 
 /****************** 点餐分类部分 ******************/
@@ -1168,15 +1178,15 @@ export default {
 }
 
 .wrapper .top-businesses-carousel .rank-badge.champion {
-    background: var(--skin-brand, #1d8bd1);
+    background: var(--fwl-brand, #1d8bd1);
 }
 
 .wrapper .top-businesses-carousel .rank-badge.runner-up {
-    background: var(--skin-brand, #4d9fcf);
+    background: var(--fwl-brand, #4d9fcf);
 }
 
 .wrapper .top-businesses-carousel .rank-badge.third {
-    background: var(--skin-brand-soft, #76b4d8);
+    background: var(--fwl-brand-soft, #76b4d8);
 }
 
 .wrapper .top-businesses-carousel .business-image {
@@ -1237,21 +1247,21 @@ export default {
 }
 
 .wrapper .top-businesses-carousel .rating-stat {
-    background: var(--skin-surface, #eaf5ff);
-    color: var(--skin-brand-strong, #24577e);
+    background: var(--fwl-surface, #eaf5ff);
+    color: var(--fwl-brand-strong, #24577e);
 }
 
 .wrapper .top-businesses-carousel .rating-stat .fa-star {
-    color: var(--skin-brand, #2588c9);
+    color: var(--fwl-brand, #2588c9);
 }
 
 .wrapper .top-businesses-carousel .sales-stat {
-    background: var(--skin-surface, #edf7fb);
-    color: var(--skin-brand-strong, #24577e);
+    background: var(--fwl-surface, #edf7fb);
+    color: var(--fwl-brand-strong, #24577e);
 }
 
 .wrapper .top-businesses-carousel .sales-stat .fa-fire {
-    color: var(--skin-brand, #2588c9);
+    color: var(--fwl-brand, #2588c9);
 }
 
 .wrapper .top-businesses-carousel .delivery-info {
@@ -1264,10 +1274,10 @@ export default {
     display: flex;
     align-items: center;
     gap: 0.5vw;
-    background: var(--skin-surface, #f8f9fa);
+    background: var(--fwl-surface, #f8f9fa);
     padding: 1vw 1.5vw;
     border-radius: 1.5vw;
-    border: 1px solid var(--skin-border, #e9ecef);
+    border: 1px solid var(--fwl-border, #e9ecef);
     flex: 1;
     justify-content: center;
 }
@@ -1280,7 +1290,7 @@ export default {
 
 .wrapper .top-businesses-carousel .delivery-tag .tag-price {
     font-size: 2.4vw;
-    color: var(--skin-brand, #007bff);
+    color: var(--fwl-brand, #007bff);
     font-weight: 600;
 }
 
@@ -1346,7 +1356,7 @@ export default {
 }
 
 .wrapper .top-businesses-carousel .indicator.active {
-    background: var(--skin-brand, #0097ff);
+    background: var(--fwl-brand, #0097ff);
     transform: scale(1.2);
 }
 
@@ -1546,8 +1556,6 @@ export default {
     gap: 4px;
 }
 
-button.location-text { border: 0; background: transparent; color: inherit; padding: 0; font: inherit; text-align: left; cursor: pointer; }
-
 .location-text:hover {
     color: #e0e0e0;
 }
@@ -1592,7 +1600,7 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
     align-items: center;
     padding: 20px;
     border-bottom: 1px solid #f0f0f0;
-    background: var(--skin-brand, #0097ff);
+    background: var(--fwl-brand, #0097ff);
     color: white;
 }
 
@@ -1621,14 +1629,11 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
     display: flex;
     flex-direction: column;
     padding: 20px;
-    margin: 0;
-    min-height: 0;
+    margin-left: 27px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     overflow-y: auto;
 }
-
-.location-error { padding: 18px 0; color: var(--skin-muted, #657b8c); line-height: 1.6; font-size: 14px; }
-.location-modal .btn-confirm:disabled { opacity: .45; cursor: not-allowed; }
-.location-modal .modal-container { color: var(--skin-ink, #26455b); }
 
 /* 位置导航样式 */
 .location-nav {
@@ -1647,8 +1652,8 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
 }
 
 .nav-item.active {
-    color: var(--skin-brand, #0097ff);
-    border-bottom-color: var(--skin-brand, #0097ff);
+    color: var(--fwl-brand, #0097ff);
+    border-bottom-color: var(--fwl-brand, #0097ff);
 }
 
 .nav-item.disabled {
@@ -1657,7 +1662,7 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
 }
 
 .nav-item:not(.disabled):hover {
-    color: var(--skin-brand, #0097ff);
+    color: var(--fwl-brand, #0097ff);
 }
 
 /* 位置列表样式 */
@@ -1701,13 +1706,13 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
 }
 
 .location-item:hover {
-    border-color: var(--skin-brand, #0097ff);
-    background-color: var(--skin-surface, #f8f9ff);
+    border-color: var(--fwl-brand, #0097ff);
+    background-color: var(--fwl-surface, #f8f9ff);
 }
 
 .location-item.selected {
-    border-color: var(--skin-brand, #0097ff);
-    background-color: var(--skin-surface, #e6f3ff);
+    border-color: var(--fwl-brand, #0097ff);
+    background-color: var(--fwl-surface, #e6f3ff);
 }
 
 .item-name {
@@ -1715,21 +1720,21 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
 }
 
 .selected-icon {
-    color: var(--skin-brand, #0097ff);
+    color: var(--fwl-brand, #0097ff);
     font-size: 14px;
 }
 
 /* 当前选择显示 */
 .current-selection {
     padding: 15px;
-    background-color: var(--skin-surface, #f8f9fa);
+    background-color: var(--fwl-surface, #f8f9fa);
     border-radius: 8px;
     margin-top: 15px;
 }
 
 .selection-text {
     font-weight: 600;
-    color: var(--skin-brand, #0097ff);
+    color: var(--fwl-brand, #0097ff);
     display: inline-block;
     max-width: 250px;
     overflow: hidden;
@@ -1758,21 +1763,21 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
 }
 
 .btn-cancel {
-    background-color: var(--skin-surface, #f8f9fa);
+    background-color: var(--fwl-surface, #f8f9fa);
     color: #666;
 }
 
 .btn-cancel:hover {
-    background-color: var(--skin-border, #e9ecef);
+    background-color: var(--fwl-border, #e9ecef);
 }
 
 .btn-confirm {
-    background: var(--skin-brand, #0097ff);
+    background: var(--fwl-brand, #0097ff);
     color: white;
 }
 
 .btn-confirm:hover {
-    background: var(--skin-brand, #087dcc);
+    background: var(--fwl-brand, #087dcc);
     transform: translateY(-1px);
 }
 
@@ -1841,48 +1846,22 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
 }
 
 .wrapper .recommendtype li:hover {
-    color: var(--skin-brand, #0097ff);
+    color: var(--fwl-brand, #0097ff);
 }
 
 .wrapper .recommendtype li.active {
-    color: var(--skin-brand, #0097ff);
-    background-color: var(--skin-surface, #f0f8ff);
+    color: var(--fwl-brand, #0097ff);
+    background-color: var(--fwl-surface, #f0f8ff);
 }
 
-/* 筛选弹窗样式 */
-.filter-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    padding: 20px;
-}
-
-.filter-container {
-    background: white;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 400px;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-}
-
+/* 筛选面板继承的通用样式（结构见 .filter-sheet） */
 .filter-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px;
     border-bottom: 1px solid #f0f0f0;
-    background: var(--skin-brand, #0097ff);
+    background: var(--fwl-brand, #0097ff);
     color: white;
 }
 
@@ -1917,38 +1896,6 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
     margin-bottom: 25px;
 }
 
-.filter-section h4 {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 15px 0;
-    color: #333;
-}
-
-.filter-option {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #666;
-}
-
-.filter-option input[type="checkbox"],
-.filter-option input[type="radio"] {
-    margin-right: 10px;
-    transform: scale(1.2);
-}
-
-.filter-option:hover {
-    color: var(--skin-brand, #0097ff);
-}
-
-.price-range {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
 .filter-footer {
     display: flex;
     gap: 12px;
@@ -1969,21 +1916,21 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
 }
 
 .btn-reset {
-    background-color: var(--skin-surface, #f8f9fa);
+    background-color: var(--fwl-surface, #f8f9fa);
     color: #666;
 }
 
 .btn-reset:hover {
-    background-color: var(--skin-border, #e9ecef);
+    background-color: var(--fwl-border, #e9ecef);
 }
 
 .btn-confirm {
-    background: var(--skin-brand, #0097ff);
+    background: var(--fwl-brand, #0097ff);
     color: white;
 }
 
 .btn-confirm:hover {
-    background: var(--skin-brand, #087dcc);
+    background: var(--fwl-brand, #087dcc);
     transform: translateY(-1px);
 }
 
@@ -1994,217 +1941,153 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
   z-index: 9999;
 }
 
-/* 首页移动端可读性兜底：限制横向内容，避免用户问候和历史样式撑破页面 */
-.wrapper { max-width: 600px; margin: 0 auto; }
-.wrapper header { min-width: 0; }
-.wrapper header .location-text { min-width: 0; max-width: 48%; font-size: 16px; }
-.wrapper header .location-display { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wrapper .login-register { min-width: 0; margin-left: 8px; }
-.wrapper .login-register .user-info { width: 104px; max-width: 104px; font-size: 13px; overflow: hidden; }
-.wrapper .login-register .scroll-text { display: block; padding-left: 0; animation: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wrapper .top-businesses-carousel { width: calc(100% - 20px); max-width: 560px; overflow: hidden; box-sizing: border-box; }
-.wrapper .top-businesses-carousel .carousel-3d-container { width: 100%; margin: 0; padding: 12px 42px; overflow: hidden; }
-.wrapper .top-businesses-carousel .business-card-3d { width: min(70vw, 260px); min-width: 0; }
-@media (max-width: 480px) {
-    .wrapper header .location-text { max-width: 46%; font-size: 15px; }
-    .wrapper .login-register .user-info { width: 96px; max-width: 96px; }
-    .wrapper .top-businesses-carousel .carousel-3d-container { height: 320px; min-height: 0; padding-left: 36px; padding-right: 36px; }
-}
+/* 首页外壳：手机优先，桌面端保持居中 600px 的手机画布 */
+.wrapper { max-width: 600px; margin: 0 auto; overflow-x: hidden; }
 
-/* 首页新版信息层级：搜索 → 分类 → 猜你喜欢 → 推荐商家 */
-.wrapper { min-height: 100vh; background: var(--skin-surface, #f5f8fb); color: var(--skin-ink, #314f64); }
-.wrapper header { height: 56px; padding: 0 16px; background: var(--skin-brand, #168bd1); }
-.wrapper header .icon-location-box { width: 20px; height: 20px; margin-right: 7px; }
-.wrapper header .icon-location-box i { font-size: 18px; }
-.wrapper header .location-text { min-width: 0; max-width: 62%; font-size: 15px; font-weight: 500; }
-.wrapper header .login-register { margin-left: auto; gap: 7px; }
-.wrapper header .login-register button { padding: 6px 10px; border-radius: 14px; font-size: 12px; }
-.wrapper .search { height: 68px; }
-.wrapper .search .search-fixed-top { height: 68px; padding: 10px 14px; box-sizing: border-box; background: var(--skin-brand, #168bd1); }
-.wrapper .search .search-fixed-top .search-box { width: 100%; height: 46px; padding: 0 6px 0 15px; box-sizing: border-box; border: 1px solid var(--skin-border, #cce9f7); border-radius: 24px; background: #fff; color: var(--skin-muted, #91a7b5); font-size: 14px; }
-.wrapper .search .search-fixed-top .search-box input { margin: 0 8px; font-size: 14px; }
-.wrapper .search .search-fixed-top .search-box .search-btn { min-width: 58px; padding: 9px 13px; border-radius: 19px; background: var(--skin-brand, #168bd1); font-size: 13px; }
-.wrapper .foodtype { height: auto; padding: 12px 10px 9px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px 4px; align-content: initial; box-sizing: border-box; border-bottom: 1px solid var(--skin-border, #e5edf2); }
-.wrapper .foodtype li { width: auto; height: 66px; gap: 4px; }
-.wrapper .foodtype li img { width: 38px; height: 34px; object-fit: contain; }
-.wrapper .foodtype li p { color: var(--skin-muted, #5d7484); font-size: 12px; }
-.guess-section { padding: 13px 14px 12px; background: #fff; border-bottom: 1px solid var(--skin-border, #e5edf2); }
-.guess-section .section-heading { display: flex; align-items: center; justify-content: space-between; margin: 0 1px 10px; }
-.guess-section .section-heading > div { display: flex; align-items: baseline; gap: 8px; }
-.guess-section .section-heading h2 { color: var(--skin-ink, #31556d); font-size: 17px; }
-.guess-section .section-heading span { color: var(--skin-subtle, #9aadb9); font-size: 11px; }
-.guess-section .section-heading button { border: 0; background: transparent; color: var(--skin-muted, #8aa0af); font-size: 12px; cursor: pointer; }
-.guess-scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
-.guess-scroll::-webkit-scrollbar { display: none; }
-.guess-card { flex: 0 0 145px; min-width: 0; padding: 8px; border: 1px solid var(--skin-border, #e1edf4); border-radius: 8px; background: #fff; text-align: left; cursor: pointer; }
-.guess-card img { width: 100%; height: 72px; object-fit: cover; border-radius: 6px; background: var(--skin-surface, #f1f6f8); }
-.guess-card strong { display: block; margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--skin-ink, #3c5f74); font-size: 13px; }
-.guess-card span { display: block; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--skin-muted, #94a7b3); font-size: 10px; }
-.guess-card b { color: #e58a4e; font-weight: 500; }
-.wrapper .recommend { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; height: auto; min-height: 52px; box-sizing: border-box; margin: 0; padding: 17px 14px 9px; background: var(--skin-surface, #f5f8fb); }
-.wrapper .recommend p { color: var(--skin-ink, #31556d); font-size: 18px; font-weight: 600; }
-.wrapper .recommend .recommend-line { display: none; }
-.wrapper .recommendtype { position: sticky; top: 0; z-index: 8; width: 100%; height: 44px; margin-bottom: 0; padding: 0 14px; box-sizing: border-box; justify-content: flex-start; gap: 23px; background: var(--skin-surface, #f5f8fb); border-bottom: 1px solid var(--skin-border, #e2ebf1); }
-.wrapper .recommendtype li { width: auto; height: 44px; padding: 13px 0 10px; color: var(--skin-muted, #6e8798); font-size: 13px; }
-.wrapper .recommendtype li.active { color: var(--skin-brand, #168bd1); font-weight: 600; border-bottom: 2px solid var(--skin-brand, #168bd1); }
-.wrapper .business-list { width: 100%; margin: 0; padding: 0 12px 80px; box-sizing: border-box; }
-.wrapper .business-list li { width: 100%; margin: 0 0 10px; padding: 12px; box-sizing: border-box; border: 1px solid var(--skin-border, #e1edf4); border-radius: 9px; background: #fff; box-shadow: 0 2px 7px rgba(var(--skin-brand-strong-rgb, 39, 86, 114), 0.05); cursor: pointer; }
-.wrapper .business-list li:hover { transform: none; box-shadow: 0 2px 7px rgba(var(--skin-brand-strong-rgb, 39, 86, 114), 0.05); }
-.wrapper .business-list li .business-info { display: flex; align-items: flex-start; gap: 11px; }
-.wrapper .business-list li .business-info img { width: 98px; height: 98px; flex: 0 0 98px; margin: 0; border-radius: 7px; object-fit: cover; background: var(--skin-surface, #f0f5f8); }
-.wrapper .business-list li .business-info .business-info-detail { min-width: 0; flex: 1; padding-top: 1px; }
-.wrapper .business-list li .business-info .business-info-detail h3 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--skin-ink, #2f526a); font-size: 16px; line-height: 1.35; }
-.wrapper .business-list li .business-info .business-info-rating { display: flex; align-items: baseline; gap: 8px; margin-top: 6px; }
-.wrapper .business-list li .business-info .business-info-rating .rating-score { color: #e07b45; font-size: 15px; font-weight: 600; }
-.wrapper .business-list li .business-info .business-info-rating .monthly-sales,
-.wrapper .business-list li .business-info .business-info-rating .average-price { color: var(--skin-muted, #8399a8); font-size: 11px; }
-.wrapper .business-list li .business-info .business-info-delivery { display: flex; gap: 10px; margin-top: 7px; color: var(--skin-muted, #708797); font-size: 11px; }
-.wrapper .business-list li .business-info .business-info-delivery .start-price,
-.wrapper .business-list li .business-info .business-info-delivery .delivery-fee { color: var(--skin-muted, #708797); font-size: 11px; line-height: 1.4; }
-.wrapper .business-list li .business-info .business-info-delivery .free-delivery { color: var(--skin-brand, #168bd1); }
-.business-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-.business-tag { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 3px 6px; border: 1px solid var(--skin-border, #d9e7ee); border-radius: 3px; font-size: 10px; line-height: 1.1; }
-.business-tag.tag-blue { border-color: var(--skin-brand-soft, #b9def1); background: var(--skin-surface, #f1faff); color: var(--skin-brand, #168bd1); }
-.business-tag.tag-orange { border-color: #f1d0b7; background: #fff8f2; color: #d97b43; }
-.business-tag.tag-gold { border-color: #f0dfb0; background: #fffbef; color: #b48731; }
-.business-tag.tag-green { border-color: #c5e5d2; background: #f2fbf5; color: #3d9b69; }
-.business-tag.tag-neutral { border-color: var(--skin-border, #dce7ed); background: var(--skin-surface, #f8fbfc); color: var(--skin-muted, #7591a0); }
-.closed-shop-tag{margin-left:5px;padding:2px 6px;border-radius:7px;background:var(--skin-surface, #edf1f4);color:var(--skin-muted, #80909c);font-size:10px;font-weight:500;vertical-align:2px}
-.wrapper .empty-business-list { padding: 50px 16px; }
-.load-more { display: block; width: calc(100% - 28px); margin: 2px auto 82px; padding: 11px 0; border: 1px solid var(--skin-border, #c8e4f4); border-radius: 6px; background: #fff; color: var(--skin-brand, #168bd1); font-size: 13px; cursor: pointer; }
-.load-more:active { background: var(--skin-surface, #f1faff); }
-@media (min-width: 700px) {
-    .wrapper { max-width: 600px; }
-    .wrapper .business-list { padding-left: 0; padding-right: 0; }
-}
-
-/* Reference-led home polish: keep the supplied campus artwork visible in the
- * first viewport while all controls and data remain live Vue elements. */
+/* ── 首页最终稿（对照参考图实现）──────────────────────────────────
+ * 插画头部 → 搜索 → 分类卡 → 猜你想吃 → 推荐商家。
+ * 只有 CSS 画不出的校园插画被裁成图片，其余全部是活元素与真实数据。
+ */
 .home-page {
-    --home-blue: var(--skin-brand, #168fe4);
-    --home-deep-blue: var(--skin-brand-strong, #123f70);
-    --home-muted: var(--skin-muted, #718aa4);
-    --home-surface: rgba(255, 255, 255, .92);
-    --home-border: rgba(var(--skin-brand-soft-rgb, 157, 205, 238), 0.58);
+    --home-blue: var(--fwl-brand, #168fe4);
+    --home-deep: var(--fwl-brand-strong, #0f3559);
+    --home-title: var(--fwl-brand-strong, #103c6c);
+    --home-muted: var(--fwl-muted, #8aa2b4);
+    --home-border: var(--fwl-border, #dceaf4);
     position: relative;
     min-height: 100vh;
-    background: var(--skin-surface, #f3f9fd);
-    color: var(--home-deep-blue);
+    background: var(--fwl-surface, #f4f9fd);
+    color: var(--home-deep);
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
-    isolation: isolate;
-    --home-bg-shift: 0px;
-    --home-text-shift: 0px;
 }
 
-.home-page::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset: 0 0 auto;
-    height: 220px;
-    pointer-events: none;
-    background:
-        linear-gradient(180deg, rgba(var(--skin-brand-rgb, 20, 142, 228), 0.08), rgba(var(--skin-surface-rgb, 243, 249, 253), 0.98) 94%),
-        url('../assets/home-reference.png') center var(--home-bg-shift) / 100% auto no-repeat;
-    filter: saturate(.98) blur(.15px);
-}
-
-.home-page header {
+/* 头部保持与搜索区同色的纯色底，只保留插画色的浅蓝，不再叠任何背景图 */
+.home-hero {
     position: relative;
-    z-index: 2;
-    height: 112px;
-    padding: 43px 20px 0;
-    box-sizing: border-box;
-    align-items: flex-start;
-    justify-content: flex-start;
-    background:
-        linear-gradient(180deg, rgba(var(--skin-brand-rgb, 20, 145, 231), 0.08), rgba(var(--skin-brand-rgb, 20, 145, 231), 0.62)),
-        url('../assets/home-reference.png') center var(--home-bg-shift) / 100% auto no-repeat;
-    border: 0;
+    background: var(--fwl-border, #d9edfe);
 }
 
-/* The supplied artwork contains a phone status bar and decorative copy.
- * Cover the complete header so the browser's live controls never overlap it. */
-.home-page header::before {
-    content: "";
-    position: absolute;
-    z-index: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background: var(--skin-brand, #2498e5);
-}
-
-.home-page header > * {
+.home-page .home-header {
     position: relative;
     z-index: 1;
-    transform: translateY(var(--home-text-shift));
+    height: 112px;
+    padding: 43px 16px 0;
+    box-sizing: border-box;
+    display: block;
+    background: transparent;
 }
 
-.home-page header .icon-location-box {
-    width: 19px;
-    height: 21px;
-    margin-right: 8px;
-    line-height: 21px;
-}
-
-.home-page header .icon-location-box i {
-    color: #fff;
-    font-size: 19px;
-    filter: drop-shadow(0 1px 2px rgba(var(--skin-brand-strong-rgb, 12, 73, 124), 0.16));
-}
-
-.home-page header .location-text {
-    max-width: calc(100% - 112px);
-    color: #fff;
+.home-page .home-header .location-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    max-width: 52%;
+    color: var(--fwl-brand-strong, #0b2b54);
     font-size: 16px;
     font-weight: 700;
-    line-height: 21px;
-    text-shadow: 0 1px 2px rgba(var(--skin-brand-strong-rgb, 14, 74, 126), 0.2);
+    line-height: 22px;
+    cursor: pointer;
+    user-select: none;
 }
 
-.home-page header .location-text .fa-caret-down {
-    margin-left: 7px;
-    font-size: 12px;
+.home-page .home-header .location-text .fa-map-marker-alt {
+    color: var(--fwl-brand, #1a8cff);
+    font-size: 17px;
 }
 
-.home-page header .login-register {
+.home-page .home-header .location-text .fa-caret-down {
+    margin-left: 1px;
+    color: var(--fwl-brand, #1a8cff);
+    font-size: 13px;
+}
+
+.home-page .home-header .location-display {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.home-page .home-header .hero-actions {
     position: absolute;
-    top: 41px;
-    right: 18px;
-    margin: 0;
-    gap: 5px;
+    top: 39px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.home-page header .login-register button {
-    min-width: 42px;
-    padding: 5px 9px;
-    border: 1px solid rgba(255, 255, 255, .55);
-    border-radius: 14px;
-    color: #fff;
-    background: rgba(255, 255, 255, .16);
-    font-size: 12px;
-    box-shadow: 0 3px 8px rgba(var(--skin-brand-strong-rgb, 12, 78, 133), 0.08);
-    backdrop-filter: blur(8px);
-}
-
-.home-page header .login-register button:hover {
-    background: rgba(255, 255, 255, .28);
-}
-
-.home-page header .login-register .user-info {
-    width: 106px;
-    max-width: 106px;
-    padding: 5px 10px;
+.home-page .home-header .hero-pill,
+.home-page .home-header .hero-user {
+    max-width: 104px;
+    padding: 4px 10px;
     box-sizing: border-box;
-    border: 1px solid rgba(255, 255, 255, .52);
-    border-radius: 14px;
-    color: #fff;
-    background: rgba(255, 255, 255, .15);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .9);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .72);
+    color: var(--home-deep);
     font-size: 12px;
-    text-align: center;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     backdrop-filter: blur(8px);
+}
+
+.home-page .home-header .hero-pill {
+    cursor: pointer;
+}
+
+.home-page .home-header .hero-pill:hover {
+    background: #fff;
+}
+
+.home-page .home-header .hero-bell {
+    position: relative;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--fwl-brand-strong, #0b2b54);
+    font-size: 19px;
+    line-height: 26px;
+    cursor: pointer;
+}
+
+.home-page .home-header .hero-bell-dot {
+    position: absolute;
+    top: 2px;
+    right: 3px;
+    width: 7px;
+    height: 7px;
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+    background: #ff4d4f;
+}
+
+.home-page .home-header .hero-bottom {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 72px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.home-page .home-header .hero-slogan {
+    margin: 0;
+    padding-bottom: 3px;
+    border-bottom: 2px solid rgba(var(--fwl-brand-rgb, 18, 129, 253), 0.32);
+    color: var(--fwl-brand, #1281fd);
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 600;
+    letter-spacing: .04em;
+    line-height: 1.3;
+    text-align: right;
 }
 
 .home-page .search {
@@ -2224,299 +2107,454 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
     height: 72px;
     padding: 11px 14px 15px;
     box-sizing: border-box;
-    background: var(--skin-brand, #2498e5);
+    background: var(--fwl-border, #d9edfe);
     backdrop-filter: none;
+    /* 聚焦时两侧内边距收窄，搜索框展开到满宽 */
+    transition: padding 300ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.home-page .search .search-fixed-top:focus-within {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+/* 位置弹窗保持在同一个手机画布内居中，并盖住底部导航 */
+.home-page .location-modal {
+    position: fixed;
+    z-index: 12000;
+    left: 50%;
+    right: auto;
+    width: min(100vw, 600px);
+    max-width: 600px;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+}
+
+.home-page .modal-container {
+    width: calc(100% - 32px);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .home-page .search .search-fixed-top .search-box {
     width: 100%;
     height: 46px;
-    padding: 0 6px 0 16px;
+    padding: 0 6px 0 15px;
     box-sizing: border-box;
-    border: 1px solid rgba(255, 255, 255, .72);
-    border-radius: 25px;
-    background: rgba(255, 255, 255, .95);
-    color: var(--skin-muted, #83a5c0);
-    box-shadow: 0 8px 18px rgba(var(--skin-brand-rgb, 35, 113, 166), 0.14);
+    border: 1px solid rgba(255, 255, 255, .95);
+    border-radius: 23px;
+    background: #fff;
+    color: var(--fwl-muted, #8aa4bb);
+    box-shadow: 0 7px 18px rgba(var(--fwl-brand-rgb, 35, 113, 166), 0.13);
     font-family: inherit;
     transform-origin: center;
-    transition: transform 180ms cubic-bezier(.22, 1, .36, 1), box-shadow 180ms ease, border-color 180ms ease;
+    transition: transform 300ms cubic-bezier(.22, 1, .36, 1), box-shadow 300ms ease, border-color 300ms ease;
 }
 
 .home-page .search .search-fixed-top .search-box:focus-within {
-    transform: translateY(-2px) scale(1.01);
-    border-color: rgba(var(--skin-brand-soft-rgb, 112, 194, 243), 0.95);
-    box-shadow: 0 12px 24px rgba(var(--skin-brand-rgb, 35, 113, 166), 0.19), 0 0 0 3px rgba(255, 255, 255, .22);
+    transform: translateY(-2px) scale(1.015);
+    border-color: rgba(var(--fwl-brand-rgb, 22, 143, 228), 0.55);
+    box-shadow: 0 13px 26px rgba(var(--fwl-brand-rgb, 35, 113, 166), 0.22), 0 0 0 3px rgba(var(--fwl-brand-rgb, 22, 143, 228), 0.12);
 }
 
 .home-page .search .search-fixed-top .search-box .fa-search {
-    margin-right: 9px;
+    margin-right: 8px;
     color: var(--home-blue);
-    font-size: 20px;
+    font-size: 19px;
 }
 
 .home-page .search .search-fixed-top .search-box input {
     min-width: 0;
     margin: 0 8px;
-    color: var(--home-deep-blue);
+    color: var(--home-deep);
     font-size: 14px;
 }
 
 .home-page .search .search-fixed-top .search-box input::placeholder {
-    color: var(--skin-muted, #8fa8be);
+    color: var(--fwl-muted, #8fa8be);
 }
 
 .home-page .search .search-fixed-top .search-box .search-btn {
-    min-width: 70px;
-    padding: 9px 15px;
-    border-radius: 21px;
-    background: linear-gradient(135deg, var(--skin-brand, #2aa9f1), var(--skin-brand, #0f83dc));
+    min-width: 66px;
+    padding: 9px 14px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--fwl-brand, #2aa9f1), var(--fwl-brand, #0f83dc));
+    color: #fff;
     font-size: 14px;
     font-weight: 700;
-    box-shadow: 0 4px 10px rgba(var(--skin-brand-rgb, 18, 126, 207), 0.2);
+    box-shadow: 0 4px 10px rgba(var(--fwl-brand-rgb, 18, 126, 207), 0.2);
     transform-origin: center;
-    transition: transform 160ms cubic-bezier(.22, 1, .36, 1), filter 160ms ease, box-shadow 160ms ease;
+    transition: transform 160ms cubic-bezier(.22, 1, .36, 1);
 }
 
 .home-page .search .search-fixed-top .search-box .search-btn:active {
-    transform: scale(.94);
-    filter: brightness(.97);
-    box-shadow: 0 2px 6px rgba(var(--skin-brand-rgb, 18, 126, 207), 0.16);
+    transform: scale(.95);
 }
 
+/* 分类卡：白色圆角卡 + 浅蓝图标底，白色底图用 multiply 融进底色 */
 .home-page .foodtype {
     position: relative;
     z-index: 2;
     width: calc(100% - 24px);
     height: auto;
-    margin: 13px auto 0;
-    padding: 17px 11px 13px;
+    margin: 14px auto 0;
+    padding: 14px 8px 12px;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 13px 2px;
+    gap: 10px 2px;
     align-content: initial;
     box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, .9);
-    border-radius: 19px;
+    border-radius: 18px;
     background: #fff;
-    box-shadow: 0 10px 28px rgba(var(--skin-brand-rgb, 58, 129, 177), 0.1), inset 0 1px 0 rgba(255, 255, 255, .8);
-    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 26px rgba(var(--fwl-brand-rgb, 58, 129, 177), 0.09);
+    list-style: none;
 }
 
 .home-page .foodtype li {
     width: auto;
-    height: 65px;
-    gap: 5px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
     cursor: pointer;
     touch-action: manipulation;
 }
 
-.home-page .foodtype li img {
-    width: 42px;
-    height: 38px;
-    object-fit: contain;
-    filter: drop-shadow(0 4px 5px rgba(var(--skin-brand-rgb, 45, 111, 155), 0.08));
+.home-page .foodtype li .foodtype-icon {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    background: var(--fwl-surface, #eaf4fd);
+    isolation: isolate;
     transform-origin: center;
-    transition: transform 180ms cubic-bezier(.22, 1, .36, 1), filter 180ms ease;
+    transition: transform 180ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.home-page .foodtype li .foodtype-icon img {
+    width: 34px;
+    height: 30px;
+    object-fit: contain;
+    mix-blend-mode: multiply;
 }
 
 .home-page .foodtype li p {
-    color: var(--skin-brand-strong, #244b73);
+    margin: 0;
+    color: var(--fwl-brand-strong, #24476b);
     font-size: 12px;
     font-weight: 600;
+    white-space: nowrap;
     transition: color 180ms ease;
 }
 
-.home-page .foodtype li:active img {
-    animation: category-press 220ms cubic-bezier(.22, 1, .36, 1);
+.home-page .foodtype li:active .foodtype-icon {
+    animation: category-press 150ms cubic-bezier(.22, 1, .36, 1);
 }
 
 .home-page .foodtype li:active p {
     color: var(--home-blue);
 }
 
+/* 分类点击反馈：放大到 1.15 并轻微上跳，再回弹归位 */
+@keyframes category-press {
+    0% { transform: scale(1) translateY(0); }
+    45% { transform: scale(1.15) translateY(-4px); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+/* 猜你想吃：横向卡片 + 后端规则给出的角标 */
 .home-page .guess-section {
-    padding: 22px 14px 13px;
+    padding: 20px 14px 12px;
     background: transparent;
     border: 0;
 }
 
-.home-page .guess-section .section-heading {
-    margin: 0 1px 11px;
+.home-page .guess-section .section-heading,
+.home-page .recommend .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 1px 12px;
 }
 
-.home-page .guess-section .section-heading > div {
-    gap: 9px;
+.home-page .guess-section .section-heading > div,
+.home-page .recommend .section-heading > div {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
 }
 
 .home-page .guess-section .section-heading h2,
-.home-page .recommend p {
+.home-page .recommend .section-heading h2 {
     position: relative;
-    color: var(--skin-brand-strong, #103c6c);
+    margin: 0;
+    color: var(--home-title);
+    font-size: 21px;
     font-weight: 800;
     letter-spacing: 0;
 }
 
-.home-page .guess-section .section-heading h2 {
-    font-size: 21px;
+.home-page .guess-section .section-heading h2 .section-spark {
+    margin-left: 2px;
+    color: #f7b731;
+    font-size: 14px;
 }
 
-.home-page .guess-section .section-heading h2::after,
-.home-page .recommend p::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -7px;
-    width: 34px;
-    height: 4px;
-    border-radius: 4px;
-    background: var(--skin-brand, #168fe4);
-}
-
-.home-page .guess-section .section-heading span {
-    color: var(--skin-muted, #829ab0);
+.home-page .guess-section .section-heading span,
+.home-page .recommend .section-heading span {
+    color: var(--fwl-subtle, #9aadb9);
     font-size: 12px;
 }
 
 .home-page .guess-section .section-heading button {
-    color: var(--skin-muted, #7592ad);
+    border: 0;
+    background: transparent;
+    color: var(--fwl-muted, #8aa0af);
     font-size: 12px;
+    cursor: pointer;
 }
 
 .home-page .guess-scroll {
+    display: flex;
     gap: 10px;
     padding: 2px 1px 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.home-page .guess-scroll::-webkit-scrollbar {
+    display: none;
 }
 
 .home-page .guess-card {
-    flex-basis: 145px;
+    flex: 0 0 152px;
+    min-width: 0;
     padding: 8px;
     border: 1px solid var(--home-border);
-    border-radius: 13px;
-    background: rgba(255, 255, 255, .94);
-    box-shadow: 0 7px 16px rgba(var(--skin-brand-rgb, 59, 120, 161), 0.08);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 6px 16px rgba(var(--fwl-brand-rgb, 59, 120, 161), 0.07);
+    text-align: left;
+    cursor: pointer;
 }
 
-.home-page .guess-card img {
-    height: 76px;
-    border-radius: 9px;
-    transform-origin: center;
-    transition: transform 180ms cubic-bezier(.22, 1, .36, 1);
+.home-page .guess-card-media {
+    position: relative;
+    display: block;
 }
 
-.home-page .guess-card:active {
-    transform: scale(.97);
+.home-page .guess-card-media img {
+    display: block;
+    width: 100%;
+    height: 78px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: var(--fwl-surface, #eef5f9);
 }
 
-.home-page .guess-card:active img {
-    transform: scale(1.03);
+.home-page .guess-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: calc(100% - 12px);
+    overflow: hidden;
+    padding: 3px 8px;
+    border-radius: 9px 0 9px 0;
+    color: #fff;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
+
+.home-page .guess-badge-hot { background: linear-gradient(135deg, #ff7444, #f4452c); }
+.home-page .guess-badge-morning { background: linear-gradient(135deg, #ffbb45, #f79009); }
+.home-page .guess-badge-good { background: linear-gradient(135deg, var(--fwl-brand, #3aa8f2), var(--fwl-brand, #168fe4)); }
+.home-page .guess-badge-fresh { background: linear-gradient(135deg, #45ce93, #22a866); }
+.home-page .guess-badge-neutral { background: linear-gradient(135deg, var(--fwl-subtle, #9db2c4), var(--fwl-muted, #7d94a8)); }
 
 .home-page .guess-card strong {
-    color: var(--skin-brand-strong, #183f6c);
+    display: block;
+    margin-top: 7px;
+    overflow: hidden;
+    color: var(--home-title);
     font-size: 13px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.home-page .guess-card span {
-    color: var(--skin-muted, #839bb0);
+.home-page .guess-card-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-top: 5px;
+}
+
+.home-page .guess-card-meta b {
+    color: #f27635;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.home-page .guess-card-meta span {
+    overflow: hidden;
+    color: var(--home-muted);
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.home-page .guess-card-price {
+    display: block;
+    margin-top: 3px;
+    color: var(--home-muted);
     font-size: 10px;
 }
 
-.home-page .guess-card b {
-    color: #f27b3a;
-}
-
+/* 推荐商家标题与排序胶囊 */
 .home-page .recommend {
-    justify-content: flex-start;
-    min-height: 52px;
-    margin-top: 2px;
-    padding: 17px 14px 12px;
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 18px 14px 0;
+    box-sizing: border-box;
     background: transparent;
 }
 
+.home-page .recommend .recommend-line,
 .home-page .recommend p {
-    margin: 0;
-    color: var(--skin-brand-strong, #103c6c);
-    font-size: 21px;
-    font-weight: 800;
+    display: none;
 }
 
 .home-page .recommendtype {
     position: relative;
-    height: 45px;
-    padding: 0 14px;
-    gap: 25px;
-    background: rgba(var(--skin-surface-rgb, 243, 249, 253), 0.88);
-    border-bottom: 1px solid rgba(var(--skin-brand-soft-rgb, 174, 207, 228), 0.6);
-    backdrop-filter: blur(9px);
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+    height: auto;
+    margin: 12px 0 0;
+    padding: 0 14px 12px;
+    box-sizing: border-box;
+    background: transparent;
+    border-bottom: 0;
+    backdrop-filter: none;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.home-page .recommendtype::-webkit-scrollbar {
+    display: none;
 }
 
 .home-page .recommendtype li {
-    height: 45px;
-    padding: 13px 0 10px;
-    border-radius: 0;
-    color: var(--skin-muted, #718aa4);
-    font-size: 13px;
-    position: relative;
+    position: static;
+    flex: 0 0 auto;
+    width: auto;
+    height: auto;
+    padding: 7px 12px;
+    border: 0;
+    border-radius: 16px;
+    background: var(--fwl-surface, #eef4f9);
+    color: var(--fwl-muted, #70899c);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 160ms ease, color 160ms ease;
+}
+
+.home-page .recommendtype li i {
+    margin-left: 4px;
+    font-size: 10px;
 }
 
 .home-page .recommendtype li.active {
+    background: var(--fwl-surface, #e2f1fe);
     color: var(--home-blue);
-    background: transparent;
+    font-weight: 700;
     border-bottom: 0;
 }
 
-.home-page .recommendtype .sort-indicator {
-    position: absolute;
-    left: 14px;
-    bottom: 0;
-    height: 3px;
-    border-radius: 3px;
-    background: var(--home-blue);
-    pointer-events: none;
-    transition: transform 250ms cubic-bezier(.22, 1, .36, 1), width 250ms cubic-bezier(.22, 1, .36, 1), opacity 180ms ease;
-}
-
+/* 推荐商家卡片：图片 + 信息 + 距离/送达时间/箭头 */
 .home-page .business-list {
-    padding: 12px 12px 88px;
+    width: 100%;
+    margin: 0;
+    padding: 2px 12px 92px;
+    box-sizing: border-box;
+    list-style: none;
 }
 
 .home-page .business-list li {
+    width: 100%;
     min-height: 122px;
-    margin-bottom: 11px;
+    margin: 0 0 11px;
     padding: 12px;
+    box-sizing: border-box;
     border: 1px solid var(--home-border);
     border-radius: 15px;
-    background: rgba(255, 255, 255, .94);
-    box-shadow: 0 7px 17px rgba(var(--skin-brand-rgb, 51, 111, 151), 0.08);
+    background: #fff;
+    box-shadow: 0 7px 17px rgba(var(--fwl-brand-rgb, 51, 111, 151), 0.08);
+    cursor: pointer;
+}
+
+.home-page .business-list li:hover {
+    box-shadow: 0 7px 17px rgba(var(--fwl-brand-rgb, 51, 111, 151), 0.08);
 }
 
 .home-page .business-list li .business-info {
-    gap: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
 }
 
 .home-page .business-list li .business-info img {
     width: 104px;
     height: 104px;
-    flex-basis: 104px;
+    flex: 0 0 104px;
+    margin: 0;
     border-radius: 10px;
+    object-fit: cover;
+    background: var(--fwl-surface, #eef5f9);
+}
+
+.home-page .business-list li .business-info .business-info-detail {
+    min-width: 0;
+    flex: 1;
 }
 
 .home-page .business-list li .business-info .business-info-detail h3 {
-    margin-bottom: 0;
-    color: var(--skin-brand-strong, #103c6c);
+    margin: 0;
+    overflow: hidden;
+    color: var(--home-title);
     font-size: 16px;
     font-weight: 800;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .home-page .business-list li .business-info .business-info-rating {
-    gap: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 7px;
     margin-top: 7px;
 }
 
 .home-page .business-list li .business-info .business-info-rating .rating-score {
     color: #f27635;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 800;
 }
 
@@ -2524,12 +2562,15 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
 .home-page .business-list li .business-info .business-info-rating .average-price,
 .home-page .business-list li .business-info .business-info-delivery .start-price,
 .home-page .business-list li .business-info .business-info-delivery .delivery-fee {
-    color: var(--skin-muted, #7893ac);
+    color: var(--fwl-muted, #7893ac);
     font-size: 11px;
+    line-height: 1.4;
 }
 
 .home-page .business-list li .business-info .business-info-delivery {
-    gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
     margin-top: 8px;
 }
 
@@ -2537,55 +2578,304 @@ button.location-text { border: 0; background: transparent; color: inherit; paddi
     color: var(--home-blue);
 }
 
+.home-page .business-side {
+    flex: 0 0 auto;
+    max-width: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    padding-top: 2px;
+}
+
+.home-page .business-distance {
+    color: var(--home-muted);
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.home-page .business-eta {
+    padding: 2px 6px;
+    border-radius: 9px;
+    background: var(--fwl-surface, #e8f4fe);
+    color: var(--home-blue);
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.home-page .business-chevron {
+    margin-top: 2px;
+    color: var(--fwl-subtle, #c2d0da);
+    font-size: 15px;
+}
+
 .home-page .business-tags {
+    display: flex;
+    flex-wrap: wrap;
     gap: 5px;
     margin-top: 8px;
 }
 
 .home-page .business-tag {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
     padding: 3px 6px;
+    border: 1px solid var(--fwl-border, #d9e7ee);
     border-radius: 4px;
     font-size: 10px;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.home-page .business-tag.tag-blue { border-color: var(--fwl-brand-soft, #b9def1); background: var(--fwl-surface, #f1faff); color: var(--fwl-brand, #168bd1); }
+.home-page .business-tag.tag-orange { border-color: #f1d0b7; background: #fff8f2; color: #d97b43; }
+.home-page .business-tag.tag-gold { border-color: #f0dfb0; background: #fffbef; color: #b48731; }
+.home-page .business-tag.tag-green { border-color: #c5e5d2; background: #f2fbf5; color: #3d9b69; }
+.home-page .business-tag.tag-neutral { border-color: var(--fwl-border, #dce7ed); background: var(--fwl-surface, #f8fbfc); color: var(--fwl-muted, #7591a0); }
+
+.home-page .closed-shop-tag {
+    margin-left: 5px;
+    padding: 2px 6px;
+    border-radius: 7px;
+    background: var(--fwl-surface, #edf1f4);
+    color: var(--fwl-muted, #80909c);
+    font-size: 10px;
+    font-weight: 500;
+    vertical-align: 2px;
+}
+
+.home-page .empty-business-list {
+    padding: 50px 16px;
 }
 
 .home-page .load-more {
-    margin-bottom: 90px;
-    border-color: var(--skin-border, #b9dff4);
+    display: block;
+    width: calc(100% - 24px);
+    margin: 2px auto 90px;
+    padding: 11px 0;
+    border: 1px solid var(--fwl-border, #b9dff4);
     border-radius: 9px;
+    background: #fff;
     color: var(--home-blue);
-    background: rgba(255, 255, 255, .88);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.home-page .load-more:active {
+    background: var(--fwl-surface, #f1faff);
+}
+
+/* 筛选面板：底部弹出，5 个维度 + 查看 N 家商家。
+ * 层级要高于底部导航(1000)和 AI 悬浮入口(9999)。 */
+.filter-sheet-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgba(var(--fwl-brand-strong-rgb, 12, 52, 86), 0.42);
+}
+
+.filter-sheet {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: 8px;
+    box-sizing: border-box;
+    border-radius: 22px 22px 0 0;
+    background: #fff;
+    box-shadow: 0 -14px 40px rgba(var(--fwl-brand-strong-rgb, 12, 52, 86), 0.18);
+}
+
+.filter-sheet .sheet-handle {
+    display: block;
+    width: 42px;
+    height: 4px;
+    margin: 0 auto 6px;
+    border-radius: 3px;
+    background: var(--fwl-border, #dbe6ee);
+}
+
+.filter-sheet .filter-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 6px 18px 12px;
+    border: 0;
+    background: #fff;
+    color: inherit;
+}
+
+.filter-sheet .filter-header h3 {
+    margin: 0;
+    color: var(--home-title);
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.filter-sheet .filter-header p {
+    margin: 4px 0 0;
+    color: var(--fwl-muted, #93a9ba);
+    font-size: 12px;
+}
+
+.filter-sheet .close-btn {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--fwl-surface, #f2f6fa);
+    color: var(--fwl-muted, #7b93a8);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.filter-sheet .close-btn:hover {
+    background: var(--fwl-border, #e8eef4);
+}
+
+.filter-sheet .filter-content {
+    flex: 1;
+    padding: 2px 18px 8px;
+    overflow-y: auto;
+}
+
+.filter-sheet .filter-section {
+    margin-bottom: 18px;
+}
+
+.filter-sheet .filter-section h4 {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 11px;
+    color: var(--home-title);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.filter-sheet .filter-section h4 i {
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    background: var(--fwl-surface, #e8f4fe);
+    color: var(--home-blue);
+    font-size: 11px;
+}
+
+.filter-sheet .filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-sheet .filter-chip {
+    padding: 8px 15px;
+    border: 0;
+    border-radius: 18px;
+    background: var(--fwl-surface, #f1f5f9);
+    color: var(--fwl-muted, #5d7488);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 160ms ease, color 160ms ease;
+}
+
+.filter-sheet .filter-chip.active {
+    background: linear-gradient(135deg, var(--fwl-brand, #2aa9f1), var(--fwl-brand, #0f83dc));
+    color: #fff;
+    font-weight: 600;
+}
+
+.filter-sheet .filter-footer {
+    display: flex;
+    gap: 12px;
+    padding: 12px 18px 18px;
+    border: 0;
+    background: #fff;
+}
+
+.filter-sheet .filter-footer .btn-reset {
+    flex: 0 0 34%;
+    padding: 13px 0;
+    border: 0;
+    border-radius: 14px;
+    background: var(--fwl-surface, #e8f4fe);
+    color: var(--home-blue);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.filter-sheet .filter-footer .btn-confirm {
+    flex: 1;
+    padding: 13px 0;
+    border: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--fwl-brand, #2aa9f1), var(--fwl-brand, #0f83dc));
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.sheet-enter-active,
+.sheet-leave-active {
+    transition: opacity 240ms ease;
+}
+
+.sheet-enter-active .filter-sheet,
+.sheet-leave-active .filter-sheet {
+    transition: transform 350ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.sheet-enter-from,
+.sheet-leave-to {
+    opacity: 0;
+}
+
+.sheet-enter-from .filter-sheet,
+.sheet-leave-to .filter-sheet {
+    transform: translateY(100%);
 }
 
 @media (max-width: 380px) {
-    .home-page header { padding-left: 16px; padding-right: 14px; }
-    .home-page header .location-text { max-width: calc(100% - 96px); font-size: 14px; }
-    .home-page header .login-register { right: 14px; }
-    .home-page header .login-register button { min-width: 37px; padding-left: 7px; padding-right: 7px; }
+    .home-page .home-header { padding-left: 14px; padding-right: 14px; }
+    .home-page .home-header .location-text { max-width: 46%; font-size: 15px; }
+    .home-page .home-header .hero-actions { right: 14px; }
+    .home-page .home-header .hero-bottom { left: 14px; right: 14px; }
+    .home-page .home-header .hero-slogan { font-size: 13px; }
     .home-page .business-list li .business-info img { width: 92px; height: 92px; flex-basis: 92px; }
-}
-
-@keyframes category-press {
-    0% { transform: scale(1); }
-    38% { transform: scale(.9); }
-    72% { transform: scale(1.05); }
-    100% { transform: scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .home-page .search .search-fixed-top .search-box,
     .home-page .search .search-fixed-top .search-box .search-btn,
-    .home-page .foodtype li img,
+    .home-page .foodtype li .foodtype-icon,
     .home-page .foodtype li p,
     .home-page .guess-card,
-    .home-page .guess-card img {
+    .home-page .recommendtype li,
+    .filter-sheet .filter-chip {
         transition: none;
     }
 
-    .home-page .foodtype li:active img {
+    .home-page .foodtype li:active .foodtype-icon {
         animation: none;
     }
 
-    .home-page .recommendtype .sort-indicator {
+    .sheet-enter-active,
+    .sheet-leave-active,
+    .sheet-enter-active .filter-sheet,
+    .sheet-leave-active .filter-sheet {
         transition: none;
     }
 }

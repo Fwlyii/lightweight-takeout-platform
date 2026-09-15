@@ -41,4 +41,7 @@ public class Cart {
     @Schema(description = "商品ID")
     private Long foodId;
 
+    @Schema(description = "同一商家的备注（口味/餐具等）")
+    private String remarks;
+
 }

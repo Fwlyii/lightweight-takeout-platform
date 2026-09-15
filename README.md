@@ -120,7 +120,7 @@ npm run build
 3. `elm_bk/db/seeds/rider-demo-seed.sql`
 4. `elm_bk/db/seeds/demo-showcase-seed.sql`
 
-随后 migrate 服务执行 `003_order_name_snapshot.sql`。初始化 SQL 只在 MySQL 数据目录首次创建时运行。
+随后 migrate 服务执行 `003_order_name_snapshot.sql` 和 `005_cart_order_remarks.sql`（均可重复执行）。初始化 SQL 只在 MySQL 数据目录首次创建时运行。已有服务升级购物车备注功能前，先备份并执行 `005_cart_order_remarks.sql`，再部署后端。
 
 已有数据库应先备份、核对表结构，再选择适用迁移。`migrations/legacy/` 保存较早的迁移，不应对整个目录盲目批量执行。脚本可能包含特定库名或基线假设，隔离测试不能只改连接参数。H2 测试夹具仍在 `src/test/resources`，不是生产迁移。
 

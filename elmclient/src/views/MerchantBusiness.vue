@@ -2,6 +2,7 @@
   <div class="shop-management-page">
     <div class="top-background">
       <h1>经营工作台</h1>
+      <MerchantLogoutButton />
     </div>
 
     <div class="workbench-summary">
@@ -70,9 +71,11 @@ import { useRouter } from 'vue-router';
 import { toast } from '../utils/toast';
 import { clearAuth, getToken } from '../utils/auth';
 import { listMyBusinesses } from '../services/businessService';
+import MerchantLogoutButton from '../components/MerchantLogoutButton.vue';
 
 export default {
   name: 'MyApplication',
+  components: { MerchantLogoutButton },
   setup() {
     const router = useRouter();
     const shops = ref([]);
@@ -222,7 +225,7 @@ export default {
                 <option value="30-5">满30减5</option>
                 <option value="50-10">满50减10</option>
               </select>
-              
+
               <select id="orderTypeInput" class="swal2-input modern-input" aria-label="商铺类型" required>
                 <option value="">请选择商铺类型</option>
                 <option value="1">美食</option><option value="2">早餐</option><option value="3">跑腿代购</option>

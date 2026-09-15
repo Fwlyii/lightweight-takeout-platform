@@ -58,7 +58,7 @@ public class SecurityConfig {
                         // businesses/foods namespace (it also contains management actions).
                         .requestMatchers(HttpMethod.GET, "/api/businesses/search",
                                 "/api/businesses/type/presentations", "/api/businesses/carousel",
-                                "/api/businesses/public/{id:[0-9]+}", "/api/foods/list",
+                                "/api/businesses/public/{id:[0-9]+}", "/api/businesses/{id:[0-9]+}/summary", "/api/foods/list",
                                 "/api/v1/reviews/public/business/{id:[0-9]+}").permitAll()
                         // Aggregate store counters are also displayed in the merchant workspace;
                         // customer-specific collections and mutations remain USER-only below.

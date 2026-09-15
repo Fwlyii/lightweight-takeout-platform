@@ -73,6 +73,8 @@ public class OrderTimeoutScheduler {
         notification.setUserId(order.getCustomerId());
         notification.setNotificationType(2);
         notification.setNotificationContent(content);
+        // Order lifecycle messages are not approval results, but the legacy schema requires a value.
+        notification.setAuditResult(0);
         notification.setIsRead(0);
         notification.setIsDeleted(0);
         notification.setCreateTime(LocalDateTime.now());

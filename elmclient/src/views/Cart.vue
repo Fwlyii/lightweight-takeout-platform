@@ -1,64 +1,111 @@
 <template>
 	<div class="wrapper cart-page">
-		<!-- header部分 -->
-		<PageHeader title="购物车" :back-action="goBack" />
+		<!-- header部分：插画只作背景，返回/标题/管理都是活元素 -->
+		<header class="cart-header">
+			<button type="button" class="cart-return" aria-label="返回商家" @click="goBack">‹</button>
+			<p>购物车</p>
+			<button type="button" class="manage-toggle" @click="manageMode = !manageMode">{{ manageMode ? '完成' : '管理' }}</button>
+		</header>
 
 		<!-- 购物车为空提示 -->
-		<div v-if="loading || loadError" class="empty-cart" role="status">
-			<p>{{ loading ? '正在加载购物车…' : loadError }}</p>
-			<button v-if="!loading" @click="listCart">重新加载</button>
-		</div>
+		<div v-if="loading || loadError" class="empty-cart" role="status"><p>{{ loading ? '正在加载购物车…' : loadError }}</p><button v-if="loadError" @click="listCart">重试</button></div>
 		<div class="empty-cart" v-else-if="cartItems.length === 0">
 			<img src="../assets/empty-cart.png" alt="购物车为空">
 			<p>您的购物车空空如也</p>
-			<button @click="goBack">继续选购</button>
+			<button @click="goBack">返回商家</button>
 		</div>
 
 		<!-- 购物车列表部分 -->
-			<div v-else>
-			<!-- 商家信息 -->
-			<div class="business-info">
-				<div class="business-info-title"><h3>{{ businessName }}</h3><button class="select-all" @click="toggleSelectAll">{{ allSelected ? '取消全选' : '全选' }}</button></div>
-				<p class="selection-hint">已选 {{ selectedItems.length }} 份商品，可分批结算</p>
-				<div v-if="merchants.length > 1" class="merchant-choices">
-					<p>不同商家需要分别下单，请选择一家：</p>
-					<button v-for="merchant in merchants" :key="merchant.id" @click="selectMerchant(merchant.id)">{{ merchant.name }}</button>
+			<div v-else class="cart-body">
+			<label v-if="merchants.length > 1" class="merchant-picker">切换商家 <select :value="businessId" @change="selectMerchant($event.target.value)"><option v-for="merchant in merchants" :key="merchant.id" :value="merchant.id">{{ merchant.name }}</option></select></label>
+			<!-- 商家分组卡片 -->
+			<section class="merchant-card">
+				<div class="merchant-head">
+					<button type="button" class="merchant-name" @click="goToBusiness">
+						<i class="fa fa-shopping-bag"></i>
+						<strong>{{ businessName }}</strong>
+						<i class="fa fa-angle-right"></i>
+					</button>
+					<button type="button" class="select-all" @click="toggleSelectAll">{{ allSelected ? '取消全选' : '全选' }}</button>
 				</div>
-			</div>
+				<p class="selection-hint">已选 {{ selectedItems.length }} 份商品，可分批结算</p>
 
-			<ul class="cart">
-				<li v-for="item in cartItems" :key="item.id">
-					<label class="cart-select" :aria-label="`选择${item.foodName}`"><input type="checkbox" v-model="selectedFoodIds" :value="item.foodId"><span></span></label>
-					<div class="cart-img">
-						<!-- 这里假设您有食物图片的URL，如果没有可以移除或使用默认图片 -->
-						<img :src="item.foodImg || require('../assets/food-default.png')" alt="食物图片" @error="handleImageError">
-						<div class="cart-img-quantity" v-show="item.quantity > 0">{{ item.quantity }}</div>
-					</div>
-					<div class="cart-info">
-						<h3>{{ item.foodName }}</h3>
-						<small v-if="merchants.length > 1">{{ item.businessName }}</small>
-						<small v-if="item.purchaseLimit" class="food-meta">每单最多 {{ item.purchaseLimit }} 份</small>
-						<p>&#165;{{ Number(item.foodPrice || 0).toFixed(2) }} / 份</p>
-						<small v-if="Number(item.stock || 0) <= 0" class="stock-hint">当前已售罄</small>
-					</div>
-					<div class="cart-item-side">
-						<button type="button" class="delete-item" :disabled="updatingCartIds.has(item.id)" :aria-label="`删除${item.foodName}`" @click="removeItem(item)"><i class="fa fa-trash-o"></i></button>
-						<strong>￥{{ (Number(item.foodPrice || 0) * Number(item.quantity || 0)).toFixed(2) }}</strong>
-						<div class="quantity-stepper" :aria-label="`${item.foodName}数量`">
-							<button type="button" :disabled="updatingCartIds.has(item.id)" @click="changeQuantity(item, -1)">−</button>
-							<span>{{ item.quantity }}</span>
-							<button type="button" :disabled="updatingCartIds.has(item.id) || item.quantity >= maxQuantity(item)" @click="changeQuantity(item, 1)">+</button>
+				<ul class="cart">
+					<li v-for="item in cartItems" :key="item.id">
+						<label class="cart-select" :aria-label="`选择${item.foodName}`"><input type="checkbox" v-model="selectedFoodIds" :value="item.foodId"><span></span></label>
+						<div class="cart-img">
+							<!-- 这里假设您有食物图片的URL，如果没有可以移除或使用默认图片 -->
+							<img :src="item.foodImg || require('../assets/food-default.png')" alt="食物图片" @error="handleImageError">
+							<div class="cart-img-quantity" v-show="item.quantity > 0">{{ item.quantity }}</div>
 						</div>
-					</div>
-				</li>
-			</ul>
+						<div class="cart-info">
+							<h3>{{ item.foodName }}</h3>
+							<small v-if="item.purchaseLimit" class="food-meta">每单最多 {{ item.purchaseLimit }} 份</small>
+							<p>&#165;{{ Number(item.foodPrice || 0).toFixed(2) }} / 份</p>
+							<small v-if="Number(item.stock || 0) <= 0" class="stock-hint">当前已售罄</small>
+						</div>
+						<div class="cart-item-side">
+							<button v-if="manageMode" type="button" class="delete-item" :disabled="updatingCartIds.has(item.id)" :aria-label="`删除${item.foodName}`" @click="removeItem(item)"><i class="fa fa-trash-o"></i></button>
+							<strong>￥{{ (Number(item.foodPrice || 0) * Number(item.quantity || 0)).toFixed(2) }}</strong>
+							<div class="quantity-stepper" :aria-label="`${item.foodName}数量`">
+								<button type="button" :disabled="updatingCartIds.has(item.id)" @click="changeQuantity(item, -1)">−</button>
+								<span>{{ item.quantity }}</span>
+								<button type="button" :disabled="updatingCartIds.has(item.id) || item.quantity >= maxQuantity(item)" @click="changeQuantity(item, 1)">+</button>
+							</div>
+						</div>
+					</li>
+				</ul>
+
+				<!-- 口味备注 / 餐具：同一商家一条备注，下单时写入订单 -->
+				<div class="remark-row">
+					<div class="remark-label"><i class="fa fa-commenting-o"></i><span>口味备注 / 餐具</span></div>
+					<input
+						v-model="remarkDraft"
+						type="text"
+						maxlength="255"
+						placeholder="如：少辣、不要香菜、需要一次性餐具等"
+						aria-label="口味备注与餐具需求"
+						@focus="remarkEditing = true"
+						@blur="saveRemark"
+						@keyup.enter="$event.target.blur()" />
+					<button v-if="remarkEditing" type="button" class="remark-save" :disabled="savingRemark" @click="saveRemark">{{ savingRemark ? '保存中' : '保存' }}</button>
+					<i v-else class="fa fa-angle-right remark-arrow"></i>
+				</div>
+			</section>
+
+			<!-- 你可能还想加点 -->
+			<section v-if="recommendFoods.length" class="recommend-block">
+				<div class="recommend-head">
+					<h2>你可能还想加点</h2>
+					<button type="button" @click="rotateRecommend">换一批</button>
+				</div>
+				<div class="recommend-scroll">
+					<article v-for="food in recommendFoods" :key="food.id" class="recommend-card">
+						<img :src="food.foodImg || require('../assets/food-default.png')" :alt="food.foodName" @error="handleImageError">
+						<strong>{{ food.foodName }}</strong>
+						<span>{{ food.foodExplain || '店内热销' }}</span>
+						<div class="recommend-foot">
+							<b>¥{{ Number(food.foodPrice || 0).toFixed(2) }}</b>
+							<button type="button" :disabled="addingFoodId === food.id" :aria-label="`加购${food.foodName}`" @click="addRecommended(food)">+</button>
+						</div>
+					</article>
+				</div>
+			</section>
+
+			<!-- 促销插画（无文字，装饰用） -->
+			<section class="cart-banner" aria-hidden="true">
+				<img src="../assets/cart-banner-art.png" alt="">
+			</section>
 
 			<!-- 底部结算栏 -->
 			<div class="checkout-bar">
+				<button type="button" class="select-all-circle" :class="{ active: allSelected }" aria-label="全选" @click="toggleSelectAll"><i class="fa fa-check"></i></button>
+				<span class="select-all-label" @click="toggleSelectAll">全选</span>
 				<div class="total-price">
-					<p style="color: black;">总计:  <span style="color:crimson;">&#165; {{ totalPrice }}</span></p>
+					<p>总计：<span>&#165; {{ totalPrice }}</span></p>
+					<small><i class="fa fa-info-circle"></i>另需配送费 &#165; {{ deliveryFeeText }}</small>
 				</div>
-				<button class="checkout-btn" :disabled="selectedItems.length === 0 || selectedBusinessIds.length !== 1 || updatingCartIds.size > 0" @click="checkout">{{ selectedBusinessIds.length > 1 ? '请按商家分别结算' : '去下单' }}</button>
+				<button class="checkout-btn" :disabled="selectedItems.length === 0" @click="checkout">去下单</button>
 			</div>
 		</div>
 
@@ -68,29 +115,56 @@
 </template>
 
 <script>
-import PageHeader from '../components/PageHeader.vue';
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { toast } from '../utils/toast';
+import request from '../utils/request';
 import { cartQuantityLimitMessage, maxCartQuantity } from '../utils/cartQuantityRules';
-import { listCartItems, removeCartItem, setCartItemQuantity } from '../services/cartService';
+import { addCartItem, listCartItems, removeCartItem, setCartItemQuantity } from '../services/cartService';
 import { returnToMerchant } from '../utils/backNavigation';
 import { positiveId } from '../utils/checkout';
 
 export default {
-  components: { PageHeader },
 	name: 'Cart',
 	setup() {
 		const cartItems = ref([]);
+		const merchants = ref([]);
+		const loading = ref(true);
+		const loadError = ref('');
 		const userInfo = ref(null);
 		const route = useRoute();
 		const router = useRouter();
 		const businessId = ref(null);
 		const selectedFoodIds = ref([]);
 		const updatingCartIds = ref(new Set());
-		const loading = ref(true), loadError = ref('');
 		// const businessId = ref(null);
 		const businessName = ref('');
+		const businessSummary = ref(null);
+		const allFoods = ref([]);
+		const recommendOffset = ref(0);
+		const addingFoodId = ref(null);
+		// 管理态下才展示删除按钮，与参考图的“管理/完成”切换一致。
+		const manageMode = ref(false);
+		const remarkDraft = ref('');
+		const remarkEditing = ref(false);
+		const savingRemark = ref(false);
+		let remarkSavePromise = null;
+
+		/** 另需配送费来自商家展示口径，自取时不计配送费。 */
+		const deliveryFeeText = computed(() => {
+			const mode = route.query.serviceMode || localStorage.getItem(`businessServiceMode:${businessId.value}`) || 'delivery';
+			if (mode === 'pickup') return '0.00';
+			return Number(businessSummary.value?.deliveryPrice ?? 0).toFixed(2);
+		});
+
+		/** 推荐菜品只用同店真实在售商品，已在本单里的不重复推荐。 */
+		const recommendFoods = computed(() => {
+			const inCart = new Set(cartItems.value.map(item => item.foodId));
+			const pool = allFoods.value.filter(food => !inCart.has(food.id));
+			if (!pool.length) return [];
+			const start = recommendOffset.value % pool.length;
+			return [...pool.slice(start), ...pool.slice(0, start)].slice(0, 3);
+		});
 
 		onMounted(() => {
 			businessId.value = route.query.businessId === undefined ? null : positiveId(route.query.businessId);
@@ -102,30 +176,118 @@ export default {
 
 			if (userInfo.value) {
 				listCart();
+				loadBusinessSummary();
+				loadRecommendFoods();
 			} else {
 				toast.error("用户未登录，请先登录！");
 				router.replace({ path: '/login', query: { role: 'user', redirect: route.fullPath } });
 			}
 		});
 
-		const listCart = () => {
+		const listCart = async () => {
 			loading.value = true; loadError.value = '';
-			listCartItems(businessId.value)
-				.then(items => {
-					cartItems.value = Array.isArray(items) ? items : [];
-					businessName.value = businessId.value ? cartItems.value[0]?.businessName || '当前商家' : '我的购物车';
-					selectedFoodIds.value = [...new Set(cartItems.value.map(item => item.foodId).filter(Boolean))];
-				}).catch(error => {
-					console.error('获取购物车失败:', error);
-					loadError.value = error?.response?.data?.message || error.message || '购物车加载失败';
-				}).finally(() => { loading.value = false; });
+			try {
+				const allItems = await listCartItems(null);
+				merchants.value = [...new Map(allItems.map(item => [Number(item.businessId), { id: Number(item.businessId), name: item.businessName }])).values()];
+				if (!businessId.value && merchants.value.length) businessId.value = merchants.value[0].id;
+				const items = allItems.filter(item => Number(item.businessId) === Number(businessId.value));
+				const previousIds = new Set(cartItems.value.map(item => item.foodId));
+				cartItems.value = Array.isArray(items) ? items : [];
+				businessName.value = cartItems.value[0]?.businessName || '当前商家';
+				selectedFoodIds.value = [...new Set(cartItems.value.map(item => item.foodId).filter(id => id && (!previousIds.has(id) || selectedFoodIds.value.includes(id))))];
+				if (!remarkEditing.value) remarkDraft.value = cartItems.value[0]?.remarks || '';
+				await Promise.all([loadBusinessSummary(), loadRecommendFoods()]);
+			} catch (error) {
+				console.error('获取购物车失败:', error);
+				loadError.value = error?.response?.data?.message || error.message || '购物车加载失败';
+			} finally {
+				loading.value = false;
+			}
+		};
+		const selectMerchant = async id => {
+			if (!await saveRemark()) return;
+			businessId.value = positiveId(id);
+			cartItems.value = []; selectedFoodIds.value = [];
+			await router.replace({ path: '/cart', query: { businessId: String(businessId.value) } });
+			await listCart();
+		};
+
+		/** 备注只写一次、作用于同商家全部购物车行，下单时写入订单。 */
+		const saveRemark = async () => {
+			if (remarkSavePromise) {
+				if (!await remarkSavePromise) return false;
+				return saveRemark();
+			}
+			remarkEditing.value = false;
+			const next = (remarkDraft.value || '').trim();
+			const current = cartItems.value[0]?.remarks || '';
+			if (next === current) return true;
+			savingRemark.value = true;
+			remarkSavePromise = (async () => {
+			try {
+				const response = await request.put('/api/carts/remarks', null, { params: { businessId: businessId.value, remarks: next } });
+				if (!response?.success) throw new Error(response?.message || '备注保存失败');
+				cartItems.value = cartItems.value.map(item => ({ ...item, remarks: next || null }));
+				return true;
+			} catch (error) {
+				toast.error(error?.response?.data?.message || error?.message || '备注保存失败');
+				remarkEditing.value = true;
+				return false;
+			} finally {
+				savingRemark.value = false;
+			}
+			})();
+			try { return await remarkSavePromise; } finally { remarkSavePromise = null; }
+		};
+
+		// 店铺展示指标（配送费）与同店在售菜品，用于底部配送费与推荐位。
+		const loadBusinessSummary = async () => {
+			if (!businessId.value) return;
+			try {
+				const response = await request.get(`/api/businesses/${businessId.value}/summary`);
+				businessSummary.value = response?.success ? (response.data || null) : null;
+			} catch (error) {
+				console.error('获取商家展示指标失败:', error);
+				businessSummary.value = null;
+			}
+		};
+
+		const loadRecommendFoods = async () => {
+			if (!businessId.value) return;
+			try {
+				const response = await request.get('/api/foods/list', { params: { businessId: businessId.value } });
+				const foods = response?.success && Array.isArray(response.data) ? response.data : [];
+				allFoods.value = foods.filter(food => food.shelveStatus === 1);
+			} catch (error) {
+				console.error('获取推荐菜品失败:', error);
+				allFoods.value = [];
+			}
+		};
+
+		const rotateRecommend = () => {
+			recommendOffset.value += 3;
+		};
+
+		const addRecommended = async (food) => {
+			if (addingFoodId.value) return;
+			addingFoodId.value = food.id;
+			try {
+				await addCartItem(food.id, 1);
+				await listCart();
+				toast.success(`已加入购物车：${food.foodName}`);
+			} catch (error) {
+				toast.error(error?.response?.data?.message || error?.message || '加入购物车失败');
+			} finally {
+				addingFoodId.value = null;
+			}
+		};
+
+		const goToBusiness = () => {
+			if (businessId.value) router.push({ path: '/businessInfo', query: { businessId: businessId.value } });
 		};
 
 		// 计算总价
 		const selectedItems = computed(() => cartItems.value.filter(item => selectedFoodIds.value.includes(item.foodId)));
-		const selectedBusinessIds = computed(() => [...new Set(selectedItems.value.map(item => positiveId(item.businessId)).filter(Boolean))]);
-		const merchants = computed(() => [...new Map(cartItems.value.map(item => [Number(item.businessId), { id: Number(item.businessId), name: item.businessName }])).values()]);
-		const selectMerchant = id => { selectedFoodIds.value = cartItems.value.filter(item => Number(item.businessId) === id).map(item => item.foodId); };
 		const allSelected = computed(() => cartItems.value.length > 0 && selectedItems.value.length === cartItems.value.length);
 		const totalPrice = computed(() => {
 			return selectedItems.value.reduce((total, item) => {
@@ -184,23 +346,23 @@ export default {
 		};
 
 		// 结算
-		const checkout = () => {
-			if (updatingCartIds.value.size > 0) return;
+		const checkout = async () => {
+			if (updatingCartIds.value.size || addingFoodId.value) {
+				toast.warning('商品正在更新，请稍后再结算');
+				return;
+			}
 			if (selectedItems.value.length === 0) {
 				toast.warning('请先选择要结算的商品');
 				return;
 			}
-			if (selectedBusinessIds.value.length !== 1) {
-				toast.warning('不同商家需要分别下单，请只选择一家商家的商品'); return;
-			}
-			const checkoutBusinessId = selectedBusinessIds.value[0];
+			if (!await saveRemark()) return;
 			// 跳转到结算页面
 				router.push({
 					path: '/userAddress',
 					query: {
-						businessId: checkoutBusinessId,
+						businessId: businessId.value,
 						foodIds: selectedFoodIds.value.join(','),
-						serviceMode: route.query.serviceMode || localStorage.getItem(`businessServiceMode:${checkoutBusinessId}`) || 'delivery',
+						serviceMode: route.query.serviceMode || localStorage.getItem(`businessServiceMode:${businessId.value}`) || 'delivery',
 					}
 			});
 		};
@@ -218,9 +380,20 @@ export default {
 		};
 
 		return {
+			loading, loadError, merchants, selectMerchant, listCart,
 			cartItems,
-			loading, loadError, listCart, merchants, selectMerchant, selectedBusinessIds,
 			businessName,
+			manageMode,
+			remarkDraft,
+			remarkEditing,
+			savingRemark,
+			saveRemark,
+			deliveryFeeText,
+			recommendFoods,
+			addingFoodId,
+			rotateRecommend,
+			addRecommended,
+			goToBusiness,
 			selectedFoodIds,
 			selectedItems,
 			allSelected,
@@ -240,12 +413,12 @@ export default {
 </script>
 
 <style scoped>
-.stock-hint{display:block;color:var(--skin-muted, #8aa0b2);font-size:12px;margin-top:4px}
-.food-meta{display:block;color:var(--skin-brand, #2384bd);font-size:12px;margin-top:4px}
+.stock-hint{display:block;color:var(--fwl-muted, #8aa0b2);font-size:12px;margin-top:4px}
+.food-meta{display:block;color:var(--fwl-brand, #2384bd);font-size:12px;margin-top:4px}
 .business-info-title{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .business-info-title h3{margin:0}
-.selection-hint{margin:6px 0 0;color:var(--skin-muted, #8aa0b2);font-size:12px}
-.select-all{border:1px solid var(--skin-brand-soft, #a9d5ef);border-radius:14px;background:var(--skin-surface, #f5fbff);color:var(--skin-brand, #168bd1);padding:5px 10px;font-size:12px;cursor:pointer}
+.selection-hint{margin:6px 0 0;color:var(--fwl-muted, #8aa0b2);font-size:12px}
+.select-all{border:1px solid var(--fwl-brand-soft, #a9d5ef);border-radius:14px;background:var(--fwl-surface, #f5fbff);color:var(--fwl-brand, #168bd1);padding:5px 10px;font-size:12px;cursor:pointer}
 /****************** 总容器 ******************/
 .wrapper {
 	width: 100%;
@@ -258,7 +431,7 @@ export default {
 .wrapper header {
 	width: 100%;
 	height: 12vw;
-	background-color: var(--skin-brand, #0097FF);
+	background-color: var(--fwl-brand, #0097FF);
 	color: #fff;
 	font-size: 4.8vw;
 	position: fixed;
@@ -301,8 +474,8 @@ export default {
 }
 .cart-select{width:24px;flex:0 0 24px;display:flex;align-items:center;justify-content:center;margin-right:6px;cursor:pointer}
 .cart-select input{position:absolute;opacity:0;pointer-events:none}
-.cart-select span{width:18px;height:18px;border:1px solid var(--skin-subtle, #b5c9d8);border-radius:50%;background:#fff;position:relative}
-.cart-select input:checked + span{border-color:var(--skin-brand, #168bd1);background:var(--skin-brand, #168bd1)}
+.cart-select span{width:18px;height:18px;border:1px solid var(--fwl-subtle, #b5c9d8);border-radius:50%;background:#fff;position:relative}
+.cart-select input:checked + span{border-color:var(--fwl-brand, #168bd1);background:var(--fwl-brand, #168bd1)}
 .cart-select input:checked + span::after{content:'✓';position:absolute;left:3px;top:-1px;color:#fff;font-size:14px;line-height:18px}
 
 .wrapper .cart li .cart-img {
@@ -328,13 +501,13 @@ export default {
 	gap: 8px;
 }
 
-.cart-item-side strong { font-size: 3.5vw; color: var(--skin-ink, #202d3d); white-space: nowrap; }
-.delete-item { border: 0; background: transparent; color: var(--skin-subtle, #9aabb8); font-size: 18px; padding: 2px 4px; cursor: pointer; }
-.quantity-stepper { height: 28px; display: flex; align-items: center; border: 1px solid var(--skin-border, #dce8f0); border-radius: 15px; overflow: hidden; background: #fff; }
-.quantity-stepper button { width: 28px; height: 28px; border: 0; background: var(--skin-surface, #f2f8fc); color: var(--skin-brand, #168bd1); font-size: 18px; line-height: 1; cursor: pointer; }
+.cart-item-side strong { font-size: 3.5vw; color: var(--fwl-ink, #202d3d); white-space: nowrap; }
+.delete-item { border: 0; background: transparent; color: var(--fwl-subtle, #9aabb8); font-size: 18px; padding: 2px 4px; cursor: pointer; }
+.quantity-stepper { height: 28px; display: flex; align-items: center; border: 1px solid var(--fwl-border, #dce8f0); border-radius: 15px; overflow: hidden; background: #fff; }
+.quantity-stepper button { width: 28px; height: 28px; border: 0; background: var(--fwl-surface, #f2f8fc); color: var(--fwl-brand, #168bd1); font-size: 18px; line-height: 1; cursor: pointer; }
 .quantity-stepper button:disabled,
 .delete-item:disabled { opacity: .4; cursor: not-allowed; }
-.quantity-stepper span { min-width: 28px; text-align: center; color: var(--skin-ink, #24384a); font-size: 13px; font-weight: 600; }
+.quantity-stepper span { min-width: 28px; text-align: center; color: var(--fwl-ink, #24384a); font-size: 13px; font-weight: 600; }
 
 .wrapper .cart li .cart-img .cart-img-quantity {
 	width: 5vw;
@@ -379,7 +552,7 @@ export default {
 	height: 6vw;
 	border: none;
 	border-radius: 50%;
-	background-color: var(--skin-brand, #0097FF);
+	background-color: var(--fwl-brand, #0097FF);
 	color: white;
 	font-size: 3.5vw;
 	display: flex;
@@ -426,7 +599,7 @@ export default {
 }
 
 .checkout-bar .checkout-btn {
-	background-color: var(--skin-brand, #0097FF);
+	background-color: var(--fwl-brand, #0097FF);
 	color: white;
 	border: none;
 	padding: 2.5vw 5vw;
@@ -434,7 +607,7 @@ export default {
 	font-size: 4vw;
 	cursor: pointer;
 }
-.checkout-bar .checkout-btn:disabled{background:var(--skin-subtle, #b8cbd7);cursor:not-allowed;box-shadow:none}
+.checkout-bar .checkout-btn:disabled{background:var(--fwl-subtle, #b8cbd7);cursor:not-allowed;box-shadow:none}
 
 /****************** 空购物车 ******************/
 .empty-cart {
@@ -458,7 +631,7 @@ export default {
 }
 
 .empty-cart button {
-	background-color: var(--skin-brand, #0097FF);
+	background-color: var(--fwl-brand, #0097FF);
 	color: white;
 	border: none;
 	padding: 3vw 6vw;
@@ -474,27 +647,27 @@ export default {
 }
 
 /* 桌面端也保持移动端外卖页面的窄栏比例，避免 vw 字号随窗口放大造成拥挤。 */
-.wrapper{width:100%;max-width:600px;min-height:100vh;height:auto;margin:0 auto;top:0;background:var(--skin-surface, #f7fafc);color:var(--skin-ink, #29455f);overflow-x:hidden;box-sizing:border-box}
+.wrapper{width:100%;max-width:600px;min-height:100vh;height:auto;margin:0 auto;top:0;background:var(--fwl-surface, #f7fafc);color:var(--fwl-ink, #29455f);overflow-x:hidden;box-sizing:border-box}
 .wrapper header{width:100%;height:56px;position:fixed;left:50%;top:0;transform:translateX(-50%);max-width:600px;font-size:20px;z-index:1000}
-.business-info{margin-top:56px;padding:14px 16px;background:#fff;border-bottom:1px solid var(--skin-border, #e5edf2)}
-.business-info h3{font-size:18px;color:var(--skin-ink, #31556d)}
+.business-info{margin-top:56px;padding:14px 16px;background:#fff;border-bottom:1px solid var(--fwl-border, #e5edf2)}
+.business-info h3{font-size:18px;color:var(--fwl-ink, #31556d)}
 .business-info-title h3{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .selection-hint{font-size:12px}
-.wrapper .cart{margin:0 0 82px;padding:0;list-style:none;background:var(--skin-surface, #f7fafc)}
-.wrapper .cart li{padding:14px 12px;gap:8px;align-items:center;background:#fff;border-bottom:1px solid var(--skin-border, #e7eef3);min-height:104px}
+.wrapper .cart{margin:0 0 82px;padding:0;list-style:none;background:var(--fwl-surface, #f7fafc)}
+.wrapper .cart li{padding:14px 12px;gap:8px;align-items:center;background:#fff;border-bottom:1px solid var(--fwl-border, #e7eef3);min-height:104px}
 .wrapper .cart li .cart-img img{width:76px;height:76px;object-fit:cover;border-radius:6px}
 .wrapper .cart li .cart-img .cart-img-quantity{width:22px;height:22px;right:-7px;top:-7px;border-radius:50%;font-size:12px}
 .wrapper .cart li .cart-info{margin-left:4px;min-width:0}
-.wrapper .cart li .cart-info h3{font-size:15px;color:var(--skin-ink, #31556d);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wrapper .cart li .cart-info p{font-size:13px;color:var(--skin-muted, #708797);margin-top:7px}
+.wrapper .cart li .cart-info h3{font-size:15px;color:var(--fwl-ink, #31556d);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wrapper .cart li .cart-info p{font-size:13px;color:var(--fwl-muted, #708797);margin-top:7px}
 .wrapper .cart li .cart-info .quantity-mark{font-size:13px;color:#b33e48}
 .wrapper .cart li .cart-info .stock-hint{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cart-item-side{width:108px;flex:0 0 108px}
 .cart-item-side strong{font-size:14px}
-.checkout-bar{left:50%;transform:translateX(-50%);max-width:600px;width:100%;height:64px;padding:0 14px;background:#fff;border-top:1px solid var(--skin-border, #dfeaf1);box-shadow:0 -2px 8px rgba(var(--skin-brand-strong-rgb, 40, 84, 110), 0.08)}
-.checkout-bar .total-price{font-size:15px;color:var(--skin-ink, #31556d)}
+.checkout-bar{left:50%;transform:translateX(-50%);max-width:600px;width:100%;height:64px;padding:0 14px;background:#fff;border-top:1px solid var(--fwl-border, #dfeaf1);box-shadow:0 -2px 8px rgba(var(--fwl-brand-strong-rgb, 40, 84, 110), 0.08)}
+.checkout-bar .total-price{font-size:15px;color:var(--fwl-ink, #31556d)}
 .checkout-bar .total-price p{font-size:15px!important}
-.checkout-bar .checkout-btn{padding:10px 24px;border-radius:6px;font-size:15px;background:var(--skin-brand, #168bd1)}
+.checkout-bar .checkout-btn{padding:10px 24px;border-radius:6px;font-size:15px;background:var(--fwl-brand, #168bd1)}
 .empty-cart{padding-top:120px}
 .empty-cart img{width:160px;height:160px;margin-bottom:18px}
 .empty-cart p{font-size:15px;margin-bottom:18px}
@@ -503,4 +676,199 @@ export default {
 :deep(.back-button){left:max(16px, calc(50% - 284px));top:10px}
 @media (max-width:600px){.wrapper header,.checkout-bar{left:0;transform:none}.back-btn-container{left:8px}}
 @media (max-width:600px){:deep(.back-button){left:16px}}
+
+/* ── 购物车（对照参考图）：蓝色插画头部 → 商家分组卡 → 推荐位 → 海报 → 结算栏 ── */
+.cart-page { background: var(--fwl-surface, #f4f9fd); }
+
+.cart-page .cart-header {
+	position: relative;
+	height: 96px;
+	padding: 0 16px;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: var(--fwl-brand, #2f9df1);
+	background-image: url('../assets/cart-header-art.png');
+	background-repeat: no-repeat;
+	background-position: center top;
+	background-size: 100% auto;
+}
+
+.cart-page .cart-header p {
+	margin: 0;
+	color: #fff;
+	font-size: 17px;
+	font-weight: 700;
+	letter-spacing: .02em;
+	text-shadow: 0 1px 2px rgba(var(--fwl-brand-strong-rgb, 12, 78, 133), 0.28);
+}
+
+.cart-page .cart-header .manage-toggle {
+	position: absolute;
+	right: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	border: 0;
+	background: transparent;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.cart-page .cart-body { padding: 12px 14px 92px; }
+
+/* 商家分组卡 */
+.merchant-card {
+	padding: 12px;
+	border-radius: 16px;
+	background: #fff;
+	box-shadow: 0 8px 22px rgba(var(--fwl-brand-strong-rgb, 39, 86, 114), 0.07);
+}
+
+.cart-page .merchant-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.cart-page .merchant-name {
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	border: 0;
+	background: transparent;
+	color: var(--fwl-brand-strong, #103c6c);
+	font-size: 16px;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.cart-page .merchant-name strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cart-page .merchant-name .fa-shopping-bag { color: var(--fwl-brand, #168bd1); font-size: 15px; }
+.cart-page .merchant-name .fa-angle-right { color: var(--fwl-subtle, #a9bccb); font-size: 14px; }
+.cart-page .selection-hint { margin: 5px 0 8px; color: var(--fwl-muted, #8aa0b2); font-size: 12px; }
+
+.cart-page .cart { margin: 0; padding: 0; }
+
+.cart-page .cart li {
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 12px 0;
+	border-bottom: 1px solid var(--fwl-surface, #f0f5f9);
+}
+
+.cart-page .cart li:last-child { border-bottom: 0; }
+.cart-page .cart li .cart-info { min-width: 0; flex: 1; }
+.cart-page .cart li .cart-info h3 { margin: 0; color: var(--fwl-brand-strong, #103c6c); font-size: 15px; font-weight: 700; }
+.cart-page .cart li .cart-info p { margin: 5px 0 0; color: #e2604b; font-size: 13px; font-weight: 700; }
+.cart-page .cart li .cart-img img { width: 68px; height: 68px; border-radius: 10px; object-fit: cover; }
+.cart-page .cart li .cart-img .cart-img-quantity {
+	position: absolute;
+	left: 54px;
+	top: 0;
+	min-width: 16px;
+	height: 16px;
+	padding: 0 4px;
+	box-sizing: border-box;
+	border-radius: 8px;
+	background: #f4483b;
+	color: #fff;
+	font-size: 10px;
+	line-height: 16px;
+	text-align: center;
+}
+.cart-page .cart-item-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.cart-page .cart-item-side strong { color: var(--fwl-brand-strong, #103c6c); font-size: 15px; font-weight: 700; }
+.cart-page .quantity-stepper { border-color: var(--fwl-border, #dbe9f4); }
+.cart-page .quantity-stepper button { background: var(--fwl-surface, #eef6fd); }
+
+/* 你可能还想加点 */
+.recommend-block { margin-top: 14px; padding: 12px; border-radius: 16px; background: #fff; box-shadow: 0 8px 22px rgba(var(--fwl-brand-strong-rgb, 39, 86, 114), 0.06); }
+.recommend-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.recommend-head h2 { margin: 0; color: var(--fwl-brand-strong, #103c6c); font-size: 16px; font-weight: 800; }
+.recommend-head button { border: 0; background: transparent; color: var(--fwl-muted, #8aa0b2); font-size: 12px; cursor: pointer; }
+.recommend-scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+.recommend-scroll::-webkit-scrollbar { display: none; }
+.recommend-card { flex: 0 0 118px; min-width: 0; padding: 8px; box-sizing: border-box; border: 1px solid var(--fwl-border, #e3eef6); border-radius: 12px; background: #fff; }
+.recommend-card img { width: 100%; height: 66px; border-radius: 8px; object-fit: cover; background: var(--fwl-surface, #eef5f9); }
+.recommend-card strong { display: block; margin-top: 6px; overflow: hidden; color: var(--fwl-brand-strong, #103c6c); font-size: 13px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.recommend-card span { display: block; margin-top: 3px; overflow: hidden; color: var(--fwl-muted, #93a7b6); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.recommend-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+.recommend-foot b { color: #e2604b; font-size: 13px; }
+.recommend-foot button { width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--fwl-brand, #168bd1); color: #fff; font-size: 16px; line-height: 1; cursor: pointer; }
+.recommend-foot button:disabled { background: var(--fwl-subtle, #b8cbd7); cursor: not-allowed; }
+
+/* 海报插画 */
+.cart-banner { margin-top: 14px; border-radius: 16px; overflow: hidden; }
+.cart-banner img { display: block; width: 100%; }
+
+/* 底部结算栏 */
+.cart-page .checkout-bar {
+	height: 64px;
+	padding: 0 12px;
+	gap: 8px;
+	justify-content: flex-start;
+	border-top: 1px solid var(--fwl-border, #e7f0f7);
+	background: #fff;
+	box-shadow: 0 -6px 18px rgba(var(--fwl-muted-rgb, 58, 112, 150), 0.07);
+}
+
+.cart-page .select-all-circle {
+	width: 22px;
+	height: 22px;
+	flex: 0 0 22px;
+	display: grid;
+	place-items: center;
+	border: 1px solid var(--fwl-subtle, #b5c9d8);
+	border-radius: 50%;
+	background: #fff;
+	color: transparent;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.cart-page .select-all-circle.active { border-color: var(--fwl-brand, #168bd1); background: var(--fwl-brand, #168bd1); color: #fff; }
+.cart-page .select-all-label { color: var(--fwl-muted, #6f8ba0); font-size: 12px; cursor: pointer; }
+
+.cart-page .checkout-bar .total-price { flex: 1; min-width: 0; margin-left: 6px; text-align: left; }
+.cart-page .checkout-bar .total-price p { margin: 0; color: var(--fwl-ink, #24405c); font-size: 13px; }
+.cart-page .checkout-bar .total-price p span { color: #f4483b; font-size: 19px; font-weight: 800; }
+.cart-page .checkout-bar .total-price small { display: block; margin-top: 2px; color: var(--fwl-muted, #93a7b6); font-size: 11px; }
+.cart-page .checkout-bar .total-price small i { margin-right: 3px; }
+
+.cart-page .checkout-bar .checkout-btn {
+	width: auto;
+	height: 40px;
+	padding: 0 26px;
+	border-radius: 20px;
+	background: linear-gradient(135deg, var(--fwl-brand, #2aa9f1), var(--fwl-brand, #0f83dc));
+	color: #fff;
+	font-size: 15px;
+	font-weight: 700;
+}
+
+.cart-page .checkout-bar .checkout-btn:disabled { background: var(--fwl-subtle, #b8cbd7); }
+/* 口味备注 / 餐具 */
+.cart-page .remark-row {
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px dashed var(--fwl-border, #e6eff6);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.cart-page .remark-row .remark-label { display: flex; align-items: center; gap: 5px; flex: 0 0 auto; color: var(--fwl-ink, #24405c); font-size: 12px; font-weight: 600; }
+.cart-page .remark-row .remark-label i { color: var(--fwl-brand, #168bd1); font-size: 13px; }
+.cart-page .remark-row input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--fwl-muted, #4e7fa6); font-size: 12px; outline: none; }
+.cart-page .remark-row input::placeholder { color: var(--fwl-subtle, #a9bccb); }
+.cart-page .remark-save { flex: 0 0 auto; border: 0; border-radius: 9px; padding: 4px 10px; background: var(--fwl-surface, #e9f6ff); color: var(--fwl-brand, #168bd1); font-size: 12px; font-weight: 600; cursor: pointer; }
+.cart-page .remark-save:disabled { opacity: .6; cursor: not-allowed; }
+.cart-page .remark-arrow { color: var(--fwl-subtle, #c2d2de); font-size: 14px; }
 </style>

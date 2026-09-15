@@ -1,0 +1,53 @@
+/* Keep fwl-AI's 600px page stage and component artwork/layouts authoritative.
+ * Only integration/accessibility corrections belong here, not page redesigns. */
+:root { --app-width: 600px; }
+.cart-page .cart-return { position: absolute; left: 16px; top: 22px; border: 0; background: transparent; color: inherit; font-size: 32px; z-index: 2; }
+.cart-page .merchant-picker { display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 10px; background: white; border-radius: 12px; }
+.cart-page .merchant-picker select { flex: 1; min-width: 0; padding: 8px; border: 1px solid var(--skin-border); border-radius: 6px; }
+.location-modal .modal-container { color: var(--skin-ink); }
+.location-modal .location-error { padding: 18px; line-height: 1.6; }
+.location-modal .btn-confirm:disabled { opacity: .45; cursor: not-allowed; }
+.app-container > .content { scroll-padding-bottom: 84px; }
+.app-container.auth-area > .content { max-width: none; }
+.app-container.auth-area > .content > * { max-width: none !important; }
+.app-container.auth-area { --skin-brand: initial; --skin-brand-strong: initial; --skin-surface: initial; --skin-border: initial; --skin-ink: initial; --skin-muted: initial; --skin-ink-rgb: initial; }
+#app .app-container > .back-button { left: max(12px,calc((100vw - 600px)/2 + 12px)); }
+#app .unified-page-header { position: sticky; top: 0; left: auto; right: auto; transform: none; width: 100%; max-width: 600px; z-index: 30; }
+#app .order-detail-page .fixed-top { position: sticky; top: 0; left: auto; transform: none; width: 100%; max-width: 600px; }
+#app .order-detail-page .content-area { padding-top: 14px; }
+#app .merchant-detail-page > .unified-page-header { position: sticky; transform: none; left: auto; max-width: none; }
+#app .merchant-detail-page .business-info-card { margin-top: 16px; }
+#app .profile-page { width: 100%; }
+#app .profile-page .profile-content { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
+#app .profile-page .address-selected { border-color: var(--skin-brand); box-shadow: 0 0 0 1px var(--skin-brand); }
+#app .profile-page .address-add:not(.primary) { border: 1px dashed var(--skin-brand); min-height: 44px; background: transparent; }
+#app button:focus-visible, #app a:focus-visible { outline: 3px solid var(--skin-brand); outline-offset: 3px; }
+.swal2-container { z-index: 11000; }
+.swal2-popup.compact-popup { width: min(560px,calc(100vw - 32px)) !important; max-height: calc(100dvh - 32px); border-radius: 18px; padding: 24px !important; }
+.compact-popup .swal2-title { font-size: 22px; padding: 0; }
+.compact-popup .swal2-html-container { margin: 16px 0 0; padding: 0 4px; max-height: calc(100dvh - 220px); overflow-y: auto; }
+.compact-popup .swal2-content-wrapper { display: grid; gap: 10px; text-align: left; }
+.compact-popup .shop-amount-fields { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
+.compact-popup .modern-textarea { height: 64px; min-height: 64px; }
+.compact-popup :is(.modern-input,.modern-textarea) { width: 100%; margin: 0; border: 1px solid var(--skin-border); box-shadow: none; border-radius: 10px; font-size: 15px; min-height: 44px; padding: 12px; }
+.compact-popup .image-upload-area { position: relative; height: 96px; border: 1px dashed var(--skin-brand); background: var(--skin-surface); border-radius: 14px; display: grid; place-content: center; text-align: center; overflow: hidden; }
+.compact-popup .upload-icon { font-size: 28px; color: var(--skin-brand); }
+.compact-popup .upload-text { font-size: 14px; }
+.compact-popup .file-input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2; }
+.compact-popup .image-preview { display: none; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.compact-popup .shop-setting-row { display: grid; grid-template-columns: 22px 1fr; gap: 4px 10px; align-items: center; padding: 14px; border-radius: 10px; background: var(--skin-surface); }
+.compact-popup .shop-setting-row input { grid-row: span 2; width: 18px; height: 18px; }
+.compact-popup .shop-setting-row small { grid-column: 2; display: block; color: var(--skin-muted); }
+.compact-popup .swal2-actions { gap: 12px; }
+/* New upstream styles keep their own blue/white shades in the default skin.
+ * Non-default skins opt in via separate tokens, preserving the reference UI. */
+html:not([data-theme="light"]) {
+  --fwl-brand: var(--skin-brand); --fwl-brand-strong: var(--skin-brand-strong);
+  --fwl-brand-soft: var(--skin-brand-soft); --fwl-surface: var(--skin-surface);
+  --fwl-border: var(--skin-border); --fwl-ink: var(--skin-ink);
+  --fwl-muted: var(--skin-muted); --fwl-subtle: var(--skin-subtle);
+  --fwl-brand-rgb: var(--skin-brand-rgb); --fwl-brand-strong-rgb: var(--skin-brand-strong-rgb);
+  --fwl-brand-soft-rgb: var(--skin-brand-soft-rgb); --fwl-surface-rgb: var(--skin-surface-rgb);
+  --fwl-border-rgb: var(--skin-border-rgb); --fwl-ink-rgb: var(--skin-ink-rgb);
+  --fwl-muted-rgb: var(--skin-muted-rgb); --fwl-subtle-rgb: var(--skin-subtle-rgb);
+}

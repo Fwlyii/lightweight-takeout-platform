@@ -16,6 +16,7 @@ public class DeliveryTaskVO {
     private Long orderId;
     private Long riderUserId;
     private String riderName;
+    private String riderPhone;
     private String taskStatus;
     private Integer orderState;
     private BigDecimal orderTotal;

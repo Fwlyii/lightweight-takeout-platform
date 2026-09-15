@@ -41,4 +41,7 @@ public class CartItemVO {
 
     @Schema(description = "单笔限购数量，空表示不限购")
     private Integer purchaseLimit;
+
+    @Schema(description = "同一商家的备注（口味/餐具等）")
+    private String remarks;
 }

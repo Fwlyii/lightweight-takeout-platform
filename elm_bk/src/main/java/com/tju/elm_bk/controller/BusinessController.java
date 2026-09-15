@@ -48,7 +48,21 @@ public class BusinessController {
     }
 
     /**
-     * 更新店铺信息
+     * 店铺展示指标（评分 / 月售 / 人均 / 优惠标签），与首页、搜索共用同一 SQL 口径。
+     * @param id 店铺ID (路径参数)
+     * @return 店铺展示指标
+     */
+    @GetMapping("/{id}/summary")
+    @Operation(summary = "获取店铺展示指标", description = "评分、月售、人均与推荐标签统一口径")
+    public HttpResult<BusinessSearchVO> getBusinessSummary(@PathVariable("id") Long id) {
+        if (id == null || id <= 0) {
+            throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
+        }
+        return HttpResult.success(businessService.getBusinessSummary(id));
+    }
+
+    /**
+     * 更新店铺信息--牙膏
      * @param id 店铺ID (路径参数)
      * @param updateDto 更新数据
      * @return 更新后的店铺信息

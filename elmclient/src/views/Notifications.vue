@@ -186,6 +186,8 @@ const formatTime = (timeStr) => {
 </script>
 
 <style scoped>
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+
 .notifications-container {
   max-width: 600px;
   margin: 0 auto;
@@ -201,7 +203,7 @@ const formatTime = (timeStr) => {
   left: 0;
   width: 100%;
   height: 50px;
-  background-color: var(--skin-brand, #0097ff);
+  background-color: var(--fwl-brand, #0097ff);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -262,10 +264,10 @@ const formatTime = (timeStr) => {
   gap: 8px;
   margin-bottom: 10px;
   padding: 9px 12px;
-  border: 1px solid var(--skin-border, #dcebf7);
+  border: 1px solid var(--fwl-border, #dcebf7);
   border-radius: 7px;
-  background: var(--skin-surface, #f4f9fd);
-  color: var(--skin-muted, #617b92);
+  background: var(--fwl-surface, #f4f9fd);
+  color: var(--fwl-muted, #617b92);
   font-size: 12px;
 }
 
@@ -273,7 +275,7 @@ const formatTime = (timeStr) => {
   margin-left: auto;
   border: 0;
   background: transparent;
-  color: var(--skin-brand, #168bd1);
+  color: var(--fwl-brand, #168bd1);
   cursor: pointer;
 }
 
@@ -287,7 +289,7 @@ const formatTime = (timeStr) => {
 }
 
 .notification-item:hover {
-  background-color: var(--skin-surface, #f5f8ff); /* 浅蓝色背景 */
+  background-color: var(--fwl-surface, #f5f8ff); /* 浅蓝色背景 */
 }
 
 .notification-item:last-child {
@@ -303,17 +305,17 @@ const formatTime = (timeStr) => {
   height: 40px;
   border-radius: 50%;
   margin-right: 15px;
-  background-color: var(--skin-surface, #e6f0ff); /* 浅蓝色 */
+  background-color: var(--fwl-surface, #e6f0ff); /* 浅蓝色 */
 }
 
 .icon-wrapper.unread {
-  background-color: var(--skin-border, #c9e2ff); /* 针对未读消息的更深的蓝色 */
+  background-color: var(--fwl-border, #c9e2ff); /* 针对未读消息的更深的蓝色 */
 }
 
 .icon {
   width: 20px;
   height: 20px;
-  color: var(--skin-brand, #1a73e8); /* 图标蓝色 */
+  color: var(--fwl-brand, #1a73e8); /* 图标蓝色 */
 }
 
 .content {
@@ -330,7 +332,7 @@ const formatTime = (timeStr) => {
 
 .message-text.bold {
   font-weight: 600;
-  color: var(--skin-brand, #1a73e8); /* 未读消息文本蓝色 */
+  color: var(--fwl-brand, #1a73e8); /* 未读消息文本蓝色 */
 }
 
 .timestamp {
@@ -382,7 +384,7 @@ const formatTime = (timeStr) => {
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid var(--skin-brand, #1a73e8);
+  border-top: 4px solid var(--fwl-brand, #1a73e8);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 15px;
@@ -415,7 +417,7 @@ const formatTime = (timeStr) => {
 }
 
 .retry-btn {
-  background-color: var(--skin-brand, #1a73e8);
+  background-color: var(--fwl-brand, #1a73e8);
   color: white;
   border: none;
   border-radius: 4px;
@@ -426,6 +428,6 @@ const formatTime = (timeStr) => {
 }
 
 .retry-btn:hover {
-  background-color: var(--skin-brand, #0d66d0);
+  background-color: var(--fwl-brand, #0d66d0);
 }
 </style>

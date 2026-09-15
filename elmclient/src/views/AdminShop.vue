@@ -408,34 +408,323 @@ export default {
 </script>
 
 <style scoped>
-.wrapper { width: 100%; max-width: 960px; margin: 0 auto; min-height: 100%; background: var(--skin-surface, #f5f8fb); color: var(--skin-ink, #253f54); }
-.content { padding: 16px 16px calc(90px + env(safe-area-inset-bottom)); }
-.store-list { display: grid; gap: 12px; }
-.store-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: #fff; border: 1px solid var(--skin-border, #dfe8ef); border-radius: 12px; }
-.store-info { display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1; }
-.logo { width: 88px; height: 88px; flex: 0 0 88px; object-fit: cover; border-radius: 10px; }
-.meta { min-width: 0; overflow-wrap: anywhere; }
-.name { font-size: 17px; font-weight: 650; margin-bottom: 8px; }
-.addr, .desc, .type { font-size: 13px; color: var(--skin-muted, #6d8192); line-height: 1.6; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; }
-button { min-height: 40px; padding: 8px 14px; border: 1px solid var(--skin-border, #cbdde9); border-radius: 8px; color: var(--skin-brand, #087ecc); background: #fff; font: inherit; cursor: pointer; }
-button:disabled { opacity: .5; cursor: wait; }
-.edit, .save, .add, .confirm-btn, .upload-submit { background: var(--skin-brand, #087ecc); border-color: var(--skin-brand, #087ecc); color: #fff; }
-.del { color: #b63b4d; border-color: #efc8cf; }
-.bottom-bar { display: flex; justify-content: flex-end; margin-top: 16px; }
-.editor, .modal-overlay { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px; background: rgba(var(--skin-brand-strong-rgb, 16, 40, 57), 0.501961); }
-.editor .card, .modal-content { width: 100%; max-width: 540px; max-height: 85dvh; overflow-y: auto; border-radius: 14px; padding: 22px; background: white; }
-.form { display: grid; gap: 8px; margin: 18px 0; }
-.form label { font-size: 14px; color: var(--skin-ink, #455d70); margin-top: 8px; }
-.form input, .form textarea, .form select { width: 100%; min-width: 0; min-height: 44px; padding: 10px; border: 1px solid var(--skin-border, #cbdde9); border-radius: 8px; font: inherit; margin: 0; }
-.form textarea { min-height: 90px; resize: vertical; }
-.editor-actions, .modal-footer, .modal-header { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
-.modal-header { justify-content: space-between; }
-.modal-body { padding: 20px 0; line-height: 1.6; }
-.close-btn { min-width: 40px; font-size: 26px; cursor: pointer; }
-.upload-area { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.file-name, .limit { font-size: 12px; color: var(--skin-muted, #748799); overflow-wrap: anywhere; }
-.image-preview img { display: block; max-width: 160px; max-height: 120px; object-fit: contain; }
-.error { color: #b63b4d; font-size: 13px; }
-@media (max-width: 480px) { .store-item { align-items: flex-start; flex-wrap: wrap; padding: 12px; } .logo { width: 64px; height: 64px; flex-basis: 64px; } .actions { width: 100%; justify-content: flex-end; } .editor .card { padding: 16px; } }
+.wrapper { width: 100%; min-height: 100vh; background: #fff; }
+.wrapper .header {
+	width: 100%;
+  height: 12vw;
+  background-color: var(--fwl-brand, #0097ff);
+  color: #fff;
+  font-size: 4.8vw;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.content { margin-top: 50px; padding: 4vw; }
+.add {
+	background: var(--fwl-brand, #1e80ff);
+	color: #fff;
+	border: none;
+	border-radius: 1.2vw;
+	padding: 1.6vw 3vw;
+	font-size: 3.6vw;
+}
+.store-list { list-style: none; padding-bottom: 30vw; margin: 0; }
+.store-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 3vw;
+	border-bottom: 1px solid #f0f0f0;
+}
+.store-info {
+	display: flex;
+	align-items: center;
+	flex: 1;
+}
+.logo {
+	width: 20vw;
+	height: 20vw;
+	object-fit: cover;
+	border-radius: 1vw;
+	margin-right: 3vw;
+}
+.meta {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+.name {
+	font-size: 4vw;
+	color: #333;
+	margin-bottom: 1vw;
+}
+.addr {
+	font-size: 3.2vw;
+	color: #777;
+	margin-bottom: 1vw;
+}
+.desc {
+	font-size: 3.2vw;
+	color: #666;
+	line-height: 1.4;
+}
+.actions {
+	display: flex;
+	flex-direction: column;
+	gap: 2vw;
+	align-items: center;
+}
+.edit {
+	background: var(--fwl-brand, #1e80ff);
+	color: #fff;
+	border: none;
+	border-radius: 1.2vw;
+	padding: 1.6vw 3vw;
+	font-size: 3.6vw;
+}
+.del {
+	background: #fff;
+	color: #e15656;
+	border: 1px solid #f3caca;
+	border-radius: 1.2vw;
+	padding: 1.6vw 3vw;
+	font-size: 3.6vw;
+}
+.editor {
+	position: fixed;
+	inset: 0;
+	background: rgba(0,0,0,.35);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1001;
+}
+.editor .card {
+	width: 86vw;
+	background: #fff;
+	border-radius: 1.6vw;
+	padding: 4vw;
+	max-height: 80vh;
+	overflow-y: auto;
+}
+.editor .form {
+	display: flex;
+	flex-direction: column;
+	gap: 2vw;
+	margin: 2vw 0;
+}
+.editor .form label {
+	font-size: 3.2vw;
+	color: #555;
+}
+.editor .form input,
+.editor .form textarea {
+	height: 9vw;
+	font-size: 3.6vw;
+	padding: 0 2vw;
+	border: 1px solid #eee;
+	border-radius: 1vw;
+}
+.editor .form textarea {
+	height: 18vw;
+	padding: 2vw;
+	resize: vertical;
+}
+.editor-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 2vw;
+}
+.editor-actions .cancel {
+	background: #eee;
+	color: #333;
+	border: none;
+	border-radius: 1.2vw;
+	padding: 1.6vw 3vw;
+	font-size: 3.6vw;
+}
+.editor-actions .save {
+	background: var(--fwl-brand, #1e80ff);
+	color: #fff;
+	border: none;
+	border-radius: 1.2vw;
+	padding: 1.6vw 3vw;
+	font-size: 3.6vw;
+}
+
+.bottom-bar {
+  position: fixed;
+  right: 4vw;
+  bottom: 18vw;
+  background: transparent;
+}
+.bottom-bar .add {
+  border-radius: 8vw;
+  padding: 2.2vw 5vw;
+  box-shadow: 0 6px 16px rgba(var(--fwl-brand-rgb, 30, 128, 255), 0.35);
+}
+
+.upload-area {
+  display: flex;
+  align-items: center;
+  gap: 2vw;
+  margin-bottom: 2vw;
+}
+.upload-btn {
+  background: var(--fwl-brand, #409eff);
+  color: white;
+  border: none;
+  border-radius: 1.2vw;
+  padding: 1.6vw 3vw;
+  font-size: 3.6vw;
+  cursor: pointer;
+}
+.upload-submit {
+  background: #67c23a;
+  color: white;
+  border: none;
+  border-radius: 1.2vw;
+  padding: 1.6vw 3vw;
+  font-size: 3.6vw;
+  cursor: pointer;
+}
+.upload-submit:disabled {
+  background: var(--fwl-subtle, #c0c4cc);
+  cursor: not-allowed;
+}
+.file-name {
+  font-size: 3.2vw;
+  color: #666;
+  flex: 1;
+}
+.image-preview {
+  margin-top: 2vw;
+}
+.image-preview img {
+  width: 100%;
+  max-height: 30vw;
+  object-fit: contain;
+  border-radius: 1vw;
+  border: 1px solid #eee;
+}
+
+.limit {
+  color: #999;
+  font-size: 2.8vw;
+}
+.error {
+  color: #f56c6c;
+  font-size: 3vw;
+  margin-top: -1vw;
+  margin-bottom: 1vw;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.close-btn {
+  font-size: 1.5rem;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #666;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-body p {
+  color: #555;
+  line-height: 1.5;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.modal-btn {
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background-color: #c7c7c7;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.confirm-btn {
+  background-color: var(--fwl-brand, #1e80ff);
+  color: white;
+}
+
+.confirm-btn:hover {
+  background-color: var(--fwl-brand, #0085e0);
+  box-shadow: 0 4px 12px rgba(var(--fwl-brand-rgb, 30, 128, 255), 0.3);
+}
 </style>

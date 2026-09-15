@@ -81,6 +81,9 @@ public class Order {
     private Integer contactSexSnapshot;
     private String contactTelSnapshot;
 
+    @Schema(description = "顾客备注（口味/餐具等）")
+    private String remarks;
+
 //    // 关联字段
 //    @Schema(description = "下单客户")
 //    private User customer;

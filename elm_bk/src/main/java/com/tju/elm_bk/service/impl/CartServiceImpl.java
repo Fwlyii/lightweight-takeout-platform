@@ -72,6 +72,7 @@ public class CartServiceImpl implements CartService {
         cart.setUpdateTime(LocalDateTime.now());
         cart.setIsDeleted(false);
 
+        cart.setRemarks(cartMapper.selectBusinessRemarks(user.getId(), food.getBusinessId()));
         cartMapper.insertCart(cart);
         CartVO cartVO = cartMapper.selectCart(cart.getId());
         UserVO userVO = new UserVO();
@@ -90,6 +91,18 @@ public class CartServiceImpl implements CartService {
         if (businessId != null && businessId <= 0) throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
         Long userId = currentUserService.requireUserId();
         return cartMapper.selectCartItems(userId, businessId);
+    }
+
+    @Override
+    public int updateRemarks(Long businessId, String remarks) {
+        if (businessId == null || businessId <= 0) throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
+        Long userId = currentUserService.requireUserId();
+        String normalized = remarks == null ? null : remarks.trim();
+        if (normalized != null && normalized.isEmpty()) normalized = null;
+        if (normalized != null && normalized.length() > 255) {
+            throw new APIException("备注不能超过 255 个字符");
+        }
+        return cartMapper.updateCartRemarks(userId, businessId, normalized);
     }
 
     @Override
@@ -126,6 +139,7 @@ public class CartServiceImpl implements CartService {
         cart.setUpdateTime(LocalDateTime.now());
         cart.setIsDeleted(false);
 
+        cart.setRemarks(cartMapper.selectBusinessRemarks(userId, food.getBusinessId()));
         cartMapper.insertCart(cart);
 
         return cart.getId();

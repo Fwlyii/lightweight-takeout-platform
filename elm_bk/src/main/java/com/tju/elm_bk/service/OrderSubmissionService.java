@@ -71,7 +71,7 @@ public class OrderSubmissionService {
         OrderPricingService.OrderQuote quote = orderPricingService.quote(business, items, assets, mode);
         reserveStock(items);
 
-        Order order = buildOrder(businessId, addressId, normalizedKey, mode, address, userId, quote);
+        Order order = buildOrder(businessId, addressId, normalizedKey, mode, address, userId, quote, items);
         ordersMapper.insertOrder(order);
         orderStateTransitionService.recordCreated(order.getId(), userId);
         saveDetails(order.getId(), items, userId);
@@ -168,13 +168,15 @@ public class OrderSubmissionService {
     }
 
     private Order buildOrder(Long businessId, Long addressId, String key, FulfillmentMode mode,
-                             DeliveryAddress address, Long userId, OrderPricingService.OrderQuote quote) {
+                             DeliveryAddress address, Long userId, OrderPricingService.OrderQuote quote,
+                             List<CartItemVO> items) {
         LocalDateTime now = LocalDateTime.now();
         Order order = new Order();
         order.setBusinessId(businessId);
         order.setOrderDate(now);
         order.setCustomerId(userId);
         order.setIdempotencyKey(key);
+        order.setRemarks(cartRemarks(items));
         order.setAddressId(mode.requiresAddress() ? addressId : null);
         copyAddressSnapshot(order, address);
         order.setOrderState(OrderStatus.WAITING_PAYMENT.getCode());
@@ -190,8 +192,7 @@ public class OrderSubmissionService {
         return order;
     }
 
-    private void saveDetails(Long orderId, List<CartItemVO> items, Long userId) {
-        LocalDateTime now = LocalDateTime.now();
+    private void saveDetails(Long orderId, List<CartItemVO> items, Long userId) {        LocalDateTime now = LocalDateTime.now();
         for (CartItemVO item : items) {
             OrderDetailet detail = new OrderDetailet();
             detail.setOrderId(orderId);
@@ -208,8 +209,18 @@ public class OrderSubmissionService {
         }
     }
 
-    private void clearSubmittedCart(Long userId, Long businessId, List<Long> selectedFoodIds) {
-        if (selectedFoodIds == null || selectedFoodIds.isEmpty()) {
+    /** 同一商家的备注写在购物车行上，下单时带入订单，空串归一为 null。 */
+    private String cartRemarks(List<CartItemVO> items) {
+        if (items == null) return null;
+        return items.stream()
+                .map(CartItemVO::getRemarks)
+                .filter(value -> value != null && !value.isBlank())
+                .map(String::trim)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void clearSubmittedCart(Long userId, Long businessId, List<Long> selectedFoodIds) {        if (selectedFoodIds == null || selectedFoodIds.isEmpty()) {
             cartMapper.clearCart(userId, businessId);
             return;
         }

@@ -18,7 +18,7 @@ CREATE TABLE food (
 CREATE TABLE cart (
  id BIGINT AUTO_INCREMENT PRIMARY KEY, customer_id BIGINT NOT NULL REFERENCES users(id),
  business_id BIGINT NOT NULL REFERENCES business(id), food_id BIGINT NOT NULL REFERENCES food(id),
- quantity INT, is_deleted TINYINT DEFAULT 0, create_time TIMESTAMP, update_time TIMESTAMP,
+ quantity INT, remarks VARCHAR(255), is_deleted TINYINT DEFAULT 0, create_time TIMESTAMP, update_time TIMESTAMP,
  creator BIGINT, updater BIGINT
 );
 CREATE TABLE delivery_address (
@@ -31,7 +31,7 @@ CREATE TABLE orders (
  customer_id BIGINT NOT NULL REFERENCES users(id), address_id BIGINT REFERENCES delivery_address(id),
  order_state INT, order_total DECIMAL(10,2) NOT NULL, delivery_price DECIMAL(10,2) NOT NULL,
  order_date TIMESTAMP, create_time TIMESTAMP, update_time TIMESTAMP, creator BIGINT, updater BIGINT,
- is_deleted TINYINT DEFAULT 0, service_mode VARCHAR(16) DEFAULT 'DELIVERY',
+ is_deleted TINYINT DEFAULT 0, service_mode VARCHAR(16) DEFAULT 'DELIVERY', remarks VARCHAR(255),
  payment_method VARCHAR(20) DEFAULT 'SIMULATED', payment_status VARCHAR(20) DEFAULT 'PENDING',
  points_used INT DEFAULT 0, wallet_paid TINYINT DEFAULT 0, idempotency_key VARCHAR(64),
  address_snapshot VARCHAR(255), contact_name_snapshot VARCHAR(80), contact_sex_snapshot INT,
