@@ -151,8 +151,12 @@ export default {
 
     const statusText = computed(() => {
       if (capabilitiesState.value === 'loading') return '正在连接';
+      if (capabilitiesState.value === 'error') return '连接暂不可用';
       if (capabilities.value.textChat === false) return '助手暂不可用';
-      return '在线 · 支持语音与图片点餐';
+      const modes = ['文字'];
+      if (capabilities.value.speechRecognition) modes.push('语音');
+      if (capabilities.value.imageRecognition) modes.push('图片');
+      return `支持${modes.join('、')}点餐`;
     });
 
     const busy = computed(() => loading.value || recording.value || imageState.value === 'recognizing');
@@ -165,6 +169,9 @@ export default {
     let mediaStream = null;
     let audioChunks = [];
     let recordTimer = null;
+    let disposed = false;
+    let requestingMicrophone = false;
+    let recordingEpoch = 0;
 
     // ---- 图片 ----
     const imageState = ref('idle');
@@ -279,6 +286,7 @@ export default {
     };
 
     const transcribeAudio = async (blob) => {
+      if (disposed || !props.open) return;
       if (blob.size > 7 * 1024 * 1024) {
         pushMessage('assistant', '录音太长了，请控制在 7 MB 以内。');
         return;
@@ -287,7 +295,7 @@ export default {
       pushMessage('assistant', '正在识别你的语音…');
       try {
         const form = new FormData();
-        form.append('audio', blob, 'voice.webm');
+        form.append('audio', blob, blob.type.includes('mp4') ? 'voice.m4a' : 'voice.webm');
         const result = await request.post('/api/v1/voice-order-drafts', form, { timeout: 15000 });
         const transcript = result?.data?.transcript?.trim();
         if (transcript) {
@@ -306,15 +314,29 @@ export default {
     };
 
     const startRecording = async () => {
+      if (disposed || requestingMicrophone || recording.value || !props.open) return;
+      if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+        pushMessage('assistant', '当前浏览器不支持录音，请使用文字或图片点餐。');
+        return;
+      }
       if (!capabilities.value.speechRecognition) {
         toast.info('服务端未配置语音识别，先试试打字或图片吧');
         return;
       }
+      const epoch = recordingEpoch;
+      requestingMicrophone = true;
       try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (disposed || !props.open || epoch !== recordingEpoch) {
+          stream.getTracks().forEach(track => track.stop());
+          return;
+        }
+        mediaStream = stream;
       } catch (error) {
         pushMessage('assistant', error?.name === 'NotAllowedError' ? '需要麦克风权限才能语音点餐。' : '无法启动录音，请改用文字输入。');
         return;
+      } finally {
+        requestingMicrophone = false;
       }
       audioChunks = [];
       mediaRecorder = new MediaRecorder(mediaStream);
@@ -327,7 +349,7 @@ export default {
       mediaRecorder.start();
       recording.value = true;
       recordingSeconds.value = 0;
-      recordTimer = window.setInterval(() => { recordingSeconds.value += 1; }, 1000);
+      recordTimer = window.setInterval(() => { recordingSeconds.value += 1; if (recordingSeconds.value >= 30) stopRecording(); }, 1000);
     };
 
     const clearRecordTimer = () => {
@@ -342,6 +364,7 @@ export default {
     };
 
     const cancelRecording = () => {
+      recordingEpoch += 1;
       clearRecordTimer();
       recording.value = false;
       audioChunks = [];
@@ -409,8 +432,8 @@ export default {
     });
 
     onBeforeUnmount(() => {
-      clearRecordTimer();
-      stopMediaStream();
+      disposed = true;
+      cancelRecording();
       resetImage();
     });
 
