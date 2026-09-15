@@ -129,11 +129,9 @@ npm run build
 
 后端配置包括 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD`、`JWT_SECRET`；AI 和地图使用可选密钥，参见根目录及各模块的 `.env.example`。
 
-如使用 Cloudflare Pages，将 `deploy/cloudflare-pages/.env.example` 复制为同目录 `.env.local`，填写 `PAGES_PROJECT`，可选填写 `PUBLIC_DEMO_URL`。文件按 shell 配置读取，只能放可信的本地内容，不得提交。核对 Wrangler 登录账户和目标项目后执行：
+当前正式站在本地配置中使用 `PAGES_PROJECT=elm-demo`、`PUBLIC_DEMO_URL=https://elm-demo.pages.dev/index`，后端连接现有 Railway 服务。`deploy/cloudflare-pages/.env.local` 按 shell 配置读取，只能放可信内容，不得提交。核对 Wrangler 登录账户和项目后，直接更新同一个正式地址，不另建预览站：
 
 ```bash
-./scripts/deploy-cloudflare-pages.sh qa-preview
-# 核对预览后再发布正式分支
 ./scripts/deploy-cloudflare-pages.sh main
 ```
 
