@@ -35,7 +35,7 @@
 }
 
 /* Rider reference palette stays centralized; other saved themes keep their shared tokens. */
-html[data-theme="light"] :is(.rider-page, .rider-information, .role-footer[aria-label="骑手导航"]) {
+html[data-theme="light"] :is(.rider-page, .rider-information, .role-footer[aria-label="骑手导航"], .merchant-ui, .merchant-shop-popup, .merchant-order-dialog, .role-footer[aria-label="商家导航"]) {
   --skin-brand: #0095ff;
   --skin-brand-strong: #0751a0;
   --skin-ink: #14243f;

@@ -1,144 +1,63 @@
 <template>
-  <div class="wrapper merchant-orders-page">
-    <!-- 顶部蓝色栏 -->
-    <div class="top-background">
-      <h1>商家订单管理</h1>
-      <MerchantLogoutButton />
-    </div>
-
-    <!-- 商铺选择栏 -->
-    <div class="merchant-selector">
-      <ul class="merchant-tabs">
-        <div class="merchant-no-business" v-if="merchantList.length === 0">您还没有商铺哦</div>
-        <li
-          v-for="merchant in merchantList"
-          :key="merchant.merchantId"
-          :class="{ active: selectedMerchantId === merchant.merchantId }"
-          @click="selectMerchant(merchant.merchantId)"
-        >
-          {{ merchant.merchantName }}
-        </li>
-      </ul>
-    </div>
-
-    <!-- 订单状态分类 -->
-    <ul class="tabs">
-      <li
-        v-for="(t, i) in statusTabs"
-        :key="t"
-        :class="{ active: activeStatusTab === i }"
-        @click="changeStatusTab(i)"
-      >
-        {{ t }} <span v-if="orderCounts[i] > 0">({{ orderCounts[i] }})</span>
-      </li>
-    </ul>
-
-    <!-- 加载提示 -->
-    <div v-if="loading" class="loading">
-      <p>加载中...</p>
-    </div>
-
-    <!-- 空状态提示 -->
-    <div v-else-if="filteredOrders.length === 0" class="empty-state">
-      <img src="../assets/empty-order.png" alt="暂无订单">
-      <p>暂无订单</p>
-    </div>
-
-    <!-- 订单列表 -->
+  <div class="wrapper merchant-orders-page merchant-ui">
+    <header class="top-background"><h1>商家订单管理</h1><MerchantLogoutButton /></header>
+    <div class="merchant-selector"><div class="merchant-tabs" aria-label="选择店铺">
+      <p v-if="merchantList.length === 0" class="merchant-no-business">{{ loadingMerchants ? '正在加载店铺…' : '您还没有商铺哦' }}</p>
+      <button v-for="merchant in merchantList" :key="merchant.merchantId" :class="{ active: selectedMerchantId === merchant.merchantId }" @click="selectMerchant(merchant.merchantId)">{{ merchant.merchantName }}</button>
+    </div></div>
+    <nav class="tabs" aria-label="订单状态"><button v-for="(t, i) in statusTabs" :key="t" :class="{ active: activeStatusTab === i }" @click="changeStatusTab(i)">{{ t }}<span v-if="orderCounts[i] > 0">({{ orderCounts[i] }})</span></button></nav>
+    <div v-if="loading" class="loading"><p>正在加载订单…</p></div>
+    <div v-else-if="filteredOrders.length === 0" class="empty-state"><img src="../assets/empty-order.png" alt=""><p>暂无订单</p></div>
     <ul v-else class="order-list">
-      <li v-for="order in filteredOrders" :key="order.id" class="order-item" title="查看订单详情">
+      <li v-for="order in filteredOrders" :key="order.id" class="order-item">
         <div class="order-header">
-          <span class="order-id">订单号: {{ order.id }}</span>
+          <i class="fas fa-clipboard-list order-icon"></i>
+          <div><h2 class="order-id">订单号 <strong>{{ order.id }}</strong></h2><span class="order-time">下单时间：{{ formatTime(order.orderDate) }}</span></div>
           <span class="status-badge" :class="getStatusClass(order.orderState)">{{ getStatusText(order.orderState, order) }}</span>
         </div>
-
         <div class="order-content">
           <div class="customer-info">
-            <p><span>顾客:</span> {{ order.customerName || '-' }}</p>
+            <p><i class="fas fa-user"></i><span>顾客</span><b>{{ order.customerName || '-' }}</b></p>
             <template v-if="order.serviceMode !== 'PICKUP'">
-              <p><span>电话:</span> {{ order.contactTel || '-' }}</p>
-              <p><span>地址:</span> {{ order.address || '-' }}</p>
+              <p><i class="fas fa-phone"></i><span>联系电话</span><b>{{ order.contactTel || '-' }}</b></p>
+              <p><i class="fas fa-map-marker-alt"></i><span>配送地址</span><b>{{ order.address || '-' }}</b></p>
             </template>
-            <p v-else class="pickup-label"><span>履约:</span> 到店自取</p>
-            <p v-if="order.remarks" class="remark-line"><span>备注:</span> {{ order.remarks }}</p>
+            <p v-else class="pickup-label"><i class="fas fa-shopping-bag"></i><span>履约方式</span><b>到店自取</b></p>
+            <p v-if="order.remarks" class="remark-line"><i class="fas fa-file-alt"></i><span>备注</span><b>{{ order.remarks }}</b></p>
           </div>
-
           <div class="order-items">
-            <p class="items-title">商品明细:</p>
+            <h3 class="items-title"><i class="fas fa-utensils"></i>商品明细</h3>
             <div v-for="(item, index) in order.foodList" :key="index" class="item-row">
-              <span class="item-name">{{ item.foodName || '未知商品' }}&nbsp; &#165;{{ item.foodPrice }} &nbsp; × {{ item.quantity || 0 }}</span>
+              <span class="item-name">{{ item.foodName || '未知商品' }}</span><span class="item-quantity">¥{{ Number(item.foodPrice || 0).toFixed(2) }} × {{ item.quantity || 0 }}</span>
               <span class="item-price">¥ {{ (Number(item.foodPrice || 0) * Number(item.quantity || 0)).toFixed(2) }}</span>
             </div>
           </div>
-
-          <div class="price-row">
-            <template v-if="order.serviceMode !== 'PICKUP'">
-              <br><span class="items-title">配送费: &#165;{{ Number(order.deliveryPrice || 0).toFixed(2) }}</span>
-            </template>
-            <template v-else>
-              <br><span class="items-title pickup-label">无需配送费 · 到店自取</span>
-            </template>
-          </div>
-
-          <div class="order-footer">
-            <span class="order-time">下单时间: {{ formatTime(order.orderDate) }}</span>
-            <span class="order-total">总计: ¥ {{ Number(order.orderTotal || 0).toFixed(2) }}</span>
-          </div>
+          <div class="price-row"><i class="fas fa-truck"></i><span>{{ order.serviceMode === 'PICKUP' ? '无需配送费 · 到店自取' : '配送费' }}</span><b v-if="order.serviceMode !== 'PICKUP'">¥ {{ Number(order.deliveryPrice || 0).toFixed(2) }}</b></div>
+          <div class="order-footer"><span><i class="fas fa-yen-sign"></i> 总计</span><strong class="order-total">¥ {{ Number(order.orderTotal || 0).toFixed(2) }}</strong></div>
         </div>
-
         <div class="actions">
-          <!-- 待接单：拒单 + 接单 -->
-          <template v-if="order.orderState === ORDER_STATUS.WAITING_MERCHANT_ACCEPT">
-            <button class="cancel-btn" @click.stop="rejectOrder(order.id)">拒单</button>
-            <button class="confirm-btn" @click.stop="acceptOrder(order.id)">接单</button>
-          </template>
-          <template v-else-if="order.orderState === ORDER_STATUS.WAITING_DISPATCH">
-            <button class="confirm-btn" @click.stop="readyOrder(order.id)">确认出餐</button>
-          </template>
-
-          <div v-else class="fulfillment-tip"><i class="fas fa-route"></i> {{ fulfillmentTip(order.orderState, order) }}</div>
+          <template v-if="order.orderState === ORDER_STATUS.WAITING_MERCHANT_ACCEPT"><button class="cancel-btn" :disabled="submitting" @click.stop="rejectOrder(order.id)">拒单</button><button class="confirm-btn" :disabled="submitting" @click.stop="acceptOrder(order.id)">接单</button></template>
+          <button v-else-if="order.orderState === ORDER_STATUS.WAITING_DISPATCH" class="confirm-btn" :disabled="submitting" @click.stop="readyOrder(order.id)">确认出餐</button>
+          <div v-else-if="![ORDER_STATUS.COMPLETED, ORDER_STATUS.CANCELLED].includes(order.orderState)" class="fulfillment-tip"><i class="fas fa-route"></i> {{ fulfillmentTip(order.orderState, order) }}</div>
         </div>
       </li>
     </ul>
-
-
-    <!-- 接单确认弹窗 -->
-    <div v-if="showAcceptModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>确认操作</h3>
-          <span class="close-btn" @click="closeModal">&times;</span>
-        </div>
-        <div class="modal-body">
-          <p>确定要接单吗？</p>
-        </div>
-        <div class="modal-footer">
-          <button class="modal-btn confirm-btn" @click="confirmAccept">确认</button>
-          <button class="modal-btn cancel-btn" @click="closeModal">取消</button>
-        </div>
+    <Teleport to="body">
+      <div v-if="showAcceptModal || showRejectModal" class="merchant-order-modal-overlay" @click.self="closeModal">
+        <section class="merchant-order-dialog" role="dialog" aria-modal="true" aria-labelledby="merchant-confirm-title">
+          <header class="dialog-heading"><span class="dialog-icon"><i class="fas fa-clipboard-list"></i><i class="fas fa-check-circle"></i></span><div><h2 id="merchant-confirm-title">{{ showAcceptModal ? '确认接单' : '确认拒单' }}</h2><p>{{ showAcceptModal ? '请确认订单信息，是否接单？' : '请确认订单信息，是否拒绝此订单？' }}</p></div><button class="dialog-close" :disabled="submitting" aria-label="关闭确认弹窗" @click="closeModal">×</button></header>
+          <dl v-if="selectedOrder" class="confirmation-details">
+            <div><dt><i class="fas fa-file-alt"></i>订单号</dt><dd>{{ selectedOrder.id }}</dd></div>
+            <div><dt><i class="fas fa-shopping-bag"></i>履约方式</dt><dd>{{ selectedOrder.serviceMode === 'PICKUP' ? '到店自取' : '配送到家' }}</dd></div>
+            <div><dt><i class="fas fa-file-alt"></i>顾客备注</dt><dd>{{ selectedOrder.remarks || '无备注' }}</dd></div>
+          </dl>
+          <p class="confirmation-note"><i class="fas fa-info-circle"></i>{{ showAcceptModal ? '请确认可正常备餐后接单' : '拒单后订单将取消，请谨慎确认' }}</p>
+          <div class="dialog-actions"><button class="cancel-btn" :disabled="submitting" @click="closeModal">{{ showAcceptModal ? '暂不接单' : '暂不拒单' }}</button><button class="confirm-btn" :class="{ 'reject-confirm': showRejectModal }" :disabled="submitting" @click="showAcceptModal ? confirmAccept() : confirmReject()">{{ submitting ? '提交中…' : showAcceptModal ? '确认接单' : '确认拒单' }}</button></div>
+        </section>
       </div>
-    </div>
-
-    <!-- 拒单确认弹窗 -->
-    <div v-if="showRejectModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>确认操作</h3>
-          <span class="close-btn" @click="closeModal">&times;</span>
-        </div>
-        <div class="modal-body">
-          <p>确定要拒单吗？</p>
-        </div>
-        <div class="modal-footer">
-          <button class="modal-btn confirm-btn" @click="confirmReject">确认</button>
-          <button class="modal-btn cancel-btn" @click="closeModal">取消</button>
-        </div>
-      </div>
-    </div>
-
+    </Teleport>
   </div>
 </template>
-
 <script>
 import { ref, onMounted, computed,onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
@@ -172,6 +91,8 @@ export default {
     const showAcceptModal = ref(false);
     const showRejectModal = ref(false);
     const selectId = ref(0);
+    const submitting = ref(false);
+    const selectedOrder = computed(() => orders.value.find(order => order.id === selectId.value));
 
     let realtimeConnection = null;
 
@@ -284,7 +205,8 @@ export default {
 
     // 确认接单
     const confirmAccept = async () => {
-      if (selectId.value === 0) return;
+      if (selectId.value === 0 || submitting.value) return;
+      submitting.value = true;
 
       try {
         const response = await request.post(`/api/v1/orders/${selectId.value}/merchant-accept`);
@@ -297,16 +219,20 @@ export default {
       } catch (error) {
         toast.error("接单失败，请稍后重试");
       } finally {
+        submitting.value = false;
         closeModal();
       }
     };
 
     const readyOrder = async (id) => {
+      if (submitting.value) return;
+      submitting.value = true;
       try {
         const response = await request.post(`/api/v1/orders/${id}/merchant-ready`);
         if (response.success) { toast.success(orderById(id)?.serviceMode === 'PICKUP' ? '已确认出餐，等待顾客到店取餐' : '已确认出餐，配送任务已发布'); fetchOrders(); }
         else toast.error(response.message || '确认出餐失败');
       } catch (error) { toast.error(error.response?.data?.message || '确认出餐失败，请稍后重试'); }
+      finally { submitting.value = false; }
     };
 
     // 拒单
@@ -317,7 +243,8 @@ export default {
 
     // 确认拒单
     const confirmReject = async () => {
-      if (selectId.value === 0) return;
+      if (selectId.value === 0 || submitting.value) return;
+      submitting.value = true;
 
       try {
         const response = await request.post(`/api/v1/orders/${selectId.value}/merchant-reject`);
@@ -330,6 +257,7 @@ export default {
       } catch (error) {
         toast.error("拒绝失败，请重试");
       } finally {
+        submitting.value = false;
         closeModal();
       }
     };
@@ -352,6 +280,7 @@ export default {
 
     // 关闭弹窗
     const closeModal = () => {
+      if (submitting.value) return;
       showAcceptModal.value = false;
       showRejectModal.value = false;
       selectId.value = 0;
@@ -384,6 +313,9 @@ export default {
 
     return {
       loading,
+      loadingMerchants,
+      selectedOrder,
+      submitting,
       orders,
       merchantList,
       selectedMerchantId,
@@ -412,570 +344,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.wrapper {
-  width: 100%;
-  min-height: 100vh;
-  background: var(--skin-surface, #f5f7fa);
-}
-
-.top-background {
-  width: 100%;
-  height: 100px;
-  background: linear-gradient(to right, var(--skin-brand, #3a7bd5), var(--skin-brand, #00d2ff));
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 16px 16px 0 0;
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  overflow: hidden;
-  margin-bottom: 50px;
-  max-width: 600px;
-}
-
-.top-background::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(30deg);
-  animation: shine 6s infinite linear;
-}
-
-@keyframes shine {
-  0% {
-    transform: rotate(30deg) translate(-10%, -10%);
-  }
-  100% {
-    transform: rotate(30deg) translate(10%, 10%);
-  }
-}
-
-.top-background h1 {
-  color: white;
-  font-size: 1.8rem;
-  font-weight: 600;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  letter-spacing: 1px;
-  margin: 0;
-  z-index: 1;
-}
-
-/* 商铺选择栏 */
-.merchant-selector {
-  background:var(--skin-surface, #f0f5f9);
-  box-shadow: 0 2vw 4vw rgba(var(--skin-brand-soft-rgb, 102, 126, 234), 0.2);
-  padding: 3vw 0 0 0;
-  position: fixed;
-  top: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 600px;
-  z-index: 999;
-  height: 17vw;
-}
-
-.merchant-header {
-  padding: 0 4vw 2vw 4vw;
-}
-
-.merchant-title {
-  font-size: 3.8vw;
-  color: #fff;
-  font-weight: 600;
-  opacity: 0.9;
-}
-
-.merchant-tabs {
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  overflow-x: auto;
-  white-space: nowrap;
-  padding-bottom: 12px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  touch-action: pan-x;
-  height: 76px;
-  scroll-behavior: auto; /* 禁用平滑滚动，更直接 */
-  -webkit-overflow-scrolling: touch; /* 启用动量滚动 */
-}
-
-.merchant-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-.merchant-no-business {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  font-size: 4vw;
-  color: #a7a6a6;
-  font-weight: 500;
-  text-align: center;
-}
-
-.merchant-tabs li {
-  margin-right: 16px;
-  padding: 12px 16px;
-  font-size: 16px;
-  color: #2f3335;
-  background: var(--skin-border, #d0dff1);
-  border-radius: 8px;
-  cursor: pointer;
-  flex: 0 0 auto;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  touch-action: pan-x;
-}
-
-.merchant-tabs li.active {
-  background: var(--skin-brand, #0097ff);
-  color: #ffffff;
-  font-weight: 600;
-  transform: translateY(-0.5vw);
-  box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.2);
-}
-
-.merchant-tabs li:not(.active):hover {
-  background: var(--skin-surface, #f7fbfc);
-  transform: translateY(-0.2vw);
-}
-
-/* 订单状态分类 - 修复滑动问题 */
-.tabs {
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  background: var(--skin-border, #c3ecfe);
-  border-bottom: 1px solid #f0f0f0;
-  overflow-x: auto;
-  white-space: nowrap;
-  position: fixed;
-  top: 176px; /* 顶部标题栏100px + 商铺选择栏76px */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 600px;
-  z-index: 998;
-  height: 64px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  touch-action: pan-x;
-  box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.1);
-  border-radius: 0 0 12px 12px;
-  scroll-behavior: auto; /* 禁用平滑滚动，更直接 */
-  -webkit-overflow-scrolling: touch; /* 启用动量滚动 */
-}
-
-.tabs::-webkit-scrollbar {
-  display: none;
-}
-
-.tabs li {
-  margin-right: 24px;
-  padding: 12px 0;
-  font-size: 16px;
-  color: #666;
-  position: relative;
-  cursor: pointer;
-  flex: 0 0 auto;
-  touch-action: pan-x;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tabs li.active {
-  color: var(--skin-brand, #3490de);
-  font-weight: 600;
-}
-
-.tabs li.active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 3px;
-  background: var(--skin-brand, #409eff);
-  border-radius: 2px;
-}
-
-/* 调整订单列表的上边距，为固定栏留出空间 */
-.order-list {
-  padding: 16px;
-  margin-top: 264px; /* 固定标题、店铺和状态栏后留出间距 */
-  margin-bottom: 90px;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* 调整空状态和加载状态的上边距 */
-.loading, .empty-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 48px;
-  font-size: 16px;
-  color: #999;
-  background: white;
-  margin: 24px auto;
-  border-radius: 10px;
-  margin-top: 288px;
-  max-width: 600px;
-}
-
-/* 其他样式保持不变 */
-.empty-state {
-  flex-direction: column;
-}
-
-.empty-state img {
-  width: 140px;
-  height: 140px;
-  margin-bottom: 20px;
-  opacity: 0.5;
-}
-
-.order-item {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,.05);
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 14px;
-  border-bottom: 1px solid #f5f5f5;
-  margin-bottom: 14px;
-}
-
-.order-id {
-  font-size: 16px;
-  color: #999;
-}
-
-.status-badge {
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  font-weight: 500;
-  position: relative;
-  z-index: 10; /* 确保在最上层 */
-}
-
-.status-badge.unpaid {
-	background: #fff0f0;
-	color: #ff4d4f;
-}
-.status-badge.pending {
-	background: var(--skin-surface, #e6f7ff);
-	color: var(--skin-brand, #1890ff);
-}
-.status-badge.accepted {
-	background: #f6ffed;
-	color: #52c41a;
-}
-.status-badge.done {
-	background: #fdf4de;
-	color: #ffa700;
-}
-.status-badge.canceled {
-	background: #f9f9f9;
-	color: #999;
-}
-
-.order-content {
-  margin-bottom: 18px;
-}
-
-.customer-info p {
-  font-size: 16px;
-  color: #333;
-  margin: 8px 0;
-  display: flex;
-}
-
-.customer-info span {
-  color: #666;
-  margin-right: 10px;
-  min-width: 56px;
-}
-
-.items-title {
-  font-size: 16px;
-  color: #333;
-  font-weight: 500;
-  margin: 16px 0 10px 0;
-  border-top: 1px solid #f0f0f0;
-  padding-top: 14px;
-}
-
-.item-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  font-size: 15px;
-  color: #333;
-}
-
-.item-name {
-  flex: 1;
-}
-
-.item-quantity {
-  margin: 0 12px;
-  color: #666;
-}
-
-.item-price {
-  font-weight: 500;
-}
-
-.order-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid #f0f0f0;
-}
-
-.order-time {
-  font-size: 13px;
-  color: #999;
-}
-
-.order-total {
-  font-size: 18px;
-  color: #ff6b00;
-  font-weight: bold;
-}
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding-top: 14px;
-  border-top: 1px solid #f5f5f5;
-}
-
-.actions button {
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 15px;
-  cursor: pointer;
-  border: none;
-}
-
-.cancel-btn {
-  background: #fff;
-  color: #ff4d4f;
-}
-
-.confirm-btn {
-  background: var(--skin-brand, #409eff);
-  color: #fff;
-}
-
-.complete-btn {
-  background: #52c41a;
-  color: #fff;
-}
-
-.detail-btn {
-  background: #f5f5f5;
-  color: #666;
-}
-
-/* 弹窗样式 */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95) translateY(20px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.2rem;
-  color: #333;
-}
-
-.close-btn {
-  font-size: 1.5rem;
-  color: #aaa;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.close-btn:hover {
-  color: #666;
-}
-
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.modal-body p {
-  color: #555;
-  line-height: 1.5;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #eee;
-}
-
-.modal-btn {
-  border: none;
-  border-radius: 20px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.cancel-btn {
-  background-color: #e0e0e0;
-  color: #333;
-}
-
-.cancel-btn:hover {
-  background-color: #c7c7c7;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.confirm-btn {
-  background-color: var(--skin-brand, #1e80ff);
-  color: white;
-}
-
-.confirm-btn:hover {
-  background-color: var(--skin-brand, #0085e0);
-  box-shadow: 0 4px 12px rgba(var(--skin-brand-rgb, 30, 128, 255), 0.3);
-}
-
-/* 移动端响应式样式 */
-@media (max-width: 480px) {
-  .wrapper {
-    max-width: 100vw;
-    width: 100vw;
-  }
-
-  .top-background {
-    height: 90px;
-    border-radius: 0;
-    max-width: 100vw;
-  }
-
-  .merchant-selector {
-    top: 90px;
-    max-width: 100vw;
-    transform: none;
-    left: 0;
-  }
-
-  .tabs {
-    top: calc(90px + 17vw);
-    max-width: 100vw;
-    transform: none;
-    left: 0;
-  }
-
-  .order-list {
-    margin-top: calc(90px + 17vw + 14vw + 4vw);
-    max-width: 100vw;
-    width: 100vw;
-  }
-
-  .loading, .empty-state {
-    margin-top: calc(90px + 17vw + 14vw + 7vw);
-    max-width: 100vw;
-  }
-}
-
-/* 与用户端统一的朴素蓝白头部和筛选栏 */
-.wrapper { background: var(--skin-surface, #f5f9fd); color: var(--skin-ink, #24405c); }
-.top-background { height: 64px; background: var(--skin-brand, #0097ff); background-image: none; border-radius: 0; box-shadow: 0 1px 0 rgba(var(--skin-brand-strong-rgb, 0, 83, 145), 0.15); }
-.top-background::before { display: none; }
-.top-background h1 { font-size: 20px; letter-spacing: 0; text-shadow: none; }
-.merchant-selector { top: 64px; height: 56px; padding: 6px 0 0; background: #fff; box-shadow: none; border-bottom: 1px solid var(--skin-border, #dcebf7); }
-.merchant-header { padding: 0 16px 4px; }
-.merchant-tabs { height: 42px; padding: 0 16px 5px; }
-.merchant-tabs li { margin-right: 8px; padding: 6px 12px; font-size: 13px; border-radius: 6px; background: var(--skin-surface, #edf6fc); border: 1px solid var(--skin-border, #dcebf7); backdrop-filter: none; }
-.merchant-tabs li.active { background: var(--skin-surface, #e5f3ff); color: var(--skin-brand, #0879c7); border-color: var(--skin-brand-soft, #a9d6f4); box-shadow: none; transform: none; }
-.tabs { top: 120px; height: 46px; background: #fff; box-shadow: none; border-radius: 0; border-bottom: 1px solid var(--skin-border, #dcebf7); }
-.tabs li { margin-right: 22px; padding: 12px 0; font-size: 13px; }
-.tabs li.active { color: var(--skin-brand, #0879c7); }
-.order-list { margin-top: 184px; padding: 12px 16px 84px; }
-.order-item { border: 1px solid var(--skin-border, #e1edf7); border-radius: 10px; box-shadow: 0 2px 8px rgba(var(--skin-brand-strong-rgb, 36, 91, 132), 0.06); }
-.order-item .order-content, .order-item .order-footer { min-width: 0; }
-.order-item .remark-line { color: #c2571f; }
-.order-item p, .order-item span { overflow-wrap: anywhere; }
-@media (max-width: 480px) {
-  .top-background { height: 64px; }
-  .merchant-selector { top: 64px; }
-  .tabs { top: 120px; left: 0; transform: none; max-width: 100vw; }
-  .order-list { margin-top: 184px; width: 100vw; max-width: 100vw; padding: 12px 12px 84px; box-sizing: border-box; }
-}
-</style>
