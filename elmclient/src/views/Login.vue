@@ -1560,7 +1560,7 @@ const login = async () => {
   max-width: 520px;
   min-height: 0;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
   padding: 0 0 24px;
   margin: 0 auto;
@@ -1579,6 +1579,7 @@ const login = async () => {
 
 .login-panel {
   width: 100%;
+  min-width: 0;
   min-height: 0;
   padding: 28px 28px 25px;
   border-radius: 22px;

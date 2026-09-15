@@ -25,7 +25,7 @@ test('production component CSS has no hard-coded platform blue outside theme swa
       if (decl.parent.selector?.includes('theme-preview')) return;
       values(decl.value).walk(node => {
         if (node.type === 'function' && ['var', 'url'].includes(node.value)) return false;
-        if ((node.type === 'word' && /^#[\da-f]{3}(?:[\da-f]{3})?$/i.test(node.value)) ||
+        if ((node.type === 'word' && /^#(?:[\da-f]{3,4}|[\da-f]{6}|[\da-f]{8})$/i.test(node.value)) ||
             (node.type === 'function' && /^rgba?$/.test(node.value))) {
           if (skinColor(values.stringify(node))) failures.push(`${url.pathname}: ${decl.prop}: ${decl.value}`);
           return false;

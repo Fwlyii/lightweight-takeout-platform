@@ -5,7 +5,7 @@ function skinColor(literal) {
   let channels;
   if (literal.startsWith('#')) {
     let hex = literal.slice(1);
-    if (hex.length === 3) hex = [...hex].map(c => c + c).join('');
+    if (hex.length === 3 || hex.length === 4) hex = [...hex].map(c => c + c).join('');
     channels = hex.match(/../g).map(c => parseInt(c, 16));
     if (channels.length === 4) channels[3] /= 255;
   } else channels = literal.match(/[\d.]+/g).map(Number);
