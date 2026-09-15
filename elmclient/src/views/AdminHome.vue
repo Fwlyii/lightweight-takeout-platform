@@ -3,10 +3,15 @@
     <section class="hero-panel" aria-labelledby="admin-home-title">
       <div class="hero-topline">
         <span>数据驱动 · 高效运营</span>
-        <button class="icon-button" type="button" aria-label="查看通知" title="查看通知" @click="router.push('/notifications?role=admin')">
-          <i class="fa fa-bell-o" aria-hidden="true"></i>
-          <span v-if="pendingTotal" class="notification-dot"></span>
-        </button>
+        <div class="hero-actions">
+          <button class="icon-button" type="button" aria-label="查看通知" title="查看通知" @click="router.push('/notifications?role=admin')">
+            <i class="fa fa-bell-o" aria-hidden="true"></i>
+            <span v-if="pendingTotal" class="notification-dot"></span>
+          </button>
+          <button class="logout-button" type="button" title="退出登录" @click="logout">
+            <i class="fa fa-sign-out" aria-hidden="true"></i><span>退出登录</span>
+          </button>
+        </div>
       </div>
       <h1 id="admin-home-title">外卖管理后台</h1>
       <p>让美食更好地抵达</p>
@@ -440,9 +445,10 @@ const closeModal = () => {
 
 const logout = () => {
   realtimeConnection?.stop();
+  realtimeConnection = null;
   clearAuth();
-  router.push('/index');
   toast.success('已成功退出登录');
+  router.replace({ path: '/login', query: { role: 'admin' } });
 };
 
 const handleAvatarError = (event) => {
@@ -479,7 +485,12 @@ const handleImageError = (event) => {
 .hero-panel p { position: relative; z-index: 1; margin: 0; font-size: 16px; }
 .hero-line { position: absolute; right: 82px; bottom: 34px; width: 166px; height: 26px; border-top: 2px solid rgba(255,255,255,.82); border-radius: 50%; transform: rotate(-12deg); }
 .hero-line::after { content: '让美食更好地抵达'; position: absolute; right: -3px; top: -37px; width: 180px; font-family: 'KaiTi','STKaiti',serif; font-size: 18px; transform: rotate(4deg); }
+.hero-actions { display: flex; align-items: center; gap: 5px; }
 .icon-button { position: relative; z-index: 1; width: 40px; height: 40px; border: 0; color: #fff; background: transparent; font-size: 24px; cursor: pointer; }
+.logout-button { position: relative; z-index: 1; display: inline-flex; min-width: 78px; height: 34px; align-items: center; justify-content: center; gap: 5px; padding: 0 9px; border: 1px solid rgba(255,255,255,.52); border-radius: 8px; color: #fff; background: rgba(255,255,255,.14); font: inherit; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background 180ms ease, transform 180ms ease; }
+.logout-button:hover,.logout-button:focus-visible { background: rgba(255,255,255,.25); outline: none; }
+.logout-button:active { transform: scale(.97); }
+.logout-button i { font-size: 13px; }
 .notification-dot { position: absolute; top: 4px; right: 2px; width: 9px; height: 9px; border-radius: 50%; background: #ff4d4f; }
 .profile-panel { position: relative; z-index: 2; display: flex; align-items: center; gap: 16px; min-height: 168px; margin: -26px 14px 18px; padding: 23px 20px; overflow: hidden; background: rgba(255,255,255,.97); border-radius: 20px; box-shadow: 0 10px 28px rgba(var(--skin-brand-rgb),.10); }
 .profile-avatar { flex: none; width: 98px; height: 98px; overflow: hidden; border: 4px solid #fff; border-radius: 50%; background: var(--skin-surface); box-shadow: 0 5px 16px rgba(var(--skin-brand-rgb),.20); }
