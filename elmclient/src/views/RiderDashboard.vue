@@ -226,8 +226,8 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 .rider-page {
     min-height: 100vh;
-    background: #f3f6f9;
-    color: #17283b;
+    background: var(--skin-surface, #f3f6f9);
+    color: var(--skin-ink, #17283b);
     padding-bottom: 50px
 }
 
@@ -237,7 +237,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #092f3c;
+    background: var(--skin-brand-strong, #092f3c);
     color: #fff
 }
 
@@ -263,7 +263,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .brand small {
-    color: #8eb1ba;
+    color: var(--skin-muted, #8eb1ba);
     font-size: 10px;
     letter-spacing: 1.5px;
     margin-top: 3px
@@ -278,7 +278,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 .user-side {
     border: 1px solid rgba(255, 255, 255, .2);
     background: transparent;
-    color: #d9e8ec;
+    color: var(--skin-border, #d9e8ec);
     border-radius: 11px;
     padding: 10px 14px;
     cursor: pointer
@@ -307,12 +307,12 @@ onUnmounted(() => { realtimeConnection?.stop(); });
     margin-top: 30px;
     padding: 30px 34px;
     border-radius: 24px;
-    background: radial-gradient(circle at 80% 0, rgba(102, 229, 196, .2), transparent 28%), linear-gradient(135deg, #0b4652, #0b6d69);
+    background: radial-gradient(circle at 80% 0, rgba(102, 229, 196, .2), transparent 28%), linear-gradient(135deg, var(--skin-brand-strong, #0b4652), var(--skin-brand-strong, #0b6d69));
     color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 20px 45px rgba(11, 70, 82, .18)
+    box-shadow: 0 20px 45px rgba(var(--skin-brand-strong-rgb, 11, 70, 82), 0.18)
 }
 
 .date {
@@ -328,7 +328,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .hero-note {
-    color: #b7d4d6;
+    color: var(--skin-subtle, #b7d4d6);
     font-size: 14px
 }
 
@@ -354,8 +354,8 @@ onUnmounted(() => { realtimeConnection?.stop(); });
     width: 13px;
     height: 13px;
     border-radius: 50%;
-    background: #7f9ba0;
-    box-shadow: 0 0 0 5px rgba(127, 155, 160, .15)
+    background: var(--skin-muted, #7f9ba0);
+    box-shadow: 0 0 0 5px rgba(var(--skin-muted-rgb, 127, 155, 160), 0.15)
 }
 
 .online .switch-dot {
@@ -370,7 +370,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .online-switch small {
-    color: #9dbabe;
+    color: var(--skin-subtle, #9dbabe);
     font-size: 10px;
     margin-top: 3px
 }
@@ -385,12 +385,12 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 .stat-grid article {
     padding: 19px;
     background: #fff;
-    border: 1px solid #eaf0f3;
+    border: 1px solid var(--skin-border, #eaf0f3);
     border-radius: 17px;
     display: flex;
     align-items: center;
     gap: 13px;
-    box-shadow: 0 8px 24px rgba(25, 52, 72, .04)
+    box-shadow: 0 8px 24px rgba(var(--skin-brand-strong-rgb, 25, 52, 72), 0.04)
 }
 
 .stat-icon {
@@ -407,8 +407,8 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .blue {
-    background: #ebf4ff;
-    color: #2477d4
+    background: var(--skin-surface, #ebf4ff);
+    color: var(--skin-brand, #2477d4)
 }
 
 .orange {
@@ -418,7 +418,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 .purple {
     background: #f2edff;
-    color: #7656d8
+    color: var(--skin-brand, #7656d8)
 }
 
 .stat-grid small,
@@ -428,7 +428,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 .stat-grid small {
     font-size: 11px;
-    color: #8795a5
+    color: var(--skin-muted, #8795a5)
 }
 
 .stat-grid strong {
@@ -439,14 +439,14 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 .stat-grid em {
     font-style: normal;
     font-size: 11px;
-    color: #728296
+    color: var(--skin-muted, #728296)
 }
 
 .workspace {
     margin-top: 20px;
     background: #fff;
     border-radius: 20px;
-    border: 1px solid #e7edf1;
+    border: 1px solid var(--skin-border, #e7edf1);
     min-height: 420px;
     overflow: hidden
 }
@@ -454,7 +454,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 .tabs {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #edf1f4;
+    border-bottom: 1px solid var(--skin-surface, #edf1f4);
     padding: 0 20px
 }
 
@@ -462,7 +462,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
     border: 0;
     background: none;
     padding: 20px 17px;
-    color: #6f7e8e;
+    color: var(--skin-muted, #6f7e8e);
     cursor: pointer;
     font-weight: 700
 }
@@ -508,7 +508,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .task-card {
-    border: 1px solid #e4ebef;
+    border: 1px solid var(--skin-border, #e4ebef);
     border-radius: 17px;
     padding: 20px;
     transition: .2s
@@ -516,7 +516,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 .task-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 32px rgba(19, 50, 69, .08)
+    box-shadow: 0 15px 32px rgba(var(--skin-brand-strong-rgb, 19, 50, 69), 0.08)
 }
 
 .task-head {
@@ -528,7 +528,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 .task-id {
     font-size: 9px;
     letter-spacing: 1.5px;
-    color: #95a1ad
+    color: var(--skin-muted, #95a1ad)
 }
 
 .task-head h3 {
@@ -553,8 +553,8 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 .status.completed,
 .status.cancelled {
-    background: #f0f2f4;
-    color: #7b8794
+    background: var(--skin-surface, #f0f2f4);
+    color: var(--skin-muted, #7b8794)
 }
 
 .route {
@@ -575,7 +575,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
     width: 1px;
     flex: 1;
     min-height: 25px;
-    border-left: 1px dashed #bed0d2;
+    border-left: 1px dashed var(--skin-subtle, #bed0d2);
     margin: 4px
 }
 
@@ -590,7 +590,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .route-copy small {
-    color: #9aa5b0;
+    color: var(--skin-muted, #9aa5b0);
     font-size: 10px
 }
 
@@ -602,7 +602,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 .route-copy em {
     font-size: 11px;
-    color: #718090;
+    color: var(--skin-muted, #718090);
     font-style: normal
 }
 
@@ -610,8 +610,8 @@ onUnmounted(() => { realtimeConnection?.stop(); });
     display: flex;
     gap: 15px;
     padding: 13px 0;
-    border-top: 1px dashed #dfe6e9;
-    color: #718090;
+    border-top: 1px dashed var(--skin-border, #dfe6e9);
+    color: var(--skin-muted, #718090);
     font-size: 11px
 }
 
@@ -646,9 +646,9 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .ghost {
-    border: 1px solid #dce5e8;
+    border: 1px solid var(--skin-border, #dce5e8);
     background: #fff;
-    color: #536577;
+    color: var(--skin-muted, #536577);
     flex: 1
 }
 
@@ -685,7 +685,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 .loading-card {
     padding: 70px 24px;
     text-align: center;
-    color: #8795a3
+    color: var(--skin-muted, #8795a3)
 }
 
 .empty span,
@@ -703,7 +703,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 .empty h3,
 .loading-card h2 {
-    color: #34485d;
+    color: var(--skin-ink, #34485d);
     margin-bottom: 8px
 }
 
@@ -735,7 +735,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 .modal-mask {
     position: fixed;
     inset: 0;
-    background: rgba(3, 24, 31, .62);
+    background: rgba(var(--skin-brand-strong-rgb, 3, 24, 31), 0.62);
     display: grid;
     place-items: center;
     padding: 20px;
@@ -765,7 +765,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .modal>p {
-    color: #7c8997;
+    color: var(--skin-muted, #7c8997);
     font-size: 13px;
     line-height: 1.6
 }
@@ -775,13 +775,13 @@ onUnmounted(() => { realtimeConnection?.stop(); });
     margin-top: 18px;
     font-size: 12px;
     font-weight: 800;
-    color: #405269
+    color: var(--skin-ink, #405269)
 }
 
 .modal select,
 .modal textarea {
     width: 100%;
-    border: 1px solid #dae3e7;
+    border: 1px solid var(--skin-border, #dae3e7);
     border-radius: 11px;
     padding: 12px;
     margin-top: 7px;
@@ -849,8 +849,8 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 /* 与用户首页一致的克制蓝白工作台。功能状态用颜色表达，视觉不再依赖渐变和发光。 */
 .rider-page {
-    background: #f6f9fd;
-    color: #253b55;
+    background: var(--skin-surface, #f6f9fd);
+    color: var(--skin-ink, #253b55);
     padding-bottom: 78px
 }
 
@@ -858,9 +858,9 @@ onUnmounted(() => { realtimeConnection?.stop(); });
     height: 64px;
     padding: 0 max(20px, calc((100% - 1120px)/2));
     background: #fff;
-    color: #173b62;
-    border-bottom: 1px solid #e5eef8;
-    box-shadow: 0 1px 6px rgba(40, 92, 145, .05)
+    color: var(--skin-brand-strong, #173b62);
+    border-bottom: 1px solid var(--skin-border, #e5eef8);
+    box-shadow: 0 1px 6px rgba(var(--skin-brand-strong-rgb, 40, 92, 145), 0.05)
 }
 
 .brand {
@@ -871,8 +871,8 @@ onUnmounted(() => { realtimeConnection?.stop(); });
     width: 34px;
     height: 34px;
     border-radius: 8px;
-    background: #e7f4ff;
-    color: #0097ff
+    background: var(--skin-surface, #e7f4ff);
+    color: var(--skin-brand, #0097ff)
 }
 
 .brand b {
@@ -881,7 +881,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .brand small {
-    color: #7890aa;
+    color: var(--skin-muted, #7890aa);
     font-size: 10px;
     letter-spacing: .5px;
     margin-top: 2px
@@ -892,9 +892,9 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .user-side {
-    border: 1px solid #d5e7f8;
+    border: 1px solid var(--skin-border, #d5e7f8);
     background: #fff;
-    color: #287bc0;
+    color: var(--skin-brand, #287bc0);
     border-radius: 6px;
     padding: 8px 12px
 }
@@ -902,8 +902,8 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 .avatar {
     width: 34px;
     height: 34px;
-    background: #e8f4ff;
-    color: #1778c1;
+    background: var(--skin-surface, #e8f4ff);
+    color: var(--skin-brand, #1778c1);
     border-radius: 50%
 }
 
@@ -919,13 +919,13 @@ onUnmounted(() => { realtimeConnection?.stop(); });
     padding: 22px 24px;
     border-radius: 10px;
     background: #fff;
-    color: #253b55;
-    border: 1px solid #dfeaf5;
-    box-shadow: 0 4px 14px rgba(51, 101, 150, .06)
+    color: var(--skin-ink, #253b55);
+    border: 1px solid var(--skin-border, #dfeaf5);
+    box-shadow: 0 4px 14px rgba(var(--skin-brand-rgb, 51, 101, 150), 0.06)
 }
 
 .date {
-    color: #6f8aa6;
+    color: var(--skin-muted, #6f8aa6);
     font-size: 12px;
     letter-spacing: .2px
 }
@@ -936,38 +936,38 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .hero-note {
-    color: #70849a;
+    color: var(--skin-muted, #70849a);
     font-size: 13px
 }
 
 .online-switch {
     min-width: 150px;
     padding: 10px 13px;
-    border: 1px solid #cfe2f4;
-    background: #f5f9fd;
+    border: 1px solid var(--skin-border, #cfe2f4);
+    background: var(--skin-surface, #f5f9fd);
     border-radius: 7px;
-    color: #44617d
+    color: var(--skin-muted, #44617d)
 }
 
 .online-switch.online {
-    background: #edf7ff;
-    border-color: #9dccf3
+    background: var(--skin-surface, #edf7ff);
+    border-color: var(--skin-brand-soft, #9dccf3)
 }
 
 .switch-dot {
     width: 10px;
     height: 10px;
-    background: #a9b9c9;
+    background: var(--skin-subtle, #a9b9c9);
     box-shadow: none
 }
 
 .online .switch-dot {
-    background: #0097ff;
-    box-shadow: 0 0 0 4px #d9efff
+    background: var(--skin-brand, #0097ff);
+    box-shadow: 0 0 0 4px var(--skin-border, #d9efff)
 }
 
 .online-switch small {
-    color: #7991a8
+    color: var(--skin-muted, #7991a8)
 }
 
 .stat-grid {
@@ -977,7 +977,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 .stat-grid article {
     padding: 15px 16px;
-    border: 1px solid #e0ebf6;
+    border: 1px solid var(--skin-border, #e0ebf6);
     border-radius: 9px;
     box-shadow: none
 }
@@ -989,13 +989,13 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .green {
-    background: #e9f5ff;
-    color: #1983c6
+    background: var(--skin-surface, #e9f5ff);
+    color: var(--skin-brand, #1983c6)
 }
 
 .blue {
-    background: #e9f5ff;
-    color: #1983c6
+    background: var(--skin-surface, #e9f5ff);
+    color: var(--skin-brand, #1983c6)
 }
 
 .orange {
@@ -1004,12 +1004,12 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .purple {
-    background: #f1f5fb;
-    color: #617fa1
+    background: var(--skin-surface, #f1f5fb);
+    color: var(--skin-muted, #617fa1)
 }
 
 .stat-grid small {
-    color: #8396aa
+    color: var(--skin-muted, #8396aa)
 }
 
 .stat-grid strong {
@@ -1019,8 +1019,8 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 .workspace {
     margin-top: 16px;
     border-radius: 10px;
-    border: 1px solid #dfeaf5;
-    box-shadow: 0 4px 14px rgba(51, 101, 150, .04)
+    border: 1px solid var(--skin-border, #dfeaf5);
+    box-shadow: 0 4px 14px rgba(var(--skin-brand-rgb, 51, 101, 150), 0.04)
 }
 
 .tabs {
@@ -1029,21 +1029,21 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 .tabs button {
     padding: 17px 14px;
-    color: #7489a0
+    color: var(--skin-muted, #7489a0)
 }
 
 .tabs button b {
-    background: #e8f4ff;
-    color: #1479c3
+    background: var(--skin-surface, #e8f4ff);
+    color: var(--skin-brand, #1479c3)
 }
 
 .tabs button.active {
-    color: #0097ff;
-    box-shadow: inset 0 -2px #0097ff
+    color: var(--skin-brand, #0097ff);
+    box-shadow: inset 0 -2px var(--skin-brand, #0097ff)
 }
 
 .tabs .refresh {
-    color: #6d8aa8
+    color: var(--skin-muted, #6d8aa8)
 }
 
 .task-grid {
@@ -1052,7 +1052,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .task-card {
-    border: 1px solid #e0ebf5;
+    border: 1px solid var(--skin-border, #e0ebf5);
     border-radius: 10px;
     padding: 17px;
     transition: box-shadow .18s ease
@@ -1060,7 +1060,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 .task-card:hover {
     transform: none;
-    box-shadow: 0 7px 18px rgba(42, 94, 145, .08)
+    box-shadow: 0 7px 18px rgba(var(--skin-brand-strong-rgb, 42, 94, 145), 0.08)
 }
 
 .task-head h3 {
@@ -1070,8 +1070,8 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 .status {
     padding: 5px 8px;
     border-radius: 6px;
-    background: #eaf6ff;
-    color: #1978bd
+    background: var(--skin-surface, #eaf6ff);
+    color: var(--skin-brand, #1978bd)
 }
 
 .route {
@@ -1079,7 +1079,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .route-mark {
-    color: #1687ca
+    color: var(--skin-brand, #1687ca)
 }
 
 .route-mark i:last-child {
@@ -1095,7 +1095,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .task-meta i {
-    color: #1687ca
+    color: var(--skin-brand, #1687ca)
 }
 
 .task-actions button,
@@ -1106,20 +1106,20 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 
 .accept,
 .primary {
-    background: #0097ff;
+    background: var(--skin-brand, #0097ff);
     box-shadow: none
 }
 
 .ghost {
-    border-color: #d6e5f2;
-    color: #51718f
+    border-color: var(--skin-border, #d6e5f2);
+    color: var(--skin-muted, #51718f)
 }
 
 .waiting-confirm,
 .complete-note {
     border-radius: 6px;
-    background: #edf7ff;
-    color: #2475ad
+    background: var(--skin-surface, #edf7ff);
+    color: var(--skin-brand, #2475ad)
 }
 
 .waiting-confirm.warning {
@@ -1132,13 +1132,13 @@ onUnmounted(() => { realtimeConnection?.stop(); });
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: #eaf5ff;
-    color: #1687ca
+    background: var(--skin-surface, #eaf5ff);
+    color: var(--skin-brand, #1687ca)
 }
 
 .empty h3,
 .loading-card h2 {
-    color: #38536f
+    color: var(--skin-ink, #38536f)
 }
 
 .primary.small,
@@ -1147,12 +1147,12 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 }
 
 .spinner {
-    border-color: #d6e9f8;
-    border-top-color: #0097ff
+    border-color: var(--skin-border, #d6e9f8);
+    border-top-color: var(--skin-brand, #0097ff)
 }
 
 .modal-mask {
-    background: rgba(18, 53, 89, .42)
+    background: rgba(var(--skin-brand-strong-rgb, 18, 53, 89), 0.42)
 }
 
 .modal {
@@ -1193,7 +1193,7 @@ onUnmounted(() => { realtimeConnection?.stop(); });
 /* 统计卡片也只使用蓝色层级，橙色仅保留给真正的异常提示 */
 .rider-page .stat-icon.orange,
 .rider-page .stat-icon.purple {
-    background: #edf7ff;
-    color: #2b81bf;
+    background: var(--skin-surface, #edf7ff);
+    color: var(--skin-brand, #2b81bf);
 }
 </style>

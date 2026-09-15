@@ -136,8 +136,8 @@ onMounted(load);
 
 .apply-page {
     min-height: 100vh;
-    background: #f4f7fb;
-    color: #14213d;
+    background: var(--skin-surface, #f4f7fb);
+    color: var(--skin-brand-strong, #14213d);
     display: grid;
     grid-template-columns: minmax(320px, .9fr) minmax(440px, 1.1fr);
 }
@@ -146,7 +146,7 @@ onMounted(load);
     position: relative;
     padding: clamp(40px, 7vw, 100px);
     color: #fff;
-    background: radial-gradient(circle at 15% 12%, rgba(75, 223, 183, .35), transparent 27%), linear-gradient(150deg, #073b4c 0%, #0b6e75 55%, #14a887 100%);
+    background: radial-gradient(circle at 15% 12%, rgba(75, 223, 183, .35), transparent 27%), linear-gradient(150deg, var(--skin-brand-strong, #073b4c) 0%, var(--skin-brand-strong, #0b6e75) 55%, #14a887 100%);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -236,7 +236,7 @@ form,
     background: #fff;
     padding: clamp(28px, 5vw, 52px);
     border-radius: 28px;
-    box-shadow: 0 24px 70px rgba(29, 54, 81, .1);
+    box-shadow: 0 24px 70px rgba(var(--skin-brand-strong-rgb, 29, 54, 81), 0.1);
 }
 
 .panel-heading {
@@ -256,7 +256,7 @@ form,
 label>span,
 legend {
     display: block;
-    color: #405269;
+    color: var(--skin-ink, #405269);
     font-size: 13px;
     font-weight: 700;
     margin-bottom: 9px;
@@ -270,7 +270,7 @@ label {
 input:not([type=checkbox]) {
     width: 100%;
     height: 52px;
-    border: 1px solid #dfe6ef;
+    border: 1px solid var(--skin-border, #dfe6ef);
     border-radius: 13px;
     padding: 0 16px;
     outline: 0;
@@ -297,10 +297,10 @@ fieldset {
 
 .vehicle-grid button {
     padding: 16px 8px;
-    border: 1px solid #dfe6ef;
+    border: 1px solid var(--skin-border, #dfe6ef);
     background: #fff;
     border-radius: 15px;
-    color: #405269;
+    color: var(--skin-ink, #405269);
     cursor: pointer;
 }
 
@@ -320,7 +320,7 @@ fieldset {
 }
 
 .vehicle-grid small {
-    color: #94a0ae;
+    color: var(--skin-muted, #94a0ae);
     margin-top: 4px
 }
 
@@ -337,7 +337,7 @@ fieldset {
     align-items: flex-start;
     font-size: 12px;
     line-height: 1.6;
-    color: #738094;
+    color: var(--skin-muted, #738094);
 }
 
 .agreement input {
@@ -379,7 +379,7 @@ fieldset {
 
 .privacy {
     text-align: center;
-    color: #9aa5b3;
+    color: var(--skin-muted, #9aa5b3);
     font-size: 11px;
     margin-top: 14px;
 }
@@ -431,7 +431,7 @@ fieldset {
 }
 
 .state-card p {
-    color: #6d7a8c;
+    color: var(--skin-muted, #6d7a8c);
     line-height: 1.8;
     margin: 14px 0
 }
@@ -445,15 +445,15 @@ fieldset {
 
 .profile-preview span {
     padding: 14px;
-    background: #f7f9fc;
+    background: var(--skin-surface, #f7f9fc);
     border-radius: 12px;
-    color: #8894a3;
+    color: var(--skin-muted, #8894a3);
     font-size: 12px
 }
 
 .profile-preview b {
     display: block;
-    color: #27374c;
+    color: var(--skin-ink, #27374c);
     margin-top: 5px
 }
 
@@ -491,16 +491,16 @@ fieldset {
     display: block;
     max-width: 1100px;
     margin: 0 auto;
-    background: #f5f9fd;
-    color: #24405c;
+    background: var(--skin-surface, #f5f9fd);
+    color: var(--skin-ink, #24405c);
 }
 
 .hero {
     min-height: 0;
     padding: 28px 32px 24px;
-    color: #24405c;
-    background: #eaf5ff;
-    border-bottom: 1px solid #d5e9f8;
+    color: var(--skin-ink, #24405c);
+    background: var(--skin-surface, #eaf5ff);
+    border-bottom: 1px solid var(--skin-border, #d5e9f8);
 }
 
 .hero::after {
@@ -511,7 +511,7 @@ fieldset {
     position: static;
     margin-bottom: 22px;
     padding: 0;
-    color: #2878ad;
+    color: var(--skin-brand, #2878ad);
     font-size: 13px;
 }
 
@@ -521,39 +521,39 @@ fieldset {
     margin-bottom: 18px;
     border-radius: 10px;
     background: #fff;
-    color: #0097ff;
-    border: 1px solid #cfe6f8;
+    color: var(--skin-brand, #0097ff);
+    border: 1px solid var(--skin-border, #cfe6f8);
     backdrop-filter: none;
     font-size: 25px;
 }
 
 .eyebrow,
 .step {
-    color: #4b86ae;
+    color: var(--skin-muted, #4b86ae);
     letter-spacing: 1px;
 }
 
 .hero h1 {
     max-width: 620px;
     margin: 8px 0 10px;
-    color: #173b60;
+    color: var(--skin-brand-strong, #173b60);
     font-size: clamp(28px, 4vw, 46px);
 }
 
 .subtitle {
     max-width: 560px;
-    color: #637f97;
+    color: var(--skin-muted, #637f97);
     line-height: 1.65;
 }
 
 .hero-points {
     margin-top: 24px;
     gap: 18px;
-    color: #637f97;
+    color: var(--skin-muted, #637f97);
 }
 
 .hero-points b {
-    color: #0879c7;
+    color: var(--skin-brand, #0879c7);
 }
 
 .form-panel {
@@ -566,9 +566,9 @@ form,
 .state-card {
     width: min(100%, 560px);
     padding: 28px;
-    border: 1px solid #dfeaf5;
+    border: 1px solid var(--skin-border, #dfeaf5);
     border-radius: 12px;
-    box-shadow: 0 4px 18px rgba(36, 91, 132, .08);
+    box-shadow: 0 4px 18px rgba(var(--skin-brand-strong-rgb, 36, 91, 132), 0.08);
 }
 
 .panel-heading {
@@ -577,68 +577,68 @@ form,
 
 .panel-heading h2,
 .state-card h2 {
-    color: #24405c;
+    color: var(--skin-ink, #24405c);
     font-size: 22px;
 }
 
 label>span,
 legend {
-    color: #405f79;
+    color: var(--skin-muted, #405f79);
 }
 
 input:not([type=checkbox]) {
     height: 46px;
-    border-color: #cfdfeb;
+    border-color: var(--skin-border, #cfdfeb);
     border-radius: 6px;
 }
 
 input:focus {
-    border-color: #0097ff;
-    box-shadow: 0 0 0 3px rgba(0, 151, 255, .12);
+    border-color: var(--skin-brand, #0097ff);
+    box-shadow: 0 0 0 3px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.12);
 }
 
 .vehicle-grid button {
     padding: 13px 8px;
-    border-color: #cfdfeb;
+    border-color: var(--skin-border, #cfdfeb);
     border-radius: 7px;
-    color: #405f79;
+    color: var(--skin-muted, #405f79);
 }
 
 .vehicle-grid button.selected {
-    border-color: #0097ff;
-    background: #edf7ff;
-    color: #0879c7;
-    box-shadow: inset 0 0 0 1px #0097ff;
+    border-color: var(--skin-brand, #0097ff);
+    background: var(--skin-surface, #edf7ff);
+    color: var(--skin-brand, #0879c7);
+    box-shadow: inset 0 0 0 1px var(--skin-brand, #0097ff);
 }
 
 .agreement {
-    color: #71879a;
+    color: var(--skin-muted, #71879a);
 }
 
 .agreement input {
-    accent-color: #0097ff;
+    accent-color: var(--skin-brand, #0097ff);
 }
 
 .primary {
     color: #fff;
-    background: #0097ff;
+    background: var(--skin-brand, #0097ff);
     box-shadow: none;
     border-radius: 7px;
 }
 
 .primary:hover:not(:disabled) {
-    background: #087dcc;
+    background: var(--skin-brand, #087dcc);
 }
 
 .secondary {
     margin-top: 14px;
-    color: #0879c7;
-    background: #edf7ff;
+    color: var(--skin-brand, #0879c7);
+    background: var(--skin-surface, #edf7ff);
     border-radius: 7px;
 }
 
 .privacy {
-    color: #8498aa;
+    color: var(--skin-muted, #8498aa);
 }
 
 .rejected,
@@ -647,13 +647,13 @@ input:focus {
 }
 
 .state-icon {
-    background: #eaf5ff;
-    color: #0879c7;
+    background: var(--skin-surface, #eaf5ff);
+    color: var(--skin-brand, #0879c7);
 }
 
 .state-card .status-pill {
-    background: #edf7ff;
-    color: #0879c7;
+    background: var(--skin-surface, #edf7ff);
+    color: var(--skin-brand, #0879c7);
 }
 
 .state-card.approved .status-pill {
@@ -662,12 +662,12 @@ input:focus {
 }
 
 .profile-preview span {
-    background: #f5f9fd;
-    border: 1px solid #e1edf7;
+    background: var(--skin-surface, #f5f9fd);
+    border: 1px solid var(--skin-border, #e1edf7);
 }
 
 .profile-preview b {
-    color: #24405c;
+    color: var(--skin-ink, #24405c);
 }
 
 @media (max-width: 800px) {

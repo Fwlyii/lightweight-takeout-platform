@@ -173,7 +173,7 @@ export default {
 .top-background {
   width: 100%;
   height: 100px;
-  background: linear-gradient(to right, #3a7bd5, #00d2ff);
+  background: linear-gradient(to right, var(--skin-brand, #3a7bd5), var(--skin-brand, #00d2ff));
   display: flex;
   justify-content: center;
   align-items: center;
@@ -245,9 +245,9 @@ export default {
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid white;
-  box-shadow: 0 6px 20px rgba(0, 151, 255, 0.3);
+  box-shadow: 0 6px 20px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.3);
   flex-shrink: 0;
-  background: #f8f9fa;
+  background: var(--skin-surface, #f8f9fa);
   margin-left: 15px;
 }
 .avatar img {
@@ -258,11 +258,11 @@ export default {
 }
 .user-details {
   flex: 1;
-  background-color: #f8f9fa;
+  background-color: var(--skin-surface, #f8f9fa);
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--skin-border, #e9ecef);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -275,7 +275,7 @@ export default {
 }
 .user-name, .user-phone {
   font-size: 0.95rem;
-  color: #495057;
+  color: var(--skin-ink, #495057);
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -292,7 +292,7 @@ export default {
 .user-name .user-icon, 
 .user-phone .phone-icon {
   margin-right: 8px;
-  color: #3498db;
+  color: var(--skin-brand, #3498db);
 }
 
 /* 新增商铺列表样式 - 房子造型 */
@@ -362,12 +362,12 @@ export default {
 .store-name {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--skin-ink, #2c3e50);
   margin-bottom: 15px;
   text-align: center;
   padding-top: 8px;
   position: relative;
-  border-bottom: 2px solid #ecf0f1;
+  border-bottom: 2px solid var(--skin-border, #ecf0f1);
   padding-bottom: 12px;
 }
 
@@ -378,8 +378,8 @@ export default {
   width: 100%;
   padding: 20px 10px 15px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-  border: 2px solid #dee2e6;
+  background: linear-gradient(135deg, var(--skin-surface, #f8f9fa), var(--skin-border, #e9ecef));
+  border: 2px solid var(--skin-border, #dee2e6);
   position: relative;
   margin-top: 10px;
 }
@@ -393,7 +393,7 @@ export default {
   transform: translateY(-50%);
   width: 1px;
   height: 60%;
-  background: #ced4da;
+  background: var(--skin-subtle, #ced4da);
 }
 
 .store-data-bar::after {
@@ -404,7 +404,7 @@ export default {
   transform: translateY(-50%);
   width: 1px;
   height: 60%;
-  background: #ced4da;
+  background: var(--skin-subtle, #ced4da);
 }
 
 .data-item {
@@ -416,7 +416,7 @@ export default {
 .data-value {
   font-size: 22px;
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--skin-ink, #2c3e50);
   margin-bottom: 6px;
   text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
@@ -581,7 +581,7 @@ export default {
   min-height: 100vh;
   margin: 0 auto;
   padding: 0 16px 88px;
-  background: #f6f9fd;
+  background: var(--skin-surface, #f6f9fd);
   box-shadow: none;
   border-radius: 0;
   align-items: stretch;
@@ -598,11 +598,11 @@ export default {
   margin-bottom: 0;
   background: #fff;
   border-radius: 0;
-  border-bottom: 1px solid #e3edf7;
-  box-shadow: 0 2px 8px rgba(40, 92, 145, .05);
+  border-bottom: 1px solid var(--skin-border, #e3edf7);
+  box-shadow: 0 2px 8px rgba(var(--skin-brand-strong-rgb, 40, 92, 145), 0.05);
 }
 .top-background h1 {
-  color: #173b62;
+  color: var(--skin-brand-strong, #173b62);
   font-size: 20px;
   text-shadow: none;
   letter-spacing: 0;
@@ -612,19 +612,19 @@ export default {
   max-width: none;
   margin: 18px 0 14px;
   padding: 18px;
-  border: 1px solid #dfeaf5;
+  border: 1px solid var(--skin-border, #dfeaf5);
   border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(51, 101, 150, .05);
+  box-shadow: 0 4px 14px rgba(var(--skin-brand-rgb, 51, 101, 150), 0.05);
   transform: none;
   top: auto;
   gap: 16px;
 }
 .user-info-row { gap: 14px; }
-.avatar { width: 64px; height: 64px; margin-left: 0; border: 2px solid #fff; box-shadow: 0 3px 10px rgba(0, 151, 255, .16); }
+.avatar { width: 64px; height: 64px; margin-left: 0; border: 2px solid #fff; box-shadow: 0 3px 10px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.16); }
 .user-details { padding: 0; margin-right: 0; background: transparent; border: 0; box-shadow: none; gap: 7px; }
 .user-name, .user-phone { padding: 0; background: transparent; box-shadow: none; border-radius: 0; }
-.user-name { color: #244d73; font-size: 17px; margin-bottom: 2px; }
-.user-phone { color: #7189a2; font-size: 12px; }
+.user-name { color: var(--skin-brand-strong, #244d73); font-size: 17px; margin-bottom: 2px; }
+.user-phone { color: var(--skin-muted, #7189a2); font-size: 12px; }
 .user-actions { gap: 10px; }
 .logout-btn { padding: 10px 12px; border-radius: 7px; border: 1px solid transparent; box-shadow: none; font-size: 12px; margin-bottom: 0; }
 .logout-btn { background: #fff5f3; color: #c65a4d; border-color: #f2d8d3; }
@@ -633,25 +633,25 @@ export default {
   width: 100%;
   padding: 20px;
   background: #fff;
-  border: 1px solid #dfeaf5;
+  border: 1px solid var(--skin-border, #dfeaf5);
   border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(51, 101, 150, .04);
+  box-shadow: 0 4px 14px rgba(var(--skin-brand-rgb, 51, 101, 150), 0.04);
 }
 .entry-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
-.entry-kicker { color: #1683c8; font-size: 11px; font-weight: 700; }
-.entry-heading h2 { margin: 6px 0; color: #244d73; font-size: 19px; }
-.entry-heading p { color: #7c91a6; font-size: 12px; line-height: 1.6; }
-.entry-button { flex: none; padding: 10px 13px; border: 0; border-radius: 7px; background: #0097ff; color: #fff; font-size: 12px; cursor: pointer; }
+.entry-kicker { color: var(--skin-brand, #1683c8); font-size: 11px; font-weight: 700; }
+.entry-heading h2 { margin: 6px 0; color: var(--skin-brand-strong, #244d73); font-size: 19px; }
+.entry-heading p { color: var(--skin-muted, #7c91a6); font-size: 12px; line-height: 1.6; }
+.entry-button { flex: none; padding: 10px 13px; border: 0; border-radius: 7px; background: var(--skin-brand, #0097ff); color: #fff; font-size: 12px; cursor: pointer; }
 .entry-button i { margin-left: 5px; }
-.entry-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; padding-top: 15px; border-top: 1px solid #edf3f8; }
+.entry-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--skin-surface, #edf3f8); }
 .entry-stats div { text-align: center; }
 .entry-stats strong, .entry-stats span { display: block; }
-.entry-stats strong { color: #1e5a87; font-size: 20px; }
-.entry-stats span { margin-top: 4px; color: #8398ad; font-size: 11px; }
-.empty-store-tip { width: 100%; margin-top: 14px; padding: 28px 16px; text-align: center; background: #fff; border: 1px dashed #cfe1f1; border-radius: 12px; color: #8195a8; }
-.empty-store-tip i { color: #6faeda; font-size: 24px; }
+.entry-stats strong { color: var(--skin-brand-strong, #1e5a87); font-size: 20px; }
+.entry-stats span { margin-top: 4px; color: var(--skin-muted, #8398ad); font-size: 11px; }
+.empty-store-tip { width: 100%; margin-top: 14px; padding: 28px 16px; text-align: center; background: #fff; border: 1px dashed var(--skin-border, #cfe1f1); border-radius: 12px; color: var(--skin-muted, #8195a8); }
+.empty-store-tip i { color: var(--skin-brand, #6faeda); font-size: 24px; }
 .empty-store-tip p { margin: 8px 0 13px; font-size: 12px; }
-.empty-store-tip button { padding: 8px 16px; border: 1px solid #9dccf3; border-radius: 6px; background: #edf7ff; color: #1479c3; cursor: pointer; }
+.empty-store-tip button { padding: 8px 16px; border: 1px solid var(--skin-brand-soft, #9dccf3); border-radius: 6px; background: var(--skin-surface, #edf7ff); color: var(--skin-brand, #1479c3); cursor: pointer; }
 @media (max-width: 480px) {
   .container { padding-left: 12px; padding-right: 12px; }
   .top-background { width: calc(100% + 24px); margin-left: -12px; }
@@ -661,5 +661,5 @@ export default {
 </style>
 
 <style scoped>
-.reviews-link{margin-top:12px;border:1px solid #168bd1;color:#168bd1;background:#fff;border-radius:7px;padding:9px 14px;cursor:pointer}.reviews-link:hover{background:#f2f8fd}
+.reviews-link{margin-top:12px;border:1px solid var(--skin-brand, #168bd1);color:var(--skin-brand, #168bd1);background:#fff;border-radius:7px;padding:9px 14px;cursor:pointer}.reviews-link:hover{background:var(--skin-surface, #f2f8fd)}
 </style>

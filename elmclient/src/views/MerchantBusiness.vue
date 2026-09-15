@@ -566,7 +566,7 @@ body {
 .shop-management-page .top-background {
   width: 100%;
   height: 100px;
-  background: linear-gradient(to right, #3a7bd5, #00d2ff);
+  background: linear-gradient(to right, var(--skin-brand, #3a7bd5), var(--skin-brand, #00d2ff));
   display: flex;
   justify-content: center;
   align-items: center;
@@ -642,8 +642,8 @@ body {
 }
 
 .status-tabs button.active {
-  color: #0097ff;
-  background-color: #e6f2ff;
+  color: var(--skin-brand, #0097ff);
+  background-color: var(--skin-surface, #e6f2ff);
   font-weight: bold;
 }
 
@@ -739,8 +739,8 @@ body {
 }
 
 .action-buttons button.edit-btn {
-  color: #0097ff;
-  border-color: #0097ff;
+  color: var(--skin-brand, #0097ff);
+  border-color: var(--skin-brand, #0097ff);
 }
 
 .action-buttons button.delete-btn {
@@ -753,7 +753,7 @@ body {
 }
 
 .action-buttons button.edit-btn:hover {
-  background-color: #0097ff;
+  background-color: var(--skin-brand, #0097ff);
 }
 
 .action-buttons button.delete-btn:hover {
@@ -811,7 +811,7 @@ body {
 .apply-button {
   width: 100%;
   max-width: 500px;
-  background-color: #0097ff;
+  background-color: var(--skin-brand, #0097ff);
   color: #fff;
   padding: 12px 0;
   border-radius: 10px;
@@ -825,7 +825,7 @@ body {
 }
 
 .apply-button:hover {
-  background-color: #007bb5;
+  background-color: var(--skin-brand-strong, #007bb5);
   transform: translateY(-2px);
 }
 
@@ -866,7 +866,7 @@ body {
 }
 
 .footer-nav .nav-item.active {
-  color: #0097ff;
+  color: var(--skin-brand, #0097ff);
 }
 
 .workbench-summary {
@@ -879,13 +879,13 @@ body {
 .workbench-summary > div {
   padding: 14px 12px;
   background: #fff;
-  border: 1px solid #e1edf8;
+  border: 1px solid var(--skin-border, #e1edf8);
   border-radius: 8px;
   text-align: center;
 }
 .workbench-summary strong,.workbench-summary span { display: block; }
-.workbench-summary strong { color: #173b60; font-size: 20px; }
-.workbench-summary span { color: #8297aa; font-size: 11px; margin-top: 4px; }
+.workbench-summary strong { color: var(--skin-brand-strong, #173b60); font-size: 20px; }
+.workbench-summary span { color: var(--skin-muted, #8297aa); font-size: 11px; margin-top: 4px; }
 .workbench-summary { margin-top: 154px; }
 .shop-management-page > .container { padding-top: 18px; }
 @media (max-width: 480px) {
@@ -961,7 +961,7 @@ body {
   position: relative;
   width: 120px;
   height: 120px;
-  border: 2px dashed #0097ff;
+  border: 2px dashed var(--skin-brand, #0097ff);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -975,14 +975,14 @@ body {
 }
 
 .image-upload-area:hover {
-  border-color: #007bb5;
-  background-color: #f0f8ff;
+  border-color: var(--skin-brand-strong, #007bb5);
+  background-color: var(--skin-surface, #f0f8ff);
   /* 悬停时颜色变浅 */
 }
 
 .upload-icon {
   font-size: 40px;
-  color: #0097ff;
+  color: var(--skin-brand, #0097ff);
   font-weight: 300;
   transition: all 0.3s;
 }
@@ -1027,8 +1027,8 @@ body {
 
 .modern-input:focus,
 .modern-textarea:focus {
-  border-color: #0097ff !important;
-  box-shadow: 0 0 0 4px rgba(0, 151, 255, 0.15) !important;
+  border-color: var(--skin-brand, #0097ff) !important;
+  box-shadow: 0 0 0 4px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.15) !important;
   outline: none !important;
 }
 
@@ -1058,8 +1058,8 @@ body {
 
 .select-type-btn {
   padding: 10px 14px;
-  border: 1px solid #0097ff;
-  background-color: #0097ff;
+  border: 1px solid var(--skin-brand, #0097ff);
+  background-color: var(--skin-brand, #0097ff);
   color: #fff;
   border-radius: 6px;
   font-size: 14px;
@@ -1070,8 +1070,8 @@ body {
 }
 
 .select-type-btn:hover {
-  background-color: #007bb5;
-  border-color: #007bb5;
+  background-color: var(--skin-brand-strong, #007bb5);
+  border-color: var(--skin-brand-strong, #007bb5);
   transform: translateY(-1px);
 }
 
@@ -1134,7 +1134,7 @@ body {
 
 .type-select-popup-header {
   padding: 16px 20px;
-  background-color: #f8f9fa;
+  background-color: var(--skin-surface, #f8f9fa);
   border-bottom: 1px solid #e0e0e0;
   display: flex;
   justify-content: space-between;
@@ -1165,7 +1165,7 @@ body {
 }
 
 .type-select-close:hover {
-  background-color: #e9ecef;
+  background-color: var(--skin-border, #e9ecef);
   color: #333;
 }
 
@@ -1189,12 +1189,12 @@ body {
 }
 
 .type-option:hover {
-  background-color: #f8f9fa;
-  color: #0097ff;
+  background-color: var(--skin-surface, #f8f9fa);
+  color: var(--skin-brand, #0097ff);
 }
 
 .type-option:active {
-  background-color: #e6f2ff;
+  background-color: var(--skin-surface, #e6f2ff);
 }
 
 @keyframes fadeIn {
@@ -1252,17 +1252,17 @@ body {
   max-width: 600px;
   min-height: 100vh;
   margin: 0 auto;
-  background: #f5f9fd;
-  color: #24405c;
+  background: var(--skin-surface, #f5f9fd);
+  color: var(--skin-ink, #24405c);
   overflow-x: hidden;
 }
 .shop-management-page .top-background {
   height: 64px;
   max-width: 600px;
   border-radius: 0;
-  background: #0097ff;
+  background: var(--skin-brand, #0097ff);
   background-image: none;
-  box-shadow: 0 1px 0 rgba(0, 83, 145, .15);
+  box-shadow: 0 1px 0 rgba(var(--skin-brand-strong-rgb, 0, 83, 145), 0.15);
 }
 .shop-management-page .top-background::before { display: none; }
 .shop-management-page .top-background h1 {
@@ -1279,26 +1279,26 @@ body {
 .shop-management-page .workbench-summary > div {
   min-width: 0;
   padding: 12px 8px;
-  border: 1px solid #dcebf7;
+  border: 1px solid var(--skin-border, #dcebf7);
   border-radius: 8px;
   box-shadow: none;
 }
-.shop-management-page .workbench-summary strong { font-size: 18px; color: #1d537d; }
-.shop-management-page .workbench-summary span { font-size: 12px; color: #6c8499; white-space: nowrap; }
+.shop-management-page .workbench-summary strong { font-size: 18px; color: var(--skin-brand-strong, #1d537d); }
+.shop-management-page .workbench-summary span { font-size: 12px; color: var(--skin-muted, #6c8499); white-space: nowrap; }
 .shop-management-page .status-tabs {
   top: 64px;
   height: 44px;
   padding: 4px 8px;
-  border-bottom: 1px solid #dcebf7;
+  border-bottom: 1px solid var(--skin-border, #dcebf7);
   box-shadow: none;
 }
 .shop-management-page .status-tabs button {
   min-width: 56px;
   padding: 7px 8px;
   font-size: 13px;
-  color: #678198;
+  color: var(--skin-muted, #678198);
 }
-.shop-management-page .status-tabs button.active { color: #0879c7; background: #e8f5ff; }
+.shop-management-page .status-tabs button.active { color: var(--skin-brand, #0879c7); background: var(--skin-surface, #e8f5ff); }
 .shop-management-page .container {
   width: calc(100% - 32px);
   max-width: 568px;
@@ -1312,12 +1312,12 @@ body {
   gap: 12px;
   padding: 14px;
   margin-bottom: 10px;
-  border: 1px solid #e1edf7;
+  border: 1px solid var(--skin-border, #e1edf7);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(36, 91, 132, .06);
+  box-shadow: 0 2px 8px rgba(var(--skin-brand-strong-rgb, 36, 91, 132), 0.06);
   transition: none;
 }
-.shop-management-page .business-list li:hover { transform: none; box-shadow: 0 2px 8px rgba(36, 91, 132, .06); }
+.shop-management-page .business-list li:hover { transform: none; box-shadow: 0 2px 8px rgba(var(--skin-brand-strong-rgb, 36, 91, 132), 0.06); }
 .shop-management-page .logo {
   width: 56px;
   height: 56px;
@@ -1328,7 +1328,7 @@ body {
 .shop-management-page .business-info-detail { min-width: 0; }
 .shop-management-page .business-info-detail h3 {
   margin: 0 0 6px;
-  color: #24405c;
+  color: var(--skin-ink, #24405c);
   font-size: 16px;
   line-height: 1.35;
   white-space: nowrap;
@@ -1339,7 +1339,7 @@ body {
 .shop-management-page .business-info-delivery {
   min-width: 0;
   margin: 2px 0;
-  color: #71879a;
+  color: var(--skin-muted, #71879a);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -1358,13 +1358,13 @@ body {
   line-height: 1.3;
   box-shadow: none;
 }
-.shop-management-page .action-buttons button.edit-btn { color: #0879c7; border-color: #9bcdf0; background: #f4fbff; }
+.shop-management-page .action-buttons button.edit-btn { color: var(--skin-brand, #0879c7); border-color: var(--skin-brand-soft, #9bcdf0); background: var(--skin-surface, #f4fbff); }
 .shop-management-page .action-buttons button.delete-btn { color: #b45a5a; border-color: #e7bcbc; background: #fffafa; }
 .shop-management-page .footer-button-container { bottom: 72px; padding: 0 16px; }
-.shop-management-page .apply-button { max-width: 568px; padding: 10px 0; border-radius: 7px; font-size: 15px; box-shadow: 0 3px 10px rgba(0, 116, 194, .18); }
-.shop-management-page .footer-nav { height: 64px; border-top-color: #dcebf7; }
-.shop-management-page .footer-nav .nav-item { padding: 7px 0; color: #7890a4; }
-.shop-management-page .footer-nav .nav-item.active { color: #0097ff; }
+.shop-management-page .apply-button { max-width: 568px; padding: 10px 0; border-radius: 7px; font-size: 15px; box-shadow: 0 3px 10px rgba(var(--skin-brand-strong-rgb, 0, 116, 194), 0.18); }
+.shop-management-page .footer-nav { height: 64px; border-top-color: var(--skin-border, #dcebf7); }
+.shop-management-page .footer-nav .nav-item { padding: 7px 0; color: var(--skin-muted, #7890a4); }
+.shop-management-page .footer-nav .nav-item.active { color: var(--skin-brand, #0097ff); }
 @media (max-width: 480px) {
   .shop-management-page .top-background { height: 64px; }
   .shop-management-page .status-tabs { top: 64px; left: 0; transform: none; max-width: 100vw; }
@@ -1379,15 +1379,15 @@ body {
   gap: 7px;
   width: calc(100% - 1.5rem);
   margin: 8px auto;
-  color: #45677d;
+  color: var(--skin-muted, #45677d);
   font-size: 13px;
   text-align: left;
 }
-.shop-setting-row input { width: 16px; height: 16px; margin: 0; accent-color: #168bd1; }
-.shop-setting-row small { margin-left: auto; color: #9aadb9; font-size: 11px; }
+.shop-setting-row input { width: 16px; height: 16px; margin: 0; accent-color: var(--skin-brand, #168bd1); }
+.shop-setting-row small { margin-left: auto; color: var(--skin-subtle, #9aadb9); font-size: 11px; }
 .shop-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
-.shop-tags span { padding: 2px 6px; border: 1px solid #cfe3f0; border-radius: 3px; background: #f5fbff; color: #168bd1; font-size: 11px; }
-.shop-tags .shop-open{border-color:#bfe2cc;background:#f1faf4;color:#34895a}.shop-tags .shop-closed{border-color:#dce4e9;background:#f5f7f8;color:#7f8e99}
+.shop-tags span { padding: 2px 6px; border: 1px solid var(--skin-border, #cfe3f0); border-radius: 3px; background: var(--skin-surface, #f5fbff); color: var(--skin-brand, #168bd1); font-size: 11px; }
+.shop-tags .shop-open{border-color:#bfe2cc;background:#f1faf4;color:#34895a}.shop-tags .shop-closed{border-color:var(--skin-border, #dce4e9);background:var(--skin-surface, #f5f7f8);color:var(--skin-muted, #7f8e99)}
 
 /* 申请新店是列表后的普通操作，不能固定覆盖正在浏览的店铺卡片。 */
 .shop-management-page .footer-button-container {

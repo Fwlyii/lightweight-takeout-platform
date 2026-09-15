@@ -408,33 +408,33 @@ export default {
 </script>
 
 <style scoped>
-.wrapper { width: 100%; max-width: 960px; margin: 0 auto; min-height: 100%; background: #f5f8fb; color: #253f54; }
+.wrapper { width: 100%; max-width: 960px; margin: 0 auto; min-height: 100%; background: var(--skin-surface, #f5f8fb); color: var(--skin-ink, #253f54); }
 .content { padding: 16px 16px calc(90px + env(safe-area-inset-bottom)); }
 .store-list { display: grid; gap: 12px; }
-.store-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: #fff; border: 1px solid #dfe8ef; border-radius: 12px; }
+.store-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: #fff; border: 1px solid var(--skin-border, #dfe8ef); border-radius: 12px; }
 .store-info { display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1; }
 .logo { width: 88px; height: 88px; flex: 0 0 88px; object-fit: cover; border-radius: 10px; }
 .meta { min-width: 0; overflow-wrap: anywhere; }
 .name { font-size: 17px; font-weight: 650; margin-bottom: 8px; }
-.addr, .desc, .type { font-size: 13px; color: #6d8192; line-height: 1.6; }
+.addr, .desc, .type { font-size: 13px; color: var(--skin-muted, #6d8192); line-height: 1.6; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
-button { min-height: 40px; padding: 8px 14px; border: 1px solid #cbdde9; border-radius: 8px; color: #087ecc; background: #fff; font: inherit; cursor: pointer; }
+button { min-height: 40px; padding: 8px 14px; border: 1px solid var(--skin-border, #cbdde9); border-radius: 8px; color: var(--skin-brand, #087ecc); background: #fff; font: inherit; cursor: pointer; }
 button:disabled { opacity: .5; cursor: wait; }
-.edit, .save, .add, .confirm-btn, .upload-submit { background: #087ecc; border-color: #087ecc; color: #fff; }
+.edit, .save, .add, .confirm-btn, .upload-submit { background: var(--skin-brand, #087ecc); border-color: var(--skin-brand, #087ecc); color: #fff; }
 .del { color: #b63b4d; border-color: #efc8cf; }
 .bottom-bar { display: flex; justify-content: flex-end; margin-top: 16px; }
-.editor, .modal-overlay { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px; background: #10283980; }
+.editor, .modal-overlay { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px; background: rgba(var(--skin-brand-strong-rgb, 16, 40, 57), 0.501961); }
 .editor .card, .modal-content { width: 100%; max-width: 540px; max-height: 85dvh; overflow-y: auto; border-radius: 14px; padding: 22px; background: white; }
 .form { display: grid; gap: 8px; margin: 18px 0; }
-.form label { font-size: 14px; color: #455d70; margin-top: 8px; }
-.form input, .form textarea, .form select { width: 100%; min-width: 0; min-height: 44px; padding: 10px; border: 1px solid #cbdde9; border-radius: 8px; font: inherit; margin: 0; }
+.form label { font-size: 14px; color: var(--skin-ink, #455d70); margin-top: 8px; }
+.form input, .form textarea, .form select { width: 100%; min-width: 0; min-height: 44px; padding: 10px; border: 1px solid var(--skin-border, #cbdde9); border-radius: 8px; font: inherit; margin: 0; }
 .form textarea { min-height: 90px; resize: vertical; }
 .editor-actions, .modal-footer, .modal-header { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
 .modal-header { justify-content: space-between; }
 .modal-body { padding: 20px 0; line-height: 1.6; }
 .close-btn { min-width: 40px; font-size: 26px; cursor: pointer; }
 .upload-area { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.file-name, .limit { font-size: 12px; color: #748799; overflow-wrap: anywhere; }
+.file-name, .limit { font-size: 12px; color: var(--skin-muted, #748799); overflow-wrap: anywhere; }
 .image-preview img { display: block; max-width: 160px; max-height: 120px; object-fit: contain; }
 .error { color: #b63b4d; font-size: 13px; }
 @media (max-width: 480px) { .store-item { align-items: flex-start; flex-wrap: wrap; padding: 12px; } .logo { width: 64px; height: 64px; flex-basis: 64px; } .actions { width: 100%; justify-content: flex-end; } .editor .card { padding: 16px; } }

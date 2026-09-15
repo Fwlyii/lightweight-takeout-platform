@@ -21,7 +21,7 @@ const router = useRouter();
   width: 100%;
   min-height: 64px;
   padding: 8px 12px;
-  background: #087ecc;
+  background: var(--skin-brand, #087ecc);
   color: white;
   flex: none;
 }

@@ -128,26 +128,26 @@ onBeforeUnmount(releasePreview);
 </script>
 
 <style scoped>
-.registration-page { box-sizing: border-box; min-height: 100dvh; background: #f5f7fa; color: #263442; padding-bottom: 32px; }
+.registration-page { box-sizing: border-box; min-height: 100dvh; background: var(--skin-surface, #f5f7fa); color: var(--skin-ink, #263442); padding-bottom: 32px; }
 .registration-page * { box-sizing: border-box; }
-.registration-header { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; padding: 8px 12px; background: #fff; border-bottom: 1px solid #e4eaf0; }
+.registration-header { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; padding: 8px 12px; background: #fff; border-bottom: 1px solid var(--skin-border, #e4eaf0); }
 .registration-header h1 { margin: 0; text-align: center; font-size: 18px; line-height: 44px; }
-.registration-header a { text-align: center; font: 32px/44px Arial, sans-serif; color: #168bd2; text-decoration: none; }
+.registration-header a { text-align: center; font: 32px/44px Arial, sans-serif; color: var(--skin-brand, #168bd2); text-decoration: none; }
 .registration-form { width: calc(100% - 24px); max-width: 440px; margin: 20px auto 0; padding: 24px; background: #fff; border-radius: 10px; }
 fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
 label { display: block; margin: 18px 0 7px; font-size: 14px; }
-input { display: block; width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid #d9e1e8; border-radius: 6px; background: #fff; color: #263442; font: inherit; font-size: 16px; }
-input:focus-visible { outline: 2px solid #168bd2; outline-offset: 2px; }
-small { display: block; margin-top: 7px; color: #687786; font-size: 12px; line-height: 1.5; }
+input { display: block; width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid var(--skin-border, #d9e1e8); border-radius: 6px; background: #fff; color: var(--skin-ink, #263442); font: inherit; font-size: 16px; }
+input:focus-visible { outline: 2px solid var(--skin-brand, #168bd2); outline-offset: 2px; }
+small { display: block; margin-top: 7px; color: var(--skin-muted, #687786); font-size: 12px; line-height: 1.5; }
 .avatar-field { text-align: center; }
 .avatar-field img { border-radius: 50%; object-fit: cover; }
 .avatar-field label { margin-top: 8px; }
 .avatar-field input { font-size: 12px; padding: 9px; }
-.submit-button { display: block; width: 100%; margin: 24px 0 0; padding: 13px; border: 0; border-radius: 6px; background: #168bd2; color: #fff; font: inherit; font-size: 16px; text-align: center; text-decoration: none; cursor: pointer; }
+.submit-button { display: block; width: 100%; margin: 24px 0 0; padding: 13px; border: 0; border-radius: 6px; background: var(--skin-brand, #168bd2); color: #fff; font: inherit; font-size: 16px; text-align: center; text-decoration: none; cursor: pointer; }
 fieldset:disabled .submit-button { opacity: .6; cursor: wait; }
-.login-link { display: block; margin-top: 18px; color: #168bd2; font-size: 14px; text-align: center; text-decoration: none; }
+.login-link { display: block; margin-top: 18px; color: var(--skin-brand, #168bd2); font-size: 14px; text-align: center; text-decoration: none; }
 .form-error, .form-success { margin: 16px 0 0; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
 .form-error { color: #c0392b; }
-.form-success { color: #167bb5; }
+.form-success { color: var(--skin-brand, #167bb5); }
 @media (max-width: 360px) { .registration-form { padding: 18px; } }
 </style>

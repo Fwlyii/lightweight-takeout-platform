@@ -74,10 +74,10 @@ export default {
   border: 1px solid rgba(255, 255, 255, .92);
   border-radius: 18px;
   background: rgba(255, 255, 255, .94);
-  color: #173b60;
+  color: var(--skin-brand-strong, #173b60);
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
   font-size: 16px;
-  box-shadow: 0 18px 44px rgba(38, 86, 124, .2), 0 2px 10px rgba(255, 255, 255, .7) inset;
+  box-shadow: 0 18px 44px rgba(var(--skin-brand-strong-rgb, 38, 86, 124), 0.2), 0 2px 10px rgba(255, 255, 255, .7) inset;
   backdrop-filter: blur(18px) saturate(1.12);
   -webkit-backdrop-filter: blur(18px) saturate(1.12);
 }
@@ -96,9 +96,9 @@ export default {
   place-items: center;
   border-radius: 50%;
   color: #fff;
-  background: linear-gradient(145deg, #32aaf2, #1786dd);
+  background: linear-gradient(145deg, var(--skin-brand, #32aaf2), var(--skin-brand, #1786dd));
   font-size: 18px;
-  box-shadow: 0 0 0 6px #e8f4fc, 0 5px 12px rgba(22, 133, 220, .2);
+  box-shadow: 0 0 0 6px var(--skin-surface, #e8f4fc), 0 5px 12px rgba(var(--skin-brand-rgb, 22, 133, 220), 0.2);
 }
 
 .toast-content span {
@@ -106,13 +106,13 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #173b60;
+  color: var(--skin-brand-strong, #173b60);
   font-weight: 700;
 }
 
 /* 类型样式 */
 .toast-wrapper.success .toast-content i {
-  background: linear-gradient(145deg, #32aaf2, #1786dd);
+  background: linear-gradient(145deg, var(--skin-brand, #32aaf2), var(--skin-brand, #1786dd));
 }
 
 .toast-wrapper.error .toast-content i {
@@ -126,7 +126,7 @@ export default {
 }
 
 .toast-wrapper.info .toast-content i {
-  background: linear-gradient(145deg, #32aaf2, #1786dd);
+  background: linear-gradient(145deg, var(--skin-brand, #32aaf2), var(--skin-brand, #1786dd));
 }
 
 /* 动画效果 */
@@ -151,7 +151,7 @@ export default {
   }
 
   .toast-content { gap: 12px; }
-  .toast-content i { width: 32px; height: 32px; flex-basis: 32px; font-size: 16px; box-shadow: 0 0 0 5px #e8f4fc, 0 4px 10px rgba(22, 133, 220, .18); }
+  .toast-content i { width: 32px; height: 32px; flex-basis: 32px; font-size: 16px; box-shadow: 0 0 0 5px var(--skin-surface, #e8f4fc), 0 4px 10px rgba(var(--skin-brand-rgb, 22, 133, 220), 0.18); }
   .toast-wrapper.error .toast-content i { box-shadow: 0 0 0 5px #fdecef, 0 4px 10px rgba(217, 82, 99, .16); }
   .toast-wrapper.warning .toast-content i { box-shadow: 0 0 0 5px #fff4e6, 0 4px 10px rgba(232, 140, 53, .16); }
 }

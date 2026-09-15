@@ -77,6 +77,6 @@
   }
 
   .nav-item.active {
-    color: #0097ff;
+    color: var(--skin-brand, #0097ff);
   }
   </style>

@@ -40,8 +40,8 @@ const openAssistant = () => router.push('/ai-chat')
   align-items: center;
   gap: 8px;
   color: #fff;
-  background: linear-gradient(135deg, #16a7ff 0%, #008cf0 100%);
-  box-shadow: 0 10px 28px rgba(0, 132, 225, .24), 0 2px 8px rgba(25, 72, 108, .08);
+  background: linear-gradient(135deg, var(--skin-brand, #16a7ff) 0%, var(--skin-brand, #008cf0) 100%);
+  box-shadow: 0 10px 28px rgba(var(--skin-brand-rgb, 0, 132, 225), 0.24), 0 2px 8px rgba(var(--skin-brand-strong-rgb, 25, 72, 108), 0.08);
   cursor: pointer;
   overflow: visible;
   isolation: isolate;
@@ -53,7 +53,7 @@ const openAssistant = () => router.push('/ai-chat')
 
 .ai-chat-launcher:hover {
   transform: translateY(-3px);
-  box-shadow: 0 15px 34px rgba(0, 132, 225, .31), 0 4px 12px rgba(25, 72, 108, .1);
+  box-shadow: 0 15px 34px rgba(var(--skin-brand-rgb, 0, 132, 225), 0.31), 0 4px 12px rgba(var(--skin-brand-strong-rgb, 25, 72, 108), 0.1);
   filter: saturate(1.04);
   animation-play-state: paused;
 }
@@ -67,7 +67,7 @@ const openAssistant = () => router.push('/ai-chat')
   inset: -6px;
   z-index: -1;
   border-radius: 24px;
-  border: 1px solid rgba(0, 151, 255, .2);
+  border: 1px solid rgba(var(--skin-brand-rgb, 0, 151, 255), 0.2);
   opacity: 0;
   animation: launcher-pulse 5s ease-out 1.1s infinite;
 }
@@ -79,10 +79,10 @@ const openAssistant = () => router.push('/ai-chat')
   display: grid;
   place-items: center;
   border-radius: 12px;
-  color: #008df0;
+  color: var(--skin-brand, #008df0);
   background: rgba(255, 255, 255, .94);
   font-size: 15px;
-  box-shadow: inset 0 0 0 1px rgba(0, 151, 255, .08);
+  box-shadow: inset 0 0 0 1px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.08);
 }
 
 .launcher-copy {

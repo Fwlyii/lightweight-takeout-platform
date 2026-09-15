@@ -934,7 +934,7 @@ export default {
 </script>
 
 <style scoped>
-.food-category-note { color:#7890a0!important; font-size:12px!important; }
+.food-category-note { color:var(--skin-muted, #7890a0)!important; font-size:12px!important; }
 /* 实时校验错误提示样式 */
 .field-error-message {
   color: #dc3545 !important;
@@ -967,14 +967,14 @@ export default {
   min-height: 100vh;
   padding: 72px 0 88px;
   box-sizing: border-box;
-  background-color: #f4f8fb;
+  background-color: var(--skin-surface, #f4f8fb);
 }
 
 /****************** header部分 ******************/
 .wrapper header {
   width: min(100%, 720px);
   height: 56px;
-  background-color: #0097ff;
+  background-color: var(--skin-brand, #0097ff);
   color: #fff;
   font-size: 18px;
   font-weight: 600;
@@ -999,7 +999,7 @@ export default {
 .business-info-card {
   padding: 18px;
   background-color: #fff;
-  border: 1px solid #e4edf3;
+  border: 1px solid var(--skin-border, #e4edf3);
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   display: flex;
@@ -1052,7 +1052,7 @@ export default {
   background-color: #fff;
   margin: 14px 16px;
   padding: 14px 0;
-  border: 1px solid #e4edf3;
+  border: 1px solid var(--skin-border, #e4edf3);
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   font-size: 14px;
@@ -1067,7 +1067,7 @@ export default {
 .likes-collections .icon-item .fa {
   margin-right: 7px;
   font-size: 18px;
-  color: #0097ef;
+  color: var(--skin-brand, #0097ef);
 }
 
 /* 编辑商家按钮 */
@@ -1082,9 +1082,9 @@ export default {
 .operating-button {
   flex: 1;
   min-height: 40px;
-  background-color: #007bff;
+  background-color: var(--skin-brand, #007bff);
   color: #fff;
-  border: 1px solid #007bff;
+  border: 1px solid var(--skin-brand, #007bff);
   padding: 9px 14px;
   border-radius: 6px;
   font-size: 14px;
@@ -1094,9 +1094,9 @@ export default {
 }
 
 .edit-button:hover {
-  background-color: #0056b3;
+  background-color: var(--skin-brand-strong, #0056b3);
 }
-.operating-button{background:#fff;color:#168bd1;border-color:#168bd1;cursor:pointer}.operating-button.closed{background:#168bd1;color:#fff}.sold-out-label{margin-left:6px;color:#8a98a4;font-size:11px}.store-settings .open-setting{border-color:#bfe2cc;background:#f1faf4;color:#34895a}.store-settings .closed-setting{border-color:#dce4e9;background:#f5f7f8;color:#7f8e99}
+.operating-button{background:#fff;color:var(--skin-brand, #168bd1);border-color:var(--skin-brand, #168bd1);cursor:pointer}.operating-button.closed{background:var(--skin-brand, #168bd1);color:#fff}.sold-out-label{margin-left:6px;color:var(--skin-muted, #8a98a4);font-size:11px}.store-settings .open-setting{border-color:#bfe2cc;background:#f1faf4;color:#34895a}.store-settings .closed-setting{border-color:var(--skin-border, #dce4e9);background:var(--skin-surface, #f5f7f8);color:var(--skin-muted, #7f8e99)}
 
 /****************** 食品列表部分 ******************/
 .wrapper .food {
@@ -1116,7 +1116,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   background-color: #fff;
-  border: 1px solid #e4edf3;
+  border: 1px solid var(--skin-border, #e4edf3);
   border-radius: 10px;
 }
 
@@ -1171,7 +1171,7 @@ export default {
 }
 
 .wrapper .food li .food-right .action-button {
-  background-color: #0097ef;
+  background-color: var(--skin-brand, #0097ef);
   color: #fff;
   border: none;
   padding: 7px 11px;
@@ -1183,7 +1183,7 @@ export default {
 }
 
 .wrapper .food li .food-right .action-button:hover {
-  background-color: #4492fc;
+  background-color: var(--skin-brand, #4492fc);
 }
 
 .wrapper .food li .food-right .shelve-button {
@@ -1220,7 +1220,7 @@ export default {
 
 .add-food-button {
   width: calc(100% - 32px);
-  background-color: #0097ef;
+  background-color: var(--skin-brand, #0097ef);
   color: #fff;
   min-height: 44px;
   padding: 10px 0;
@@ -1233,13 +1233,13 @@ export default {
 }
 
 .add-food-button:hover {
-  background-color: #007bb6;
+  background-color: var(--skin-brand-strong, #007bb6);
 }
 
-.stock-label{font-size:12px;color:#7891a5;margin-left:6px}
+.stock-label{font-size:12px;color:var(--skin-muted, #7891a5);margin-left:6px}
 .store-settings { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
-.store-settings span { padding: 3px 7px; border: 1px solid #cfe3f0; border-radius: 4px; background: #f5fbff; color: #168bd1; font-size: 11px; }
-.store-settings .muted-setting { border-color: #e1e9ee; background: #fafcfd; color: #9aadb9; }
+.store-settings span { padding: 3px 7px; border: 1px solid var(--skin-border, #cfe3f0); border-radius: 4px; background: var(--skin-surface, #f5fbff); color: var(--skin-brand, #168bd1); font-size: 11px; }
+.store-settings .muted-setting { border-color: var(--skin-border, #e1e9ee); background: var(--skin-surface, #fafcfd); color: var(--skin-subtle, #9aadb9); }
 
 @media (max-width: 540px) {
   .wrapper { padding-top: 64px; }
@@ -1255,5 +1255,5 @@ export default {
 }
 </style>
 <style>
-.swal2-html-container .edit-field{display:block;width:90%;margin:11px auto 0;text-align:left;color:#45677d;font-size:13px;font-weight:600}.swal2-html-container .edit-field>span{display:block;margin:0 0 5px}.swal2-html-container .edit-field>small{display:block;margin-top:5px;color:#91a4b1;font-size:11px;font-weight:400}.swal2-html-container .edit-field .swal2-input,.swal2-html-container .edit-field .swal2-textarea{width:100%;margin:0;height:42px;padding:8px 11px;border:1px solid #d8e5ee;border-radius:5px;box-sizing:border-box;font-size:14px}.swal2-html-container .edit-field .swal2-textarea{height:76px;resize:vertical}.swal2-html-container .edit-field .swal2-input:focus,.swal2-html-container .edit-field .swal2-textarea:focus{border-color:#58afe7;box-shadow:0 0 0 3px #e8f5fd;outline:0}
+.swal2-html-container .edit-field{display:block;width:90%;margin:11px auto 0;text-align:left;color:var(--skin-muted, #45677d);font-size:13px;font-weight:600}.swal2-html-container .edit-field>span{display:block;margin:0 0 5px}.swal2-html-container .edit-field>small{display:block;margin-top:5px;color:var(--skin-muted, #91a4b1);font-size:11px;font-weight:400}.swal2-html-container .edit-field .swal2-input,.swal2-html-container .edit-field .swal2-textarea{width:100%;margin:0;height:42px;padding:8px 11px;border:1px solid var(--skin-border, #d8e5ee);border-radius:5px;box-sizing:border-box;font-size:14px}.swal2-html-container .edit-field .swal2-textarea{height:76px;resize:vertical}.swal2-html-container .edit-field .swal2-input:focus,.swal2-html-container .edit-field .swal2-textarea:focus{border-color:var(--skin-brand, #58afe7);box-shadow:0 0 0 3px var(--skin-surface, #e8f5fd);outline:0}
 </style>

@@ -23,8 +23,8 @@ const back = () => router.push(props.backTo);
   max-width: 600px;
   margin: 0 auto;
   min-height: 100vh;
-  background: #f4f7fa;
-  color: #253544;
+  background: var(--skin-surface, #f4f7fa);
+  color: var(--skin-ink, #253544);
   font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Microsoft YaHei",
     sans-serif;
 }
@@ -37,7 +37,7 @@ const back = () => router.push(props.backTo);
   display: grid;
   grid-template-columns: 48px minmax(0, 1fr) 48px;
   align-items: center;
-  background: #0097ff;
+  background: var(--skin-brand, #0097ff);
   color: #fff;
   min-height: 56px;
   padding: 0 8px;
@@ -60,7 +60,7 @@ const back = () => router.push(props.backTo);
 }
 .profile-page .panel {
   background: #fff;
-  border: 1px solid #e4ebf0;
+  border: 1px solid var(--skin-border, #e4ebf0);
   border-radius: 10px;
   padding: 16px;
   margin-bottom: 14px;
@@ -81,9 +81,9 @@ const back = () => router.push(props.backTo);
 .profile-page button,
 .profile-page .action-link {
   cursor: pointer;
-  border: 1px solid #d5e1ea;
+  border: 1px solid var(--skin-border, #d5e1ea);
   background: #fff;
-  color: #0879c6;
+  color: var(--skin-brand, #0879c6);
   border-radius: 7px;
   padding: 9px 13px;
   min-height: 44px;
@@ -97,8 +97,8 @@ const back = () => router.push(props.backTo);
   cursor: not-allowed;
 }
 .profile-page .primary {
-  background: #0097ff;
-  border-color: #0097ff;
+  background: var(--skin-brand, #0097ff);
+  border-color: var(--skin-brand, #0097ff);
   color: #fff;
 }
 .profile-page .wide {
@@ -111,14 +111,14 @@ const back = () => router.push(props.backTo);
   margin-top: 14px;
 }
 .profile-page .muted {
-  color: #687b8b;
+  color: var(--skin-muted, #687b8b);
   font-size: 14px;
 }
 .profile-page .notice {
   border-radius: 6px;
   padding: 10px 12px;
-  background: #e9f5ff;
-  color: #086caf;
+  background: var(--skin-surface, #e9f5ff);
+  color: var(--skin-brand-strong, #086caf);
   margin-bottom: 12px;
   overflow-wrap: anywhere;
 }
@@ -136,7 +136,7 @@ const back = () => router.push(props.backTo);
   display: block;
   margin: 0 0 14px;
   font-size: 14px;
-  color: #445968;
+  color: var(--skin-ink, #445968);
 }
 .profile-page input,
 .profile-page select {
@@ -145,10 +145,10 @@ const back = () => router.push(props.backTo);
   min-height: 44px;
   padding: 10px;
   margin-top: 6px;
-  border: 1px solid #cbd8e2;
+  border: 1px solid var(--skin-border, #cbd8e2);
   border-radius: 7px;
   background: #fff;
-  color: #253544;
+  color: var(--skin-ink, #253544);
 }
 .profile-page .split {
   display: grid;
@@ -158,7 +158,7 @@ const back = () => router.push(props.backTo);
 .profile-page a:focus-visible,
 .profile-page button:focus-visible,
 .profile-page input:focus-visible {
-  outline: 3px solid #84caff;
+  outline: 3px solid var(--skin-brand-soft, #84caff);
   outline-offset: 2px;
 }
 </style>

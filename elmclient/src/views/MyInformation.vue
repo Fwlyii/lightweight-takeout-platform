@@ -188,7 +188,7 @@ function logout() {
 onMounted(load);
 </script>
 <style scoped>
-.avatar-upload { margin: 8px 0; color: #087ecc; }
+.avatar-upload { margin: 8px 0; color: var(--skin-brand, #087ecc); }
 .avatar-upload input { max-width: 100%; font-size: 12px; }
 .identity {
   display: flex;
@@ -211,12 +211,12 @@ onMounted(load);
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  color: #253544;
+  color: var(--skin-ink, #253544);
   text-decoration: none;
   padding: 13px 0;
   min-height: 48px;
 }
 .personal-links a + a {
-  border-top: 1px solid #edf1f4;
+  border-top: 1px solid var(--skin-surface, #edf1f4);
 }
 </style>

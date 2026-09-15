@@ -82,5 +82,5 @@ onMounted(load);
 </script>
 <style scoped>
 .checkout-items { list-style:none; padding:0; }
-.checkout-items li { display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-bottom:1px solid #eef2f5; }
+.checkout-items li { display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-bottom:1px solid var(--skin-surface, #eef2f5); }
 </style>

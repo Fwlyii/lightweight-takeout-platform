@@ -50,8 +50,8 @@ const isActive = (tab) => {
   align-items: stretch;
   justify-content: center;
   background: #fff;
-  border-top: 1px solid #e6eef7;
-  box-shadow: 0 -3px 12px rgba(31, 75, 122, .06);
+  border-top: 1px solid var(--skin-border, #e6eef7);
+  box-shadow: 0 -3px 12px rgba(var(--skin-brand-strong-rgb, 31, 75, 122), 0.06);
 }
 
 .nav-item {
@@ -61,13 +61,13 @@ const isActive = (tab) => {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  color: #8091a5;
+  color: var(--skin-muted, #8091a5);
   text-decoration: none;
   font-size: 12px;
   transition: color .18s ease;
 }
 
 .nav-item i { font-size: 18px; }
-.nav-item.active { color: #0097ff; font-weight: 600; }
-.nav-item:hover { color: #0097ff; }
+.nav-item.active { color: var(--skin-brand, #0097ff); font-weight: 600; }
+.nav-item:hover { color: var(--skin-brand, #0097ff); }
 </style>

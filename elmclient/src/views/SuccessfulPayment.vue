@@ -86,12 +86,12 @@ export default {
 /* 全局和基础容器 */
 :root {
   --primary-color: #2e7d32;
-  --secondary-color: #f5f7fa;
-  --text-color-primary: #1a202c;
-  --text-color-secondary: #4a5568;
+  --secondary-color: var(--skin-surface, #f5f7fa);
+  --text-color-primary: var(--skin-ink, #1a202c);
+  --text-color-secondary: var(--skin-ink, #4a5568);
   --card-bg-color: #ffffff;
-  --button-color: #2563eb;
-  --button-hover-color: #1e40af;
+  --button-color: var(--skin-brand, #2563eb);
+  --button-hover-color: var(--skin-brand, #1e40af);
 }
 
 html, body {
@@ -167,7 +167,7 @@ html, body {
   flex-direction: column;
   gap: 1rem;
   text-align: left;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--skin-border, #e2e8f0);
   padding-top: 1.5rem;
 }
 
@@ -202,20 +202,20 @@ html, body {
 .btn-back {
   width: 100%;
   padding: 1rem;
-  background-color:  #0493f2da;
-  color: #e2e8f0;
+  background-color:  rgba(var(--skin-brand-rgb, 4, 147, 242), 0.854902);
+  color: var(--skin-border, #e2e8f0);
   border: none;
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 4px 12px rgba(var(--skin-brand-rgb, 37, 99, 235), 0.2);
 }
 
 .btn-back:hover {
   background-color: var(--button-hover-color);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 6px 16px rgba(var(--skin-brand-rgb, 37, 99, 235), 0.3);
 }
 
 /* 动画效果 */

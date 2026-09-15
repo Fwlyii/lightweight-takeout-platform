@@ -130,7 +130,7 @@ export default {
 
 /* 顶部蓝色部分 */
 .header {
-  background-color: #0097FF;
+  background-color: var(--skin-brand, #0097FF);
   padding: 10px;
   color: white;
   text-align: center;
@@ -160,7 +160,7 @@ export default {
 .search-box button {
 
   padding: 10px;
-  background-color: #0097FF;
+  background-color: var(--skin-brand, #0097FF);
   color: white;
   border: none;
   border-radius: 0 4px 4px 0;
@@ -168,7 +168,7 @@ export default {
 }
 
 .search-box button:hover {
-  background-color: #0097FF;
+  background-color: var(--skin-brand, #0097FF);
 }
 
 /* 搜索历史 */
@@ -216,7 +216,7 @@ export default {
 }
 
 .results li {
-  background-color: #e7f3ff;
+  background-color: var(--skin-surface, #e7f3ff);
   padding: 10px;
   margin-bottom: 5px;
   border-radius: 4px;
@@ -226,7 +226,7 @@ export default {
   display: flex;
   align-items: center;
   /* 垂直居中对齐 */
-  background-color: #e7f3ff;
+  background-color: var(--skin-surface, #e7f3ff);
   padding: 10px;
   border-radius: 4px;
   margin-bottom: 5px;

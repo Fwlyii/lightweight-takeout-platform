@@ -228,7 +228,7 @@ export default {
 .header {
 	width: 100%;
   height: 12vw;
-  background-color: #0097ff;
+  background-color: var(--skin-brand, #0097ff);
   color: #fff;
   font-size: 4.8vw;
   position: fixed;
@@ -252,8 +252,8 @@ export default {
 	margin-top: 12vw;
 	margin-bottom: 15vw;
 }
-.list-state { min-height: 240px; padding: 120px 16px 40px; box-sizing: border-box; text-align: center; color: #8aa0b2; font-size: 14px; }
-.list-state i { display: block; margin-bottom: 10px; color: #8fc2e4; font-size: 28px; }
+.list-state { min-height: 240px; padding: 120px 16px 40px; box-sizing: border-box; text-align: center; color: var(--skin-muted, #8aa0b2); font-size: 14px; }
+.list-state i { display: block; margin-bottom: 10px; color: var(--skin-brand-soft, #8fc2e4); font-size: 28px; }
 .list-state.error { color: #c87878; }
 
 .wrapper .business-item {
@@ -335,22 +335,22 @@ export default {
 	font-size: 2.8vw;
 	padding: 0.5vw 2vw;
 	border-radius: 3vw;
-	background: #f0f7ff;
-	color: #0097ff;
+	background: var(--skin-surface, #f0f7ff);
+	color: var(--skin-brand, #0097ff);
 }
-.closed-shop-tag{margin-left:5px;padding:2px 6px;border-radius:7px;background:#edf1f4;color:#80909c;font-size:10px;font-weight:500;vertical-align:2px}
+.closed-shop-tag{margin-left:5px;padding:2px 6px;border-radius:7px;background:var(--skin-surface, #edf1f4);color:var(--skin-muted, #80909c);font-size:10px;font-weight:500;vertical-align:2px}
 
 /* Reference-led category list: the data remains live, while the shell follows
  * the supplied blue campus mockup and keeps every category on one visual path. */
 .business-list-page {
-	--list-blue: #078fe8;
-	--list-ink: #173b5e;
-	--list-muted: #7c8d9d;
+	--list-blue: var(--skin-brand, #078fe8);
+	--list-ink: var(--skin-brand-strong, #173b5e);
+	--list-muted: var(--skin-muted, #7c8d9d);
 	width: 100%;
 	max-width: 600px;
 	min-height: 100%;
 	margin: 0 auto;
-	background: #f2f8fc;
+	background: var(--skin-surface, #f2f8fc);
 	color: var(--list-ink);
 	font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
@@ -362,7 +362,7 @@ export default {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: #119eef;
+	background: var(--skin-brand, #119eef);
 	color: #fff;
 }
 
@@ -391,7 +391,7 @@ export default {
 	font-weight: 800;
 	line-height: 1;
 	letter-spacing: 2px;
-	text-shadow: 0 3px 9px rgba(0, 92, 170, .18);
+	text-shadow: 0 3px 9px rgba(var(--skin-brand-strong-rgb, 0, 92, 170), 0.18);
 }
 
 .business-list-page .list-hero-copy span {
@@ -414,7 +414,7 @@ export default {
 	gap: 4px;
 	border-radius: 27px 27px 20px 20px;
 	background: rgba(255,255,255,.97);
-	box-shadow: 0 8px 24px rgba(45, 113, 155, .08);
+	box-shadow: 0 8px 24px rgba(var(--skin-brand-rgb, 45, 113, 155), 0.08);
 	backdrop-filter: blur(12px);
 }
 
@@ -425,7 +425,7 @@ export default {
 	border: 0;
 	border-radius: 27px;
 	background: transparent;
-	color: #34485b;
+	color: var(--skin-ink, #34485b);
 	font: inherit;
 	font-size: 14px;
 	font-weight: 600;
@@ -436,7 +436,7 @@ export default {
 
 .business-list-page .toolbar-tab.active {
 	color: var(--list-blue);
-	background: #e9f6ff;
+	background: var(--skin-surface, #e9f6ff);
 }
 
 .business-list-page .toolbar-tab:active { transform: scale(.96); }
@@ -447,22 +447,22 @@ export default {
 	gap: 8px;
 	padding: 10px 14px 12px;
 	background: #fff;
-	border-bottom: 1px solid #e4eef4;
+	border-bottom: 1px solid var(--skin-border, #e4eef4);
 }
 
 .business-list-page .filter-drawer button {
 	padding: 7px 12px;
-	border: 1px solid #dceaf2;
+	border: 1px solid var(--skin-border, #dceaf2);
 	border-radius: 999px;
-	background: #f8fbfd;
-	color: #6f8494;
+	background: var(--skin-surface, #f8fbfd);
+	color: var(--skin-muted, #6f8494);
 	font-size: 12px;
 	cursor: pointer;
 }
 
 .business-list-page .filter-drawer button.active {
-	border-color: #a9daf5;
-	background: #eaf7ff;
+	border-color: var(--skin-brand-soft, #a9daf5);
+	background: var(--skin-surface, #eaf7ff);
 	color: var(--list-blue);
 }
 
@@ -478,10 +478,10 @@ export default {
 	margin: 0 0 14px;
 	padding: 16px;
 	box-sizing: border-box;
-	border: 1px solid rgba(219,233,241,.85);
+	border: 1px solid rgba(var(--skin-border-rgb, 219, 233, 241), 0.85);
 	border-radius: 22px;
 	background: rgba(255,255,255,.98);
-	box-shadow: 0 7px 18px rgba(48, 105, 140, .08);
+	box-shadow: 0 7px 18px rgba(var(--skin-brand-strong-rgb, 48, 105, 140), 0.08);
 	transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
@@ -503,8 +503,8 @@ export default {
 	flex: none;
 	border-radius: 16px;
 	object-fit: cover;
-	background: #edf5f9;
-	box-shadow: inset 0 0 0 1px rgba(156, 195, 216, .18);
+	background: var(--skin-surface, #edf5f9);
+	box-shadow: inset 0 0 0 1px rgba(var(--skin-subtle-rgb, 156, 195, 216), 0.18);
 }
 
 .business-list-page .business-details {
@@ -524,7 +524,7 @@ export default {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	color: #132d49;
+	color: var(--skin-brand-strong, #132d49);
 	font-size: clamp(16px, 4.5vw, 22px);
 	font-weight: 800;
 	line-height: 1.25;
@@ -534,7 +534,7 @@ export default {
 	position: absolute;
 	right: 0;
 	top: 2px;
-	color: #7d8c99;
+	color: var(--skin-muted, #7d8c99);
 	font-size: 22px;
 }
 
@@ -554,19 +554,19 @@ export default {
 }
 
 .business-list-page .business-metrics strong i { font-size: 16px; }
-.business-list-page .business-metrics span { color: #7c8995; font-size: 12px; }
+.business-list-page .business-metrics span { color: var(--skin-muted, #7c8995); font-size: 12px; }
 
 .business-list-page .business-delivery {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	margin-top: 9px;
-	color: #80909e;
+	color: var(--skin-muted, #80909e);
 	font-size: 12px;
 	white-space: nowrap;
 }
 
-.business-list-page .business-delivery b { color: #ccd5db; font-weight: 400; }
+.business-list-page .business-delivery b { color: var(--skin-subtle, #ccd5db); font-weight: 400; }
 
 .business-list-page .business-tags {
 	display: flex;
@@ -590,7 +590,7 @@ export default {
 
 .business-list-page .business-tag.tag-0 { color: #f04f58; background: #fff0f1; }
 .business-list-page .business-tag.tag-1 { color: #ef872b; background: #fff4e9; }
-.business-list-page .business-tag.tag-2 { color: #128fe3; background: #eaf6ff; }
+.business-list-page .business-tag.tag-2 { color: var(--skin-brand, #128fe3); background: var(--skin-surface, #eaf6ff); }
 
 .business-list-page .business-distance {
 	min-width: 60px;
@@ -599,12 +599,12 @@ export default {
 	flex-direction: column;
 	align-items: flex-end;
 	gap: 7px;
-	color: #7d8b98;
+	color: var(--skin-muted, #7d8b98);
 	white-space: nowrap;
 	text-align: right;
 }
 
-.business-list-page .business-distance strong { color: #6f7e8b; font-size: 13px; font-weight: 500; }
+.business-list-page .business-distance strong { color: var(--skin-muted, #6f7e8b); font-size: 13px; font-weight: 500; }
 .business-list-page .business-distance span { font-size: 11px; }
 .business-list-page .filtered-empty { padding: 56px 12px; }
 

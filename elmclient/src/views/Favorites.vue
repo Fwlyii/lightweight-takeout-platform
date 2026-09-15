@@ -126,8 +126,8 @@ onMounted(load);
 }
 .store-tags span {
   font-size: 12px;
-  background: #edf6ff;
-  color: #0879c6;
+  background: var(--skin-surface, #edf6ff);
+  color: var(--skin-brand, #0879c6);
   padding: 2px 6px;
   border-radius: 4px;
 }

@@ -146,13 +146,13 @@ const vehicleName = v => ({ E_BIKE: '电动车', BIKE: '自行车', WALK: '步�
 
 .admin-page {
     min-height: 100vh;
-    background: #f3f6fa;
+    background: var(--skin-surface, #f3f6fa);
     --admin-inset: 16px;
     width: 100%;
     max-width: 960px;
     margin: 0 auto;
     padding: 0 var(--admin-inset) 100px;
-    color: #1b2a3a
+    color: var(--skin-ink, #1b2a3a)
 }
 
 .dispatch-header { width: calc(100% + var(--admin-inset) * 2); margin: 0 calc(-1 * var(--admin-inset)) 16px; }
@@ -161,7 +161,7 @@ const vehicleName = v => ({ E_BIKE: '电动车', BIKE: '自行车', WALK: '步�
     padding: 32px 35px;
     border-radius: 22px;
     color: #fff;
-    background: radial-gradient(circle at 83% 20%, rgba(79, 209, 167, .22), transparent 25%), linear-gradient(130deg, #112f42, #0b5a61);
+    background: radial-gradient(circle at 83% 20%, rgba(79, 209, 167, .22), transparent 25%), linear-gradient(130deg, var(--skin-brand-strong, #112f42), var(--skin-brand-strong, #0b5a61));
     display: flex;
     justify-content: space-between;
     align-items: center
@@ -181,7 +181,7 @@ const vehicleName = v => ({ E_BIKE: '电动车', BIKE: '自行车', WALK: '步�
 
 .page-head span {
     font-size: 13px;
-    color: #b5cdd2
+    color: var(--skin-subtle, #b5cdd2)
 }
 
 .page-head button {
@@ -204,7 +204,7 @@ const vehicleName = v => ({ E_BIKE: '电动车', BIKE: '自行车', WALK: '步�
     background: #fff;
     padding: 18px;
     border-radius: 16px;
-    border: 1px solid #e9eef3;
+    border: 1px solid var(--skin-border, #e9eef3);
     display: flex;
     align-items: center;
     gap: 14px
@@ -234,8 +234,8 @@ const vehicleName = v => ({ E_BIKE: '电动车', BIKE: '自行车', WALK: '步�
 }
 
 .kpis .blue {
-    background: #eaf3ff;
-    color: #2878d2
+    background: var(--skin-surface, #eaf3ff);
+    color: var(--skin-brand, #2878d2)
 }
 
 .kpis small,
@@ -244,7 +244,7 @@ const vehicleName = v => ({ E_BIKE: '电动车', BIKE: '自行车', WALK: '步�
 }
 
 .kpis small {
-    color: #8290a0;
+    color: var(--skin-muted, #8290a0);
     font-size: 11px
 }
 
@@ -255,14 +255,14 @@ const vehicleName = v => ({ E_BIKE: '电动车', BIKE: '自行车', WALK: '步�
 
 .panel {
     background: #fff;
-    border: 1px solid #e4ebf0;
+    border: 1px solid var(--skin-border, #e4ebf0);
     border-radius: 19px;
     min-height: 470px;
     overflow: hidden
 }
 
 .panel>nav {
-    border-bottom: 1px solid #e8edf1;
+    border-bottom: 1px solid var(--skin-border, #e8edf1);
     display: flex;
     padding: 0 22px
 }
@@ -271,7 +271,7 @@ const vehicleName = v => ({ E_BIKE: '电动车', BIKE: '自行车', WALK: '步�
     padding: 20px 17px;
     border: 0;
     background: transparent;
-    color: #718090;
+    color: var(--skin-muted, #718090);
     font-weight: 800;
     cursor: pointer
 }
@@ -301,11 +301,11 @@ const vehicleName = v => ({ E_BIKE: '电动车', BIKE: '自行车', WALK: '步�
 }
 
 .toolbar select {
-    border: 1px solid #dce4ea;
+    border: 1px solid var(--skin-border, #dce4ea);
     border-radius: 9px;
     padding: 8px 12px;
     background: #fff;
-    color: #566678
+    color: var(--skin-muted, #566678)
 }
 
 .table-wrap {
@@ -321,14 +321,14 @@ table {
 th {
     text-align: left;
     padding: 12px;
-    color: #92a0ad;
+    color: var(--skin-muted, #92a0ad);
     font-size: 10px;
-    border-bottom: 1px solid #edf1f4
+    border-bottom: 1px solid var(--skin-surface, #edf1f4)
 }
 
 td {
     padding: 15px 12px;
-    border-bottom: 1px solid #f0f3f5;
+    border-bottom: 1px solid var(--skin-surface, #f0f3f5);
     font-size: 12px
 }
 
@@ -355,7 +355,7 @@ td {
 }
 
 .person small {
-    color: #9aa6b2;
+    color: var(--skin-muted, #9aa6b2);
     margin-top: 3px
 }
 
@@ -407,14 +407,14 @@ td {
 }
 
 .muted {
-    color: #9aa4af;
+    color: var(--skin-muted, #9aa4af);
     font-size: 10px
 }
 
 .empty {
     text-align: center;
     padding: 80px;
-    color: #8c99a6
+    color: var(--skin-muted, #8c99a6)
 }
 
 .empty i {
@@ -430,7 +430,7 @@ td {
 }
 
 .exception-list article {
-    border: 1px solid #e4eaee;
+    border: 1px solid var(--skin-border, #e4eaee);
     border-radius: 15px;
     padding: 18px
 }
@@ -458,7 +458,7 @@ td {
 .exception-top small {
     font-size: 9px;
     letter-spacing: 1px;
-    color: #9ba6b0
+    color: var(--skin-muted, #9ba6b0)
 }
 
 .exception-top h3 {
@@ -469,16 +469,16 @@ td {
 .description {
     margin: 14px 0;
     padding: 12px;
-    background: #f8fafb;
+    background: var(--skin-surface, #f8fafb);
     border-radius: 9px;
     font-size: 12px;
-    color: #586979
+    color: var(--skin-muted, #586979)
 }
 
 .exception-meta {
     display: flex;
     gap: 24px;
-    color: #7b8997;
+    color: var(--skin-muted, #7b8997);
     font-size: 11px
 }
 
@@ -492,13 +492,13 @@ td {
     gap: 8px;
     margin-top: 15px;
     padding-top: 13px;
-    border-top: 1px dashed #dce4e8
+    border-top: 1px dashed var(--skin-border, #dce4e8)
 }
 
 .resolution-actions button {
-    border: 1px solid #dce5e8;
+    border: 1px solid var(--skin-border, #dce5e8);
     background: #fff;
-    color: #536577;
+    color: var(--skin-muted, #536577);
     padding: 8px 11px;
     border-radius: 8px;
     font-size: 11px;
@@ -532,7 +532,7 @@ td {
 .modal-mask {
     position: fixed;
     inset: 0;
-    background: rgba(6, 25, 34, .6);
+    background: rgba(var(--skin-brand-strong-rgb, 6, 25, 34), 0.6);
     display: grid;
     place-items: center;
     padding: 20px;
@@ -562,7 +562,7 @@ td {
 }
 
 .modal p {
-    color: #7a8896;
+    color: var(--skin-muted, #7a8896);
     font-size: 12px;
     line-height: 1.6
 }
@@ -571,7 +571,7 @@ td {
     width: 100%;
     height: 100px;
     margin: 18px 0;
-    border: 1px solid #dce4e8;
+    border: 1px solid var(--skin-border, #dce4e8);
     border-radius: 11px;
     padding: 12px;
     resize: vertical
@@ -591,9 +591,9 @@ td {
 }
 
 .secondary {
-    border: 1px solid #dce4e8;
+    border: 1px solid var(--skin-border, #dce4e8);
     background: #fff;
-    color: #627282
+    color: var(--skin-muted, #627282)
 }
 
 .confirm {
@@ -662,35 +662,35 @@ td {
 
 /* 调度端与其余工作台使用同一套蓝白视觉 */
 .admin-page {
-    background: #f5f9fd;
-    color: #24405c;
+    background: var(--skin-surface, #f5f9fd);
+    color: var(--skin-ink, #24405c);
 }
 
 .page-head {
     padding: 24px 28px;
     border-radius: 10px;
-    color: #173b60;
-    background: #eaf5ff;
-    border: 1px solid #d5e9f8;
+    color: var(--skin-brand-strong, #173b60);
+    background: var(--skin-surface, #eaf5ff);
+    border: 1px solid var(--skin-border, #d5e9f8);
 }
 
 .page-head p {
-    color: #4b86ae;
+    color: var(--skin-muted, #4b86ae);
     letter-spacing: 1px;
 }
 
 .page-head h1 {
-    color: #173b60;
+    color: var(--skin-brand-strong, #173b60);
 }
 
 .page-head span {
-    color: #637f97;
+    color: var(--skin-muted, #637f97);
 }
 
 .page-head button {
-    border: 1px solid #b9d9ef;
+    border: 1px solid var(--skin-brand-soft, #b9d9ef);
     background: #fff;
-    color: #2878ad;
+    color: var(--skin-brand, #2878ad);
     border-radius: 7px;
 }
 
@@ -699,7 +699,7 @@ td {
 }
 
 .kpis article {
-    border: 1px solid #e1edf7;
+    border: 1px solid var(--skin-border, #e1edf7);
     border-radius: 9px;
     box-shadow: none;
 }
@@ -708,28 +708,28 @@ td {
 .kpis .green,
 .kpis .red,
 .kpis .blue {
-    background: #eaf5ff;
-    color: #1683c8;
+    background: var(--skin-surface, #eaf5ff);
+    color: var(--skin-brand, #1683c8);
 }
 
 .panel {
-    border: 1px solid #dfeaf5;
+    border: 1px solid var(--skin-border, #dfeaf5);
     border-radius: 10px;
     box-shadow: none;
 }
 
 .panel>nav button.active {
-    color: #0879c7;
-    box-shadow: inset 0 -3px #0097ff;
+    color: var(--skin-brand, #0879c7);
+    box-shadow: inset 0 -3px var(--skin-brand, #0097ff);
 }
 
 .panel>nav b {
-    background: #e8f4ff;
-    color: #1479c3;
+    background: var(--skin-surface, #e8f4ff);
+    color: var(--skin-brand, #1479c3);
 }
 
 .toolbar select {
-    border-color: #cfdfeb;
+    border-color: var(--skin-border, #cfdfeb);
     border-radius: 6px;
 }
 
@@ -739,8 +739,8 @@ td {
 }
 
 .person>span {
-    background: #eaf5ff;
-    color: #1683c8;
+    background: var(--skin-surface, #eaf5ff);
+    color: var(--skin-brand, #1683c8);
 }
 
 .audit-0 {
@@ -749,16 +749,16 @@ td {
 }
 
 .audit-1 {
-    background: #eaf5ff;
-    color: #1479c3;
+    background: var(--skin-surface, #eaf5ff);
+    color: var(--skin-brand, #1479c3);
 }
 
 .pass {
-    background: #0097ff;
+    background: var(--skin-brand, #0097ff);
 }
 
 .exception-list article {
-    border-color: #e1edf7;
+    border-color: var(--skin-border, #e1edf7);
     border-radius: 9px;
 }
 
@@ -768,22 +768,22 @@ td {
 }
 
 .exception-meta i {
-    color: #1683c8;
+    color: var(--skin-brand, #1683c8);
 }
 
 .resolution-actions button:first-child,
 .confirm {
-    background: #0097ff;
-    border-color: #0097ff;
+    background: var(--skin-brand, #0097ff);
+    border-color: var(--skin-brand, #0097ff);
 }
 
 .resolution-note {
-    background: #edf7ff;
-    color: #547898;
+    background: var(--skin-surface, #edf7ff);
+    color: var(--skin-muted, #547898);
 }
 
 .resolution-note b {
-    color: #1479c3;
+    color: var(--skin-brand, #1479c3);
 }
 
 @media(max-width:800px) {
@@ -825,7 +825,7 @@ td {
         gap: 9px 14px;
         padding: 14px;
         background: #fff;
-        border: 1px solid #e1edf7;
+        border: 1px solid var(--skin-border, #e1edf7);
         border-radius: 8px;
     }
 
@@ -841,7 +841,7 @@ td {
         content: attr(data-label);
         display: block;
         margin-bottom: 3px;
-        color: #91a2b1;
+        color: var(--skin-muted, #91a2b1);
         font-size: 10px;
     }
 

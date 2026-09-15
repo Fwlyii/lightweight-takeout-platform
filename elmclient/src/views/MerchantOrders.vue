@@ -413,13 +413,13 @@ export default {
 .wrapper {
   width: 100%;
   min-height: 100vh;
-  background: #f5f7fa;
+  background: var(--skin-surface, #f5f7fa);
 }
 
 .top-background {
   width: 100%;
   height: 100px;
-  background: linear-gradient(to right, #3a7bd5, #00d2ff);
+  background: linear-gradient(to right, var(--skin-brand, #3a7bd5), var(--skin-brand, #00d2ff));
   display: flex;
   justify-content: center;
   align-items: center;
@@ -468,8 +468,8 @@ export default {
 
 /* 商铺选择栏 */
 .merchant-selector {
-  background:#f0f5f9;
-  box-shadow: 0 2vw 4vw rgba(102, 126, 234, 0.2);
+  background:var(--skin-surface, #f0f5f9);
+  box-shadow: 0 2vw 4vw rgba(var(--skin-brand-soft-rgb, 102, 126, 234), 0.2);
   padding: 3vw 0 0 0;
   position: fixed;
   top: 100px;
@@ -528,7 +528,7 @@ export default {
   padding: 12px 16px;
   font-size: 16px;
   color: #2f3335;
-  background: #d0dff1;
+  background: var(--skin-border, #d0dff1);
   border-radius: 8px;
   cursor: pointer;
   flex: 0 0 auto;
@@ -539,7 +539,7 @@ export default {
 }
 
 .merchant-tabs li.active {
-  background: #0097ff;
+  background: var(--skin-brand, #0097ff);
   color: #ffffff;
   font-weight: 600;
   transform: translateY(-0.5vw);
@@ -547,7 +547,7 @@ export default {
 }
 
 .merchant-tabs li:not(.active):hover {
-  background: #f7fbfc;
+  background: var(--skin-surface, #f7fbfc);
   transform: translateY(-0.2vw);
 }
 
@@ -556,7 +556,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 0 16px;
-  background: #c3ecfe;
+  background: var(--skin-border, #c3ecfe);
   border-bottom: 1px solid #f0f0f0;
   overflow-x: auto;
   white-space: nowrap;
@@ -597,7 +597,7 @@ export default {
 }
 
 .tabs li.active {
-  color: #3490de;
+  color: var(--skin-brand, #3490de);
   font-weight: 600;
 }
 
@@ -608,7 +608,7 @@ export default {
   bottom: 0;
   width: 100%;
   height: 3px;
-  background: #409eff;
+  background: var(--skin-brand, #409eff);
   border-radius: 2px;
 }
 
@@ -685,8 +685,8 @@ export default {
 	color: #ff4d4f;
 }
 .status-badge.pending {
-	background: #e6f7ff;
-	color: #1890ff;
+	background: var(--skin-surface, #e6f7ff);
+	color: var(--skin-brand, #1890ff);
 }
 .status-badge.accepted {
 	background: #f6ffed;
@@ -791,7 +791,7 @@ export default {
 }
 
 .confirm-btn {
-  background: #409eff;
+  background: var(--skin-brand, #409eff);
   color: #fff;
 }
 
@@ -902,13 +902,13 @@ export default {
 }
 
 .confirm-btn {
-  background-color: #1e80ff;
+  background-color: var(--skin-brand, #1e80ff);
   color: white;
 }
 
 .confirm-btn:hover {
-  background-color: #0085e0;
-  box-shadow: 0 4px 12px rgba(30, 128, 255, 0.3);
+  background-color: var(--skin-brand, #0085e0);
+  box-shadow: 0 4px 12px rgba(var(--skin-brand-rgb, 30, 128, 255), 0.3);
 }
 
 /* 移动端响应式样式 */
@@ -951,20 +951,20 @@ export default {
 }
 
 /* 与用户端统一的朴素蓝白头部和筛选栏 */
-.wrapper { background: #f5f9fd; color: #24405c; }
-.top-background { height: 64px; background: #0097ff; background-image: none; border-radius: 0; box-shadow: 0 1px 0 rgba(0,83,145,.15); }
+.wrapper { background: var(--skin-surface, #f5f9fd); color: var(--skin-ink, #24405c); }
+.top-background { height: 64px; background: var(--skin-brand, #0097ff); background-image: none; border-radius: 0; box-shadow: 0 1px 0 rgba(var(--skin-brand-strong-rgb, 0, 83, 145), 0.15); }
 .top-background::before { display: none; }
 .top-background h1 { font-size: 20px; letter-spacing: 0; text-shadow: none; }
-.merchant-selector { top: 64px; height: 56px; padding: 6px 0 0; background: #fff; box-shadow: none; border-bottom: 1px solid #dcebf7; }
+.merchant-selector { top: 64px; height: 56px; padding: 6px 0 0; background: #fff; box-shadow: none; border-bottom: 1px solid var(--skin-border, #dcebf7); }
 .merchant-header { padding: 0 16px 4px; }
 .merchant-tabs { height: 42px; padding: 0 16px 5px; }
-.merchant-tabs li { margin-right: 8px; padding: 6px 12px; font-size: 13px; border-radius: 6px; background: #edf6fc; border: 1px solid #dcebf7; backdrop-filter: none; }
-.merchant-tabs li.active { background: #e5f3ff; color: #0879c7; border-color: #a9d6f4; box-shadow: none; transform: none; }
-.tabs { top: 120px; height: 46px; background: #fff; box-shadow: none; border-radius: 0; border-bottom: 1px solid #dcebf7; }
+.merchant-tabs li { margin-right: 8px; padding: 6px 12px; font-size: 13px; border-radius: 6px; background: var(--skin-surface, #edf6fc); border: 1px solid var(--skin-border, #dcebf7); backdrop-filter: none; }
+.merchant-tabs li.active { background: var(--skin-surface, #e5f3ff); color: var(--skin-brand, #0879c7); border-color: var(--skin-brand-soft, #a9d6f4); box-shadow: none; transform: none; }
+.tabs { top: 120px; height: 46px; background: #fff; box-shadow: none; border-radius: 0; border-bottom: 1px solid var(--skin-border, #dcebf7); }
 .tabs li { margin-right: 22px; padding: 12px 0; font-size: 13px; }
-.tabs li.active { color: #0879c7; }
+.tabs li.active { color: var(--skin-brand, #0879c7); }
 .order-list { margin-top: 184px; padding: 12px 16px 84px; }
-.order-item { border: 1px solid #e1edf7; border-radius: 10px; box-shadow: 0 2px 8px rgba(36,91,132,.06); }
+.order-item { border: 1px solid var(--skin-border, #e1edf7); border-radius: 10px; box-shadow: 0 2px 8px rgba(var(--skin-brand-strong-rgb, 36, 91, 132), 0.06); }
 .order-item .order-content, .order-item .order-footer { min-width: 0; }
 .order-item p, .order-item span { overflow-wrap: anywhere; }
 @media (max-width: 480px) {

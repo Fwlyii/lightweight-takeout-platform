@@ -47,9 +47,9 @@
   .footer {
 	width: 100%;
 	height: 72px;
-	border-top: 1px solid rgba(180, 211, 230, .7);
+	border-top: 1px solid rgba(var(--skin-brand-soft-rgb, 180, 211, 230), 0.7);
 	background: rgba(255, 255, 255, .94);
-	box-shadow: 0 -8px 22px rgba(58, 112, 150, .08);
+	box-shadow: 0 -8px 22px rgba(var(--skin-muted-rgb, 58, 112, 150), 0.08);
 	backdrop-filter: blur(14px);
   
 	position: fixed;
@@ -67,7 +67,7 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	color: #91a0aa;
+	color: var(--skin-muted, #91a0aa);
 	user-select: none;
 	cursor: pointer;
 	flex: 1; /* 使每个 li 平均分配宽度 */
@@ -87,7 +87,7 @@
 	}
 
 	.footer > li.active {
-		color: #168fe4;
+		color: var(--skin-brand, #168fe4);
 	}
 
 	.footer > li.active i {

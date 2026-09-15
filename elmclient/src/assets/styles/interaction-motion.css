@@ -25,14 +25,14 @@
 @media (hover: hover) and (pointer: fine) {
   .content .wrapper .business-list li:hover {
     transform: translateY(-3px);
-    border-color: #cfe5f2;
-    box-shadow: 0 9px 22px rgba(39, 86, 114, .11);
+    border-color: var(--skin-border, #cfe5f2);
+    box-shadow: 0 9px 22px rgba(var(--skin-brand-strong-rgb, 39, 86, 114), 0.11);
   }
 
   .content .guess-card:hover {
     transform: translateY(-3px);
-    border-color: #cfe5f2;
-    box-shadow: 0 8px 18px rgba(39, 86, 114, .10);
+    border-color: var(--skin-border, #cfe5f2);
+    box-shadow: 0 8px 18px rgba(var(--skin-brand-strong-rgb, 39, 86, 114), 0.1);
   }
 }
 
@@ -133,7 +133,7 @@
   pointer-events: none;
   border-radius: 50%;
   background: var(--tertiary-color, #0097ff);
-  box-shadow: 0 3px 10px rgba(0, 151, 255, .35);
+  box-shadow: 0 3px 10px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.35);
   will-change: transform;
 }
 

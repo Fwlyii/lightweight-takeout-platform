@@ -10,9 +10,9 @@
     <BackButton v-if="showBackButton" />
     <div class="content">
       <router-view v-slot="{ Component, route: viewRoute }">
-        <transition mode="out-in" :name="viewRoute.name === 'Login' ? 'auth-route' : 'page-route'">
-          <component :is="Component" :key="viewRoute.path" />
-        </transition>
+        <!-- 路由页面可包含弹窗等多个根节点，不能直接放入 out-in Transition。
+             保留页面自身的入场动效，切页不等待不可靠的离场回调。 -->
+        <component :is="Component" :key="viewRoute.path" />
       </router-view>
     </div>
     <Footer v-if="showFooter" />

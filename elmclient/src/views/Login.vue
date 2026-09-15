@@ -313,8 +313,8 @@ const login = async () => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  color: #173b60;
-  background: linear-gradient(135deg, #fbfdff 0%, #f7fbfe 48%, #fafdff 100%);
+  color: var(--skin-brand-strong, #173b60);
+  background: linear-gradient(135deg, var(--skin-surface, #fbfdff) 0%, var(--skin-surface, #f7fbfe) 48%, var(--skin-surface, #fafdff) 100%);
 }
 
 .ambient {
@@ -328,7 +328,7 @@ const login = async () => {
   height: 520px;
   left: -300px;
   bottom: -290px;
-  background: rgba(0, 151, 255, .07);
+  background: rgba(var(--skin-brand-rgb, 0, 151, 255), 0.07);
   animation: ambient-left 14s ease-in-out infinite alternate;
 }
 
@@ -337,7 +337,7 @@ const login = async () => {
   height: 420px;
   right: -190px;
   top: -230px;
-  background: rgba(0, 151, 255, .055);
+  background: rgba(var(--skin-brand-rgb, 0, 151, 255), 0.055);
   animation: ambient-right 16s ease-in-out infinite alternate;
 }
 
@@ -368,19 +368,19 @@ const login = async () => {
   margin-right: 11px;
   border-radius: 12px;
   color: #fff;
-  background: #0097ff;
+  background: var(--skin-brand, #0097ff);
   font-size: 17px;
-  box-shadow: 0 8px 22px rgba(0, 151, 255, .16);
+  box-shadow: 0 8px 22px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.16);
   transition: transform .22s ease, box-shadow .22s ease;
 }
 
 .brand-link:hover .brand-mark {
   transform: translateY(-1px) rotate(-2deg);
-  box-shadow: 0 11px 25px rgba(0, 151, 255, .21);
+  box-shadow: 0 11px 25px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.21);
 }
 
 .brand-name {
-  color: #173b60;
+  color: var(--skin-brand-strong, #173b60);
   font-size: 20px;
   font-weight: 800;
   letter-spacing: .02em;
@@ -390,11 +390,11 @@ const login = async () => {
   width: 1px;
   height: 18px;
   margin: 0 12px;
-  background: #d7e4ef;
+  background: var(--skin-border, #d7e4ef);
 }
 
 .brand-product {
-  color: #7c94a8;
+  color: var(--skin-muted, #7c94a8);
   font-size: 13px;
 }
 
@@ -402,7 +402,7 @@ const login = async () => {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: #70899f;
+  color: var(--skin-muted, #70899f);
   font-size: 13px;
   text-decoration: none;
   transition: color .18s ease, transform .18s ease;
@@ -414,7 +414,7 @@ const login = async () => {
 }
 
 .home-link:hover {
-  color: #0097ff;
+  color: var(--skin-brand, #0097ff);
   transform: translateX(-2px);
 }
 
@@ -464,7 +464,7 @@ const login = async () => {
 
 .hero-kicker {
   margin: 0 0 15px;
-  color: #4e91c5;
+  color: var(--skin-brand, #4e91c5);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .17em;
@@ -472,18 +472,18 @@ const login = async () => {
 
 .hero-copy h1 {
   margin: 0;
-  color: #173b60;
+  color: var(--skin-brand-strong, #173b60);
   font-size: clamp(48px, 4.5vw, 64px);
   line-height: 1.045;
   letter-spacing: -.048em;
   font-weight: 800;
 }
 
-.hero-copy h1 span { color: #0097ff; }
+.hero-copy h1 span { color: var(--skin-brand, #0097ff); }
 
 .hero-description {
   margin: 23px 0 0;
-  color: #748da3;
+  color: var(--skin-muted, #748da3);
   font-size: 14px;
   line-height: 1.8;
 }
@@ -493,12 +493,12 @@ const login = async () => {
   height: 3px;
   margin-top: 25px;
   border-radius: 999px;
-  background: #0097ff;
+  background: var(--skin-brand, #0097ff);
 }
 
 .hero-note {
   margin: 11px 0 0;
-  color: #9aaab7;
+  color: var(--skin-subtle, #9aaab7);
   font-size: 11px;
 }
 
@@ -525,11 +525,11 @@ const login = async () => {
 }
 
 .food-visual::before {
-  background: linear-gradient(180deg, rgba(248,251,254,.76) 0%, rgba(248,251,254,.38) 34%, rgba(248,251,254,.08) 72%, rgba(248,251,254,0) 100%);
+  background: linear-gradient(180deg, rgba(var(--skin-surface-rgb, 248, 251, 254), 0.76) 0%, rgba(var(--skin-surface-rgb, 248, 251, 254), 0.38) 34%, rgba(var(--skin-surface-rgb, 248, 251, 254), 0.08) 72%, rgba(var(--skin-surface-rgb, 248, 251, 254), 0) 100%);
 }
 
 .food-visual::after {
-  background: linear-gradient(90deg, rgba(248,251,254,0) 0%, rgba(248,251,254,.05) 38%, rgba(248,251,254,.62) 72%, #f8fbfe 100%);
+  background: linear-gradient(90deg, rgba(var(--skin-surface-rgb, 248, 251, 254), 0) 0%, rgba(var(--skin-surface-rgb, 248, 251, 254), 0.05) 38%, rgba(var(--skin-surface-rgb, 248, 251, 254), 0.62) 72%, var(--skin-surface, #f8fbfe) 100%);
 }
 
 .food-visual img {
@@ -544,10 +544,10 @@ const login = async () => {
 .login-panel {
   width: 100%;
   padding: 31px 34px 27px;
-  border: 1px solid rgba(207, 223, 235, .88);
+  border: 1px solid rgba(var(--skin-border-rgb, 207, 223, 235), 0.88);
   border-radius: 18px;
   background: rgba(255, 255, 255, .965);
-  box-shadow: 0 18px 46px rgba(50, 83, 112, .075);
+  box-shadow: 0 18px 46px rgba(var(--skin-ink-rgb, 50, 83, 112), 0.075);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   animation: panel-rise .58s cubic-bezier(.22, .61, .36, 1) .17s both;
@@ -555,8 +555,8 @@ const login = async () => {
 }
 
 .login-panel:hover {
-  border-color: #d3e4ef;
-  box-shadow: 0 20px 50px rgba(50, 83, 112, .09);
+  border-color: var(--skin-border, #d3e4ef);
+  box-shadow: 0 20px 50px rgba(var(--skin-ink-rgb, 50, 83, 112), 0.09);
 }
 
 .login-panel.success-state { border-color: rgba(32, 165, 107, .28); }
@@ -568,7 +568,7 @@ const login = async () => {
 
 .panel-kicker {
   margin: 0 0 6px;
-  color: #5c8db4;
+  color: var(--skin-muted, #5c8db4);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: .02em;
@@ -576,7 +576,7 @@ const login = async () => {
 
 .panel-heading h2 {
   margin: 0;
-  color: #173b60;
+  color: var(--skin-brand-strong, #173b60);
   font-size: 27px;
   line-height: 1.22;
   letter-spacing: -.028em;
@@ -584,7 +584,7 @@ const login = async () => {
 
 .panel-heading-copy > p {
   margin: 7px 0 0;
-  color: #8a9dac;
+  color: var(--skin-muted, #8a9dac);
   font-size: 12px;
 }
 
@@ -602,7 +602,7 @@ const login = async () => {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   margin-bottom: 21px;
-  border-bottom: 1px solid #e8eff4;
+  border-bottom: 1px solid var(--skin-border, #e8eff4);
 }
 
 .role-tabs button {
@@ -612,7 +612,7 @@ const login = async () => {
   padding: 0 4px;
   border: 0;
   background: transparent;
-  color: #8297aa;
+  color: var(--skin-muted, #8297aa);
   font: inherit;
   font-size: 12px;
   cursor: pointer;
@@ -620,11 +620,11 @@ const login = async () => {
 }
 
 .role-tabs button:hover:not(:disabled) {
-  color: #267ebc;
+  color: var(--skin-brand, #267ebc);
   transform: translateY(-1px);
 }
 
-.role-tabs button.active { color: #008de9; font-weight: 600; }
+.role-tabs button.active { color: var(--skin-brand, #008de9); font-weight: 600; }
 .role-tabs button:disabled { cursor: wait; opacity: .55; }
 
 .role-indicator {
@@ -645,8 +645,8 @@ const login = async () => {
   height: 100%;
   margin: 0 auto;
   border-radius: 999px;
-  background: #0097ff;
-  box-shadow: 0 1px 5px rgba(0, 151, 255, .18);
+  background: var(--skin-brand, #0097ff);
+  box-shadow: 0 1px 5px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.18);
 }
 
 .redirect-hint {
@@ -654,11 +654,11 @@ const login = async () => {
   align-items: center;
   gap: 6px;
   margin: -8px 0 17px;
-  color: #6f90a9;
+  color: var(--skin-muted, #6f90a9);
   font-size: 10px;
 }
 
-.redirect-hint i { color: #0097ff; }
+.redirect-hint i { color: var(--skin-brand, #0097ff); }
 
 .field {
   display: block;
@@ -668,7 +668,7 @@ const login = async () => {
 .field > span {
   display: block;
   margin-bottom: 7px;
-  color: #425f78;
+  color: var(--skin-muted, #425f78);
   font-size: 12px;
   font-weight: 600;
 }
@@ -679,18 +679,18 @@ const login = async () => {
   align-items: center;
   gap: 10px;
   padding: 0 14px;
-  border: 1px solid #dbe7ef;
+  border: 1px solid var(--skin-border, #dbe7ef);
   border-radius: 11px;
-  background: #fbfdff;
+  background: var(--skin-surface, #fbfdff);
   transition: border-color .18s ease, box-shadow .18s ease, background .18s ease, transform .18s ease;
 }
 
-.input-shell:hover { border-color: #cddfea; }
+.input-shell:hover { border-color: var(--skin-border, #cddfea); }
 
 .input-shell:focus-within {
-  border-color: #62b9f1;
+  border-color: var(--skin-brand-soft, #62b9f1);
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(0, 151, 255, .065);
+  box-shadow: 0 0 0 4px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.065);
   transform: translateY(-1px);
 }
 
@@ -698,12 +698,12 @@ const login = async () => {
   width: 16px;
   flex: 0 0 16px;
   text-align: center;
-  color: #a1b3c1;
+  color: var(--skin-subtle, #a1b3c1);
   font-size: 13px;
   transition: color .18s ease;
 }
 
-.input-shell:focus-within > i { color: #0097ff; }
+.input-shell:focus-within > i { color: var(--skin-brand, #0097ff); }
 
 .input-shell input {
   min-width: 0;
@@ -711,12 +711,12 @@ const login = async () => {
   border: 0;
   outline: 0;
   background: transparent;
-  color: #294861;
+  color: var(--skin-ink, #294861);
   font: inherit;
   font-size: 14px;
 }
 
-.input-shell input::placeholder { color: #b1c0cc; }
+.input-shell input::placeholder { color: var(--skin-subtle, #b1c0cc); }
 
 .password-toggle {
   width: 30px;
@@ -726,18 +726,18 @@ const login = async () => {
   flex: 0 0 30px;
   border: 0;
   background: transparent;
-  color: #8ea4b6;
+  color: var(--skin-muted, #8ea4b6);
   cursor: pointer;
   transition: color .18s ease, transform .18s ease;
 }
 
-.password-toggle:hover { color: #0097ff; transform: scale(1.06); }
+.password-toggle:hover { color: var(--skin-brand, #0097ff); transform: scale(1.06); }
 
 .form-row {
   display: flex;
   align-items: center;
   margin: 1px 0 18px;
-  color: #7f95a7;
+  color: var(--skin-muted, #7f95a7);
   font-size: 12px;
 }
 
@@ -763,7 +763,7 @@ const login = async () => {
   height: 16px;
   display: grid;
   place-items: center;
-  border: 1px solid #c7d7e3;
+  border: 1px solid var(--skin-subtle, #c7d7e3);
   border-radius: 5px;
   background: #fff;
   color: transparent;
@@ -772,19 +772,19 @@ const login = async () => {
 }
 
 .remember-option:hover .checkbox-ui {
-  border-color: #8dcdf7;
+  border-color: var(--skin-brand-soft, #8dcdf7);
   transform: translateY(-1px);
 }
 
 .remember-option input:checked + .checkbox-ui {
-  border-color: #0097ff;
-  background: #0097ff;
+  border-color: var(--skin-brand, #0097ff);
+  background: var(--skin-brand, #0097ff);
   color: #fff;
-  box-shadow: 0 3px 8px rgba(0, 151, 255, .18);
+  box-shadow: 0 3px 8px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.18);
 }
 
 .remember-option input:focus-visible + .checkbox-ui {
-  box-shadow: 0 0 0 3px rgba(0, 151, 255, .12);
+  box-shadow: 0 0 0 3px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.12);
 }
 
 .inline-error {
@@ -824,20 +824,20 @@ const login = async () => {
   gap: 8px;
   border: 0;
   border-radius: 11px;
-  background: #0097ff;
+  background: var(--skin-brand, #0097ff);
   color: #fff;
   font: inherit;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 9px 22px rgba(0, 151, 255, .16);
+  box-shadow: 0 9px 22px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.16);
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
 }
 
 .login-button:hover:not(:disabled) {
-  background: #008ae8;
+  background: var(--skin-brand, #008ae8);
   transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(0, 151, 255, .21);
+  box-shadow: 0 12px 26px rgba(var(--skin-brand-rgb, 0, 151, 255), 0.21);
 }
 
 .login-button:active:not(:disabled) { transform: translateY(1px) scale(.995); }
@@ -847,13 +847,13 @@ const login = async () => {
 .register-line {
   margin: 16px 0 0;
   text-align: center;
-  color: #879aa9;
+  color: var(--skin-muted, #879aa9);
   font-size: 11px;
 }
 
 .register-line a {
   margin-left: 5px;
-  color: #0097ff;
+  color: var(--skin-brand, #0097ff);
   font-weight: 600;
   text-decoration: none;
 }
@@ -865,7 +865,7 @@ const login = async () => {
   z-index: 2;
   padding: 0 20px 20px;
   text-align: center;
-  color: #bfccd5;
+  color: var(--skin-subtle, #bfccd5);
   font-size: 9px;
   letter-spacing: .07em;
   animation: footer-fade .5s ease .34s both;
@@ -966,7 +966,7 @@ const login = async () => {
   }
 
   .food-visual::after {
-    background: linear-gradient(90deg, rgba(248,251,254,0) 0%, rgba(248,251,254,.42) 56%, #f8fbfe 100%);
+    background: linear-gradient(90deg, rgba(var(--skin-surface-rgb, 248, 251, 254), 0) 0%, rgba(var(--skin-surface-rgb, 248, 251, 254), 0.42) 56%, var(--skin-surface, #f8fbfe) 100%);
   }
 
   .hero-copy h1 {
@@ -1023,8 +1023,8 @@ const login = async () => {
 /* Reference layout: a full-bleed campus scene with the sign-in surface anchored on the right. */
 .login-page {
   min-height: 100dvh;
-  color: #24364c;
-  background: #eaf7ff;
+  color: var(--skin-ink, #24364c);
+  background: var(--skin-surface, #eaf7ff);
   isolation: isolate;
 }
 
@@ -1051,7 +1051,7 @@ const login = async () => {
 .background-tint {
   z-index: -2;
   background:
-    linear-gradient(90deg, rgba(255,255,255,.9) 0%, rgba(255,255,255,.69) 29%, rgba(255,255,255,.2) 53%, rgba(241,250,255,.25) 73%, rgba(239,249,255,.77) 100%),
+    linear-gradient(90deg, rgba(255,255,255,.9) 0%, rgba(255,255,255,.69) 29%, rgba(255,255,255,.2) 53%, rgba(var(--skin-surface-rgb, 241, 250, 255), 0.25) 73%, rgba(var(--skin-surface-rgb, 239, 249, 255), 0.77) 100%),
     linear-gradient(0deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.03) 45%, rgba(255,255,255,.18) 100%);
 }
 
@@ -1071,17 +1071,17 @@ const login = async () => {
   margin-right: 14px;
   border-radius: 16px;
   font-size: 23px;
-  box-shadow: 0 9px 20px rgba(0, 130, 245, .2);
+  box-shadow: 0 9px 20px rgba(var(--skin-brand-rgb, 0, 130, 245), 0.2);
 }
 
 .brand-name {
-  color: #152033;
+  color: var(--skin-ink, #152033);
   font-size: 25px;
   letter-spacing: .01em;
 }
 
-.brand-divider { height: 26px; margin: 0 17px; background: #c9d7e4; }
-.brand-product { color: #52799f; font-size: 18px; }
+.brand-divider { height: 26px; margin: 0 17px; background: var(--skin-border, #c9d7e4); }
+.brand-product { color: var(--skin-muted, #52799f); font-size: 18px; }
 .home-link { display: none; }
 
 .hero-shell {
@@ -1107,7 +1107,7 @@ const login = async () => {
 }
 
 .hero-copy h1 {
-  color: #172333;
+  color: var(--skin-ink, #172333);
   font-size: 62px;
   line-height: 1.12;
   letter-spacing: 0;
@@ -1115,11 +1115,11 @@ const login = async () => {
   text-shadow: 0 2px 0 rgba(255,255,255,.42);
 }
 
-.hero-copy h1 span { color: #087cf0; }
+.hero-copy h1 span { color: var(--skin-brand, #087cf0); }
 
 .hero-description {
   margin-top: 24px;
-  color: #4c6580;
+  color: var(--skin-muted, #4c6580);
   font-size: 20px;
   line-height: 1.72;
   font-weight: 500;
@@ -1130,15 +1130,15 @@ const login = async () => {
   height: 7px;
   margin-top: 18px;
   border-radius: 99px;
-  background: #087cf0;
+  background: var(--skin-brand, #087cf0);
   transform: rotate(-2deg);
-  box-shadow: 0 2px 4px rgba(8,124,240,.13);
+  box-shadow: 0 2px 4px rgba(var(--skin-brand-rgb, 8, 124, 240), 0.13);
 }
 
 .campus-doodle {
   position: absolute;
   z-index: 1;
-  color: #124e87;
+  color: var(--skin-brand-strong, #124e87);
   font-family: 'KaiTi', 'STKaiti', cursive;
   font-size: 20px;
   line-height: 1.5;
@@ -1147,7 +1147,7 @@ const login = async () => {
   text-align: center;
 }
 
-.campus-doodle span { color: #087cf0; font-family: Arial, sans-serif; }
+.campus-doodle span { color: var(--skin-brand, #087cf0); font-family: Arial, sans-serif; }
 .doodle-top { top: 43px; right: 6%; transform: rotate(-8deg); }
 .doodle-top::after,
 .doodle-bottom::after {
@@ -1156,7 +1156,7 @@ const login = async () => {
   width: 178px;
   height: 9px;
   margin: -2px auto 0;
-  border-bottom: 2px solid #1684ee;
+  border-bottom: 2px solid var(--skin-brand, #1684ee);
   border-radius: 50%;
   transform: rotate(-3deg);
 }
@@ -1173,22 +1173,22 @@ const login = async () => {
   border: 0;
   border-radius: 25px;
   background: rgba(255,255,255,.94);
-  box-shadow: 0 22px 55px rgba(50, 91, 125, .14), 0 2px 9px rgba(50,91,125,.05);
+  box-shadow: 0 22px 55px rgba(var(--skin-ink-rgb, 50, 91, 125), 0.14), 0 2px 9px rgba(var(--skin-ink-rgb, 50, 91, 125), 0.05);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   animation: panel-rise .58s cubic-bezier(.22, .61, .36, 1) .17s both;
 }
 
-.login-panel:hover { border-color: transparent; box-shadow: 0 24px 60px rgba(50, 91, 125, .17), 0 2px 9px rgba(50,91,125,.05); }
+.login-panel:hover { border-color: transparent; box-shadow: 0 24px 60px rgba(var(--skin-ink-rgb, 50, 91, 125), 0.17), 0 2px 9px rgba(var(--skin-ink-rgb, 50, 91, 125), 0.05); }
 .panel-heading { min-height: 82px; margin-bottom: 12px; }
-.panel-heading h2 { color: #111820; font-size: 32px; line-height: 1.2; letter-spacing: 0; font-weight: 800; }
-.panel-heading-copy > p { margin-top: 11px; color: #8297ad; font-size: 16px; }
+.panel-heading h2 { color: var(--skin-ink, #111820); font-size: 32px; line-height: 1.2; letter-spacing: 0; font-weight: 800; }
+.panel-heading-copy > p { margin-top: 11px; color: var(--skin-muted, #8297ad); font-size: 16px; }
 
-.role-tabs { margin-bottom: 29px; border-bottom-color: #dce5ed; }
-.role-tabs button { height: 47px; color: #607188; font-size: 16px; font-weight: 500; }
-.role-tabs button.active { color: #087cf0; font-weight: 700; }
+.role-tabs { margin-bottom: 29px; border-bottom-color: var(--skin-border, #dce5ed); }
+.role-tabs button { height: 47px; color: var(--skin-muted, #607188); font-size: 16px; font-weight: 500; }
+.role-tabs button.active { color: var(--skin-brand, #087cf0); font-weight: 700; }
 .role-indicator { height: 3px; }
-.role-indicator::after { width: 58%; background: #087cf0; box-shadow: 0 2px 8px rgba(8,124,240,.26); }
+.role-indicator::after { width: 58%; background: var(--skin-brand, #087cf0); box-shadow: 0 2px 8px rgba(var(--skin-brand-rgb, 8, 124, 240), 0.26); }
 
 .redirect-hint { margin: -9px 0 18px; font-size: 12px; }
 .field { margin-bottom: 20px; }
@@ -1198,45 +1198,45 @@ const login = async () => {
   height: 64px;
   gap: 16px;
   padding: 0 20px;
-  border: 1px solid #e4ebf1;
+  border: 1px solid var(--skin-border, #e4ebf1);
   border-radius: 18px;
-  background: rgba(247,250,252,.92);
+  background: rgba(var(--skin-surface-rgb, 247, 250, 252), 0.92);
 }
 
-.input-shell:hover { border-color: #d2e1ec; background: #f9fcfe; }
-.input-shell:focus-within { border-color: #7abaf1; box-shadow: 0 0 0 4px rgba(8,124,240,.08); transform: none; }
-.input-shell > i { width: 20px; flex-basis: 20px; color: #71869d; font-size: 18px; }
-.input-shell input { color: #3b4c61; font-size: 18px; }
-.input-shell input::placeholder { color: #8d9caf; }
+.input-shell:hover { border-color: var(--skin-border, #d2e1ec); background: var(--skin-surface, #f9fcfe); }
+.input-shell:focus-within { border-color: var(--skin-brand-soft, #7abaf1); box-shadow: 0 0 0 4px rgba(var(--skin-brand-rgb, 8, 124, 240), 0.08); transform: none; }
+.input-shell > i { width: 20px; flex-basis: 20px; color: var(--skin-muted, #71869d); font-size: 18px; }
+.input-shell input { color: var(--skin-ink, #3b4c61); font-size: 18px; }
+.input-shell input::placeholder { color: var(--skin-muted, #8d9caf); }
 .password-toggle { width: 35px; height: 35px; flex-basis: 35px; font-size: 17px; }
 
 .form-row {
   justify-content: space-between;
   margin: 2px 0 31px;
-  color: #6d8196;
+  color: var(--skin-muted, #6d8196);
   font-size: 16px;
 }
 
 .remember-option { gap: 9px; }
-.checkbox-ui { width: 22px; height: 22px; border-color: #b7c8d8; border-radius: 6px; font-size: 12px; }
-.forgot-link { padding: 0; border: 0; background: transparent; color: #58718c; font: inherit; font-size: 16px; cursor: pointer; }
-.forgot-link:hover { color: #087cf0; }
+.checkbox-ui { width: 22px; height: 22px; border-color: var(--skin-subtle, #b7c8d8); border-radius: 6px; font-size: 12px; }
+.forgot-link { padding: 0; border: 0; background: transparent; color: var(--skin-muted, #58718c); font: inherit; font-size: 16px; cursor: pointer; }
+.forgot-link:hover { color: var(--skin-brand, #087cf0); }
 
 .inline-error { margin: -13px 0 17px; padding: 11px 13px; font-size: 13px; }
 
 .login-button {
   height: 66px;
   border-radius: 17px;
-  background: linear-gradient(180deg, #1a94ff 0%, #087cf0 100%);
+  background: linear-gradient(180deg, var(--skin-brand, #1a94ff) 0%, var(--skin-brand, #087cf0) 100%);
   font-size: 22px;
-  box-shadow: 0 12px 24px rgba(8,124,240,.23);
+  box-shadow: 0 12px 24px rgba(var(--skin-brand-rgb, 8, 124, 240), 0.23);
 }
 
-.login-button:hover:not(:disabled) { background: linear-gradient(180deg, #2b9dff 0%, #0877e5 100%); box-shadow: 0 15px 28px rgba(8,124,240,.28); }
+.login-button:hover:not(:disabled) { background: linear-gradient(180deg, var(--skin-brand, #2b9dff) 0%, var(--skin-brand, #0877e5) 100%); box-shadow: 0 15px 28px rgba(var(--skin-brand-rgb, 8, 124, 240), 0.28); }
 .login-button.success { background: #20a56b; }
 
-.register-line { margin-top: 24px; color: #7e91a5; font-size: 16px; }
-.register-line a { margin-left: 7px; color: #087cf0; font-weight: 700; }
+.register-line { margin-top: 24px; color: var(--skin-muted, #7e91a5); font-size: 16px; }
+.register-line a { margin-left: 7px; color: var(--skin-brand, #087cf0); font-weight: 700; }
 
 .login-footer {
   position: relative;
@@ -1248,7 +1248,7 @@ const login = async () => {
   align-items: center;
   justify-content: flex-start;
   gap: 66px;
-  color: #263c53;
+  color: var(--skin-ink, #263c53);
   font-size: 16px;
   letter-spacing: 0;
   text-align: left;
@@ -1256,14 +1256,14 @@ const login = async () => {
 }
 
 .feature-item { display: inline-flex; align-items: center; gap: 14px; min-width: 205px; }
-.feature-icon { width: 59px; height: 59px; display: grid; place-items: center; flex: 0 0 59px; border-radius: 50%; color: #fff; font-size: 25px; box-shadow: 0 7px 14px rgba(31,120,220,.17); }
-.feature-icon.blue { background: #1687f5; }
-.feature-icon.sky { background: #2a9eea; }
+.feature-icon { width: 59px; height: 59px; display: grid; place-items: center; flex: 0 0 59px; border-radius: 50%; color: #fff; font-size: 25px; box-shadow: 0 7px 14px rgba(var(--skin-brand-rgb, 31, 120, 220), 0.17); }
+.feature-icon.blue { background: var(--skin-brand, #1687f5); }
+.feature-icon.sky { background: var(--skin-brand, #2a9eea); }
 .feature-icon.green { background: #35c886; }
 .feature-icon.coral { background: #f35c67; }
 .feature-copy { display: grid; gap: 4px; }
-.feature-copy strong { color: #1d344c; font-size: 18px; font-weight: 800; white-space: nowrap; }
-.feature-copy small { color: #67809b; font-size: 14px; white-space: nowrap; }
+.feature-copy strong { color: var(--skin-ink, #1d344c); font-size: 18px; font-weight: 800; white-space: nowrap; }
+.feature-copy small { color: var(--skin-muted, #67809b); font-size: 14px; white-space: nowrap; }
 
 @keyframes background-drift {
   from { transform: scale(1); }
@@ -1286,7 +1286,7 @@ const login = async () => {
 @media (max-width: 880px) {
   .login-page { overflow-y: auto; }
   .background-layer img { object-position: 35% center; }
-  .background-tint { background: linear-gradient(180deg, rgba(239,249,255,.2) 0%, rgba(255,255,255,.83) 36%, rgba(255,255,255,.97) 73%); }
+  .background-tint { background: linear-gradient(180deg, rgba(var(--skin-surface-rgb, 239, 249, 255), 0.2) 0%, rgba(255,255,255,.83) 36%, rgba(255,255,255,.97) 73%); }
   .brand-header { width: min(100% - 36px, 620px); height: 78px; }
   .brand-mark { width: 46px; height: 46px; border-radius: 14px; font-size: 19px; }
   .brand-name { font-size: 21px; }
@@ -1401,7 +1401,7 @@ const login = async () => {
   .background-tint {
     inset: 0 0 auto;
     height: 312px;
-    background: linear-gradient(180deg, rgba(232,247,255,.08) 0%, rgba(240,250,255,.1) 16%, rgba(255,255,255,.57) 54%, #fff 100%);
+    background: linear-gradient(180deg, rgba(var(--skin-surface-rgb, 232, 247, 255), 0.08) 0%, rgba(var(--skin-surface-rgb, 240, 250, 255), 0.1) 16%, rgba(255,255,255,.57) 54%, #fff 100%);
   }
 
   .background-layer picture { height: 272px; }
@@ -1412,10 +1412,10 @@ const login = async () => {
   .brand-header { position: relative; z-index: 3; }
   .hero-shell { position: relative; z-index: 2; }
   .hero-side::before { display: none; }
-  .hero-copy h1 { color: #172333; font-size: 40px; font-weight: 800; text-shadow: 0 1px 0 rgba(255,255,255,.8); }
-  .hero-copy h1 span { color: #087cf0; }
-  .hero-description { color: #506a82; font-weight: 400; }
-  .login-panel { box-shadow: 0 13px 35px rgba(57,96,125,.14); }
+  .hero-copy h1 { color: var(--skin-ink, #172333); font-size: 40px; font-weight: 800; text-shadow: 0 1px 0 rgba(255,255,255,.8); }
+  .hero-copy h1 span { color: var(--skin-brand, #087cf0); }
+  .hero-description { color: var(--skin-muted, #506a82); font-weight: 400; }
+  .login-panel { box-shadow: 0 13px 35px rgba(var(--skin-ink-rgb, 57, 96, 125), 0.14); }
 }
 
 @media (max-width: 560px) {
@@ -1464,15 +1464,15 @@ const login = async () => {
 
 .login-panel {
   border: 1px solid rgba(255, 255, 255, .82);
-  background: linear-gradient(145deg, rgba(255, 255, 255, .91), rgba(247, 252, 255, .78));
-  box-shadow: 0 24px 64px rgba(40, 88, 126, .18), 0 2px 10px rgba(255, 255, 255, .34) inset;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .91), rgba(var(--skin-surface-rgb, 247, 252, 255), 0.78));
+  box-shadow: 0 24px 64px rgba(var(--skin-brand-strong-rgb, 40, 88, 126), 0.18), 0 2px 10px rgba(255, 255, 255, .34) inset;
   backdrop-filter: blur(20px) saturate(1.16);
   -webkit-backdrop-filter: blur(20px) saturate(1.16);
 }
 
 .login-panel:hover {
   border-color: rgba(255, 255, 255, .95);
-  box-shadow: 0 28px 70px rgba(40, 88, 126, .22), 0 2px 12px rgba(255, 255, 255, .4) inset;
+  box-shadow: 0 28px 70px rgba(var(--skin-brand-strong-rgb, 40, 88, 126), 0.22), 0 2px 12px rgba(255, 255, 255, .4) inset;
 }
 
 @media (min-width: 881px) {
@@ -1496,7 +1496,7 @@ const login = async () => {
   }
 
   .background-tint {
-    background: linear-gradient(180deg, rgba(239, 249, 255, .08) 0%, rgba(255, 255, 255, .52) 54%, rgba(255, 255, 255, .96) 100%);
+    background: linear-gradient(180deg, rgba(var(--skin-surface-rgb, 239, 249, 255), 0.08) 0%, rgba(255, 255, 255, .52) 54%, rgba(255, 255, 255, .96) 100%);
   }
 
   .hero-side {
@@ -1504,8 +1504,8 @@ const login = async () => {
   }
 
   .login-panel {
-    background: linear-gradient(145deg, rgba(255, 255, 255, .92), rgba(247, 252, 255, .84));
-    box-shadow: 0 17px 42px rgba(43, 94, 128, .18), 0 2px 10px rgba(255, 255, 255, .4) inset;
+    background: linear-gradient(145deg, rgba(255, 255, 255, .92), rgba(var(--skin-surface-rgb, 247, 252, 255), 0.84));
+    box-shadow: 0 17px 42px rgba(var(--skin-brand-strong-rgb, 43, 94, 128), 0.18), 0 2px 10px rgba(255, 255, 255, .4) inset;
   }
 }
 
@@ -1552,7 +1552,7 @@ const login = async () => {
 .background-tint {
   inset: 0 0 auto;
   height: calc(var(--reference-visual-height) + 40px);
-  background: linear-gradient(180deg, rgba(239, 249, 255, .05) 0%, rgba(255, 255, 255, .2) 60%, rgba(255, 255, 255, .92) 100%);
+  background: linear-gradient(180deg, rgba(var(--skin-surface-rgb, 239, 249, 255), 0.05) 0%, rgba(255, 255, 255, .2) 60%, rgba(255, 255, 255, .92) 100%);
 }
 
 .hero-shell {
@@ -1582,8 +1582,8 @@ const login = async () => {
   min-height: 0;
   padding: 28px 28px 25px;
   border-radius: 22px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, .92), rgba(247, 252, 255, .84));
-  box-shadow: 0 17px 42px rgba(43, 94, 128, .18), 0 2px 10px rgba(255, 255, 255, .4) inset;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .92), rgba(var(--skin-surface-rgb, 247, 252, 255), 0.84));
+  box-shadow: 0 17px 42px rgba(var(--skin-brand-strong-rgb, 43, 94, 128), 0.18), 0 2px 10px rgba(255, 255, 255, .4) inset;
 }
 
 .panel-heading { min-height: 68px; }
@@ -1610,8 +1610,8 @@ const login = async () => {
   padding: 25px 34px;
   border: 1px solid rgba(255, 255, 255, .78);
   border-radius: 24px;
-  background: linear-gradient(135deg, rgba(249, 253, 255, .93), rgba(231, 245, 255, .82));
-  box-shadow: 0 24px 56px rgba(53, 116, 162, .2), 0 2px 12px rgba(255, 255, 255, .6) inset;
+  background: linear-gradient(135deg, rgba(var(--skin-surface-rgb, 249, 253, 255), 0.93), rgba(var(--skin-surface-rgb, 231, 245, 255), 0.82));
+  box-shadow: 0 24px 56px rgba(var(--skin-brand-rgb, 53, 116, 162), 0.2), 0 2px 12px rgba(255, 255, 255, .6) inset;
   backdrop-filter: blur(18px) saturate(1.12);
   -webkit-backdrop-filter: blur(18px) saturate(1.12);
   transform: translate(-50%, -50%);
@@ -1624,12 +1624,12 @@ const login = async () => {
   display: grid;
   place-items: center;
   flex: 0 0 76px;
-  border: 10px solid rgba(122, 197, 246, .2);
+  border: 10px solid rgba(var(--skin-brand-soft-rgb, 122, 197, 246), 0.2);
   border-radius: 50%;
-  background: linear-gradient(145deg, #27a6ff, #087cf0);
+  background: linear-gradient(145deg, var(--skin-brand, #27a6ff), var(--skin-brand, #087cf0));
   color: #fff;
   font-size: 30px;
-  box-shadow: 0 8px 20px rgba(8, 124, 240, .2);
+  box-shadow: 0 8px 20px rgba(var(--skin-brand-rgb, 8, 124, 240), 0.2);
 }
 
 .success-feedback-copy {
@@ -1640,14 +1640,14 @@ const login = async () => {
 }
 
 .success-feedback-copy strong {
-  color: #172b43;
+  color: var(--skin-brand-strong, #172b43);
   font-size: 27px;
   line-height: 1.15;
   font-weight: 800;
 }
 
 .success-feedback-copy small {
-  color: #6685a4;
+  color: var(--skin-muted, #6685a4);
   font-size: 14px;
   line-height: 1.45;
 }

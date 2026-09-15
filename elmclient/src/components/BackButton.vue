@@ -31,14 +31,14 @@ export default {
   justify-content: center;
   cursor: pointer;
   background: #fff;
-  color: #167bc0;
-  border: 1px solid #d7e8f6;
+  color: var(--skin-brand, #167bc0);
+  border: 1px solid var(--skin-border, #d7e8f6);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(31, 93, 145, .08);
+  box-shadow: 0 2px 8px rgba(var(--skin-brand-strong-rgb, 31, 93, 145), 0.08);
   user-select: none;
   z-index: 1005;
   font-size: 16px;
 }
-.back-button:hover { background: #f1f8ff; color: #0097ff; }
+.back-button:hover { background: var(--skin-surface, #f1f8ff); color: var(--skin-brand, #0097ff); }
 .back-arrow { font-family: Arial, sans-serif; font-size: 30px; line-height: 1; transform: translateY(-1px); }
 </style>

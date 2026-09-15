@@ -111,8 +111,8 @@ onMounted(load);
   display: inline-block;
   border-radius: 4px;
   padding: 2px 7px;
-  background: #e7f4ff;
-  color: #0879c6;
+  background: var(--skin-surface, #e7f4ff);
+  color: var(--skin-brand, #0879c6);
   font-size: 13px;
 }
 h2 {
