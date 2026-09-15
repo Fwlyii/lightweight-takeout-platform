@@ -1,83 +1,101 @@
 # 轻量外卖平台
 
-基于 Vue 3、Spring Boot 3、MyBatis 和 MySQL 8 的课程实践项目，提供顾客、商家、骑手和管理员四个工作端。
+这是一个面向校园点餐场景的外卖系统，包含顾客、商家、骑手和管理员四个端。顾客可以浏览店铺、选择外送或到店自取；商家负责接单和备餐，骑手完成配送，管理员处理账号审核和平台管理。系统还提供 AI 辅助点餐、优惠券、积分和消息通知等功能。
 
-## 评测入口
+前端使用 Vue 3，后端使用 Spring Boot 3 和 MyBatis，数据库使用 MySQL 8。
 
-- 提交分支：`main`，包含完整项目源码、测试和文档。
-- [需求规格说明书（SRS）](docs/SRS.pdf)
-- [部署文档：本地部署与公网访问](docs/DEPLOYMENT.md)
-- [公网演示网站](https://elm-demo.pages.dev/index)
+[在线体验](https://elm-demo.pages.dev/index) · [本地部署](docs/DEPLOYMENT.md) · [需求规格说明书](docs/SRS.pdf)
 
-## 目录结构
+## 先运行起来
 
-```text
-elmclient/                    Vue 3 前端
-  src/views/                  四个角色的页面
-  src/components/             公共组件
-  src/composables/            页面状态与交互逻辑
-  src/services/               API 请求封装
-  src/router/                 路由与访问控制
-  src/utils/                  通用工具与规则
-  tests/                      前端回归测试
-elm_bk/                       Spring Boot 后端
-  src/main/java/              Controller、Service、Mapper 等业务代码
-  src/main/resources/         应用配置和 MyBatis 映射
-  src/test/                   后端测试及隔离数据
-  db/schema/                  完整数据库结构
-  db/seeds/                   本地演示数据
-  db/migrations/              已有数据库增量迁移
-docs/                         评测文档
-  SRS.pdf                     需求规格说明书
-  DEPLOYMENT.md               本地部署流程与公网链接
-  source/                     SRS 的 LaTeX 源码及配图
-deploy/                       部署模板
-scripts/                      环境初始化、部署和检查脚本
-docker-compose.demo.yml       本地前端、后端、数据库运行配置
-```
-
-## 主要功能
-
-- 顾客：浏览商家与菜品、购物车、地址管理、外送或自取、支付、取消订单、收藏、评价、个人资产。
-- 商家：店铺与商品管理、库存和限购、接单与备餐、评价回复。
-- 骑手：申请与审核、接单、到店、取餐、送达及历史任务。
-- 管理员：用户管理、商家与骑手审核、配送调度及统计。
-- 智能辅助：文字、图片、语音点餐及推荐，外部能力按配置启用。
-
-跨店商品分别结算；自取无需配送地址且不收配送费。金额、库存、权限和订单状态以服务端校验为准。支付宝、微信为演示支付入口，尚未接入真实支付渠道，不要进行真实转账。
-
-## 开发与测试
-
-完整启动步骤、依赖、端口、演示账号和排错方式见[部署文档](docs/DEPLOYMENT.md)。
-
-安装 Node.js 20 和 JDK 17 后，可分别运行：
+推荐使用 Docker Compose。安装并启动 Docker 后，在仓库根目录执行：
 
 ```bash
-node scripts/check-repository.mjs
-bash scripts/check-architecture.sh
-npm --prefix elmclient ci
-npm --prefix elmclient test
-npm --prefix elmclient run build
-cd elm_bk
-./mvnw test
+# 生成本地配置，需要 zsh 和 OpenSSL
+zsh scripts/ensure-demo-env.sh
+
+# 构建并启动前端、后端和数据库
+docker compose -f docker-compose.demo.yml up -d --build
 ```
 
-业务测试使用隔离库和合成数据，不应在公网演示数据库中创建测试订单。自动化测试不能代替完整浏览器验收。
+启动完成后，打开 [http://localhost:18081/index](http://localhost:18081/index)。首次构建需要下载依赖，可能需要等待几分钟。
 
-Controller 负责 HTTP 参数，Service 负责业务和事务，Mapper 负责数据读写。接口文档由后端 OpenAPI 生成。接口通常返回 `success/code/data/message`，登录和当前用户接口保留各自约定格式。
+没有 zsh 的配置方法、各角色演示账号和常见问题都放在[部署文档](docs/DEPLOYMENT.md)中。只想体验系统，也可以直接打开上方的在线地址。
 
-## 文档维护
+## 可以体验什么
 
-需求正文位于 `docs/source/body/srs/`。安装包含中文支持的 TeX Live（XeLaTeX、latexmk）后，在 `docs/source` 执行 `make pdf`，输出 `docs/SRS.pdf`。配图及图源均保留在 `docs/source/figures/`。
+| 角色 | 主要功能 |
+| --- | --- |
+| 顾客 | 浏览和搜索商家、购物车、地址管理、外送与自取、支付、订单跟踪、收藏和评价 |
+| 商家 | 店铺资料、菜品与库存、接单、备餐、评价回复 |
+| 骑手 | 入驻申请、接单、到店取餐、配送与历史任务 |
+| 管理员 | 用户管理、商家与骑手审核、配送调度和统计 |
 
-README、部署文档、需求文档及其源码不包含具体组号、组员姓名或学号。更新 SRS 后应同时提交源码和生成的 PDF，并检查 PDF 元数据。
+建议先走一遍“顾客下单 → 模拟支付 → 商家接单 → 骑手配送 → 顾客确认收货”，再查看自取、取消订单和库存不足等情况。多角色操作时，可以使用不同浏览器或独立会话。
 
-图片来源与许可证：[菜品图片](elmclient/public/images/foods/SOURCES.txt)、[商家图片](elmclient/public/images/merchants/SOURCES.txt)。第三方素材署名不属于项目组员信息，应保留。
+AI 点餐支持文字、图片和语音入口，相关外部服务需要配置密钥。支付宝和微信目前是模拟支付，不会发起真实扣款。
 
-## 安全说明
+## 仓库导航
 
-- JWT、数据库和第三方密钥通过本地配置或部署环境变量提供，不提交真实密钥。
-- API 和 WebSocket 校验身份及资源归属，不能用隐藏网址代替权限控制。
-- 本地演示账号与数据库默认密码仅供隔离演示，不用于真实生产环境。
-- `APP_DEMO_ENABLED` 控制模拟支付、充值和免费会员；真实生产必须关闭，并接入支付平台服务端验证。
-- 数据库升级前先备份，不批量执行历史迁移，也不为更新代码而重置业务数据。
+```text
+elmclient/                    前端页面、组件和测试
+elm_bk/                       后端接口、业务逻辑、数据库脚本和测试
+docs/
+  SRS.pdf                     需求规格说明书
+  DEPLOYMENT.md               本地部署与公网访问
+  source/                     需求文档的 LaTeX 源码和配图
+scripts/
+  cloudflare-pages/           公网代理程序和配置示例
+  tests/                      部署脚本测试
+  *.sh / *.mjs                启动、部署和检查工具
+docker-compose.demo.yml       本地运行配置
+```
+
+### 从哪里开始读代码
+
+如果想了解点餐流程，可以先看前端的 [BusinessInfo.vue](elmclient/src/views/BusinessInfo.vue)、[Cart.vue](elmclient/src/views/Cart.vue) 和 [Payment.vue](elmclient/src/views/Payment.vue)，再看后端的 [OrderController.java](elm_bk/src/main/java/com/tju/elm_bk/controller/OrderController.java) 和 [OrderSubmissionService.java](elm_bk/src/main/java/com/tju/elm_bk/service/OrderSubmissionService.java)。
+
+前端的 `src/views/` 按页面组织，公共组件在 `src/components/`，接口封装在 `src/services/`，路由和登录访问控制在 `src/router/`。`auth-preview` 和 `profile-preview` 是登录、资料功能的独立联调入口，正常启动不用进入这些目录。
+
+后端按 Controller、Service、Mapper 分层，分别处理 HTTP 请求、业务逻辑和数据库访问。数据库结构在 `elm_bk/db/schema/`，本地演示数据在 `db/seeds/`，已有数据库的更新脚本在 `db/migrations/`。
+
+需求文档按功能和业务流程展开，适合对照代码阅读；其中的角色分析、订单状态和用例图可以帮助理解四个端之间的关系。
+
+## 开发和测试
+
+前端需要 Node.js 20：
+
+```bash
+cd elmclient
+npm ci
+npm run serve
+```
+
+后端需要 JDK 17 和可用的 MySQL。在 `elm_bk` 目录运行 `./mvnw spring-boot:run`；Windows 使用 `mvnw.cmd`。分开运行时需要配置数据库连接和 JWT 密钥，具体步骤见[部署文档](docs/DEPLOYMENT.md)。
+
+在仓库根目录可以运行以下检查：
+
+```bash
+# 前端测试
+npm --prefix elmclient test
+
+# 后端测试
+cd elm_bk
+./mvnw test
+cd ..
+
+# 目录、链接和代码约定检查
+node scripts/check-repository.mjs
+bash scripts/check-architecture.sh
+
+# 部署脚本测试（需要 zsh）
+node --test scripts/tests/*.test.mjs
+```
+
+后端测试使用独立测试数据库，不需要修改公网数据。修改数据库结构前请先备份，并查看对应迁移脚本的适用条件。
+
+## 修改文档
+
+需求正文在 `docs/source/body/srs/`，配图在 `docs/source/figures/`。安装支持中文的 TeX Live、XeLaTeX 和 latexmk 后，在 `docs/source` 运行 `make pdf` 即可重新生成 `docs/SRS.pdf`。
+
+本地配置文件 `.env` 不会提交到仓库。数据库密码、JWT 和外部服务密钥请保存在本地或部署平台的环境变量中。

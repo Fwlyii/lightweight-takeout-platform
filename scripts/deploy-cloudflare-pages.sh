@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="${0:A:h}"
 REPO_DIR="${SCRIPT_DIR:h}"
 BRANCH="${1:-main}"
-LOCAL_CONFIG="$REPO_DIR/deploy/cloudflare-pages/.env.local"
+LOCAL_CONFIG="$REPO_DIR/scripts/cloudflare-pages/.env.local"
 if [[ -f "$LOCAL_CONFIG" ]]; then
   source "$LOCAL_CONFIG"
 fi
@@ -25,7 +25,7 @@ if [[ -n "$BACKEND_ORIGIN" && ! "$BACKEND_ORIGIN" =~ '^https://[A-Za-z0-9.-]+(:[
   exit 1
 fi
 WRANGLER_VERSION="4.129.0"
-WORKER_TEMPLATE="$REPO_DIR/deploy/cloudflare-pages/_worker.template.js"
+WORKER_TEMPLATE="$REPO_DIR/scripts/cloudflare-pages/_worker.template.js"
 
 cd "$REPO_DIR"
 

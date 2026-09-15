@@ -9,11 +9,11 @@ const source = new URL('../deploy-cloudflare-pages.sh', import.meta.url);
 function runDeployment(origin, curlStatus = 0) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'elm-cloud-deploy-test-'));
   try {
-    for (const dir of ['scripts', 'deploy/cloudflare-pages', 'bin']) {
+    for (const dir of ['scripts', 'scripts/cloudflare-pages', 'bin']) {
       fs.mkdirSync(path.join(root, dir), { recursive: true });
     }
     fs.copyFileSync(source, path.join(root, 'scripts/deploy-cloudflare-pages.sh'));
-    fs.writeFileSync(path.join(root, 'deploy/cloudflare-pages/_worker.template.js'),
+    fs.writeFileSync(path.join(root, 'scripts/cloudflare-pages/_worker.template.js'),
       'const origin = "__BACKEND_ORIGIN__";');
     const log = path.join(root, 'commands.log');
     fs.writeFileSync(log, '');

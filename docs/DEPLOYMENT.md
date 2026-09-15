@@ -1,6 +1,6 @@
 # 部署文档
 
-本文前半部分说明如何从 `main` 分支在本地启动完整项目，后半部分给出当前公网评测入口。需求说明见 [SRS.pdf](SRS.pdf)。
+可以在本地运行完整系统，也可以直接访问文末的公网演示。下面先介绍本地部署，需求和业务流程见 [SRS.pdf](SRS.pdf)。
 
 ## 一、本地部署
 
@@ -130,6 +130,27 @@ docker compose -f docker-compose.demo.yml start
 | 登录失败 | 选择正确角色；确认数据库确实导入了演示种子，旧库密码可能不同 |
 | 语音、图片或地图不可用 | 检查可选配置、浏览器权限与服务额度 |
 
+### 9. 不使用 Docker 的开发方式
+
+单独启动前后端时，需要先准备 MySQL 8、Node.js 20 和 JDK 17。
+
+在新的本地数据库中，依次导入 `elm_bk/db/schema/elm_v2.sql`、`elm_bk/db/seeds/demo-seed.sql`、`rider-demo-seed.sql` 和 `demo-showcase-seed.sql`。再执行 `elm_bk/db/migrations/003_order_name_snapshot.sql` 和 `005_cart_order_remarks.sql`。这些步骤只用于新的本地环境，不要直接覆盖已有数据库。
+
+根据 `elm_bk/.env.example` 设置数据库连接、数据库账号密码和 `JWT_SECRET` 环境变量，并设置 `SERVER_PORT=18080`。Maven 不会自动读取 `.env`，需要在终端或 IDE 的运行配置中设置这些变量。在 `elm_bk` 目录执行：
+
+```bash
+./mvnw spring-boot:run
+```
+
+Windows 使用 `mvnw.cmd spring-boot:run`。另开一个终端，在 `elmclient` 目录执行：
+
+```bash
+npm ci
+npm run serve
+```
+
+前端开发地址以终端输出为准，默认端口为 `8080`；默认连接本机 `18080` 的后端。如果修改后端地址，可通过 `VUE_APP_API_BASE_URL` 配置前端连接。
+
 ## 二、公网访问
 
 当前唯一正式评测入口：
@@ -143,3 +164,17 @@ docker compose -f docker-compose.demo.yml start
 公网为课程演示环境，不接入真实支付。AI、图片、语音能力取决于部署配置、外部服务及可用额度。若公网暂时不可达，可按本文第一部分独立运行完整项目。
 
 `localhost` 地址仅供本地部署，不是公网评测入口；历史对比站和临时预览地址不用于本次提交。
+
+### 公网部署文件的用途
+
+`scripts/deploy-cloudflare-pages.sh` 用于发布前端。`scripts/cloudflare-pages/_worker.template.js` 是随前端一起发布的代理程序：将 `/api` 等请求转发给后端，同时处理页面刷新时的路由回退和浏览器安全响应头。它是运行代码，不是部署说明。
+
+需要维护公网版本时，将同目录的 `.env.example` 复制为 `.env.local`，填写 `PAGES_PROJECT`、`PUBLIC_DEMO_URL` 和 `BACKEND_ORIGIN`。当前站点使用 `PAGES_PROJECT=elm-demo`、`PUBLIC_DEMO_URL=https://elm-demo.pages.dev/index`；后端源站地址由维护者在本地配置，不需要评测人员填写。
+
+在安装 Node.js、zsh 和 curl，并通过 Wrangler 登录对应 Cloudflare 账号后，从仓库根目录执行：
+
+```bash
+./scripts/deploy-cloudflare-pages.sh main
+```
+
+设置 `BACKEND_ORIGIN` 后，脚本检查云端后端、构建前端并发布到已有 Pages 项目；这条命令不会更新 Railway 后端或数据库。不设置该值会使用本机 Docker 和临时隧道，仅适合本地演示分享。`.env.local` 只留在维护者本机，不提交到 Git。
