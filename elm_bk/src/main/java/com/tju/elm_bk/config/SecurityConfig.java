@@ -60,6 +60,10 @@ public class SecurityConfig {
                                 "/api/businesses/type/presentations", "/api/businesses/carousel",
                                 "/api/businesses/public/{id:[0-9]+}", "/api/foods/list",
                                 "/api/v1/reviews/public/business/{id:[0-9]+}").permitAll()
+                        // Aggregate store counters are also displayed in the merchant workspace;
+                        // customer-specific collections and mutations remain USER-only below.
+                        .requestMatchers(HttpMethod.GET, "/api/merchant/interaction/stats/{merchantId}")
+                                .hasAnyAuthority("USER", "BUSINESS", "ADMIN")
                         .requestMatchers("/api/carts/**", "/api/addresses/**", "/api/merchant/interaction/**", "/api/v1/assets/**",
                                 "/api/v1/preferences/**").hasAuthority("USER")
                         .anyRequest().authenticated())

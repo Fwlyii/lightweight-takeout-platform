@@ -24,32 +24,30 @@ public class FoodController {
     private final FoodService foodService;
 
     @GetMapping
-    @Operation(summary = "根据商家或订单获取商品列表",description = "老师测试用")
+    @Operation(summary = "根据商家或订单获取商品列表",description = "旧数据结构兼容接口", deprecated = true)
     public HttpResult<List<FoodVO>> getAllFoods(@RequestParam(required = false) Integer business, @RequestParam(required = false) Integer order) {
         return HttpResult.success(foodService.getFoodList(business,order));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "根据商家或订单获取商品列表",description = "老师测试用")
+    @Operation(summary = "根据商家或订单获取商品列表",description = "旧数据结构兼容接口", deprecated = true)
     public HttpResult<FoodVO> getAllFoods(@PathVariable Long id) {
         return HttpResult.success(foodService.getFoodById(id));
     }
 
     @PostMapping
-    @Operation(summary = "新增商品",description = "老师测试用")
+    @Operation(summary = "新增商品",description = "旧数据结构兼容接口", deprecated = true)
     @PreAuthorize("hasAnyAuthority('BUSINESS','ADMIN')")
     public HttpResult<FoodVO> addFood(@RequestBody FoodDTO foodDTO) {
         return HttpResult.success(foodService.addFood(foodDTO));
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "修改商品信息",description = "老师测试用")
+    @Operation(summary = "修改商品信息",description = "旧数据结构兼容接口", deprecated = true)
     @PreAuthorize("hasAnyAuthority('BUSINESS','ADMIN')")
     public HttpResult<FoodVO> modifyFood(@RequestBody FoodDTO foodDTO,@PathVariable Long id) {
         return HttpResult.success(foodService.updateFood(foodDTO,id));
     }
-
-
 
     @GetMapping("/list")
     @Operation(summary = "根据商家获取商品列表",description = "普通用户只能看到已上架的")
@@ -58,21 +56,21 @@ public class FoodController {
     }
 
     @PostMapping("/addItem")
-    @Operation(summary = "(前端用这个)商铺新增商品",description = "管理员可以随便添，商家只能为自己的商铺添")
+    @Operation(summary = "商铺新增商品",description = "校验当前身份及店铺归属")
     @PreAuthorize("hasAnyAuthority('BUSINESS','ADMIN')")
     public HttpResult<Long> addFoodItem(@RequestBody FoodCreateDTO foodCreateDTO) {
         return HttpResult.success(foodService.addFoodItem(foodCreateDTO));
     }
 
-    @GetMapping("/status")
+    @PatchMapping("/{foodId}/status")
     @Operation(summary = "上架/下架商品",description = "shelveStatus 0-下架 1-上架")
     @PreAuthorize("hasAnyAuthority('BUSINESS','ADMIN')")
-    public HttpResult<Long> setFoodShelveStatus(@RequestParam Long foodId,@RequestParam Integer shelveStatus) {
+    public HttpResult<Long> setFoodShelveStatus(@PathVariable Long foodId,@RequestParam Integer shelveStatus) {
         return HttpResult.success(foodService.setFoodStatus(foodId,shelveStatus));
     }
 
     @PostMapping("/modifyItem")
-    @Operation(summary = "(前端用这个)商铺修改商品",description = "管理员可以随便改，商家只能为自己的商铺改")
+    @Operation(summary = "商铺修改商品",description = "校验当前身份及店铺归属")
     @PreAuthorize("hasAnyAuthority('BUSINESS','ADMIN')")
     public HttpResult<Long> modifyFoodItem(@RequestBody FoodUpdateDTO foodUpdateDTO) {
         return HttpResult.success(foodService.modifyFoodMessage(foodUpdateDTO));
@@ -91,10 +89,10 @@ public class FoodController {
         return HttpResult.success(foodService.updateStock(update));
     }
 
-    @GetMapping("/delete")
+    @DeleteMapping("/{foodId}")
     @Operation(summary = "商家删除商品")
     @PreAuthorize("hasAnyAuthority('BUSINESS','ADMIN')")
-    public HttpResult<Long> setFoodShelveStatus(@RequestParam Long foodId) {
+    public HttpResult<Long> deleteFood(@PathVariable Long foodId) {
         return HttpResult.success(foodService.deleteFood(foodId));
     }
 

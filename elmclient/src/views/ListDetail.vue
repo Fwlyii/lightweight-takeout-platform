@@ -212,7 +212,7 @@ export default {
 
 		// 获取性别文本
 		const getGenderText = (gender) => {
-			return gender === 1 ? '先生' : gender === 2 ? '女士' : '';
+			return gender === 1 ? '先生' : gender === 0 ? '女士' : '';
 		};
 
 		// 格式化时间
@@ -229,36 +229,6 @@ export default {
 				return total + Number(item.foodPrice || 0) * Number(item.quantity || 0);
 			}, 0);
 		});
-
-		// 取消订单
-		const cancelOrder = async () => {
-			if (!confirm("确定要取消此订单吗？")) return;
-			
-			try {
-				const response = await request.post("/api/orders/cancel", { 
-					orderId: orderId.value 
-				});
-				
-				if (response.data.success) {
-					alert("订单取消成功");
-					// 重新加载订单详情
-					fetchOrderDetail();
-				} else {
-					alert("取消失败: " + response.data.message);
-				}
-			} catch (err) {
-				console.error("取消订单失败:", err);
-				alert("取消订单失败，请稍后重试");
-			}
-		};
-
-		// 支付订单
-		const payOrder = () => {
-			router.push({ 
-				path: "/payment", 
-				query: { orderId: orderId.value } 
-			});
-		};
 
 		onMounted(() => {
 			orderId.value = route.query.orderId;
@@ -286,8 +256,6 @@ export default {
 			getGenderText,
 			formatTime,
 			ORDER_STATUS,
-			cancelOrder,
-			payOrder,
 			router,
 			review,reviewRating,reviewContent,reviewSubmitting,reviewSection,submitReview
 		};

@@ -25,7 +25,7 @@ for attempt in {1..60}; do
 done
 [[ "$ready" == true ]] || { docker logs "$name"; exit 1; }
 sql() { docker exec -i "$name" mysql -uroot -psnapshot-test "$@"; }
-sql order_snapshot_test < "$repo/elm_bk/elm_v2.sql"
+sql order_snapshot_test < "$repo/elm_bk/db/schema/elm_v2.sql"
 migration="$repo/elm_bk/db/migrations/003_order_name_snapshot.sql"
 migration_status=0
 if [[ -f "$migration" ]]; then
@@ -49,7 +49,7 @@ else
 fi
 set +e
 docker run --rm --network "$name" \
-  -v "$repo/elm_bk:/workspace" -v "${MAVEN_CACHE:-/Users/chengwen/.m2}:/root/.m2" -w /workspace \
+  -v "$repo/elm_bk:/workspace" -v "${MAVEN_CACHE:-${HOME}/.m2}:/root/.m2" -w /workspace \
   maven:3.9.9-eclipse-temurin-17 mvn -Pcoverage \
   -Dtest=OrderNameSnapshotJourneyTest \
   "-Dsnapshot.test.jdbc-url=jdbc:mysql://$name:3306/order_snapshot_test?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8" \

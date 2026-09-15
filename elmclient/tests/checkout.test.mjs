@@ -101,7 +101,6 @@ test('account pages use implemented current-profile and admin-only endpoints', a
   const [merchant, admin, users] = await Promise.all([read('MerchantProfile.vue'), read('AdminHome.vue'), read('AdminUser.vue')]);
   assert.match(merchant, /request.get\('\/api\/user'\)/);
   assert.match(admin, /request.get\('\/api\/user'\)/);
-  assert.match(users, /request.get\('\/api\/admin\/users'/);
-  assert.match(users, /\/api\/admin\/users\/\$\{userId\}\/status/);
+  assert.match(users, /useAdminAccounts/);
   assert.doesNotMatch(merchant + admin + users, /\/api\/persons|\/api\/personInfo|\/api\/person'/);
 });

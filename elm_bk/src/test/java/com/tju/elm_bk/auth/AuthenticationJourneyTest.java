@@ -107,8 +107,8 @@ class AuthenticationJourneyTest {
     void registrationCanBeFollowedByARealLoginAndAuthenticatedRequest() throws Exception {
         register(registration()).andExpect(status().isOk());
         String token = successfulLogin("new_user", "user");
-        mvc.perform(get("/httpRest/success").header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.success").value(true));
+        mvc.perform(get("/api/user").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.username").value("new_user"));
     }
 
     @Test
@@ -256,7 +256,7 @@ class AuthenticationJourneyTest {
         seedAccount("revoked", true, "USER");
         String token = successfulLogin("revoked", "user");
         jdbc.update("UPDATE users SET activated = 0 WHERE username = 'revoked'");
-        mvc.perform(get("/httpRest/success").header("Authorization", "Bearer " + token))
+        mvc.perform(get("/api/user").header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -266,7 +266,7 @@ class AuthenticationJourneyTest {
         String token = Jwts.builder().setSubject("expired").claim("auth", "USER")
                 .claim("session_role", "user").setExpiration(new Date(1))
                 .signWith(Keys.hmacShaKeyFor(signingKey.getBytes(StandardCharsets.UTF_8))).compact();
-        mvc.perform(get("/httpRest/success").header("Authorization", "Bearer " + token))
+        mvc.perform(get("/api/user").header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnauthorized());
     }
 

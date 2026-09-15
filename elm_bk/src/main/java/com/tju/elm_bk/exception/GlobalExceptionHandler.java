@@ -26,6 +26,25 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler({org.springframework.web.servlet.resource.NoResourceFoundException.class,
+            org.springframework.web.servlet.NoHandlerFoundException.class})
+    public ResponseEntity<HttpResult<Object>> notFoundHandler(Exception ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(HttpResult.failure("NOT_FOUND", "请求的资源不存在"));
+    }
+
+    @ExceptionHandler(org.springframework.web.HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<HttpResult<Object>> unsupportedMediaTypeHandler(Exception ex) {
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .body(HttpResult.failure("UNSUPPORTED_MEDIA_TYPE", "请求内容类型不受支持"));
+    }
+
+    @ExceptionHandler({jakarta.validation.ConstraintViolationException.class,
+            org.springframework.web.method.annotation.HandlerMethodValidationException.class})
+    public ResponseEntity<HttpResult<Object>> invalidParameterHandler(Exception ex) {
+        return ResponseEntity.badRequest().body(HttpResult.failure(ResultCodeEnum.PARAM_VERIFIED_FAILED));
+    }
+
     @ExceptionHandler(MissingServletRequestPartException.class)
     public ResponseEntity<HttpResult<Object>> missingPartHandler(MissingServletRequestPartException ex) {
         return ResponseEntity.badRequest().body(HttpResult.failure(ResultCodeEnum.PARAM_NOT_MATCHED_POST));

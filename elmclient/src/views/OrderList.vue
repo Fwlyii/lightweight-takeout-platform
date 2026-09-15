@@ -162,8 +162,8 @@ export default {
         if (response.success) {
           orderArr.value = response.data || [];
         } else {
-          console.error('获取订单列表失败:', response.data.message);
-          if (!silent) toast.error('获取订单列表失败: ' + response.data.message);
+          console.error('获取订单列表失败:', response.message);
+          if (!silent) toast.error('获取订单列表失败: ' + response.message);
         }
       } catch (error) {
         console.error("请求订单列表失败:", error);

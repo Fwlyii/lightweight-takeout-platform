@@ -31,11 +31,11 @@
     <div class="likes-collections">
       <div class="icon-item">
         <i class="fa fa-thumbs-up"></i>
-        <span>点赞: {{ favoriteCount.likeCount }}</span>
+        <span>点赞: {{ favoriteCount.likeCount ?? '—' }}</span>
       </div>
       <div class="icon-item">
         <i class="fa fa-bookmark"></i>
-        <span>收藏: {{ favoriteCount.collectCount }}</span>
+        <span>收藏: {{ favoriteCount.collectCount ?? '—' }}</span>
       </div>
     </div>
 
@@ -874,13 +874,13 @@ export default {
     // 上架/下架商品
     const shelveFood = (id, shelveStatus, index) => {
       const newStatus = shelveStatus === 0 ? 1 : 0;
-      request.get(`/api/foods/status?foodId=${id}&shelveStatus=${newStatus}`)
+      request.patch(`/api/foods/${id}/status`, null, { params: { shelveStatus: newStatus } })
         .then((response) => {
           if (response.success) {
             foodArr.value[index].shelveStatus = newStatus;
             Swal.fire(shelveStatus == 0 ? '上架成功' : '下架成功');
-          }
-        });
+          } else throw new Error(response.message || '商品状态更新失败');
+        }).catch(error => Swal.fire('操作失败', error.response?.data?.message || error.message || '请稍后重试', 'error'));
     };
 
     // 删除商品
@@ -896,13 +896,13 @@ export default {
         cancelButtonText: '取消'
       }).then((result) => {
         if (result.isConfirmed) {
-          request.get(`/api/foods/delete?foodId=${id}`)
+          request.delete(`/api/foods/${id}`)
             .then((response) => {
               if (response.success) {
                 foodArr.value.splice(index, 1);
                 Swal.fire('删除成功');
-              }
-            });
+              } else throw new Error(response.message || '删除商品失败');
+            }).catch(error => Swal.fire('删除失败', error.response?.data?.message || error.message || '请稍后重试', 'error'));
         }
       });
     };

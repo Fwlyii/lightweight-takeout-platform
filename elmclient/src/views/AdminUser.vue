@@ -2,6 +2,7 @@
     <div class="manage-user-container">
         <div class="container">
             <div class="top-background">
+                <button type="button" @click="goBack">返回</button>
                 <h1>用户管理</h1>
             </div>
 
@@ -28,8 +29,9 @@
                 </div>
             </div>
 
+            <p v-if="loading" role="status">正在加载用户…</p>
             <div class="user-list">
-                <div v-for="user in filteredUsers" :key="user.userId" class="user-item">
+                <div v-for="user in users" :key="user.userId" class="user-item">
                     <div class="user-avatar">
                         <i class="fas fa-user"></i>
                     </div>
@@ -53,14 +55,14 @@
                         <button class="action-btn" :class="{
                             'enable-btn': user.disabled,
                             'disable-btn': !user.disabled
-                        }" @click="toggleUserStatus(user)">
+                        }" :disabled="updating" @click="toggleUserStatus(user)">
                             {{ user.disabled ? '启用' : '禁用' }}
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div v-if="filteredUsers.length === 0" class="empty-state">
+            <div v-if="!loading && users.length === 0" class="empty-state">
                 <i class="fas fa-users"></i>
                 <p>暂无用户数据</p>
             </div>
@@ -76,7 +78,7 @@
                         <p>确定要{{ selectedUser?.disabled ? '启用' : '禁用' }}用户 "{{ selectedUser?.username }}" 吗？</p>
                     </div>
                     <div class="modal-footer">
-                        <button class="modal-btn confirm-btn" @click="confirmToggle">确认</button>
+                        <button class="modal-btn confirm-btn" :disabled="updating" @click="confirmToggle">{{ updating ? '处理中…' : '确认' }}</button>
                         <button class="modal-btn cancel-btn" @click="showConfirmModal = false">取消</button>
                     </div>
                 </div>
@@ -86,157 +88,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { useAdminAccounts } from '../composables/useAdminAccounts';
+import adminAccounts from '../services/adminAccountService';
+import { toast } from '../utils/toast';
 import { useRoute, useRouter } from 'vue-router';
 import { navigateBack } from '../utils/backNavigation';
-import request from '../utils/request';
-import { toast } from '../utils/toast';
-
-// 路由实例
-const router = useRouter();
-const route = useRoute();
-
-// 状态定义（完全对应原data）
-const searchKeyword = ref('');
-const activeFilter = ref('all');
-const showConfirmModal = ref(false);
-const selectedUser = ref(null);
-const users = ref([]);
-
-// 计算属性（保持原逻辑）
-const filteredUsers = computed(() => {
-    let filtered = users.value;
-
-    // 按状态过滤
-    if (filterStatus.value === 1) {
-        filtered = filtered.filter(user => !user.disabled);
-    } else if (filterStatus.value === 2) {
-        filtered = filtered.filter(user => user.disabled);
-    }
-
-    // 按关键词搜索
-    if (searchKeyword.value) {
-        const keyword = searchKeyword.value.toLowerCase();
-        filtered = filtered.filter(user =>
-            user.username.toLowerCase().includes(keyword) ||
-            user.phone.includes(keyword) ||
-            user.email.toLowerCase().includes(keyword)
-        );
-    }
-
-    return filtered;
-});
-
-const filterStatus = computed(() => {
-    return activeFilter.value === 'all' ? 0 :
-        activeFilter.value === 'enabled' ? 1 : 2;
-});
-
-const getPersonList = async () => {
-    try {
-        const res = await request.get('/api/admin/users', {
-            params: { status: filterStatus.value, keyword: searchKeyword.value }
-        });
-
-        if (res.success) {
-            // 正确赋值给 Vue3 的响应式变量
-            users.value = res.data.map(item => ({
-                userId: item.id,
-                username: item.username,
-                phone: item.phone || '未填写',
-                email: item.email || '未填写',
-                disabled: !item.activated,
-                registerDate: formatDate(item.createTime),
-                photo: item.photo || ''
-            }));
-        } else {
-            toast.error(`获取失败：${res.message}`);
-        }
-    } catch (error) {
-        console.error('获取用户列表失败：', error);
-        // 区分网络错误和接口错误
-        if (error.response) {
-            toast.error(`接口错误：${error.response.status} ${error.response.statusText}`);
-        } else if (error.request) {
-            toast.error('网络错误，无法连接到服务器');
-        } else {
-            toast.error('请求失败：' + error.message);
-        }
-    }
-};
-
-const handleSearch = async () => {
-    try {
-        const res = await request.get('/api/admin/users', {
-            params: { keyword: searchKeyword.value, status: filterStatus.value }
-        });
-        if (res.success) {
-            users.value = res.data.map(item => ({
-                userId: item.id,
-                username: item.username,
-                phone: item.phone || '未填写',
-                email: item.email || '未填写',
-                disabled: !item.activated,
-                registerDate: formatDate(item.createTime),
-                photo: item.photo || ''
-            }));
-        }
-    } catch (error) {
-        console.error('搜索用户失败：', error);
-        toast.error('搜索失败，请重试');
-    }
-};
-
-const confirmToggle = async () => {
-    if (!selectedUser.value) return;
-
-    try {
-        const userId = selectedUser.value.userId;
-        const targetActivated = selectedUser.value.disabled;
-
-        const result = await request.put(`/api/admin/users/${userId}/status`, null, {
-            params: { activated: targetActivated }
-        });
-
-        if (!result.success) throw new Error(result.message || '操作失败');
-
-        selectedUser.value.disabled = !selectedUser.value.disabled;
-        showConfirmModal.value = false;
-        toast.success(`用户已${selectedUser.value.disabled ? '禁用' : '启用'}`);
-    } catch (error) {
-        console.error('切换用户状态失败：', error);
-        toast.error(error.response?.data?.message || error.message || '操作失败，请重试');
-    }
-};
-
-const formatDate = (dateStr) => {
-    if (!dateStr) return '未知时间';
-    const date = new Date(dateStr);
-    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-};
-
-const goBack = () => {
-    return navigateBack(router, route);
-};
-
-const setFilter = (filter) => {
-    activeFilter.value = filter;
-    getPersonList();
-};
-
-const toggleUserStatus = (user) => {
-    selectedUser.value = user;
-    showConfirmModal.value = true;
-};
-
-const setActiveNav = (navKey) => {
-    activeNav.value = navKey;
-};
-
-// 页面挂载时执行
-onMounted(() => {
-    getPersonList();
-});
+const router = useRouter(), route = useRoute();
+const goBack = () => navigateBack(router, route);
+const { searchKeyword, activeFilter, users, selectedUser, showConfirmModal, loading, updating,
+    handleSearch, setFilter, toggleUserStatus, confirmToggle } = useAdminAccounts(adminAccounts, toast);
 </script>
 
 <style scoped>

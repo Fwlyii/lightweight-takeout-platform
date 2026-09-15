@@ -25,25 +25,22 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    @Operation(summary = "获取用户订单列表",description = "老师测试用")
+    @Operation(summary = "获取用户订单列表",description = "旧数据结构兼容接口", deprecated = true)
     public HttpResult<List<OrderVO>> listOrdersByUserId (Long userId) {
         return HttpResult.success(orderService.getCustomerOrderList(userId));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "根据id获取用户订单",description = "老师测试用")
+    @Operation(summary = "根据id获取用户订单",description = "旧数据结构兼容接口", deprecated = true)
     public HttpResult<OrderVO> getOrderById(@PathVariable Long id) {
         return HttpResult.success(orderService.getOrderById(id));
     }
 
     @PostMapping
-    @Operation(summary = "新增订单",description = "老师测试用")
+    @Operation(summary = "新增订单",description = "旧数据结构兼容接口", deprecated = true)
     public HttpResult<OrderVO> addOrders(@RequestBody OrderDTO orderDTO) {
         return HttpResult.success(orderService.addOrder(orderDTO));
     }
-
-
-
 
     @GetMapping("/list/business")
     @Operation(summary = "根据商家和状态获取订单列表")
@@ -88,14 +85,15 @@ public class OrderController {
     }
 
     private List<Long> parseFoodIds(String foodIds) {
-        if (foodIds == null || foodIds.trim().isEmpty()) return null;
+        if (foodIds == null) return null;
         if (foodIds.length() > 2000) throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
         try {
-            List<Long> ids = Arrays.stream(foodIds.split(","))
+            List<Long> ids = Arrays.stream(foodIds.split(",", -1))
                     .map(String::trim)
-                    .filter(value -> !value.isEmpty())
-                    .map(Long::valueOf)
-                    .filter(id -> id > 0)
+                    .map(value -> {
+                        if (!value.matches("[1-9][0-9]*")) throw new NumberFormatException("invalid item id");
+                        return Long.valueOf(value);
+                    })
                     .distinct()
                     .collect(Collectors.toList());
             if (ids.isEmpty()) throw new NumberFormatException("empty");
@@ -105,7 +103,5 @@ public class OrderController {
             throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
         }
     }
-
-
 
 }

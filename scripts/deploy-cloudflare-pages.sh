@@ -5,7 +5,20 @@ set -euo pipefail
 SCRIPT_DIR="${0:A:h}"
 REPO_DIR="${SCRIPT_DIR:h}"
 BRANCH="${1:-main}"
-PAGES_PROJECT="elm-demo"
+LOCAL_CONFIG="$REPO_DIR/deploy/cloudflare-pages/.env.local"
+if [[ -f "$LOCAL_CONFIG" ]]; then
+  source "$LOCAL_CONFIG"
+fi
+PAGES_PROJECT="${PAGES_PROJECT:-}"
+PUBLIC_DEMO_URL="${PUBLIC_DEMO_URL:-}"
+if [[ -z "$PAGES_PROJECT" || ! "$PAGES_PROJECT" =~ '^[a-z0-9][a-z0-9-]*$' ]]; then
+  print -u2 "请在本地配置或环境变量中显式设置合法的 PAGES_PROJECT。"
+  exit 1
+fi
+if [[ -n "$PUBLIC_DEMO_URL" && "$PUBLIC_DEMO_URL" != https://* ]]; then
+  print -u2 "PUBLIC_DEMO_URL 必须使用 HTTPS。"
+  exit 1
+fi
 WRANGLER_VERSION="4.129.0"
 WORKER_TEMPLATE="$REPO_DIR/deploy/cloudflare-pages/_worker.template.js"
 
@@ -96,7 +109,8 @@ npm --cache "$WRANGLER_NPM_CACHE" exec --yes "wrangler@$WRANGLER_VERSION" -- \
   --commit-dirty=true
 
 if [[ "$BRANCH" == "main" ]]; then
-  print "固定演示地址：https://elm-demo.whliugong.xyz"
+  [[ -z "$PUBLIC_DEMO_URL" ]] || print "演示地址：$PUBLIC_DEMO_URL"
+  print "正式分支发布完成，访问地址也可查看上方 Wrangler 输出。"
 else
   print "这是预览部署，不会覆盖固定演示地址。"
 fi

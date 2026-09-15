@@ -22,7 +22,7 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping
-    @Operation(summary = "向购物车添加商品",description = "老师测试用")
+    @Operation(summary = "向购物车添加商品（旧数据结构兼容接口）", deprecated = true)
     public HttpResult<CartVO> addCartItem(@RequestBody CartItemCreateDTO cartItemCreateDTO) {
         return HttpResult.success(cartService.addCart(cartItemCreateDTO));
     }
@@ -35,20 +35,8 @@ public class CartController {
 
     @GetMapping("/list")
     @Operation(summary = "获取当前用户购物车，可按商家筛选")
-    public HttpResult<List<CartItemVO>> addCartItem(@RequestParam(required = false) Long businessId) {
+    public HttpResult<List<CartItemVO>> listItems(@RequestParam(required = false) Long businessId) {
         return HttpResult.success(cartService.getCartItemList(businessId));
-    }
-
-    @GetMapping("/add")
-    @Operation(summary = "向购物车添加商品（兼容旧版客户端）")
-    public HttpResult<Long> addCartItem(@RequestParam Long foodId, @RequestParam Integer quantity) {
-        return HttpResult.success(cartService.addItem(foodId, quantity));
-    }
-
-    @GetMapping("/quantity")
-    @Operation(summary = "修改购物车指定商品数量（兼容旧版客户端）",description = "quantity传0时移除该条记录")
-    public HttpResult<Long> updateItemQuantity(@RequestParam Long cartId, @RequestParam Integer quantity) {
-        return HttpResult.success(cartService.updateItem(cartId,quantity));
     }
 
     @PutMapping("/{cartId}")
@@ -57,16 +45,10 @@ public class CartController {
         return HttpResult.success(cartService.updateItem(cartId, quantity));
     }
 
-    @GetMapping("/clear")
+    @DeleteMapping
     @Operation(summary = "清空用户在指定商家的购物车")
-    public HttpResult<Long> updateItemQuantity(@RequestParam Long businessId) {
+    public HttpResult<Long> clearCart(@RequestParam Long businessId) {
         return HttpResult.success(cartService.clearCart(businessId));
-    }
-
-    @GetMapping("/remove")
-    @Operation(summary = "移除指定购物车商品")
-    public HttpResult<Long> removeItem(@RequestParam Long cartId) {
-        return HttpResult.success(cartService.removeItem(cartId));
     }
 
     @DeleteMapping("/{cartId}")

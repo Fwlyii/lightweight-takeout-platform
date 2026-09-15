@@ -47,3 +47,7 @@ application-local.yaml
 /runtime-uploads/
 elmclient/dist-profile/
 elmclient/dist/
+
+### Personal working records (existing files remain local) ###
+/RECORDS/
+/RECORDS.zip

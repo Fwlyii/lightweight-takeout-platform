@@ -141,9 +141,9 @@ class OrderNameSnapshotJourneyTest {
         long orderId = submit("pickup", "unavailable");
         renameFood(FOOD, NEW_NAME, "35.00");
         if ("delete".equals(action)) {
-            as("merchant", get("/api/foods/delete").param("foodId", "" + FOOD)).andExpect(status().isOk());
+            as("merchant", delete("/api/foods/" + FOOD)).andExpect(status().isOk());
         } else {
-            as("merchant", get("/api/foods/status").param("foodId", "" + FOOD)
+            as("merchant", patch("/api/foods/" + FOOD + "/status")
                     .param("shelveStatus", "0")).andExpect(status().isOk());
         }
 
@@ -202,7 +202,7 @@ class OrderNameSnapshotJourneyTest {
         jdbc.update("INSERT INTO orderdetailet(order_id,food_id,food_price,quantity,is_deleted) VALUES (9001,1001,20,1,0)");
         if (!"unchanged".equals(menuState)) renameFood(FOOD, NEW_NAME, "35.00");
         if ("deleted".equals(menuState)) {
-            as("merchant", get("/api/foods/delete").param("foodId", "" + FOOD)).andExpect(status().isOk());
+            as("merchant", delete("/api/foods/" + FOOD)).andExpect(status().isOk());
         }
 
         assertAll(

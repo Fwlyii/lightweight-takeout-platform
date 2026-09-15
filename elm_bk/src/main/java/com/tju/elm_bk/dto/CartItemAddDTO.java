@@ -13,6 +13,7 @@ import lombok.Data;
 @Data
 public class CartItemAddDTO {
     @NotNull
+    @Min(1)
     @Schema(description = "商品 ID", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long foodId;
 

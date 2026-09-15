@@ -157,9 +157,9 @@ class AuthenticationHardeningTest {
     void applicantTokenCannotBeReusedAfterApproval() throws Exception {
         register("candidate", "13900000001");
         String token = login("candidate", "rider");
-        mvc.perform(get("/httpRest/success").header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+        mvc.perform(get("/api/user").header("Authorization", "Bearer " + token)).andExpect(status().isOk());
         jdbc.update("INSERT INTO user_authority SELECT id, 'RIDER' FROM users WHERE username='candidate'");
-        mvc.perform(get("/httpRest/success").header("Authorization", "Bearer " + token)).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/user").header("Authorization", "Bearer " + token)).andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -167,7 +167,7 @@ class AuthenticationHardeningTest {
         register("deleted", "13900000001");
         String token = login("deleted", "user");
         jdbc.update("UPDATE users SET is_deleted=1 WHERE username='deleted'");
-        mvc.perform(get("/httpRest/success").header("Authorization", "Bearer " + token)).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/user").header("Authorization", "Bearer " + token)).andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -175,7 +175,7 @@ class AuthenticationHardeningTest {
         register("updated", "13900000001");
         String token = login("updated", "user");
         jdbc.update("UPDATE users SET update_time=TIMESTAMP '2099-01-01 00:00:00' WHERE username='updated'");
-        mvc.perform(get("/httpRest/success").header("Authorization", "Bearer " + token)).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/user").header("Authorization", "Bearer " + token)).andExpect(status().isUnauthorized());
     }
 
     private void raceRegistrations(boolean sameUsername) throws Exception {
