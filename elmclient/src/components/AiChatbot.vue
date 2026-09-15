@@ -34,7 +34,7 @@ const openAssistant = () => { drawerOpen.value = true }
 <style scoped>
 .ai-chat-launcher {
   position: fixed;
-  right: max(20px, calc((100vw - 600px) / 2 - 112px));
+  right: max(20px, calc((100vw - var(--app-width, 600px)) / 2 + 20px));
   bottom: 94px;
   z-index: 40;
   min-width: 108px;
@@ -51,6 +51,7 @@ const openAssistant = () => { drawerOpen.value = true }
   cursor: pointer;
   overflow: visible;
   isolation: isolate;
+  transform-origin: right center;
   transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
   animation:
     launcher-enter .42s cubic-bezier(.22, .72, .28, 1) both,
@@ -146,7 +147,6 @@ const openAssistant = () => { drawerOpen.value = true }
 
 @media (max-width: 760px) {
   .ai-chat-launcher {
-    right: 14px;
     bottom: 82px;
     min-width: 50px;
     width: 50px;
