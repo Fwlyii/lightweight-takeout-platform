@@ -19,6 +19,7 @@
     "font-awesome": "^4.7.0",
     "sweetalert2": "^11.23.0",
     "vue": "^3.2.13",
+    "vue-countup-v3": "^1.4.2",
     "vue-router": "^4.4.3",
     "vue3-lottie": "^3.3.1"
   },

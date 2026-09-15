@@ -64,15 +64,15 @@
     <section class="metric-grid" aria-label="核心指标">
       <article class="metric-card metric-users">
         <span class="metric-icon"><i class="fa fa-users" aria-hidden="true"></i></span>
-        <div><h2>总用户人数</h2><strong>{{ formatInteger(userCount) }}</strong><p><i class="fa fa-arrow-up"></i> {{ userGrowthText }}</p><small>较上期变化</small></div>
+        <div><h2>总用户人数</h2><strong aria-live="polite"><CountUp v-if="userCount !== null" :end-val="Number(userCount)" :duration="1.8" :decimal-places="0" /><span v-else>—</span></strong><p><i class="fa fa-arrow-up"></i> {{ userGrowthText }}</p><small>较上期变化</small></div>
       </article>
       <article class="metric-card metric-shops">
         <span class="metric-icon"><i class="fa fa-shopping-basket" aria-hidden="true"></i></span>
-        <div><h2>总店铺数</h2><strong>{{ formatInteger(shopCount) }}</strong><p><i class="fa fa-arrow-up"></i> {{ shopGrowthText }}</p><small>较上期变化</small></div>
+        <div><h2>总店铺数</h2><strong aria-live="polite"><CountUp v-if="shopCount !== null" :end-val="Number(shopCount)" :duration="1.8" :decimal-places="0" /><span v-else>—</span></strong><p><i class="fa fa-arrow-up"></i> {{ shopGrowthText }}</p><small>较上期变化</small></div>
       </article>
       <article class="metric-card metric-revenue">
         <span class="metric-icon"><i class="fa fa-bar-chart" aria-hidden="true"></i></span>
-        <div><h2>总营业额</h2><strong>¥{{ formatAmount(totalRevenue) }}</strong><p><i class="fa fa-arrow-up"></i> {{ revenueGrowthText }}</p><small>较上期变化</small></div>
+        <div><h2>总营业额</h2><strong aria-live="polite">¥<CountUp v-if="totalRevenue !== null" :end-val="Number(totalRevenue)" :duration="1.8" :decimal-places="1" /><span v-else>0.0</span></strong><p><i class="fa fa-arrow-up"></i> {{ revenueGrowthText }}</p><small>较上期变化</small></div>
       </article>
     </section>
 
@@ -170,6 +170,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import CountUp from 'vue-countup-v3';
 import { Vue3Lottie } from 'vue3-lottie';
 import request from '../utils/request';
 import { toast } from '../utils/toast';
@@ -519,6 +520,7 @@ const handleImageError = (event) => {
 @media (max-width: 560px) { .hero-panel { min-height: 178px; padding-inline: 20px; }.hero-panel h1 { margin-top: 28px; font-size: 27px; }.hero-line { right: 48px; bottom: 25px; }.hero-line::after { font-size: 16px; }.profile-panel { min-height: 151px; margin-inline: 12px; padding: 17px 13px; gap: 11px; }.profile-avatar { width: 76px; height: 76px; }.profile-name-row { gap: 6px; }.profile-name-row strong { max-width: 112px; font-size: 18px; }.role-badge { padding: 5px 7px; font-size: 11px; }.profile-copy p { font-size: 13px; }.profile-copy .profile-meta { font-size: 11px; }.profile-note { right: 9px; bottom: 15px; font-size: 11px; }.profile-note i { font-size: 25px; }.dashboard-panel { margin-inline: 12px; padding-inline: 15px; }.date-row { grid-template-columns: auto minmax(0,1fr) auto minmax(0,1fr); gap: 7px; }.filter-label,.date-separator { font-size: 15px; }.date-input input { min-height: 44px; padding-left: 8px; padding-right: 28px; font-size: 13px; }.date-input i { top: 14px; right: 8px; }.filter-actions { gap: 9px; }.filter-actions button { min-height: 44px; font-size: 15px; }.filter-summary { font-size: 14px; }.metric-grid { gap: 8px; margin-inline: 12px; }.metric-card { display: block; min-height: 178px; padding: 14px 8px; text-align: center; }.metric-icon { width: 100%; height: 34px; margin-bottom: 8px; font-size: 25px; }.metric-card h2 { margin-bottom: 12px; font-size: 13px; }.metric-card strong { font-size: 22px; }.metric-card p { margin-top: 14px; font-size: 13px; }.metric-card small { font-size: 11px; }.section-heading h2 { font-size: 19px; }.range-switch button { min-height: 34px; padding-inline: 8px; font-size: 12px; }.chart-panel { min-height: 260px; }.chart-wrap { height: 165px; }.overview-grid span { font-size: 11px; }.overview-grid strong { font-size: 18px; }.review-tabs button { min-height: 62px; font-size: 17px; }.review-content { padding-inline: 15px; } }
 @media (max-width: 380px) { .profile-note { display: none; }.date-row { gap: 5px; }.filter-label,.date-separator { font-size: 13px; }.metric-card strong { font-size: 19px; }.metric-card h2 { font-size: 12px; }.overview-grid { padding-inline: 0; }.overview-grid div { padding-inline: 4px; } }
 .state-message > .lottie-animation-container { margin-bottom: 9px; }
+.metric-card strong .countup-wrap { display: inline; }
 @media (prefers-reduced-motion: reduce) {
   .admin-home,
   .admin-home .profile-panel,
