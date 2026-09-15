@@ -1,7 +1,7 @@
 MAIN := tjumain
 BUILD_DIR := build
 RESULT_DIR := ..
-RESULT := $(RESULT_DIR)/$(MAIN).pdf
+RESULT := $(RESULT_DIR)/SRS.pdf
 
 .PHONY: pdf clean
 

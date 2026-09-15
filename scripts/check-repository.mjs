@@ -11,7 +11,10 @@ const candidates = execFileSync('git', ['ls-files', '--cached', '--others', '--e
 const files = [...new Set(candidates)].filter(file => fs.existsSync(path.join(root, file)));
 const problems = [];
 const markdown = files.filter(file => file.endsWith('.md'));
-if (markdown.length !== 1 || markdown[0] !== 'README.md') problems.push('Keep project documentation in the root README.md');
+if (markdown.some(file => file !== 'README.md' && !file.startsWith('docs/'))) problems.push('Keep project documentation in README.md and docs/');
+for (const file of ['README.md', 'docs/SRS.pdf', 'docs/DEPLOYMENT.md']) {
+  if (!fs.existsSync(path.join(root, file))) problems.push(`Missing submission document: ${file}`);
+}
 if (files.some(file => file.endsWith('.command'))) problems.push('Use scripts/ commands instead of platform-specific launchers');
 for (const file of files.filter(file => file.endsWith('.md'))) {
   const text = fs.readFileSync(path.join(root, file), 'utf8');
@@ -28,7 +31,7 @@ for (const file of files.filter(file => /\.(sh|command)$/.test(file))) {
 }
 const deployScript = fs.readFileSync(path.join(root, 'scripts/deploy-cloudflare-pages.sh'), 'utf8');
 if (/PAGES_PROJECT=["'][a-z0-9-]+["']/.test(deployScript)) problems.push('Deployment project must be configured, not hardcoded');
-const entrypoints = ['README.md', 'scripts/deploy-cloudflare-pages.sh'];
+const entrypoints = ['scripts/deploy-cloudflare-pages.sh'];
 for (const file of entrypoints) {
   const text = fs.readFileSync(path.join(root, file), 'utf8');
   if (/https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)+/i.test(text)) problems.push(`${file}: literal public deployment URL`);
