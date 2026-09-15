@@ -34,6 +34,16 @@
   --transition-ease: all 0.3s ease;
 }
 
+/* Rider reference palette stays centralized; other saved themes keep their shared tokens. */
+html[data-theme="light"] :is(.rider-page, .rider-information, .role-footer[aria-label="骑手导航"]) {
+  --skin-brand: #0095ff;
+  --skin-brand-strong: #0751a0;
+  --skin-ink: #14243f;
+  --skin-muted: #7c8da5;
+  --rider-purple: #7453ff;
+  --rider-purple-soft: #f1edff;
+}
+
 /* 深色主题仍沿用平台蓝色体系，只降低背景与卡片亮度，避免出现“炫技式”配色。 */
 html[data-theme="dark"] {
   --skin-brand: #65b7ed; --skin-brand-strong: #367cae; --skin-surface: #101b28; --skin-border: #29445a; --skin-ink: #e7f0f7; --skin-ink-rgb: 231,240,247; --skin-muted: #9fb2c2;

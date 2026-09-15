@@ -1,13 +1,14 @@
 <template>
-  <div class="container information-page" :class="{ 'information-page-ready': pageReady }">
+  <div class="container information-page" :class="{ 'information-page-ready': pageReady, 'rider-information': riderMode }">
     <div class="fixed-top">
       <div class="top-background">
-        <div class="hero-copy">
+        <img v-if="riderMode" class="rider-profile-banner" src="/images/rider/profile-banner.jpg" alt="风里雨里，美食准时送达。每一次出发，都在让生活更美好。" />
+        <div v-if="!riderMode" class="hero-copy">
           <p class="hero-eyebrow">轻松点餐 · 快乐生活</p>
           <h1>{{ riderMode ? '骑手中心' : '个人信息' }}</h1>
           <p class="hero-subtitle">美好生活，从一份美食开始</p>
         </div>
-        <div class="hero-art" aria-hidden="true">
+        <div v-if="!riderMode" class="hero-art" aria-hidden="true">
           <span class="hero-sun"></span>
           <span class="hero-cloud hero-cloud-one"></span>
           <span class="hero-cloud hero-cloud-two"></span>
@@ -33,11 +34,11 @@
         </div>
         <div class="profile-heading">
           <div class="user-name">{{ profile?.username || '加载中…' }}</div>
-          <div class="profile-caption">校园外卖用户</div>
+          <div class="profile-caption">校园外卖用户{{ riderMode ? ' · 骑手' : '' }}</div>
         </div>
         <button class="edit-button" type="button" @click="openEditModal">
           <i class="fas fa-pen"></i>
-          <span>编辑</span>
+          <span>{{ riderMode ? '编辑资料' : '编辑' }}</span>
         </button>
       </div>
 
@@ -58,15 +59,14 @@
           <strong class="info-value">{{ profile?.email || '未设置邮箱' }}</strong>
         </div>
       </div>
-      <div class="card-button-section">
-        <button v-if="riderMode" class="switch-btn rider-entry-btn" @click="backToRiderDashboard">
-          <i class="fas fa-route"></i> 返回配送工作台
-        </button>
+      <div v-if="!riderMode" class="card-button-section">
         <button class="logout-btn" @click="logout">
           <i class="fas fa-sign-out-alt"></i><span>退出登录</span>
         </button>
       </div>
     </div>
+
+    <button v-if="riderMode" class="rider-return-banner" @click="backToRiderDashboard"><span><b>立即返回配送工作台</b><small>继续接单，开启高效配送</small></span><i class="fas fa-motorcycle" aria-hidden="true"></i><span class="return-arrow"><i class="fas fa-chevron-right"></i></span></button>
 
     <!-- 隐藏的文件输入框 -->
     <input type="file" ref="fileInput" style="display: none" accept="image/*" @change="changeAvatar">
@@ -123,26 +123,27 @@
       <div class="menu-list">
         <router-link class="menu-item" to="/rider/dashboard?tab=active">
           <div class="menu-icon"><i class="fas fa-route"></i></div>
-          <span class="menu-text">配送中的订单</span>
+          <span class="menu-text">配送中的订单<small>查看当前配送任务</small></span>
           <i class="fas fa-chevron-right menu-arrow"></i>
         </router-link>
         <router-link class="menu-item" to="/rider/dashboard?tab=history">
           <div class="menu-icon"><i class="fas fa-history"></i></div>
-          <span class="menu-text">历史配送</span>
+          <span class="menu-text">历史配送<small>查看历史完成记录</small></span>
           <i class="fas fa-chevron-right menu-arrow"></i>
         </router-link>
-        <router-link class="menu-item message-item" to="/notifications">
+        <router-link class="menu-item message-item" to="/notifications?role=rider">
           <div class="menu-icon"><i class="fas fa-bell"></i></div>
-          <span class="menu-text">消息与通知</span>
+          <span class="menu-text">消息与通知<small>订单提醒、系统通知等</small></span>
           <div class="notification-badge" v-if="unreadMessageCount > 0">{{ unreadMessageCount }}</div>
           <i class="fas fa-chevron-right menu-arrow"></i>
         </router-link>
         <div class="menu-item" @click="openEditModal">
           <div class="menu-icon"><i class="fas fa-id-card"></i></div>
-          <span class="menu-text">个人资料</span>
+          <span class="menu-text">个人资料<small>查看与编辑个人信息</small></span>
           <i class="fas fa-chevron-right menu-arrow"></i>
         </div>
       </div>
+      <button class="logout-btn rider-logout" @click="logout"><i class="fas fa-sign-out-alt"></i><span>退出登录</span></button>
     </div>
 
     <!-- 加载状态 -->
@@ -284,6 +285,7 @@ function logout() {
 }
 onMounted(load);
 </script>
+<style scoped src="@/assets/styles/rider-profile.css"></style>
 <style scoped>
 .container {
   width: 100%;

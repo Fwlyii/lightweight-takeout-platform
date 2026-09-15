@@ -1,11 +1,11 @@
 <template>
-    <main class="rider-page">
+    <main class="rider-page" :class="{ 'dispatch-page': activeTab === 'available', 'detail-page': selectedTaskId }">
         <header class="topbar">
             <div class="brand"><span class="logo"><i class="fas fa-motorcycle"></i></span>
                 <div><b>配送工作台</b><small>骑手服务中心</small></div>
             </div>
             <div class="top-actions">
-                <button class="user-side" @click="$router.push('/index')"><i class="fas fa-home"></i> 顾客端</button>
+                <button v-if="activeTab === 'available' && profile?.auditStatus === 1" class="online-pill" :disabled="switching" @click="toggleOnline"><span :class="{ online: profile.online }"></span>{{ profile.online ? '在线接单' : '休息中' }}<i class="fas fa-chevron-down"></i></button>
                 <button class="avatar" @click="$router.push('/myInformation?role=rider')">{{ profile?.realName?.slice(0,
                     1) ||
                     '骑' }}</button>
@@ -22,12 +22,13 @@
 
         <template v-else>
             <section class="hero-card">
+                <img class="hero-illustration" :src="activeTab === 'available' ? '/images/rider/dispatch-hero.jpg' : '/images/rider/orders-hero.jpg'" alt="" />
                 <div>
                     <p class="date">{{ todayText }}</p>
                     <h1>{{ greeting }}，{{ profile.realName }}</h1>
                     <p class="hero-note">{{ profile.online ? '已上线，可以查看和接取附近订单。' : '当前为休息状态，上线后可接取新任务。' }}</p>
                 </div>
-                <button class="online-switch" :class="{ online: profile.online }" :disabled="switching"
+                <button v-if="activeTab !== 'available'" class="online-switch" :class="{ online: profile.online }" :disabled="switching"
                     @click="toggleOnline">
                     <span class="switch-dot"></span><span><b>{{ profile.online ? '接单中' : '已休息' }}</b><small>{{
                         profile.online ?
@@ -50,6 +51,7 @@
                 </article>
             </section>
 
+            <aside v-if="activeTab === 'available'" class="rider-notice"><i class="fas fa-bell"></i><b>骑行提醒</b><span>请注意行车安全，合理安排配送时间。</span></aside>
             <section class="workspace">
                 <nav class="tabs">
                     <button v-for="tab in visibleTabs" :key="tab.key" :class="{ active: activeTab === tab.key }"
@@ -61,6 +63,8 @@
                         刷新</button>
                 </nav>
 
+                <div v-if="selectedTaskId" class="detail-toolbar"><button class="text-button" @click="selectedTaskId = null; successNotice = false"><i class="fas fa-chevron-left"></i> 返回订单列表</button><span>配送详情</span></div>
+                <aside v-if="successNotice && selectedTaskId" class="success-notice"><i class="fas fa-check-circle"></i><div><b>抢单成功，请安全前往商家</b><p>请尽快到达商家取餐，注意交通安全</p></div><button aria-label="关闭提示" @click="successNotice = false">×</button></aside>
                 <div v-if="activeTab === 'available' && !profile.online" class="empty">
                     <span><i class="fas fa-power-off"></i></span>
                     <h3>上线后接收附近订单</h3>
@@ -73,14 +77,15 @@
                 </div>
 
                 <div v-else class="task-grid">
-                    <article v-for="task in visibleTasks" :key="task.id" class="task-card"
-                        :class="task.taskStatus.toLowerCase()">
+                    <article v-for="task in displayedTasks" :key="task.id" class="task-card"
+                        :class="[task.taskStatus.toLowerCase(), { expanded: selectedTaskId === task.id }]">
                         <div class="task-head">
-                            <div><span class="task-id">DELIVERY #{{ task.id }}</span>
-                                <h3>{{ task.businessName }}</h3>
+                            <div><span class="task-id">{{ activeTab === 'available' ? '#' : 'DELIVERY #' }}{{ task.id }}</span>
+                                <h3><button class="task-title" :aria-expanded="selectedTaskId === task.id" @click="selectedTaskId = selectedTaskId === task.id ? null : task.id; successNotice = false">{{ task.businessName }}<i v-if="!selectedTaskId" class="fas fa-chevron-right" aria-hidden="true"></i></button></h3>
                             </div>
                             <span class="status" :class="task.taskStatus.toLowerCase()">{{ taskStatus(task.taskStatus)
                             }}</span>
+                            <strong v-if="activeTab === 'available'" class="available-fee"><small>¥</small>{{ number(task.riderFee, 2) }}</strong>
                         </div>
                         <div class="route">
                             <div class="route-mark"><i class="fas fa-store"></i><span></span><i
@@ -98,27 +103,30 @@
                             </div>
                         </div>
                         <div class="task-meta">
-                            <span><i class="fas fa-road"></i><b>{{ number(task.distanceKm, 1) }}</b> km</span>
-                            <span><i class="fas fa-coins"></i>预计 <b>¥{{ number(task.riderFee, 2) }}</b></span>
-                            <span><i class="fas fa-receipt"></i>订单 ¥{{ number(task.orderTotal, 2) }}</span>
+                            <span><i class="fas fa-road"></i><div><b>{{ number(task.distanceKm, 1) }} km</b><small>配送距离</small></div></span>
+                            <span><i class="fas fa-coins"></i><div><b>¥{{ number(task.riderFee, 2) }}</b><small>{{ activeTab === 'history' ? '配送费' : '预计收入' }}</small></div></span>
+                            <span><i class="fas fa-receipt"></i><div><b>¥{{ number(task.orderTotal, 2) }}</b><small>订单金额</small></div></span>
                         </div>
+                        <ol v-if="selectedTaskId && ['ACCEPTED', 'ARRIVED_STORE', 'DELIVERING', 'DELIVERED', 'COMPLETED'].includes(task.taskStatus)" class="delivery-progress" aria-label="配送进度">
+                            <li v-for="(step, index) in deliverySteps" :key="step.title" :class="{ reached: progressIndex(task) >= index, current: progressIndex(task) === index }"><span></span><b>{{ step.title }}</b><small>{{ step.note }}</small></li>
+                        </ol>
                         <div class="task-actions">
                             <button v-if="task.taskStatus === 'WAITING_RIDER'" class="accept"
-                                :disabled="actingId === task.id" @click="act(task, 'accept')">接取订单</button>
+                                :disabled="actingId !== null" @click="act(task, 'accept')">接取订单</button>
                             <template v-else-if="task.taskStatus === 'ACCEPTED'">
                                 <button class="ghost" @click="navigate(task)"><i
                                         class="fas fa-location-arrow"></i>
                                     导航去商家</button><button class="accept"
-                                    @click="act(task, 'arrive-store')">我已到店</button>
+                                    :disabled="actingId !== null" @click="act(task, 'arrive-store')">我已到店</button>
                             </template>
                             <template v-else-if="task.taskStatus === 'ARRIVED_STORE'">
                                 <button class="ghost danger" @click="openException(task)">上报异常</button><button
-                                    class="accept" @click="act(task, 'pickup')">确认取餐</button>
+                                    class="accept" :disabled="actingId !== null" @click="act(task, 'pickup')">确认取餐</button>
                             </template>
                             <template v-else-if="task.taskStatus === 'DELIVERING'">
                                 <button class="ghost" @click="navigate(task)"><i
                                         class="fas fa-location-arrow"></i>
-                                    导航去顾客</button><button class="accept" @click="act(task, 'deliver')">确认送达</button>
+                                    导航去顾客</button><button class="accept" :disabled="actingId !== null" @click="act(task, 'deliver')">确认送达</button>
                                 <button class="exception-link" @click="openException(task)">遇到配送问题？</button>
                             </template>
                             <div v-else-if="task.taskStatus === 'DELIVERED'" class="waiting-confirm"><i
@@ -134,6 +142,7 @@
                     </article>
                 </div>
             </section>
+            <aside class="safety-card"><span><i class="fas fa-shield-alt"></i><i class="fas fa-check safety-check"></i></span><div><b>安全第一　平安配送</b><p>遵守交通规则 · 佩戴头盔 · 安全送达每一单</p></div></aside>
         </template>
 
         <div v-if="exceptionModal" class="modal-mask" @click.self="exceptionModal = null">
@@ -169,6 +178,9 @@ const router = useRouter();
 const profile = ref(null), availableTasks = ref([]), activeTasks = ref([]), historyTasks = ref([]);
 const loading = ref(true), refreshing = ref(false), switching = ref(false), actingId = ref(null), activeTab = ref('available');
 const exceptionModal = ref(null);
+const selectedTaskId = ref(null), successNotice = ref(false);
+const deliverySteps = [{ title: '前往商家', note: '请尽快到店取餐' }, { title: '到店取餐', note: '核对餐品并取餐' }, { title: '送达顾客', note: '完成配送' }];
+const progressIndex = task => task.taskStatus === 'ACCEPTED' ? 0 : task.taskStatus === 'ARRIVED_STORE' ? 1 : 2;
 let realtimeConnection = null;
 const exceptionForm = reactive({ exceptionType: 'STORE_DELAY', description: '' });
 const tabs = [
@@ -184,15 +196,19 @@ const exceptionTypes = [
 const todayText = new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' }).format(new Date());
 const greeting = computed(() => { const h = new Date().getHours(); return h < 11 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好'; });
 const visibleTasks = computed(() => activeTab.value === 'available' ? availableTasks.value : activeTab.value === 'active' ? activeTasks.value : historyTasks.value);
+const displayedTasks = computed(() => selectedTaskId.value ? visibleTasks.value.filter(task => task.id === selectedTaskId.value) : visibleTasks.value);
+watch(visibleTasks, tasks => { if (selectedTaskId.value && !tasks.some(task => task.id === selectedTaskId.value)) selectedTaskId.value = null; });
 const emptyTitle = computed(() => activeTab.value === 'available' ? '暂时没有新任务' : activeTab.value === 'active' ? '没有进行中的配送' : '还没有历史配送');
 const countFor = key => key === 'available' ? availableTasks.value.length : key === 'active' ? activeTasks.value.length : historyTasks.value.length;
 const visibleTabs = computed(() => activeTab.value === 'available'
-    ? [{ key: 'available', label: '附近订单', icon: 'fas fa-compass' }]
+    ? [{ key: 'available', label: '待接单', icon: 'fas fa-list-alt' }, ...tabs.filter(tab => tab.key !== 'available')]
     : tabs.filter(tab => tab.key !== 'available'));
 const number = (value, digits) => Number(value || 0).toFixed(digits);
 const taskStatus = taskStatusText;
 const formatTime = value => new Date(value).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 const selectTab = tab => {
+    selectedTaskId.value = null;
+    successNotice.value = false;
     activeTab.value = tab;
     router.replace({ query: { ...route.query, tab } });
 };
@@ -209,7 +225,7 @@ const loadTasks = async () => {
 };
 const refreshAll = async ({ silent = false } = {}) => { if (!silent) refreshing.value = true; try { await loadProfile(); if (profile.value?.auditStatus === 1) await loadTasks(); } catch (e) { if (!silent) toast.error(e.response?.data?.message || '数据同步失败'); } finally { if (!silent) refreshing.value = false; } };
 const toggleOnline = async () => { switching.value = true; try { const res = await request.patch('/api/v1/riders/me/online', { online: !profile.value.online }); profile.value = res.data; await loadTasks(); toast.success(profile.value.online ? '已上线，可以接单了' : '已安全下线'); } catch (e) { toast.error(e.response?.data?.message || '状态更新失败'); } finally { switching.value = false; } };
-const act = async (task, action) => { actingId.value = task.id; try { await request.post(`/api/v1/delivery-tasks/${task.id}/${action}`); toast.success(action === 'accept' ? '抢单成功，请安全前往商家' : '配送状态已更新'); activeTab.value = 'active'; await refreshAll(); } catch (e) { toast.error(e.response?.data?.message || '操作失败'); } finally { actingId.value = null; } };
+const act = async (task, action) => { if (actingId.value !== null) return; actingId.value = task.id; try { await request.post(`/api/v1/delivery-tasks/${task.id}/${action}`); toast.success(action === 'accept' ? '抢单成功，请安全前往商家' : '配送状态已更新'); await refreshAll(); activeTab.value = 'active'; selectedTaskId.value = task.id; successNotice.value = action === 'accept'; await router.replace({ query: { ...route.query, tab: 'active' } }); } catch (e) { toast.error(e.response?.data?.message || '操作失败'); } finally { actingId.value = null; } };
 const navigate = task => openDeliveryNavigation(task.id, {
     request, openWindow: () => window.open('about:blank', '_blank'), notify: message => toast.error(message)
 });
@@ -219,24 +235,4 @@ onMounted(async () => { try { await loadProfile(); if (!profile.value) { router.
 onUnmounted(() => { realtimeConnection?.stop(); });
 </script>
 
-<style scoped>
-*{box-sizing:border-box}.rider-page{min-height:100vh;background:var(--fwl-surface, #f3f6f9);color:var(--fwl-ink, #17283b);padding-bottom:50px}.topbar{height:78px;padding:0 max(24px,calc((100% - 1180px)/2));display:flex;align-items:center;justify-content:space-between;background:var(--fwl-brand-strong, #092f3c);color:#fff}.brand{display:flex;gap:12px;align-items:center}.brand .logo{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#20c997;color:#063d38}.brand b,.brand small{display:block}.brand small{color:var(--fwl-muted, #8eb1ba);font-size:10px;letter-spacing:1.5px;margin-top:3px}.top-actions{display:flex;align-items:center;gap:12px}.user-side{border:1px solid rgba(255,255,255,.2);background:transparent;color:var(--fwl-border, #d9e8ec);border-radius:11px;padding:10px 14px;cursor:pointer}.avatar{width:38px;height:38px;border:0;border-radius:50%;background:#d8fff3;color:#067c66;font-weight:900}.hero-card,.stat-grid,.workspace,.loading-card{width:min(calc(100% - 40px),1180px);margin-left:auto;margin-right:auto}.hero-card{margin-top:30px;padding:30px 34px;border-radius:24px;background:radial-gradient(circle at 80% 0,rgba(102,229,196,.2),transparent 28%),linear-gradient(135deg,var(--fwl-brand-strong, #0b4652),var(--fwl-brand-strong, #0b6d69));color:#fff;display:flex;justify-content:space-between;align-items:center;box-shadow:0 20px 45px rgba(var(--fwl-brand-strong-rgb, 11, 70, 82), 0.18)}.date{color:#7fe4cb;font-size:12px;font-weight:800;letter-spacing:1px}.hero-card h1{font-size:30px;margin:6px 0 8px}.hero-note{color:var(--fwl-subtle, #b7d4d6);font-size:14px}.online-switch{min-width:174px;padding:13px 17px;border:1px solid rgba(255,255,255,.17);background:rgba(0,0,0,.17);border-radius:16px;color:#fff;display:flex;gap:12px;align-items:center;cursor:pointer}.online-switch.online{background:rgba(47,221,170,.13);border-color:#44d8ae}.switch-dot{width:13px;height:13px;border-radius:50%;background:var(--fwl-muted, #7f9ba0);box-shadow:0 0 0 5px rgba(var(--fwl-muted-rgb, 127, 155, 160), 0.15)}.online .switch-dot{background:#38e1ac;box-shadow:0 0 0 5px rgba(56,225,172,.17)}.online-switch b,.online-switch small{display:block;text-align:left}.online-switch small{color:var(--fwl-subtle, #9dbabe);font-size:10px;margin-top:3px}.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}.stat-grid article{padding:19px;background:#fff;border:1px solid var(--fwl-border, #eaf0f3);border-radius:17px;display:flex;align-items:center;gap:13px;box-shadow:0 8px 24px rgba(var(--fwl-brand-strong-rgb, 25, 52, 72), 0.04)}.stat-icon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center}.green{background:#e8fbf5;color:#0b9f7e}.blue{background:var(--fwl-surface, #ebf4ff);color:var(--fwl-brand, #2477d4)}.orange{background:#fff5e6;color:#e78a17}.purple{background:#f2edff;color:var(--fwl-brand, #7656d8)}.stat-grid small,.stat-grid strong{display:block}.stat-grid small{font-size:11px;color:var(--fwl-muted, #8795a5)}.stat-grid strong{font-size:21px;margin-top:4px}.stat-grid em{font-style:normal;font-size:11px;color:var(--fwl-muted, #728296)}.workspace{margin-top:20px;background:#fff;border-radius:20px;border:1px solid var(--fwl-border, #e7edf1);min-height:420px;overflow:hidden}.tabs{display:flex;align-items:center;border-bottom:1px solid var(--fwl-surface, #edf1f4);padding:0 20px}.tabs button{border:0;background:none;padding:20px 17px;color:var(--fwl-muted, #6f7e8e);cursor:pointer;font-weight:700}.tabs button i{margin-right:8px}.tabs button b{margin-left:7px;padding:2px 6px;border-radius:10px;background:#e7f8f3;color:#0d9a79;font-size:10px}.tabs button.active{color:#078d72;box-shadow:inset 0 -3px #14b893}.tabs .refresh{margin-left:auto;font-size:12px}.spin{animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.task-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:20px}.task-card{border:1px solid var(--fwl-border, #e4ebef);border-radius:17px;padding:20px;transition:.2s}.task-card:hover{transform:translateY(-2px);box-shadow:0 15px 32px rgba(var(--fwl-brand-strong-rgb, 19, 50, 69), 0.08)}.task-head{display:flex;justify-content:space-between;gap:12px}.task-id{font-size:9px;letter-spacing:1.5px;color:var(--fwl-muted, #95a1ad)}.task-head h3{font-size:18px;margin:6px 0}.status{height:fit-content;padding:6px 9px;border-radius:9px;background:#edf8f5;color:#08836c;font-size:11px;font-weight:800}.status.exception{background:#fff1ec;color:#d95d31}.status.completed,.status.cancelled{background:var(--fwl-surface, #f0f2f4);color:var(--fwl-muted, #7b8794)}.route{display:flex;gap:13px;padding:15px 0}.route-mark{width:20px;display:flex;align-items:center;flex-direction:column;color:#0ba284}.route-mark span{width:1px;flex:1;min-height:25px;border-left:1px dashed var(--fwl-subtle, #bed0d2);margin:4px}.route-mark i:last-child{color:#ff8a3d}.route-copy{display:grid;gap:17px;flex:1}.route-copy small{color:var(--fwl-muted, #9aa5b0);font-size:10px}.route-copy p{font-size:13px;margin:4px 0 0;line-height:1.45}.route-copy em{font-size:11px;color:var(--fwl-muted, #718090);font-style:normal}.task-meta{display:flex;gap:15px;padding:13px 0;border-top:1px dashed var(--fwl-border, #dfe6e9);color:var(--fwl-muted, #718090);font-size:11px}.task-meta i{color:#0aa889;margin-right:4px}.task-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.task-actions button,.modal-actions button{height:38px;padding:0 14px;border-radius:10px;font-weight:800;cursor:pointer}.accept,.primary{border:0;background:#0caf8b;color:#fff;box-shadow:0 8px 17px rgba(12,175,139,.18);flex:1}.ghost{border:1px solid var(--fwl-border, #dce5e8);background:#fff;color:var(--fwl-muted, #536577);flex:1}.ghost.danger,.exception-link{color:#d3593a}.exception-link{width:100%;border:0!important;background:none!important;box-shadow:none!important;font-size:10px}.waiting-confirm,.complete-note{width:100%;padding:11px;border-radius:10px;text-align:center;background:#eef9f6;color:#16866f;font-size:12px}.waiting-confirm.warning{background:#fff5eb;color:#c77424}.empty,.loading-card{padding:70px 24px;text-align:center;color:var(--fwl-muted, #8795a3)}.empty span,.loading-card>i{width:70px;height:70px;border-radius:50%;background:#edf9f6;color:#0ba98a;display:grid;place-items:center;margin:0 auto 17px;font-size:25px}.empty h3,.loading-card h2{color:var(--fwl-ink, #34485d);margin-bottom:8px}.empty p,.loading-card p{font-size:13px}.primary.small,.loading-card .primary{display:inline-block;margin-top:18px;padding:11px 20px;border-radius:10px;flex:none}.spinner{display:inline-block;width:18px;height:18px;border:2px solid #d1e5df;border-top-color:#0aa787;border-radius:50%;animation:spin .8s linear infinite;margin-right:8px}.modal-mask{position:fixed;inset:0;background:rgba(var(--fwl-brand-strong-rgb, 3, 24, 31), 0.62);display:grid;place-items:center;padding:20px;z-index:2000}.modal{width:min(100%,460px);background:#fff;border-radius:22px;padding:30px}.modal-icon{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;background:#fff1e8;color:#de672f;font-size:20px}.modal h2{margin:15px 0 8px}.modal>p{color:var(--fwl-muted, #7c8997);font-size:13px;line-height:1.6}.modal label{display:block;margin-top:18px;font-size:12px;font-weight:800;color:var(--fwl-ink, #405269)}.modal select,.modal textarea{width:100%;border:1px solid var(--fwl-border, #dae3e7);border-radius:11px;padding:12px;margin-top:7px;font:inherit}.modal textarea{height:100px;resize:vertical}.modal-actions{display:flex;gap:10px;margin-top:20px}
-@media(max-width:800px){.topbar{padding:0 18px}.brand small,.user-side{display:none}.hero-card{align-items:flex-start;gap:22px;padding:24px;flex-direction:column}.online-switch{width:100%}.stat-grid{grid-template-columns:repeat(2,1fr)}.task-grid{grid-template-columns:1fr}.tabs{overflow-x:auto;padding:0 6px}.tabs button{white-space:nowrap;padding:17px 12px}.tabs .refresh{margin-left:0}.task-meta{flex-wrap:wrap}}
-
-/* 与用户首页一致的克制蓝白工作台。功能状态用颜色表达，视觉不再依赖渐变和发光。 */
-.rider-page{background:var(--fwl-surface, #f6f9fd);color:var(--fwl-ink, #253b55);padding-bottom:78px}
-.topbar{position:relative;height:64px;padding:0 max(20px,calc((100% - 1120px)/2));background:#fff;color:var(--fwl-brand-strong, #173b62);border-bottom:1px solid var(--fwl-border, #e5eef8);box-shadow:0 1px 6px rgba(var(--fwl-brand-strong-rgb, 40, 92, 145), 0.05)}
-.brand{gap:10px}.brand .logo{width:34px;height:34px;border-radius:8px;background:var(--fwl-surface, #e7f4ff);color:var(--fwl-brand, #0097ff)}.brand b{font-size:16px;font-weight:700}.brand small{color:var(--fwl-muted, #7890aa);font-size:10px;letter-spacing:.5px;margin-top:2px}
-.top-actions{gap:10px}.user-side{border:1px solid var(--fwl-border, #d5e7f8);background:#fff;color:var(--fwl-brand, #287bc0);border-radius:6px;padding:8px 12px}.avatar{width:34px;height:34px;background:var(--fwl-surface, #e8f4ff);color:var(--fwl-brand, #1778c1);border-radius:50%}
-.hero-card,.stat-grid,.workspace,.loading-card{width:min(calc(100% - 32px),1120px)}
-.hero-card{margin-top:18px;padding:22px 24px;border-radius:10px;background:#fff;color:var(--fwl-ink, #253b55);border:1px solid var(--fwl-border, #dfeaf5);box-shadow:0 4px 14px rgba(var(--fwl-brand-rgb, 51, 101, 150), 0.06)}
-.date{color:var(--fwl-muted, #6f8aa6);font-size:12px;letter-spacing:.2px}.hero-card h1{font-size:24px;margin:6px 0}.hero-note{color:var(--fwl-muted, #70849a);font-size:13px}
-.online-switch{min-width:150px;padding:10px 13px;border:1px solid var(--fwl-border, #cfe2f4);background:var(--fwl-surface, #f5f9fd);border-radius:7px;color:var(--fwl-muted, #44617d)}.online-switch.online{background:var(--fwl-surface, #edf7ff);border-color:var(--fwl-brand-soft, #9dccf3)}.switch-dot{width:10px;height:10px;background:var(--fwl-subtle, #a9b9c9);box-shadow:none}.online .switch-dot{background:var(--fwl-brand, #0097ff);box-shadow:0 0 0 4px var(--fwl-border, #d9efff)}.online-switch small{color:var(--fwl-muted, #7991a8)}
-.stat-grid{gap:12px;margin-top:14px}.stat-grid article{padding:15px 16px;border:1px solid var(--fwl-border, #e0ebf6);border-radius:9px;box-shadow:none}.stat-icon{width:36px;height:36px;border-radius:8px}.green{background:var(--fwl-surface, #e9f5ff);color:var(--fwl-brand, #1983c6)}.blue{background:var(--fwl-surface, #e9f5ff);color:var(--fwl-brand, #1983c6)}.orange{background:#fff6e9;color:#d98a29}.purple{background:var(--fwl-surface, #f1f5fb);color:var(--fwl-muted, #617fa1)}.stat-grid small{color:var(--fwl-muted, #8396aa)}.stat-grid strong{font-size:19px}
-.workspace{margin-top:16px;border-radius:10px;border:1px solid var(--fwl-border, #dfeaf5);box-shadow:0 4px 14px rgba(var(--fwl-brand-rgb, 51, 101, 150), 0.04)}.tabs{padding:0 16px}.tabs button{padding:17px 14px;color:var(--fwl-muted, #7489a0)}.tabs button b{background:var(--fwl-surface, #e8f4ff);color:var(--fwl-brand, #1479c3)}.tabs button.active{color:var(--fwl-brand, #0097ff);box-shadow:inset 0 -2px var(--fwl-brand, #0097ff)}.tabs .refresh{color:var(--fwl-muted, #6d8aa8)}
-.task-grid{gap:12px;padding:16px}.task-card{border:1px solid var(--fwl-border, #e0ebf5);border-radius:10px;padding:17px;transition:box-shadow .18s ease}.task-card:hover{transform:none;box-shadow:0 7px 18px rgba(var(--fwl-brand-strong-rgb, 42, 94, 145), 0.08)}.task-head h3{font-size:16px}.status{padding:5px 8px;border-radius:6px;background:var(--fwl-surface, #eaf6ff);color:var(--fwl-brand, #1978bd)}.route{padding:13px 0}.route-mark{color:var(--fwl-brand, #1687ca)}.route-mark i:last-child{color:#ef902f}.route-copy p{font-size:12px}.task-meta{gap:12px}.task-meta i{color:var(--fwl-brand, #1687ca)}.task-actions button,.modal-actions button{height:36px;border-radius:6px}.accept,.primary{background:var(--fwl-brand, #0097ff);box-shadow:none}.ghost{border-color:var(--fwl-border, #d6e5f2);color:var(--fwl-muted, #51718f)}.waiting-confirm,.complete-note{border-radius:6px;background:var(--fwl-surface, #edf7ff);color:var(--fwl-brand, #2475ad)}.waiting-confirm.warning{background:#fff6e9;color:#be7927}.empty span,.loading-card>i{width:60px;height:60px;border-radius:50%;background:var(--fwl-surface, #eaf5ff);color:var(--fwl-brand, #1687ca)}.empty h3,.loading-card h2{color:var(--fwl-ink, #38536f)}.primary.small,.loading-card .primary{border-radius:6px}.spinner{border-color:var(--fwl-border, #d6e9f8);border-top-color:var(--fwl-brand, #0097ff)}.modal-mask{background:rgba(var(--fwl-brand-strong-rgb, 18, 53, 89), 0.42)}.modal{border-radius:10px;padding:24px}.modal-icon{border-radius:8px}
-@media(max-width:800px){.hero-card{padding:20px}.stat-grid{gap:8px}.stat-grid article{padding:13px 12px}.workspace{margin-top:12px}.task-grid{padding:12px}.rider-page{padding-bottom:74px}}
-
-/* 统计卡片也只使用蓝色层级，橙色仅保留给真正的异常提示 */
-.rider-page .stat-icon.orange, .rider-page .stat-icon.purple { background: var(--fwl-surface, #edf7ff); color: var(--fwl-brand, #2b81bf); }
-</style>
+<style scoped src="@/assets/styles/rider-dashboard.css"></style>
