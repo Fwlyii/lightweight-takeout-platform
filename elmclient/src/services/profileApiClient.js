@@ -48,6 +48,11 @@ export function createProfileApiClient(request) {
     },
     profile: {
       get: async () => verifiedProfile(await request.get("/api/user")),
+      updateAvatar: async (file) => {
+        const form = new FormData();
+        form.append('avatar', file);
+        return verifiedProfile(await request.post('/api/user/avatar', form));
+      },
       update: async (value) =>
         verifiedProfile(await request.put("/api/user", profile(value))),
     },

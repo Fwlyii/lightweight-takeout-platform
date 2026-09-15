@@ -25,12 +25,46 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  "spring.datasource.url=jdbc:h2:mem:profile_journey;MODE=MySQL;DB_CLOSE_DELAY=-1",
  "spring.datasource.driver-class-name=org.h2.Driver", "spring.datasource.username=sa",
  "spring.datasource.password=",
- "spring.sql.init.schema-locations=classpath:auth-schema.sql,classpath:profile-schema.sql"
+ "spring.sql.init.schema-locations=classpath:auth-schema.sql,classpath:profile-schema.sql",
+ "app.upload.directory=target/profile-avatar-test-uploads"
 })
 @AutoConfigureMockMvc
 @ActiveProfiles("auth-test")
 @WithMockUser(username = "owner", authorities = "USER")
 class ProfileAddressJourneyTest {
+ @Autowired com.tju.elm_bk.service.ImageStorageService images;
+
+ @Test
+ void avatarUploadOnlyChangesTheAuthenticatedAccountAndPreservesProfile() throws Exception {
+  String otherPhoto = jdbc.queryForObject("SELECT photo FROM person WHERE id=2", String.class);
+  String phone = jdbc.queryForObject("SELECT phone FROM person WHERE id=1", String.class);
+  var image = new org.springframework.mock.web.MockMultipartFile("avatar", "avatar.png", "image/png",
+    java.util.Base64.getDecoder().decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jX1sAAAAASUVORK5CYII="));
+  var response = mvc.perform(multipart("/api/user/avatar").file(image).param("userId", "2"))
+    .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1)).andReturn();
+  String photo = json.readTree(response.getResponse().getContentAsString()).path("photo").asText();
+  try {
+   assertTrue(photo.matches("/uploads/[a-f0-9-]{36}\\.png"));
+   assertEquals(photo, jdbc.queryForObject("SELECT photo FROM person WHERE id=1", String.class));
+   assertEquals(otherPhoto, jdbc.queryForObject("SELECT photo FROM person WHERE id=2", String.class));
+   assertEquals(phone, jdbc.queryForObject("SELECT phone FROM person WHERE id=1", String.class));
+  } finally { images.discard(photo); }
+ }
+
+ @Test
+ void avatarRejectsExecutableContentDisguisedAsAnImage() throws Exception {
+  String previous = jdbc.queryForObject("SELECT photo FROM person WHERE id=1", String.class);
+  var image = new org.springframework.mock.web.MockMultipartFile("avatar", "avatar.png", "image/png", "<script>bad</script>".getBytes());
+  mvc.perform(multipart("/api/user/avatar").file(image)).andExpect(status().is4xxClientError());
+  assertEquals(previous, jdbc.queryForObject("SELECT photo FROM person WHERE id=1", String.class));
+ }
+
+ @Test
+ @org.springframework.security.test.context.support.WithAnonymousUser
+ void avatarUploadRequiresLogin() throws Exception {
+  var image = new org.springframework.mock.web.MockMultipartFile("avatar", "avatar.png", "image/png", new byte[]{1});
+  mvc.perform(multipart("/api/user/avatar").file(image)).andExpect(status().isUnauthorized());
+ }
  @Test
  void parallelFirstAddressesHaveExactlyOneDefault() throws Exception {
   runConcurrent(() -> mvc.perform(post("/api/addresses/me")

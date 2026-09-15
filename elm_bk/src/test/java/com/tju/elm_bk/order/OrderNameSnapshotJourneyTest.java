@@ -89,6 +89,17 @@ class OrderNameSnapshotJourneyTest {
                 order.path("orderTotal").decimalValue().setScale(2));
     }
 
+    @Test
+    void takeawayOnlyShopSupportsPickupWithoutAddressOrDeliveryFee() throws Exception {
+        jdbc.update("UPDATE business SET dine_in_available=0,start_price=100 WHERE id=101");
+        addToCart(FOOD, 1);
+        long orderId = submit("pickup", "no-dine-in");
+        assertEquals("PICKUP", jdbc.queryForObject("SELECT service_mode FROM orders WHERE id=?", String.class, orderId));
+        assertEquals(0, jdbc.queryForObject("SELECT delivery_price FROM orders WHERE id=?", BigDecimal.class, orderId).signum());
+        assertEquals(new BigDecimal("20.00"), jdbc.queryForObject("SELECT order_total FROM orders WHERE id=?", BigDecimal.class, orderId).setScale(2));
+        assertNull(jdbc.queryForObject("SELECT address_id FROM orders WHERE id=?", Long.class, orderId));
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"customer", "merchant", "merchant-list", "legacy"})
     @DisplayName("商家改名改价后，各订单查询入口仍返回原名称与原价格")

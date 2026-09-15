@@ -22,6 +22,11 @@
         <div>
           <h2>{{ profile.username }}</h2>
           <p class="muted">{{ profile.phone }}</p>
+          <label class="avatar-upload">
+            更换头像
+            <input type="file" accept="image/jpeg,image/png,image/webp" :disabled="busy" @change="changeAvatar" />
+          </label>
+          <small class="muted">JPG / PNG / WebP，最大 5MB</small>
         </div>
       </div>
       <nav
@@ -31,6 +36,14 @@
       >
         <router-link to="/userAddress">收货地址 <span>›</span></router-link>
         <router-link to="/favorites">我的收藏 <span>›</span></router-link>
+        <router-link to="/notifications">消息与通知 <span>›</span></router-link>
+        <router-link to="/assets">钱包与优惠 <span>›</span></router-link>
+        <router-link to="/preferences">个性化偏好与外观 <span>›</span></router-link>
+      </nav>
+      <nav v-else-if="getAuthRole() === 'rider'" class="panel personal-links" aria-label="骑手工具">
+        <router-link to="/rider/dashboard?tab=active">配送中的订单 <span>›</span></router-link>
+        <router-link to="/rider/dashboard?tab=history">历史配送 <span>›</span></router-link>
+        <router-link to="/notifications?role=rider">消息与通知 <span>›</span></router-link>
       </nav>
       <form class="panel" @submit.prevent="save">
         <h2>基本资料</h2>
@@ -91,7 +104,7 @@
 import { onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import ProfilePage from "../components/ProfilePage.vue";
-import { getMyProfile, updateMyProfile } from "../services/profileService";
+import { getMyProfile, updateMyProfile, updateMyAvatar } from "../services/profileService";
 import { clearAuth, getAuthRole } from "../utils/auth";
 import { getRoleDefinition } from "../utils/roles";
 import { apiBaseUrl } from "../utils/endpoints";
@@ -145,6 +158,22 @@ async function save() {
     busy.value = false;
   }
 }
+async function changeAvatar(event) {
+  const file = event.target.files?.[0];
+  if (!file || busy.value) return;
+  event.target.value = '';
+  failed.value = false;
+  message.value = '';
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+    failed.value = true;
+    message.value = '请选择 5MB 以内的 JPG、PNG 或 WebP 图片';
+    return;
+  }
+  busy.value = true;
+  try { fill(await updateMyAvatar(file)); message.value = '头像已更新~'; }
+  catch (e) { failed.value = true; message.value = e.response?.data?.message || '头像更新失败，请重试'; }
+  finally { busy.value = false; }
+}
 function avatarFallback(event) {
   if (!event.target.dataset.fallback) {
     event.target.dataset.fallback = "true";
@@ -159,6 +188,8 @@ function logout() {
 onMounted(load);
 </script>
 <style scoped>
+.avatar-upload { margin: 8px 0; color: #087ecc; }
+.avatar-upload input { max-width: 100%; font-size: 12px; }
 .identity {
   display: flex;
   gap: 14px;

@@ -62,6 +62,11 @@ const resolve = path => ({ name: path === '/orderList' ? 'OrderList' : 'Unknown'
 test('valid customer redirect is retained', () => {
   assert.equal(selectLoginDestination({ role: 'user' }, '/orderList', resolve), '/orderList');
 });
+for (const name of ['AiChat', 'AiRecommend', 'AiVoiceOrder', 'AiDishRecognition']) {
+  test(`login returns to home instead of automatically opening ${name}`, () => {
+    assert.equal(selectLoginDestination({ role: 'user' }, '/ai-chat', () => ({ name, meta: { role: 'user' } })), '/index');
+  });
+}
 for (const redirect of ['//evil.test', '/\\evil.test', 'https://evil.test', '/admin/user', '/missing', '/login']) {
   test(`unsafe or unavailable redirect is rejected: ${redirect}`, () => {
     assert.equal(selectLoginDestination({ role: 'user' }, redirect, resolve), '/index');

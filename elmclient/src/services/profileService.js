@@ -11,3 +11,9 @@ export const updateMyProfile = async (fields) => {
   updateStoredUser(profile);
   return profile;
 };
+
+export const updateMyAvatar = async (file) => {
+  const profile = await api.profile.updateAvatar(file);
+  updateStoredUser(profile);
+  return profile;
+};

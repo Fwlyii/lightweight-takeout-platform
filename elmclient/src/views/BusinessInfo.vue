@@ -4,7 +4,7 @@
             <button class="back-button" type="button" aria-label="返回" @click="goBack">‹</button>
             <div class="service-switch" role="tablist" aria-label="配送方式">
                 <button type="button" :class="{ active: deliveryMode === 'delivery' }" @click="setDeliveryMode('delivery')">外送</button>
-                <button type="button" :class="{ active: deliveryMode === 'pickup' }" :disabled="business.dineInAvailable === false" @click="setDeliveryMode('pickup')">自取</button>
+                <button type="button" :class="{ active: deliveryMode === 'pickup' }" @click="setDeliveryMode('pickup')">自取</button>
             </div>
             <div class="header-actions">
                 <button type="button" title="搜索商品" @click="focusMenu"><i class="fa fa-search"></i></button>
@@ -29,7 +29,7 @@
         </section>
 
         <div class="offer-strip" aria-label="商家优惠">
-            <span v-if="deliveryMode === 'pickup'">自取免配送费</span><template v-else><span v-if="Number(business.deliveryPrice || 0) === 0">免配送费</span><span v-else>配送 ¥{{ formatMoney(business.deliveryPrice) }}</span></template><span v-if="business.promotionThreshold && business.promotionDiscount">满{{ formatMoney(business.promotionThreshold) }}减{{ formatMoney(business.promotionDiscount) }}</span><span>品质保障</span><span v-if="business.dineInAvailable">支持自取</span>
+            <span v-if="deliveryMode === 'pickup'">自取免配送费</span><template v-else><span v-if="Number(business.deliveryPrice || 0) === 0">免配送费</span><span v-else>配送 ¥{{ formatMoney(business.deliveryPrice) }}</span></template><span v-if="business.promotionThreshold && business.promotionDiscount">满{{ formatMoney(business.promotionThreshold) }}减{{ formatMoney(business.promotionDiscount) }}</span><span>品质保障</span><span v-if="business.dineInAvailable">支持堂食</span>
         </div>
 
         <nav class="page-tabs" role="tablist" aria-label="商家内容">
@@ -188,10 +188,7 @@ export default {
             if (!categories.includes(activeCategory.value)) activeCategory.value = categories[0] || '';
         }, { immediate: true });
         const setDeliveryMode = (mode) => {
-            if (mode === 'pickup' && business.value.dineInAvailable === false) {
-                toast.warning('该商家暂不支持到店自取');
-                return;
-            }
+            if (!['delivery', 'pickup'].includes(mode)) return;
             deliveryMode.value = mode;
             if (businessId.value) localStorage.setItem(`businessServiceMode:${businessId.value}`, mode);
         };
@@ -538,7 +535,7 @@ export default {
                         remarks: response.data.remarks
                     };
                     const savedMode = localStorage.getItem(`businessServiceMode:${businessId.value}`) || 'delivery';
-                    deliveryMode.value = savedMode === 'pickup' && response.data.dineInAvailable === false ? 'delivery' : savedMode;
+                    deliveryMode.value = savedMode === 'pickup' ? 'pickup' : 'delivery';
                 } else {
                     const errorMsg = response.message || "获取商家信息失败";
                     console.error("商家信息API返回失败:", errorMsg);
@@ -644,7 +641,6 @@ export default {
             const canOrder = totalQuantity.value > 0
                 && (business.value.status === undefined || business.value.status === 1)
                 && business.value.operatingStatus !== false
-                && (deliveryMode.value !== 'pickup' || business.value.dineInAvailable !== false)
                 && (deliveryMode.value === 'pickup' || totalPrice.value >= Number(business.value.startPrice || 0));
             return canOrder;
         });
@@ -1155,10 +1151,10 @@ export default {
 .wrapper .cart .cart-right .cart-right-item.ready { background: #168bd1; cursor: pointer; }
 .wrapper .cart .cart-right .cart-right-item:disabled { opacity: 1; }
 @media (min-width: 700px) {
-    .store-header { padding-left: calc((100% - 760px) / 2 + 14px); padding-right: calc((100% - 760px) / 2 + 14px); }
+    .store-header { padding-left: 14px; padding-right: 14px; }
     .page-content { padding-bottom: 30px; }
     .wrapper { padding-bottom: 0; }
-    .wrapper .cart { left: 50%; width: 760px; transform: translateX(-50%); border-radius: 8px 8px 0 0; }
+    .wrapper .cart { left: 50%; width: min(100%, 760px); transform: translateX(-50%); border-radius: 8px 8px 0 0; }
 }
 @media (max-width: 520px) {
     .page-content { padding-left: 0; padding-right: 0; }

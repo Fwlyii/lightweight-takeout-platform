@@ -151,7 +151,7 @@ export default {
 					"/api/businesses/type/presentations",
 					{
 						params: {
-							type: orderTypeId
+							type: Number(orderTypeId) === 1 ? undefined : orderTypeId
 						}
 					}
 				);

@@ -1,9 +1,10 @@
 <template>
     <main class="admin-page">
+        <AdminPageHeader class="dispatch-header" title="骑手与配送调度" />
         <header class="page-head">
             <div>
                 <p>平台管理</p>
-                <h1>骑手与配送调度</h1><span>审核骑手资质，处理配送异常</span>
+                <span>审核骑手资质，处理配送异常</span>
             </div>
             <button @click="loadAll"><i class="fas fa-sync-alt" :class="{ spin: loading }"></i> 刷新数据</button>
         </header>
@@ -126,6 +127,7 @@
 </template>
 
 <script setup>
+import AdminPageHeader from '../components/AdminPageHeader.vue';
 import { computed, onMounted, ref } from 'vue'; import request from '@/utils/request'; import { toast } from '@/utils/toast';
 const applications = ref([]), exceptions = ref([]), loading = ref(false), tab = ref('applications'), applicationFilter = ref('all'), exceptionFilter = ref('all'), modal = ref(null);
 const pendingApplications = computed(() => applications.value.filter(x => x.auditStatus === 0)); const approvedCount = computed(() => applications.value.filter(x => x.auditStatus === 1).length); const openExceptions = computed(() => exceptions.value.filter(x => x.status === 0)); const resolvedCount = computed(() => exceptions.value.filter(x => x.status === 1).length);
@@ -145,9 +147,15 @@ const vehicleName = v => ({ E_BIKE: '电动车', BIKE: '自行车', WALK: '步�
 .admin-page {
     min-height: 100vh;
     background: #f3f6fa;
-    padding: 34px max(24px, calc((100% - 1240px)/2)) 100px;
+    --admin-inset: 16px;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 var(--admin-inset) 100px;
     color: #1b2a3a
 }
+
+.dispatch-header { width: calc(100% + var(--admin-inset) * 2); margin: 0 calc(-1 * var(--admin-inset)) 16px; }
 
 .page-head {
     padding: 32px 35px;
@@ -606,7 +614,8 @@ td {
 
 @media(max-width:800px) {
     .admin-page {
-        padding: 18px 12px 90px
+        --admin-inset: 12px;
+        padding: 0 var(--admin-inset) 90px
     }
 
     .page-head {

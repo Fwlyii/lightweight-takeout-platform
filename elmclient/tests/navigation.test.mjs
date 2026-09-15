@@ -60,6 +60,15 @@ async function namedHandler(file, name, j) {
 
 async function returnButton(file, j) {
   const source = await read(file);
+  const adminHeader = source.match(/<AdminPageHeader\b([^>]*)\/>/);
+  if (adminHeader) {
+    const component = await read('components/AdminPageHeader.vue');
+    const backTo = adminHeader[1].match(/back-to="([^"]+)"/)?.[1]
+      || component.match(/backTo:.*?default: '([^']+)'/)?.[1];
+    const click = component.match(/@click="([^"]+)"/)[1];
+    assert.ok(backTo && resolver.resolve(backTo).name);
+    return new Function('router', 'backTo', `return (${click})`)(j.router, backTo);
+  }
   if (/const goBack\s*=/.test(source)) return (await namedHandler(file, 'goBack', j))();
   const headerEnd = source.indexOf('</header>');
   const header = source.slice(0, headerEnd >= 0 ? headerEnd + 9 : source.indexOf('</template>'));
@@ -133,7 +142,9 @@ const directPages = [
   ['views/MerchantApply.vue', '/merchant/apply', '/index'],
   ['views/MerchantReviews.vue', '/merchant/reviews', '/merchant/business'],
   ['views/MerchantBusinessInfo.vue', '/merchant/businessInfo?businessId=1', '/merchant/business'],
-  ['views/AdminUser.vue', '/admin/user', '/admin/home']
+  ['views/AdminUser.vue', '/admin/user', '/admin/home'],
+  ['views/AdminBusiness.vue', '/admin/business', '/admin/home'],
+  ['views/AdminShop.vue', '/admin/shop?ownerId=2', '/admin/business']
 ];
 for (const [file, path, expected] of directPages) {
   test(`${path}: directly opened detail has an in-app fallback`, async () => {

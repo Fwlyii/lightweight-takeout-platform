@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="app-container" :class="{ 'admin-area': showAdminFooter }">
     <div
       v-if="routeMotion.active"
       class="route-wipe"
@@ -10,7 +10,7 @@
     <BackButton v-if="showBackButton" />
     <div class="content">
       <router-view v-slot="{ Component, route: viewRoute }">
-        <transition :name="viewRoute.name === 'Login' ? 'auth-route' : 'page-route'">
+        <transition mode="out-in" :name="viewRoute.name === 'Login' ? 'auth-route' : 'page-route'">
           <component :is="Component" :key="viewRoute.path" />
         </transition>
       </router-view>
@@ -65,16 +65,20 @@ export default {
       });
     }, { immediate: true });
 
-    onMounted(async () => {
-      applyTheme(getStoredTheme());
-      if (!getToken() || getAuthRole() !== 'user') return;
+    onMounted(() => applyTheme(getStoredTheme()));
+    let preferenceSession = null;
+    watch(() => route.fullPath, async () => {
+      const token = getToken();
+      if (!token || getAuthRole() !== 'user') { preferenceSession = null; return; }
+      if (token === preferenceSession) return;
+      preferenceSession = token;
       try {
         const preference = await request.get('/api/v1/preferences/me');
-        if (preference?.success && preference.data?.theme) applyTheme(preference.data.theme);
+        if (getToken() === token && preference?.success && preference.data?.theme) applyTheme(preference.data.theme);
       } catch (_) {
         // 主题读取失败不阻塞页面，继续使用本地主题。
       }
-    });
+    }, { immediate: true });
 
     const showBackButton = computed(() => {
       if (route.path.startsWith('/merchant') || route.path.startsWith('/admin') || route.path.startsWith('/rider')) {
@@ -170,12 +174,18 @@ a { text-decoration: none; }
 .app-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
-.content {
+.app-container > .content {
   flex: 1;
+  min-height: 0;
+  min-width: 0;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .route-wipe {

@@ -34,6 +34,8 @@ export function selectLoginDestination(session, redirect, resolveRoute) {
   if (typeof redirect !== 'string' || !redirect.startsWith('/') || redirect.startsWith('//')
       || /[\\\x00-\x1f]/.test(redirect)) return definition.target;
   const resolved = resolveRoute(redirect);
+  // The assistant is an opt-in tool, not the landing page after signing in.
+  if (['AiChat', 'AiRecommend', 'AiVoiceOrder', 'AiDishRecognition'].includes(resolved?.name)) return definition.target;
   if (!resolved?.name || ['Login', 'Register', 'Unknown'].includes(resolved.name)) return definition.target;
   return resolved.meta.role === 'user' || resolved.meta.public ? redirect : definition.target;
 }

@@ -102,11 +102,9 @@ public class OrderSubmissionService {
     }
 
     private FulfillmentMode requireSupportedMode(String serviceMode, Business business) {
-        FulfillmentMode mode = FulfillmentMode.fromClientValue(serviceMode);
-        if (mode == FulfillmentMode.PICKUP && !Boolean.TRUE.equals(business.getDineInAvailable())) {
-            throw new APIException("该商家暂不支持到店自取，请选择外送");
-        }
-        return mode;
+        // 堂食表示店内有座位，与顾客自行到店取走打包餐品无关。
+        // 正常营业的店铺均可自取，前置校验仍检查营业/审核状态。
+        return FulfillmentMode.fromClientValue(serviceMode);
     }
 
     private Long findExistingOrder(Long userId, String key) {

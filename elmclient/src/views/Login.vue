@@ -207,7 +207,7 @@ const activeRole = computed(() => roleMap[selectedRole.value]);
 const activeRoleIndex = computed(() => Math.max(0, roleOptions.findIndex(item => item.key === selectedRole.value)));
 const hasRedirect = computed(() => {
   const redirect = route.query.redirect;
-  return typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//');
+  return selectLoginDestination({ role: selectedRole.value }, redirect, router.resolve) !== activeRole.value.target;
 });
 const loginButtonText = computed(() => {
   if (loginSucceeded.value) return '登录成功';

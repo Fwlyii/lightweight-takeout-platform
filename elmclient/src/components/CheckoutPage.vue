@@ -61,7 +61,6 @@ async function load() {
     if (!response?.success || !response.data) throw new Error(response?.message || '商家信息加载失败');
     business.value = response.data;
     if (business.value.operatingStatus === false) throw new Error('商家当前休息中，暂时无法下单');
-    if (context.value.serviceMode === 'pickup' && business.value.dineInAvailable !== true) throw new Error('商家暂不支持自取，请返回选择外送');
     items.value = checkoutItems(cart || [], context.value);
     if (context.value.serviceMode === 'delivery' && subtotal.value < Number(business.value.startPrice || 0)) {
       throw new Error(`未达到起送价 ¥${money(business.value.startPrice)}，请返回购物车继续选购`);

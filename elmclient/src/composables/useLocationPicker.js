@@ -142,7 +142,7 @@ export function useLocationPicker({
 
     return {
         displayLocation, showPicker, loading, error, locationData, currentLevel, locationLevels,
-        selectedLocation, showLocationPicker, hideLocationPicker, switchLevel, selectLocation,
+        selectedLocation, pendingLocation, showLocationPicker, hideLocationPicker, switchLevel, selectLocation,
         isSelected, confirmLocation, getDisplayText, restoreSavedLocation
     };
 }

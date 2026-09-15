@@ -7,18 +7,19 @@
                 <i class="fas fa-map-marker-alt"></i>
             </div>
             <!-- <div class="location-text">天津大学北洋园校区<i class="fa fa-caret-down"></i></div> -->
-            <div class="location-text" @click="showLocationPicker">
+            <button type="button" class="location-text" aria-label="选择位置" @click="showLocationPicker">
                 <span class="location-display">{{ displayLocation }}</span>
                 <i class="fa fa-caret-down"></i>
-            </div>
+            </button>
 
             <!-- 漂亮的位置选择弹窗 -->
+            <Teleport to="body">
             <transition name="fade">
-                <div v-if="showPicker" class="location-modal" @click.self="hideLocationPicker">
-                    <div class="modal-container">
+                <div v-if="showPicker" class="location-modal" @click.self="hideLocationPicker" @keydown.esc="hideLocationPicker" @keydown.tab="trapLocationFocus">
+                    <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="location-dialog-title">
                         <div class="modal-header">
-                            <h3>选择位置</h3>
-                            <button class="close-btn" @click="hideLocationPicker">
+                            <h3 id="location-dialog-title">选择位置</h3>
+                            <button type="button" class="close-btn" aria-label="关闭位置选择" @click="hideLocationPicker">
                                 <i class="fa fa-times"></i>
                             </button>
                         </div>
@@ -34,7 +35,8 @@
                             </div>
 
                             <!-- 位置列表 -->
-                            <div class="location-list-container">
+                            <p v-if="locationError" class="location-error" role="status">{{ locationError }}</p>
+                            <div v-else class="location-list-container">
                                 <div v-if="loading" class="loading-state">
                                     <i class="fa fa-spinner fa-spin"></i>
                                     <span>加载中...</span>
@@ -46,7 +48,7 @@
                                 </div>
 
                                 <div v-else class="location-items">
-                                    <div v-for="item in locationData" :key="item.id"
+                                    <div v-for="item in locationData" :key="item.adcode || item.name"
                                         :class="['location-item', { selected: isSelected(item) }]"
                                         @click="selectLocation(item)">
                                         <span class="item-name">{{ item.name }}</span>
@@ -56,21 +58,22 @@
                             </div>
 
                             <!-- 当前选择显示 -->
-                            <div v-if="selectedLocation.province" class="current-selection">
+                            <div v-if="pendingLocation.province" class="current-selection">
                                 <span>已选择：</span>
                                 <span class="selection-text">
-                                    {{ getDisplayText(selectedLocation) }}
+                                    {{ getDisplayText(pendingLocation) }}
                                 </span>
                             </div>
                         </div>
 
                         <div class="modal-footer">
                             <button class="btn-cancel" @click="hideLocationPicker">取消</button>
-                            <button class="btn-confirm" @click="confirmLocation">确认</button>
+                            <button class="btn-confirm" :disabled="loading || !!locationError || !pendingLocation.district" @click="confirmLocation">确认</button>
                         </div>
                     </div>
                 </div>
             </transition>
+            </Teleport>
 
             <div class="login-register">
                 <template v-if="!userInfo">
@@ -366,6 +369,8 @@ export default {
             displayLocation,
             showPicker,
             loading,
+            error: locationError,
+            pendingLocation,
             locationData,
             currentLevel,
             locationLevels,
@@ -379,6 +384,22 @@ export default {
             getDisplayText,
             restoreSavedLocation
         } = useLocationPicker();
+
+        let locationOpener = null;
+        watch(showPicker, async open => {
+            const shell = document.querySelector('.app-container');
+            if (open) locationOpener = document.activeElement;
+            if (shell) shell.inert = open;
+            await nextTick();
+            if (open) document.querySelector('.location-modal .close-btn')?.focus();
+            else locationOpener?.focus();
+        });
+        const trapLocationFocus = event => {
+            const buttons = [...event.currentTarget.querySelectorAll('button:not(:disabled), [tabindex="0"]')];
+            const first = buttons[0], last = buttons[buttons.length - 1];
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+        };
 
         const scrollToRecommendations = () => {
             document.getElementById('recommendations')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -533,6 +554,8 @@ export default {
         });
 
         onBeforeUnmount(() => {
+            const shell = document.querySelector('.app-container');
+            if (shell) shell.inert = false;
             scrollContainer?.removeEventListener('scroll', handleScroll);
             if (scrollFrame) cancelAnimationFrame(scrollFrame);
             window.removeEventListener('resize', updateSortIndicator);
@@ -543,7 +566,7 @@ export default {
         watch([sortBy, showFilter], updateSortIndicator, { flush: 'post' });
 
         const toBusinessList = (orderTypeId) => {
-            router.push({ path: '/BusinessList', query: { orderTypeId } });
+            router.push({ path: '/businessList', query: { orderTypeId } });
         };
         const goToLChoose = () => {
             // 跳转到登录页面
@@ -731,6 +754,9 @@ export default {
             displayLocation,
             showPicker,
             loading,
+            locationError,
+            pendingLocation,
+            trapLocationFocus,
             locationData,
             currentLevel,
             locationLevels,
@@ -775,7 +801,7 @@ export default {
 /****************** 总容器 ******************/
 .wrapper {
     width: 100%;
-    height: 100%;
+    height: auto;
 }
 
 /****************** header ******************/
@@ -1532,6 +1558,8 @@ export default {
     gap: 4px;
 }
 
+button.location-text { border: 0; background: transparent; color: inherit; padding: 0; font: inherit; text-align: left; cursor: pointer; }
+
 .location-text:hover {
     color: #e0e0e0;
 }
@@ -1605,11 +1633,14 @@ export default {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    margin-left: 27px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin: 0;
+    min-height: 0;
     overflow-y: auto;
 }
+
+.location-error { padding: 18px 0; color: #657b8c; line-height: 1.6; font-size: 14px; }
+.location-modal .btn-confirm:disabled { opacity: .45; cursor: not-allowed; }
+.location-modal .modal-container { color: #26455b; }
 
 /* 位置导航样式 */
 .location-nav {
@@ -1976,7 +2007,7 @@ export default {
 }
 
 /* 首页移动端可读性兜底：限制横向内容，避免用户问候和历史样式撑破页面 */
-.wrapper { max-width: 600px; margin: 0 auto; overflow-x: hidden; }
+.wrapper { max-width: 600px; margin: 0 auto; }
 .wrapper header { min-width: 0; }
 .wrapper header .location-text { min-width: 0; max-width: 48%; font-size: 16px; }
 .wrapper header .location-display { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

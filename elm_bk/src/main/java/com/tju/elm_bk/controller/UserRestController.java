@@ -25,6 +25,12 @@ public class UserRestController {
     private final RegistrationService registration;
     private final CurrentProfileService profile;
     private final com.tju.elm_bk.service.ProfileUpdateService profileUpdate;
+    private final com.tju.elm_bk.service.AvatarUpdateService avatarUpdate;
+
+    @PostMapping(value = "/user/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public PersonVO updateAvatar(@RequestPart("avatar") MultipartFile avatar) throws IOException {
+        return avatarUpdate.update(avatar);
+    }
 
     @org.springframework.web.bind.annotation.PutMapping("/user")
     public PersonVO updateProfile(@Valid @RequestBody com.tju.elm_bk.dto.ProfileUpdateDTO request) {

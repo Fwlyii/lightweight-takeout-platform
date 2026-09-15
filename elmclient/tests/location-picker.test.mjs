@@ -35,6 +35,7 @@ test('selection changes the displayed location only after confirmation', async (
   const { picker, calls, values } = fixture();
   const initial = picker.displayLocation.value;
   await chooseDistrict(picker);
+  assert.deepEqual(picker.pendingLocation.value, savedLocation, 'dialog can display the uncommitted selection');
   assert.equal(picker.displayLocation.value, initial);
   assert.equal(picker.currentLevel.value, 2);
   assert.equal(picker.isSelected(district), true);

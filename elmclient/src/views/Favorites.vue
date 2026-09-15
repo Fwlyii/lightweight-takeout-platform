@@ -5,7 +5,7 @@
       {{ error }} <button type="button" @click="load">重试</button>
     </p>
     <p v-if="!loading && !error && !businesses.length" class="panel muted">
-      还没有收藏的店铺，去看看喜欢吃什么吧。
+      还没有收藏的店铺，去看看喜欢吃什么吧~
     </p>
     <article v-for="business in businesses" :key="business.id" class="panel">
       <router-link
