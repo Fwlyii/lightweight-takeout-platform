@@ -157,8 +157,7 @@ export default {
             try {
                 const response = await request.get('/api/businesses/merchant', {
                     params: {
-                        userId: ownerId.value,
-                        status: 1
+                        userId: ownerId.value
                     }
                 });
                 if (response.success) {

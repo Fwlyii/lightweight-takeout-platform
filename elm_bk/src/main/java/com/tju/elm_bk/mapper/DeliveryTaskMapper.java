@@ -6,11 +6,15 @@ import com.tju.elm_bk.vo.DeliveryExceptionVO;
 import com.tju.elm_bk.vo.DeliveryTaskVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
 @Mapper
 public interface DeliveryTaskMapper {
+    @Select("SELECT COUNT(*) FROM delivery_task WHERE task_status = 'DELIVERING'")
+    int countDeliveringTasks();
+
     void insertTask(DeliveryTask task);
 
     DeliveryTask selectById(Long id);

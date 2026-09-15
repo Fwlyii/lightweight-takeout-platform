@@ -11,6 +11,8 @@ import com.tju.elm_bk.vo.NavigationVO;
 import java.util.List;
 
 public interface DeliveryService {
+    int countDeliveringTasks();
+
     List<DeliveryTaskVO> listAvailableTasks();
 
     List<DeliveryTaskVO> listMyTasks(Boolean active);

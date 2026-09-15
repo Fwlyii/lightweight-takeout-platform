@@ -43,6 +43,11 @@ public class AdminRiderController {
         return HttpResult.success(requireDeliveryService().listExceptions(status));
     }
 
+    @GetMapping("/delivery-tasks/summary")
+    public HttpResult<Integer> deliveryTaskSummary() {
+        return HttpResult.success(requireDeliveryService().countDeliveringTasks());
+    }
+
     @PostMapping("/delivery-exceptions/{id}/resolve")
     public HttpResult<DeliveryTaskVO> resolveException(@PathVariable Long id,
                                                        @Valid @RequestBody DeliveryExceptionResolveDTO dto) {

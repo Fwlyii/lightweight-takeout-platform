@@ -12,6 +12,7 @@ module.exports = {
     outputDir: 'dist-auth'
   } : {}),
   devServer: {
-    port: 8080
+    port: 8080,
+    historyApiFallback: true
   }
 };

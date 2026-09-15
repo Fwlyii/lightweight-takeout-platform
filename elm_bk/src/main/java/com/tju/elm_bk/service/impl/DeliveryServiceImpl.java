@@ -297,6 +297,11 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
+    public int countDeliveringTasks() {
+        return deliveryTaskMapper.countDeliveringTasks();
+    }
+
+    @Override
     public List<DeliveryExceptionVO> listExceptions(Integer status) {
         return deliveryTaskMapper.listExceptions(status);
     }
