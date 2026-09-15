@@ -34,6 +34,10 @@ test('pickup is not incorrectly disabled by dine-in seating metadata', async () 
   }
 });
 
+test('sticky store header is not translated like a viewport-fixed legacy header', async () => {
+  assert.match(await read('assets/styles/fwl-alignment.css'), /\.business-detail-page > \.store-header \{ left: auto; right: auto; transform: none;/);
+});
+
 for (const name of ['Index', 'MyInformation', 'AdminHome', 'AdminUser', 'AdminBusiness', 'AdminShop']) {
   test(`${name} updated template compiles`, async () => {
     const source = await read(`views/${name}.vue`);

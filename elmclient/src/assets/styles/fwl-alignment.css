@@ -1,6 +1,7 @@
 /* Keep fwl-AI's 600px page stage and component artwork/layouts authoritative.
  * Only integration/accessibility corrections belong here, not page redesigns. */
 :root { --app-width: 600px; }
+#app .business-detail-page > .store-header { left: auto; right: auto; transform: none; }
 .cart-page .cart-return { position: absolute; left: 16px; top: 22px; border: 0; background: transparent; color: inherit; font-size: 32px; z-index: 2; }
 .cart-page .merchant-picker { display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 10px; background: white; border-radius: 12px; }
 .cart-page .merchant-picker select { flex: 1; min-width: 0; padding: 8px; border: 1px solid var(--skin-border); border-radius: 6px; }
