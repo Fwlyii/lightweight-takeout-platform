@@ -1,12 +1,6 @@
 <template>
-  <div class="wrapper">
-    <header>
-      <div class="header-icon">
-        <i class="fa fa-angle-left" @click="navigateBack($router, $route)"></i>
-      </div>
-      <p>商家信息</p>
-      <div></div>
-    </header>
+  <div class="wrapper merchant-detail-page">
+    <PageHeader title="商家信息" />
 
     <div class="business-info-card">
       <div class="business-logo">
@@ -75,7 +69,7 @@
 </template>
 
 <script>
-import { navigateBack } from '../utils/backNavigation';
+import PageHeader from '../components/PageHeader.vue';
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import Swal from 'sweetalert2';
@@ -84,6 +78,7 @@ import businessDefaultImg from '@/assets/business-default.png';
 import foodDefaultImg from '@/assets/food-default.png';
 
 export default {
+  components: { PageHeader },
   name: "BusinessInfo",
   setup() {
     const route = useRoute();
@@ -917,7 +912,6 @@ export default {
     };
 
     return {
-      navigateBack,
       business,
       favoriteCount,
       foodArr,

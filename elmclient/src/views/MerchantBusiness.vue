@@ -18,6 +18,9 @@
     </div>
 
     <div class="container wrapper">
+      <p v-if="loading" class="workbench-notice" role="status">正在加载店铺…</p>
+      <p v-else-if="errorMessage" class="workbench-notice" role="alert">{{ errorMessage }} <button @click="loadShops()">重新加载</button></p>
+      <p v-else-if="!filteredShops.length" class="workbench-notice">当前分类暂无店铺，可在下方申请新店。</p>
       <ul class="business-list">
         <li v-for="(shop, index) in filteredShops" :key="shop?.id || index">
           <!-- <div class="status-badge" :class="getStatusClass(shop.status)">
@@ -121,7 +124,6 @@ export default {
 
     const changeTab = (status) => {
       activeTab.value = status;
-      loadShops(status);
     };
 
     const loadShops = async (status = null) => {
@@ -209,8 +211,10 @@ export default {
               <input id="businessName" class="swal2-input modern-input" placeholder="商铺名称" required>
               <input id="businessAddress" class="swal2-input modern-input" placeholder="商铺地址" required>
               <textarea id="businessExplain" class="swal2-textarea modern-textarea" placeholder="商铺介绍"></textarea>
-              <input id="deliveryPrice" class="swal2-input modern-input" placeholder="配送费(元)" type="number" min="0" step="0.1" required>
-              <input id="startPrice" class="swal2-input modern-input" placeholder="起送价(元)" type="number" min="0" step="0.1" required>
+              <div class="shop-amount-fields">
+                <input id="deliveryPrice" class="swal2-input modern-input" aria-label="配送费（元）" placeholder="配送费(元)" type="number" min="0" step="0.01" required>
+                <input id="startPrice" class="swal2-input modern-input" aria-label="起送价（元）" placeholder="起送价(元)" type="number" min="0" step="0.01" required>
+              </div>
               <label class="shop-setting-row"><input id="dineInAvailable" type="checkbox"><span>支持堂食</span><small>在首页显示“堂食店”</small></label>
               <select id="promotionPreset" class="swal2-input modern-input">
                 <option value="">不设置满减</option>
@@ -219,14 +223,15 @@ export default {
                 <option value="50-10">满50减10</option>
               </select>
               
-              <div class="input-with-button-container">
-                <input id="orderTypeInput" class="swal2-input modern-input" placeholder="请选择商铺类型" readonly required>
-                <button id="selectTypeBtn" class="select-type-btn">选择</button>
-              </div>
+              <select id="orderTypeInput" class="swal2-input modern-input" aria-label="商铺类型" required>
+                <option value="">请选择商铺类型</option>
+                <option value="1">美食</option><option value="2">早餐</option><option value="3">跑腿代购</option>
+                <option value="4">汉堡披萨</option><option value="5">甜品饮品</option><option value="6">速食简食</option>
+                <option value="7">地方小吃</option><option value="8">米粉面馆</option><option value="9">包子粥铺</option><option value="10">炸鸡炸串</option>
+              </select>
             </div>
           `,
-          width: '90%',
-          maxWidth: '450px',
+          width: '560px',
           padding: '1rem',
           focusConfirm: false,
           showCancelButton: true,
@@ -244,7 +249,9 @@ export default {
             const uploadText = document.getElementById('upload-text');
 
             const orderTypeInput = document.getElementById('orderTypeInput');
-            const selectTypeBtn = document.getElementById('selectTypeBtn');
+            orderTypeInput.addEventListener('change', () => {
+              selectedOrderType = orderTypeInput.value ? { id: Number(orderTypeInput.value) } : null;
+            });
 
             // 实时校验函数
             const validateField = (inputId, validationFn, errorMessage) => {
@@ -337,77 +344,7 @@ export default {
               }
             });
 
-            // 点击选择按钮，弹出类型选择弹窗
-            selectTypeBtn.addEventListener('click', async (e) => {
-              e.preventDefault();
 
-              const typeOptions = [
-                { id: 1, label: '美食' },
-                { id: 2, label: '早餐' },
-                { id: 3, label: '跑腿代购' },
-                { id: 4, label: '汉堡披萨' },
-                { id: 5, label: '甜品饮品' },
-                { id: 6, label: '速食简食' },
-                { id: 7, label: '地方小吃' },
-                { id: 8, label: '米粉面馆' },
-                { id: 9, label: '包子粥铺' },
-                { id: 10, label: '炸鸡炸串' },
-              ];
-
-              const optionsHtml = typeOptions.map(option => `
-                <div class="type-option" data-id="${option.id}">${option.label}</div>
-              `).join('');
-
-              // 创建一个新的弹窗，但不关闭原弹窗
-              const typeSelectResult = await new Promise((resolve) => {
-                // 创建覆盖层和弹窗
-                const overlay = document.createElement('div');
-                overlay.className = 'type-select-overlay';
-                overlay.innerHTML = `
-                  <div class="type-select-popup">
-                    <div class="type-select-popup-header">
-                      <h3>选择商铺类型</h3>
-                      <button class="type-select-close">×</button>
-                    </div>
-                    <div class="type-options-container">${optionsHtml}</div>
-                  </div>
-                `;
-
-                document.body.appendChild(overlay);
-
-                // 添加事件监听
-                const closeBtn = overlay.querySelector('.type-select-close');
-                const options = overlay.querySelectorAll('.type-option');
-
-                closeBtn.addEventListener('click', () => {
-                  overlay.remove();
-                  resolve(null);
-                });
-
-                options.forEach(option => {
-                  option.addEventListener('click', () => {
-                    const id = option.getAttribute('data-id');
-                    const label = option.textContent;
-                    overlay.remove();
-                    resolve({ id: parseInt(id), label: label });
-                  });
-                });
-
-                // 点击覆盖层关闭
-                overlay.addEventListener('click', (e) => {
-                  if (e.target === overlay) {
-                    overlay.remove();
-                    resolve(null);
-                  }
-                });
-              });
-
-              // 如果用户选择了类型，更新输入框
-              if (typeSelectResult) {
-                orderTypeInput.value = typeSelectResult.label;
-                selectedOrderType = typeSelectResult;
-              }
-            });
           },
           preConfirm: async () => {
             const businessName = document.getElementById('businessName').value.trim();
@@ -417,6 +354,15 @@ export default {
             const startPriceStr = document.getElementById('startPrice').value.trim();
             const dineInAvailable = document.getElementById('dineInAvailable').checked;
             const promotionValue = document.getElementById('promotionPreset').value;
+
+            if (businessName.length > 10 || businessAddress.length > 15 || businessExplain.length > 15) {
+              Swal.showValidationMessage('名称最多10字，地址和介绍最多15字');
+              return false;
+            }
+            if (![deliveryPriceStr, startPriceStr].every(value => /^\d+(\.\d{1,2})?$/.test(value) && Number.isFinite(Number(value)))) {
+              Swal.showValidationMessage('配送费和起送价需填写非负金额，最多两位小数');
+              return false;
+            }
 
             // 基础必填项校验
             if (!businessName || !businessAddress || !selectedOrderType) {
@@ -510,7 +456,8 @@ export default {
       getStatusText,
       getStatusClass,
       handleImageError,
-      changeTab
+      changeTab,
+      loadShops
     };
   }
 };

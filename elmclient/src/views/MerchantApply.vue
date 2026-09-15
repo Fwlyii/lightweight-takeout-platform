@@ -1,6 +1,6 @@
 <template>
   <main class="apply-page">
-    <header><button type="button" aria-label="返回" @click="navigateBack($router, $route)">‹</button><h1>申请成为商家</h1></header>
+    <PageHeader title="申请成为商家" />
     <section class="apply-card">
       <div class="store-icon"><i class="fas fa-store"></i></div>
       <h2>开启你的店铺</h2>
@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { navigateBack } from '../utils/backNavigation';
+import PageHeader from '../components/PageHeader.vue';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import request from '../utils/request';

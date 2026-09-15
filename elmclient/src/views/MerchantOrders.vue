@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper merchant-orders-page">
     <!-- 顶部蓝色栏 -->
     <div class="top-background">
       <h1>商家订单管理</h1>

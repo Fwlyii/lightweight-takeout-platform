@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container merchant-profile-page">
     <div class="top-background">
       <h1>商家信息</h1>
     </div>

@@ -1,12 +1,7 @@
 <template>
-	<div class="wrapper">
+	<div class="wrapper order-detail-page">
 		<!-- 固定顶部栏 -->
-		<div class="fixed-top">
-			<div class="header">
-				<button type="button" class="header-back" aria-label="返回" @click="navigateBack($router, $route)">‹</button>
-				<p>订单详情</p>
-			</div>
-		</div>
+		<PageHeader title="订单详情" />
 		
 		<!-- 内容区域 -->
 		<div class="content-area">
@@ -106,7 +101,7 @@
 </template>
 
 <script>
-import { navigateBack } from '../utils/backNavigation';
+import PageHeader from '../components/PageHeader.vue';
 import { ref, onMounted, computed, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import request from '../utils/request';
@@ -115,6 +110,7 @@ import { ORDER_STATUS, orderStatusText } from '../utils/orderPresentation';
 import { formatDateTime } from '../utils/formatters';
 
 export default {
+  components: { PageHeader },
 	name: 'ListDetail',
 	setup() {
 		const route = useRoute();
@@ -242,7 +238,6 @@ export default {
 		});
 
 		return {
-			navigateBack,
 			orderId,
 			orderDetail,
 			loading,

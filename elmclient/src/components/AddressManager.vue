@@ -7,7 +7,7 @@
   <p v-if="!loading && !error && !addresses.length" class="panel muted">
     还没有收货地址，添加一个吧。
   </p>
-  <article v-for="address in addresses" :key="address.id" class="panel">
+  <article v-for="address in addresses" :key="address.id" class="panel address-card" :class="{ 'address-selected': selectable && selectedId === address.id }">
     <h2>
       {{ address.contactName }}
       <span class="muted">{{ address.contactTel }}</span>
@@ -58,7 +58,7 @@
       </div>
     </div>
   </article>
-  <router-link v-if="!disabled" class="action-link primary wide" :to="{ path: '/addUserAddress', query: checkoutQuery }"
+  <router-link v-if="!disabled" class="action-link wide address-add" :class="{ primary: !selectable }" :to="{ path: '/addUserAddress', query: checkoutQuery }"
     >新增收货地址</router-link
   >
 </template>

@@ -60,6 +60,14 @@ async function namedHandler(file, name, j) {
 
 async function returnButton(file, j) {
   const source = await read(file);
+  const pageHeader = source.match(/<PageHeader\b([^>]*)>/);
+  if (pageHeader) {
+    const action = pageHeader[1].match(/:back-action="([^"]+)"/)?.[1];
+    if (action) return (await namedHandler(file, action, j))();
+    const backTo = pageHeader[1].match(/back-to="([^"]+)"/)?.[1];
+    assert.ok((await read('components/PageHeader.vue')).includes('navigateBack(router, route)'));
+    return backTo ? j.router.push(backTo) : navigation.navigateBack(j.router, j.route);
+  }
   const adminHeader = source.match(/<AdminPageHeader\b([^>]*)\/>/);
   if (adminHeader) {
     const component = await read('components/AdminPageHeader.vue');

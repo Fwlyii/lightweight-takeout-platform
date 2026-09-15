@@ -1,9 +1,7 @@
 <template>
-	<div class="wrapper">
+	<div class="wrapper cart-page">
 		<!-- header部分 -->
-		<header>
-			<p>购物车</p>
-		</header>
+		<PageHeader title="购物车" :back-action="goBack" />
 
 		<!-- 购物车为空提示 -->
 		<div v-if="loading || loadError" class="empty-cart" role="status">
@@ -70,6 +68,7 @@
 </template>
 
 <script>
+import PageHeader from '../components/PageHeader.vue';
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { toast } from '../utils/toast';
@@ -79,6 +78,7 @@ import { returnToMerchant } from '../utils/backNavigation';
 import { positiveId } from '../utils/checkout';
 
 export default {
+  components: { PageHeader },
 	name: 'Cart',
 	setup() {
 		const cartItems = ref([]);

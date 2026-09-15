@@ -1,12 +1,8 @@
 <template>
   <div class="notifications-container">
-    <div class="header">
-      <button class="header-back" type="button" aria-label="返回" @click="navigateBack($router, $route)">
-        <i class="fa fa-chevron-left" aria-hidden="true"></i>
-      </button>
-      <h1 class="title">消息与通知</h1>
+    <PageHeader title="消息与通知">
       <div v-if="unreadCount > 0" class="unread-badge">{{ unreadCount }}</div>
-    </div>
+    </PageHeader>
 
     <!-- 加载状态 -->
     <div v-if="loading" class="loading-state">
@@ -51,7 +47,7 @@
 </template>
 
 <script setup>
-import { navigateBack } from '../utils/backNavigation';
+import PageHeader from '../components/PageHeader.vue';
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import request from '@/utils/request';

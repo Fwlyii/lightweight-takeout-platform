@@ -1,152 +1,53 @@
 <template>
-	<div class="wrapper">
-		<!-- header部分 -->
-		<header>
-			<p>在线支付</p>
-		</header>
-
-		<!-- 加载中提示 -->
-		<div v-if="loading" class="loading">
-			<p>加载中...</p>
-		</div>
-
-		<div v-else-if="loadError" class="payment-unavailable" role="alert">
-			<h2>订单加载失败</h2><p>{{ loadError }}</p>
-			<button @click="fetchOrderDetails">重新加载</button>
-			<button @click="router.replace('/orderList')">返回订单列表</button>
-		</div>
-		<template v-else>
-			<div v-if="!canPay" class="payment-unavailable">
-				<i class="fa fa-check-circle"></i>
-				<h2>{{ orderDetail.orderState === ORDER_STATUS.CANCELLED ? '订单已取消' : '该订单无需再次支付' }}</h2>
-				<p>订单状态已经发生变化，请前往订单详情查看最新进度。</p>
-				<button type="button" @click="router.push({ path: '/listDetail', query: { orderId } })">查看订单详情</button>
-			</div>
-			<div v-else class="content">
-				<!-- 订单信息部分 -->
-				<div class="section order-section">
-					<div class="section-header">
-						<h3>订单基本信息</h3>
-						<span class="total-amount">&#165;{{ orderDetail.orderTotal || '0.00' }}</span>
-					</div>
-					
-					<!-- 配送信息 -->
-					<div v-if="orderDetail.serviceMode !== 'PICKUP'" class="delivery-info">
-						<div class="info-item">
-							<i class="fa fa-map-marker"></i>
-							<span>{{ orderDetail.address || '未选择地址' }}</span>
-						</div>
-						<div class="info-item">
-							<i class="fa fa-user"></i>
-							<span>{{ orderDetail.contactName }} {{ orderDetail.contactSex === 1 ? '先生' : orderDetail.contactSex === 0 ? '女士' : '' }}</span>
-						</div>
-						<div class="info-item">
-							<i class="fa fa-phone"></i>
-							<span>{{ orderDetail.contactTel }}</span>
-						</div>
-					</div>
-					<div v-else class="pickup-payment-note"><i class="fa fa-shopping-bag"></i><span><strong>到店自取</strong><small>商家备餐完成后到店取餐，无需配送地址</small></span></div>
-
-					<div class="section-header">
-						<h3>订单详情</h3>
-					</div>
-
-					<!-- 商家信息和订单明细部分 -->
-					<div class="merchant-details" v-show="isShowDetailet">
-						<div class="merchant-info">
-							<img :src="orderDetail.businessImg || require('../assets/business-default.png')" :alt="orderDetail.businessName || '商家图片'" class="merchant-logo" @error="handleImageError">
-							<div class="merchant-name">
-								{{ orderDetail.businessName || '未知商家' }}
-							</div>
-						</div>
-
-						<!-- 订单明细部分 -->
-						<div class="order-details">
-							<template v-if="orderDetail.foodList && orderDetail.foodList.length > 0">
-								<div class="detail-item" v-for="item in orderDetail.foodList" :key="item.id">
-									<span class="item-name">{{ item.foodName || '未知商品' }} &#165;{{ item.foodPrice }} &nbsp; × {{ item.quantity || 0 }}</span>
-									<span class="item-price">&#165;{{ (Number(item.foodPrice || 0) * Number(item.quantity || 0)).toFixed(2) }}</span>
-								</div>
-							</template>
-							<div v-if="merchantDiscount > 0" class="detail-item coupon-discount">
-								<span>商家及会员优惠</span>
-								<span>-&#165;{{ merchantDiscount.toFixed(2) }}</span>
-							</div>
-							<div v-if="orderDetail.serviceMode !== 'PICKUP'" class="detail-item delivery-fee">
-								<span>配送费</span>
-								<span>&#165;{{ Number(orderDetail.deliveryPrice || 0).toFixed(2) }}</span>
-							</div>
-							<div v-if="couponDiscount > 0" class="detail-item coupon-discount">
-								<span>{{ selectedCoupon.name || '红包优惠' }}</span>
-								<span>-&#165;{{ couponDiscount.toFixed(2) }}</span>
-							</div>
-						</div>
-					</div>
-
-					<div class="coupon-panel" aria-label="红包优惠">
-						<div class="coupon-panel-header"><h3>红包</h3><span v-if="couponDiscount > 0">已减 ¥{{ couponDiscount.toFixed(2) }}</span></div>
-						<div v-if="couponLoading" class="coupon-empty">正在加载可用红包…</div>
-						<template v-else-if="usableCoupons.length">
-							<button type="button" class="coupon-option" :class="{ active: selectedCouponId === null }" @click="selectCoupon(null)">
-								<span><b>不使用红包</b><small>保留本次红包</small></span><i v-if="selectedCouponId === null" class="fa fa-check-circle"></i>
-							</button>
-							<button v-for="coupon in usableCoupons" :key="coupon.id" type="button" class="coupon-option" :class="{ active: selectedCouponId === coupon.id }" @click="selectCoupon(coupon.id)">
-								<span><b>{{ coupon.name || '红包' }} · 减 ¥{{ Number(coupon.discountAmount || 0).toFixed(2) }}</b><small>满 ¥{{ Number(coupon.minOrderAmount || 0).toFixed(2) }} 可用 · {{ formatCouponExpiry(coupon.expiresAt) }}到期</small></span><i v-if="selectedCouponId === coupon.id" class="fa fa-check-circle"></i>
-							</button>
-						</template>
-						<div v-else class="coupon-empty">暂无满足本单门槛的红包</div>
-					</div>
-				</div>
-
-				<!-- 支付方式部分 -->
-				<div class="section payment-section">
-					<h3>选择支付方式</h3>
-					<div class="payment-options">
-						<div class="payment-option" :class="{ active: selectedPayment === 'alipay' }"
-							@click="selectPayment('alipay')">
-							<img src="../assets/alipay.png" alt="支付宝支付">
-							<span class="payment-demo-badge">演示</span>
-							<i class="fa fa-check-circle"></i>
-						</div>
-						<div class="payment-option" :class="{ active: selectedPayment === 'wechat' }"
-							@click="selectPayment('wechat')">
-							<img src="../assets/wechat.png" alt="微信支付">
-							<span class="payment-demo-badge">演示</span>
-							<i class="fa fa-check-circle"></i>
-						</div>
-						<div class="payment-option wallet-option" :class="{ active: selectedPayment === 'wallet' }"
-							@click="selectPayment('wallet')">
-							<span class="wallet-icon">¥</span>
-							<strong>钱包余额</strong>
-							<i class="fa fa-check-circle"></i>
-						</div>
-					</div>
-					<p class="payment-demo-note">支付宝、微信支付仅模拟支付结果，不连接真实资金渠道。</p>
-					<div v-if="assetInfo" class="asset-pay-hint">
-						<span>钱包余额 ¥{{ Number(assetInfo.balance || 0).toFixed(2) }} · 可用积分 {{ assetInfo.points || 0 }}</span>
-						<label v-if="maxPoints > 0">积分抵扣
-							<input v-model.number="pointsToUse" type="number" min="0" step="100" :max="maxPoints" @input="normalizePoints">
-						</label>
-						<small v-if="maxPoints > 0">本单最多可抵 {{ maxPoints }} 积分（应付金额的20%）</small>
-					</div>
-				</div>
-
-				<!-- 支付按钮 -->
-				<div class="payment-action">
-					<button class="pay-button" :disabled="paying || couponLoading" @click="handlePayment">
-						<span v-if="paying">支付中...</span>
-						<span v-else>确认支付 &#165;{{ payableAmount }}</span>
-					</button>
-				</div>
-			</div>
-		</template>
-
-		<!-- 底部菜单部分 -->
-	</div>
+  <main class="payment-page">
+    <PageHeader title="确认支付" back-to="/orderList" />
+    <div v-if="loading" class="payment-unavailable" role="status">正在核对订单…</div>
+    <div v-else-if="loadError" class="payment-unavailable" role="alert">
+      <h2>暂时无法加载订单</h2><p>{{ loadError }}</p>
+      <button @click="fetchOrderDetails">重试</button><button @click="router.replace('/orderList')">我的订单</button>
+    </div>
+    <div v-else-if="!canPay" class="payment-unavailable">
+      <h2>{{ Number(orderDetail.orderState) === ORDER_STATUS.CANCELLED ? '订单已取消' : '该订单无需再次支付' }}</h2>
+      <p>订单状态已更新，可在详情中查看最新进度。</p>
+      <button @click="router.replace({path:'/listDetail',query:{orderId}})">查看订单</button>
+    </div>
+    <div v-else class="payment-content" :aria-busy="paying">
+      <section class="payment-hero"><p>{{ orderDetail.businessName || '我的订单' }}</p><strong>¥{{ payableAmount }}</strong><small>待支付 · 订单 {{ orderId }}</small></section>
+      <div class="fulfilment-note"><i :class="orderDetail.serviceMode === 'PICKUP' ? 'fa fa-shopping-bag' : 'fa fa-map-marker'" aria-hidden="true"></i>
+        <span v-if="orderDetail.serviceMode === 'PICKUP'"><strong>到店自取</strong><small>商家备餐完成后，请凭取餐信息到店领取。</small></span>
+        <span v-else><strong>{{ orderDetail.address || '配送地址以订单信息为准' }}</strong><small>{{ orderDetail.contactName }} · {{ orderDetail.contactTel }}</small></span>
+      </div>
+      <section class="section"><h3>订单详情</h3>
+        <div v-for="(item,index) in orderDetail.foodList || []" :key="item.id || index" class="detail-item">
+          <span class="item-name">{{ item.foodName }}<small>¥{{ Number(item.foodPrice || 0).toFixed(2) }} × {{ item.quantity }}</small></span><span class="item-price">¥{{ (Number(item.foodPrice || 0)*Number(item.quantity || 0)).toFixed(2) }}</span>
+        </div>
+        <div v-if="orderDetail.serviceMode !== 'PICKUP'" class="detail-item"><span>配送费</span><span>¥{{ Number(orderDetail.deliveryPrice || 0).toFixed(2) }}</span></div>
+        <div v-if="merchantDiscount > 0" class="detail-item coupon-discount"><span>商家及会员优惠</span><span>−¥{{ merchantDiscount.toFixed(2) }}</span></div>
+        <div v-if="couponDiscount > 0" class="detail-item coupon-discount"><span>红包抵扣</span><span>−¥{{ couponDiscount.toFixed(2) }}</span></div>
+        <div v-if="appliedPoints > 0" class="detail-item coupon-discount"><span>积分抵扣</span><span>−¥{{ (appliedPoints/100).toFixed(2) }}</span></div>
+        <div class="detail-item"><strong>合计</strong><strong>¥{{ payableAmount }}</strong></div>
+      </section>
+      <section class="section" aria-label="红包优惠"><div class="coupon-panel-header"><h3>红包优惠</h3><span v-if="couponDiscount">已省 ¥{{ couponDiscount.toFixed(2) }}</span></div>
+        <div v-if="couponLoading" class="coupon-empty">正在查找可用红包…</div>
+        <template v-else-if="usableCoupons.length">
+          <button class="coupon-option" :class="{active:selectedCouponId === null}" :disabled="paying" :aria-pressed="selectedCouponId === null" @click="selectCoupon(null)"><span>不使用红包</span><i v-if="selectedCouponId === null" class="fa fa-check-circle"></i></button>
+          <button v-for="coupon in usableCoupons" :key="coupon.id" class="coupon-option" :class="{active:selectedCouponId === coupon.id}" :disabled="paying" :aria-pressed="selectedCouponId === coupon.id" @click="selectCoupon(coupon.id)"><span><b>{{ coupon.name || '红包' }} · 减 ¥{{ Number(coupon.discountAmount || 0).toFixed(2) }}</b><small>满 ¥{{ Number(coupon.minOrderAmount || 0).toFixed(2) }} 可用 · {{ formatCouponExpiry(coupon.expiresAt) }}到期</small></span><i v-if="selectedCouponId === coupon.id" class="fa fa-check-circle"></i></button>
+        </template><p v-else class="coupon-empty">本单暂无可用红包</p>
+      </section>
+      <section class="section"><h3>支付方式</h3>
+        <label v-for="method in [{id:'alipay',label:'支付宝',icon:'支'},{id:'wechat',label:'微信支付',icon:'微'},{id:'wallet',label:'钱包余额',icon:'¥'}]" :key="method.id" class="payment-option"><span class="method-icon" :class="method.id">{{ method.icon }}</span><span class="method-copy"><strong>{{ method.label }}</strong><small v-if="method.id === 'wallet'">{{ assetInfo ? '可用 ¥' + Number(assetInfo.balance || 0).toFixed(2) : '余额暂不可用' }}</small></span><input type="radio" name="payment-method" :value="method.id" v-model="selectedPayment" :disabled="paying || (method.id === 'wallet' && !assetInfo)"></label>
+        <p class="payment-channel-note">未接入真实支付</p>
+        <div v-if="assetInfo && maxPoints > 0" class="asset-pay-hint"><label>积分抵扣<input v-model.number="pointsToUse" aria-label="抵扣积分" type="number" min="0" step="100" :max="maxPoints" :disabled="paying" @change="normalizePoints" @blur="normalizePoints"></label><small>100 积分抵 ¥1，本单最多 {{ maxPoints }} 积分</small></div>
+      </section>
+      <div class="payment-action"><div class="pay-total"><small>实付款</small><strong>¥{{ payableAmount }}</strong></div><button class="pay-button" :disabled="paying || couponLoading" @click="handlePayment">{{ paying ? '正在支付…' : '确认支付' }}</button></div>
+    </div>
+  </main>
 </template>
-  
+
 <script>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import PageHeader from '../components/PageHeader.vue';
+import '../assets/styles/payment.css';
 import { useRoute, useRouter } from 'vue-router';
 import request from '../utils/request';
 import { toast } from '../utils/toast';
@@ -155,7 +56,10 @@ import { positiveId } from '../utils/checkout';
 
 export default {
 	name: 'Payment',
+ components: { PageHeader },
 	setup() {
+		let active = true;
+		onBeforeUnmount(() => { active = false; });
 		const orderDetail = ref({});
 		const isShowDetailet = ref(true);
 		const route = useRoute();
@@ -190,7 +94,8 @@ export default {
 			const available = Math.max(0, Number(assetInfo.value?.points || 0));
 			return Math.floor(Math.min(orderCap, available) / 100) * 100;
 		});
-		const payableAmount = computed(() => (Math.max(0, Number(orderDetail.value?.orderTotal || 0) - couponDiscount.value - Number(pointsToUse.value || 0) / 100)).toFixed(2));
+		const appliedPoints = computed(() => Math.min(maxPoints.value, Math.max(0, Math.floor((Number(pointsToUse.value) || 0) / 100) * 100)));
+		const payableAmount = computed(() => (Math.max(0, Number(orderDetail.value?.orderTotal || 0) - couponDiscount.value - appliedPoints.value / 100)).toFixed(2));
 
 		// 获取订单详情
 		const fetchOrderDetails = async () => {
@@ -205,6 +110,7 @@ export default {
 					if (response.success && response.data) {
 					// 正确的数据访问方式
 					orderDetail.value = response.data;
+					if (canPay.value) await fetchCoupons();
 				} else {
 					throw new Error(response?.message || '获取订单信息失败，请重试');
 				}
@@ -230,8 +136,9 @@ export default {
 			}
 		};
 		const selectCoupon = (couponId) => {
+			if (paying.value) return;
 			selectedCouponId.value = couponId;
-			pointsToUse.value = Math.min(pointsToUse.value, maxPoints.value);
+			normalizePoints();
 		};
 		const formatCouponExpiry = (value) => value ? new Date(value).toLocaleDateString('zh-CN') : '近期';
 
@@ -242,6 +149,8 @@ export default {
 				return;
 			}
 			if (paying.value || couponLoading.value) return;
+            normalizePoints();
+            if (selectedPayment.value === 'wallet' && (!assetInfo.value || Number(assetInfo.value.balance || 0) < Number(payableAmount.value))) { toast.warning('钱包余额不足，请选择其他方式'); return; }
 			paying.value = true;
 			try {
 				const response = await request.put('/api/orders/status', null, { params: {
@@ -251,13 +160,13 @@ export default {
 					pointsToUse: Number(pointsToUse.value || 0),
 					couponId: selectedCouponId.value || undefined
 				} });
-				if (response.success) {
+				if (response.success && active) {
 					// 支付成功，跳转到成功页面
 					router.replace({
 						path: '/successfulPayment',
 						query: { orderId: orderId.value }
 					});
-				} else {
+				} else if (active) {
 					toast.error(response?.message || '支付失败，请重试');
 				}
 			} catch (error) {
@@ -276,8 +185,7 @@ export default {
 			selectedPayment.value = type;
 		};
 		const normalizePoints = () => {
-			const available = Number(assetInfo.value?.points || 0);
-			pointsToUse.value = Math.min(maxPoints.value, available, Math.max(0, Math.floor(Number(pointsToUse.value || 0) / 100) * 100));
+			pointsToUse.value = appliedPoints.value;
 		};
 		const handleImageError = (event) => {
 			// 远程图片失效时回退到随前端一起部署的本地占位图，避免只显示 alt 文本。
@@ -288,7 +196,7 @@ export default {
 
 			onMounted(() => {
 			orderId.value = route.query.orderId;
-				fetchOrderDetails().then(() => { if (canPay.value) fetchCoupons(); });
+				fetchOrderDetails();
 			request.get('/api/v1/assets/me').then(response => {
 				if (response?.success) assetInfo.value = response.data;
 			}).catch(() => { /* 未登录或资产接口不可用时仍可使用模拟支付 */ });
@@ -309,6 +217,7 @@ export default {
 			router,
 			assetInfo,
 			pointsToUse,
+			appliedPoints,
 			maxPoints,
 			payableAmount,
 			normalizePoints,
@@ -327,289 +236,3 @@ export default {
 	}
 }
 </script>
-  
-<style scoped>
-/****************** 总容器 ******************/
-.wrapper {
-	min-height: 100vh;
-	background-color: var(--skin-surface, #f5f7fa);
-}
-.payment-unavailable{max-width:520px;margin:100px auto 0;padding:48px 24px;text-align:center;color:var(--skin-muted, #5d7284)}
-.payment-unavailable>i{font-size:46px;color:var(--skin-brand, #71add4)}.payment-unavailable h2{margin:16px 0 8px;color:var(--skin-ink, #29455f);font-size:20px}.payment-unavailable p{font-size:13px;line-height:1.7}.payment-unavailable button{margin-top:22px;border:0;border-radius:7px;background:var(--skin-brand, #168bd1);color:#fff;padding:10px 22px;font-size:14px;cursor:pointer}
-
-/****************** header部分 ******************/
-.wrapper header {
-	width: 100%;
-	height: 12vw;
-	background-color: var(--skin-brand, #0097FF);
-	color: #fff;
-	font-size: 4.8vw;
-	position: fixed;
-	left: 0;
-	top: 0;
-	z-index: 1000;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.content {
-	padding-top: 14vw;
-	padding-bottom: 32vw;
-}
-
-.section {
-	background: white;
-	border-radius: 3vw;
-	margin: 3vw;
-	padding: 4vw;
-	box-shadow: 0 0.2vw 1vw rgba(0, 0, 0, 0.05);
-}
-
-.section-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 4vw;
-}
-
-.section-header h3 {
-	font-size: 4.2vw;
-	color: #333;
-	font-weight: 500;
-	margin: 0;
-}
-
-.total-amount {
-	font-size: 5vw;
-	color: #ff6b00;
-	font-weight: bold;
-}
-
-/* 配送信息样式 */
-.delivery-info {
-	margin-bottom: 4vw;
-	padding-bottom: 3vw;
-	border-bottom: 1px solid #f0f0f0;
-}
-.pickup-payment-note { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--skin-border, #d9ecf8); border-radius:10px; background:var(--skin-surface, #f5fbff); color:var(--skin-brand, #168bd1); }
-.pickup-payment-note i { font-size:22px; }.pickup-payment-note strong,.pickup-payment-note small { display:block; }.pickup-payment-note small { margin-top:4px; color:var(--skin-muted, #6f879b); font-size:12px; }
-
-.info-item {
-	display: flex;
-	align-items: center;
-	margin-bottom: 2vw;
-	font-size: 3.6vw;
-	color: #666;
-}
-
-.info-item i {
-	margin-right: 2vw;
-	color: var(--skin-brand, #0097FF);
-	width: 5vw;
-	text-align: center;
-}
-
-.merchant-info {
-	display: flex;
-	align-items: center;
-	padding: 3vw 0;
-	cursor: pointer;
-}
-
-.merchant-logo {
-	width: 12vw;
-	height: 12vw;
-	border-radius: 2vw;
-	object-fit: cover;
-	margin-right: 3vw;
-}
-
-.merchant-name {
-	flex: 1;
-	font-size: 4vw;
-	color: #333;
-	display: flex;
-	align-items: center;
-	gap: 2vw;
-}
-
-.fa-angle-down {
-	transition: transform 0.3s ease;
-}
-
-.fa-angle-down.rotate {
-	transform: rotate(180deg);
-}
-
-.order-details {
-	margin-top: 3vw;
-	padding-top: 3vw;
-	border-top: 0.2vw solid var(--skin-surface, #f5f7fa);
-}
-
-.detail-item {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 2vw 0;
-	font-size: 3.6vw;
-	color: #666;
-}
-
-.delivery-fee {
-	border-top: 0.2vw dashed #eee;
-	margin-top: 2vw;
-	padding-top: 2vw;
-	color: #333;
-	font-weight: bold;
-}
-
-.payment-options {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 3vw;
-	margin-top: 4vw;
-}
-
-.payment-option {
-	flex: 1;
-	padding: 4vw;
-	border: 0.2vw solid #eee;
-	border-radius: 2vw;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	background: #f9f9f9;
-}
-
-.payment-option img {
-	height: 8vw;
-	width: auto;
-	object-fit: contain;
-}
-
-.payment-option .fa-check-circle {
-	font-size: 5vw;
-	color: #ddd;
-	transition: all 0.3s ease;
-}
-
-.payment-option.active {
-	border-color: #38CA73;
-	background: #f0fff5;
-}
-
-.payment-option.active .fa-check-circle {
-	color: #38CA73;
-}
-
-.wallet-option { color: var(--skin-muted, #526f8b); gap: 2vw; }
-.wallet-option strong { flex: 1; font-size: 3.4vw; font-weight: 600; }
-.payment-demo-badge { margin-left: auto; padding: 0.5vw 1.2vw; border-radius: 1vw; background: var(--skin-surface, #edf6fc); color: var(--skin-muted, #4b8bb6); font-size: 2.6vw; line-height: 1.4; }
-.payment-demo-note { margin: 2vw 0 0; color: var(--skin-muted, #8a9eac); font-size: 2.8vw; line-height: 1.5; }
-.wallet-icon { width: 8vw; height: 8vw; display: grid; place-items: center; border-radius: 50%; background: var(--skin-surface, #e8f5ff); color: var(--skin-brand, #168bd1); font-size: 5vw; font-weight: 700; }
-.asset-pay-hint { margin-top: 3vw; padding: 3vw; border: 1px solid var(--skin-border, #dcebf7); border-radius: 2vw; background: var(--skin-surface, #f7fbff); color: var(--skin-muted, #607b92); font-size: 3.2vw; line-height: 1.8; }
-.asset-pay-hint label { display: flex; align-items: center; gap: 2vw; margin-top: 1vw; color: var(--skin-ink, #315a79); }
-.asset-pay-hint input { width: 28vw; border: 1px solid var(--skin-border, #c9deed); border-radius: 1.2vw; padding: 1.5vw 2vw; font-size: 3.2vw; color: var(--skin-ink, #315a79); }
-.asset-pay-hint small { display: block; color: var(--skin-muted, #8aa1b4); }
-.coupon-panel { margin-top: 3vw; padding-top: 3vw; border-top: 0.2vw solid var(--skin-surface, #f5f7fa); }
-.coupon-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2vw; }
-.coupon-panel-header h3 { margin: 0; color: #333; font-size: 4.2vw; font-weight: 500; }
-.coupon-panel-header span { color: #e76c48; font-size: 3.2vw; }
-.coupon-option { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 3vw; margin-top: 2vw; padding: 3vw; border: 1px solid var(--skin-border, #e1edf5); border-radius: 1.8vw; background: var(--skin-surface, #fbfdff); color: var(--skin-ink, #31556d); text-align: left; cursor: pointer; }
-.coupon-option.active { border-color: var(--skin-brand-soft, #78bde8); background: var(--skin-surface, #f0f9ff); }
-.coupon-option span { min-width: 0; flex: 1; }
-.coupon-option b, .coupon-option small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.coupon-option b { color: #d96d49; font-size: 3.5vw; font-weight: 600; }
-.coupon-option small { margin-top: 1vw; color: var(--skin-muted, #8aa1b4); font-size: 2.9vw; }
-.coupon-option i { flex: 0 0 auto; color: var(--skin-brand, #168bd1); font-size: 4.5vw; }
-.coupon-empty { padding: 3vw 0 1vw; color: var(--skin-muted, #98aab7); font-size: 3.2vw; }
-.coupon-discount { color: #df7049; }
-
-.payment-action {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	padding: 4vw;
-	background: white;
-	box-shadow: 0 -0.2vw 1vw rgba(0, 0, 0, 0.05);
-}
-
-.pay-button {
-	width: 100%;
-	height: 12vw;
-	border: none;
-	border-radius: 6vw;
-	background: var(--skin-brand, #0097ff);
-	color: white;
-	font-size: 4.2vw;
-	font-weight: bold;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	transition: all 0.3s ease;
-}
-
-.pay-button:disabled {
-	background: #ccc;
-	cursor: not-allowed;
-}
-
-.pay-button:not(:disabled):active {
-	transform: scale(0.98);
-}
-
-.loading {
-	width: 100%;
-	height: 100vh;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size: 4vw;
-	color: #666;
-}
-/* 桌面窗口下仍保持移动端容器宽度，避免 vw 按整块屏幕放大文字。 */
-.wrapper { max-width: 600px; margin: 0 auto; }
-.wrapper header { width: min(100%, 600px); height: 64px; left: 50%; transform: translateX(-50%); font-size: 20px; }
-.content { padding-top: 80px; padding-bottom: 104px; }
-.section { border-radius: 12px; margin: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, .05); }
-.section-header { margin-bottom: 18px; }
-.section-header h3 { font-size: 20px; }
-.total-amount { font-size: 28px; }
-.delivery-info { margin-bottom: 18px; padding-bottom: 14px; }
-.info-item { margin-bottom: 10px; font-size: 15px; }
-.info-item i { margin-right: 10px; width: 20px; }
-.merchant-info { padding: 14px 0; }
-.merchant-logo { width: 64px; height: 64px; border-radius: 8px; margin-right: 14px; }
-.merchant-name { font-size: 17px; gap: 8px; }
-.order-details { margin-top: 14px; padding-top: 14px; border-top-width: 1px; }
-.detail-item { padding: 9px 0; font-size: 15px; }
-.delivery-fee { border-top-width: 1px; margin-top: 9px; padding-top: 9px; }
-.payment-options { gap: 12px; margin-top: 18px; }
-.payment-option { padding: 16px; border-width: 1px; border-radius: 10px; }
-.payment-option img { height: 32px; }
-.payment-option .fa-check-circle { font-size: 20px; }
-.wallet-option { gap: 10px; }
-.wallet-option strong { font-size: 14px; }
-.wallet-icon { width: 32px; height: 32px; font-size: 20px; }
-.asset-pay-hint { margin-top: 14px; padding: 14px; border-radius: 10px; font-size: 13px; }
-.asset-pay-hint label { gap: 8px; margin-top: 5px; }
-.asset-pay-hint input { width: 120px; border-radius: 6px; padding: 7px 9px; font-size: 13px; }
-.coupon-panel { margin-top: 14px; padding-top: 14px; border-top-width: 1px; }
-.coupon-panel-header { margin-bottom: 10px; }
-.coupon-panel-header h3 { font-size: 18px; }
-.coupon-panel-header span { font-size: 13px; }
-.coupon-option { gap: 12px; margin-top: 8px; padding: 12px; border-radius: 9px; }
-.coupon-option b { font-size: 14px; }
-.coupon-option small { margin-top: 4px; font-size: 12px; }
-.coupon-option i { font-size: 18px; }
-.coupon-empty { padding: 12px 0 4px; font-size: 13px; }
-.payment-action { left: 50%; right: auto; width: min(100%, 600px); transform: translateX(-50%); padding: 16px; box-shadow: 0 -2px 10px rgba(0, 0, 0, .05); }
-.pay-button { height: 48px; border-radius: 24px; font-size: 18px; }
-.loading { font-size: 16px; }
-</style>

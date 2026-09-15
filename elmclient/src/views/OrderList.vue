@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper customer-orders-page">
     <header class="order-page-header">
       <h1>订单</h1>
       <label class="order-search">

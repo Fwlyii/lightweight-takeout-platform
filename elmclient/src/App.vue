@@ -12,7 +12,7 @@
       <router-view v-slot="{ Component, route: viewRoute }">
         <!-- 路由页面可包含弹窗等多个根节点，不能直接放入 out-in Transition。
              保留页面自身的入场动效，切页不等待不可靠的离场回调。 -->
-        <component :is="Component" :key="viewRoute.path" />
+        <component :is="Component" :key="viewRoute.fullPath" />
       </router-view>
     </div>
     <Footer v-if="showFooter" />
@@ -37,8 +37,9 @@ import { routeMotion } from './utils/routeMotion';
 
 const ROUTES_WITHOUT_GLOBAL_BACK = new Set([
   'Index', 'Login', 'MyInformation', 'SuccessfulPayment', 'BusinessInfo',
-  'UserAddress', 'Assets', 'AiChat', 'AiRecommend', 'AiVoiceOrder',
-  'AiDishRecognition', 'Favorites', 'ListDetail'
+  'UserAddress', 'Assets', 'Preferences', 'Payment', 'Cart', 'AiChat', 'AiRecommend', 'AiVoiceOrder',
+  'AiDishRecognition', 'Favorites', 'ListDetail', 'Notifications', 'Search', 'OrderList',
+  'AddUserAddress', 'EditUserAddress', 'Register'
 ]);
 
 const ROUTES_WITHOUT_CUSTOMER_FOOTER = new Set([

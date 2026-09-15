@@ -1,21 +1,15 @@
 <template>
   <main class="profile-page">
-    <header class="profile-header">
-      <button type="button" aria-label="返回" @click="back">‹</button>
-      <h1>{{ title }}</h1>
-      <span aria-hidden="true"></span>
-    </header>
+    <PageHeader :title="title" :back-to="backTo" />
     <section class="profile-content"><slot /></section>
   </main>
 </template>
 <script setup>
-import { useRouter } from "vue-router";
-const props = defineProps({
+import PageHeader from './PageHeader.vue';
+defineProps({
   title: String,
   backTo: { type: [String, Object], default: "/myInformation" },
 });
-const router = useRouter();
-const back = () => router.push(props.backTo);
 </script>
 <style>
 .profile-page {

@@ -1,6 +1,6 @@
 <template>
   <div class="assets-page">
-    <header><button @click="navigateBack($router, $route)">‹</button><h1>钱包与优惠</h1></header>
+    <PageHeader title="钱包与优惠" back-to="/myInformation" />
     <p v-if="loading" class="hint" role="status">加载资产中…</p>
     <p v-else-if="loadError" class="hint" role="alert">{{ loadError }} <button @click="refresh">重新加载</button></p>
     <main v-else>
@@ -21,7 +21,7 @@
   </div>
 </template>
 <script setup>
-import { navigateBack } from '../utils/backNavigation';
+import PageHeader from '../components/PageHeader.vue';
 import { computed, ref, onMounted } from 'vue';
 import request from '../utils/request';
 import { toast } from '../utils/toast';

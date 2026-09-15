@@ -17,14 +17,14 @@
         <p>配送费：¥{{ money(context.serviceMode === 'pickup' ? 0 : business.deliveryPrice) }}</p>
         <p class="muted">商家优惠、会员折扣及最终金额由服务器核算，提交后在支付页确认。</p>
       </section>
-      <section v-if="context.serviceMode === 'delivery'">
+      <section v-if="context.serviceMode === 'delivery'" class="checkout-address-section">
         <h2>选择收货地址</h2>
         <p v-if="selectedAddress" class="notice" role="status">已选：{{ selectedAddress.contactName }} · {{ selectedAddress.address }}</p>
         <AddressManager selectable :disabled="submitting" :selected-id="selectedAddress?.id"
           :checkout-query="checkoutQuery(context)" @select="selectAddress" @loaded="syncAddresses" />
       </section>
       <p v-if="submitError" class="notice error" role="alert">{{ submitError }}</p>
-      <button class="primary wide" type="button" :disabled="submitting || (context.serviceMode === 'delivery' && !selectedAddress)"
+      <button class="primary wide checkout-submit" type="button" :disabled="submitting || (context.serviceMode === 'delivery' && !selectedAddress)"
         @click="submit">{{ submitting ? '正在提交…' : '提交订单，去支付' }}</button>
       <p v-if="context.serviceMode === 'delivery' && !selectedAddress" class="muted">请选择上方地址；没有地址时可先新增。</p>
     </template>
@@ -48,7 +48,7 @@ const money = value => Number(value || 0).toFixed(2);
 const selectAddress = address => { selectedAddress.value = address; submitError.value = ''; };
 const syncAddresses = addresses => {
   selectedAddress.value = addresses.find(address => address.id === selectedAddress.value?.id)
-    || addresses.find(address => address.isDefault) || null;
+    || addresses.find(address => address.isDefault) || addresses[0] || null;
 };
 async function load() {
   loading.value = true; ready.value = false; error.value = '';
@@ -82,5 +82,7 @@ onMounted(load);
 </script>
 <style scoped>
 .checkout-items { list-style:none; padding:0; }
+.checkout-address-section { margin: 28px 0; }
+.checkout-submit { margin-top: 16px; min-height: 52px; }
 .checkout-items li { display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-bottom:1px solid var(--skin-surface, #eef2f5); }
 </style>

@@ -1,7 +1,7 @@
 <template>
-  <div class="back-button" aria-label="返回" @click="goBack">
+  <button type="button" class="back-button" aria-label="返回" @click="goBack">
     <span class="back-arrow" aria-hidden="true">‹</span>
-  </div>
+  </button>
 </template>
 
 <script>

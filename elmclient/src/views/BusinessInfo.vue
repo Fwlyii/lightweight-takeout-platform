@@ -986,7 +986,8 @@ export default {
     min-height: 100vh;
     background: var(--skin-surface, #f5f8fb);
     color: var(--skin-ink, #263f52);
-    padding-bottom: 18vw;
+    padding-bottom: calc(104px + env(safe-area-inset-bottom));
+    height: auto;
 }
 .store-header {
     height: 58px;
@@ -1153,7 +1154,7 @@ export default {
 @media (min-width: 700px) {
     .store-header { padding-left: 14px; padding-right: 14px; }
     .page-content { padding-bottom: 30px; }
-    .wrapper { padding-bottom: 0; }
+    .wrapper { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
     .wrapper .cart { left: 50%; width: min(100%, 760px); transform: translateX(-50%); border-radius: 8px 8px 0 0; }
 }
 @media (max-width: 520px) {

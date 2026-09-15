@@ -1,11 +1,11 @@
 <template>
-  <div class="reviews-page"><header><button @click="navigateBack($router, $route)">‹</button><h1>顾客评价</h1></header><main>
+  <div class="reviews-page"><PageHeader title="顾客评价" /><main>
     <div v-if="loading" class="empty">加载中...</div><div v-else-if="!reviews.length" class="empty">暂时还没有顾客评价</div>
     <article v-for="review in reviews" :key="review.id" class="review-card"><div class="review-head"><strong>{{ review.customerName || '匿名顾客' }}</strong><span class="stars">{{ '★'.repeat(review.rating) }}{{ '☆'.repeat(5-review.rating) }}</span><time>{{ formatDate(review.createTime) }}</time></div><p>{{ review.content || '用户未填写文字评价' }}</p><div v-if="review.merchantReply" class="reply">已回复：{{ review.merchantReply }}</div><div v-else class="reply-form"><input v-model="replyDraft[review.id]" maxlength="500" placeholder="回复这条评价"><button @click="reply(review)">回复</button></div></article>
   </main></div>
 </template>
 <script setup>
-import { navigateBack } from '../utils/backNavigation';
+import PageHeader from '../components/PageHeader.vue';
 import { ref, onMounted } from 'vue'; import request from '../utils/request'; import { toast } from '../utils/toast';
 const reviews=ref([]),loading=ref(true),replyDraft=ref({}),businessId=ref(null);
 const load=async()=>{try{const stores=await request.get('/api/businesses/id_list'); const first=stores?.data?.[0]; businessId.value=first?.merchantId || first?.businessId || first?.id; if(businessId.value){const res=await request.get(`/api/v1/reviews/business/${businessId.value}`); if(res.success) reviews.value=res.data||[]}}finally{loading.value=false}};

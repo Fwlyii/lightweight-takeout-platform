@@ -1,8 +1,6 @@
 <template>
   <div class="preferences-page">
-    <header class="page-header">
-      <h1>偏好与外观</h1>
-    </header>
+    <PageHeader title="偏好与外观" back-to="/myInformation" />
 
     <main class="preferences-content">
       <section class="settings-card appearance-card">
@@ -77,6 +75,7 @@
 </template>
 
 <script setup>
+import PageHeader from '../components/PageHeader.vue';
 import { onMounted, ref, watch } from 'vue';
 import request from '../utils/request';
 import { toast } from '../utils/toast';

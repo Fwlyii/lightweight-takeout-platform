@@ -8,6 +8,7 @@ import './assets/styles/global.css';
 import './assets/styles/ai-assistant.css';
 import './assets/styles/layout-alignment.css';
 import './assets/styles/interaction-motion.css';
+import './assets/styles/design-system.css';
 
 // 在首屏挂载前恢复皮肤，避免刷新时先闪现默认蓝色。
 applyTheme(getStoredTheme());

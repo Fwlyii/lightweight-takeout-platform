@@ -1,9 +1,7 @@
 <template>
-  <div class="container">
+  <div class="container search-page">
     <!-- 顶部蓝色部分 -->
-    <div class="header">
-      <h1>搜索</h1>
-    </div>
+    <PageHeader title="搜索商家" />
 
     <!-- 输入框和按钮 -->
     <div class="search-box-container">
@@ -24,6 +22,9 @@
     </div>
 
     <!-- 搜索结果 -->
+    <p v-if="searching" class="search-state" role="status">正在查找商家…</p>
+    <p v-else-if="searchError" class="search-state" role="alert">{{ searchError }}</p>
+    <p v-else-if="searched && !searchResults.length" class="search-state">没有找到相关商家，换个关键词试试。</p>
     <div v-if="searchResults.length > 0" class="results">
       <h2>搜索结果</h2>
       <ul>
@@ -46,6 +47,7 @@
 </template>
 
 <script>
+import PageHeader from '../components/PageHeader.vue';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { searchBusinesses } from '@/services/businessService';
@@ -55,10 +57,13 @@ const HISTORY_KEY = 'businessSearchHistory';
 const HISTORY_LIMIT = 6;
 
 export default {
+  components: { PageHeader },
   setup() {
     const searchQuery = ref('');
     const searchHistory = ref([]);
     const searchResults = ref([]);
+    const searching = ref(false), searched = ref(false), searchError = ref('');
+    let searchVersion = 0;
     const router = useRouter();
 
     onMounted(() => {
@@ -73,7 +78,7 @@ export default {
     const rememberSearch = (keyword) => {
       searchHistory.value = [keyword, ...searchHistory.value.filter(item => item !== keyword)]
         .slice(0, HISTORY_LIMIT);
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(searchHistory.value));
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(searchHistory.value)); } catch (_) { /* 搜索不依赖本地存储。 */ }
     };
 
     const toBusinessInfo = (businessId) => {
@@ -86,14 +91,20 @@ export default {
         toast.info('请输入商家名称');
         return;
       }
+      const version = ++searchVersion;
+      searching.value = true; searchError.value = '';
       try {
-        searchResults.value = await searchBusinesses(keyword);
+        const results = await searchBusinesses(keyword);
+        if (version !== searchVersion) return;
+        searchResults.value = results;
         rememberSearch(keyword);
-        if (!searchResults.value.length) toast.info('没有找到相关商家');
       } catch (error) {
+        if (version !== searchVersion) return;
         console.error('搜索失败:', error);
         searchResults.value = [];
-        toast.error(error?.message || '搜索失败，请稍后重试');
+        searchError.value = error?.message || '搜索失败，请稍后重试';
+      } finally {
+        if (version === searchVersion) { searching.value = false; searched.value = true; }
       }
     };
 
@@ -111,6 +122,7 @@ export default {
       searchQuery,
       searchHistory,
       searchResults,
+      searching, searched, searchError,
       performSearch,
       toBusinessInfo,
       handleHistoryClick,
