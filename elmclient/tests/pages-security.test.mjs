@@ -5,9 +5,9 @@ const source = await readFile(new URL('../../scripts/cloudflare-pages/_worker.te
 const { default: worker } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
 const env = { ASSETS: { fetch: async () => new Response('<html>app</html>', { headers: { 'Content-Type': 'text/html' } }) } };
 
-test('Pages allows only first-party voice while retaining camera and location restrictions', async () => {
+test('Pages allows first-party voice and geolocation while blocking camera', async () => {
   const response = await worker.fetch(new Request('https://example.test/', { headers: { Accept: 'text/html' } }), env);
-  assert.equal(response.headers.get('Permissions-Policy'), 'camera=(), microphone=(self), geolocation=()');
+  assert.equal(response.headers.get('Permissions-Policy'), 'camera=(), microphone=(self), geolocation=(self)');
   assert.equal(response.headers.get('X-Frame-Options'), 'SAMEORIGIN');
   assert.match(response.headers.get('Cache-Control'), /no-store/);
 });

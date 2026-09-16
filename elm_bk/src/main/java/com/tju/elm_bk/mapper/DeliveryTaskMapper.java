@@ -12,6 +12,10 @@ import java.util.List;
 
 @Mapper
 public interface DeliveryTaskMapper {
+    @Select("SELECT b.longitude,b.latitude FROM business b JOIN orders o ON o.business_id=b.id WHERE o.id=#{orderId}")
+    com.tju.elm_bk.entity.GeoPoint merchantPoint(Long orderId);
+    @Select("SELECT a.longitude,a.latitude FROM delivery_address a JOIN orders o ON o.address_id=a.id WHERE o.id=#{orderId}")
+    com.tju.elm_bk.entity.GeoPoint customerPoint(Long orderId);
     @Select("SELECT COUNT(*) FROM delivery_task WHERE task_status = 'DELIVERING'")
     int countDeliveringTasks();
 

@@ -69,6 +69,7 @@ INSERT INTO `authority` VALUES ('USER');
 -- ----------------------------
 DROP TABLE IF EXISTS `business`;
 CREATE TABLE `business`  (
+ longitude DECIMAL(10,6), latitude DECIMAL(10,6), poi_id VARCHAR(80), adcode VARCHAR(6), formatted_address VARCHAR(255),
   `id` bigint NOT NULL AUTO_INCREMENT,
   `create_time` timestamp NULL DEFAULT NULL,
   `creator` bigint NULL DEFAULT NULL,
@@ -134,6 +135,7 @@ CREATE TABLE `cart`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `delivery_address`;
 CREATE TABLE `delivery_address`  (
+ longitude DECIMAL(10,6), latitude DECIMAL(10,6), poi_id VARCHAR(80), adcode VARCHAR(6), formatted_address VARCHAR(255),
   `id` bigint NOT NULL AUTO_INCREMENT,
   `is_default` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否默认收货地址',
   `create_time` timestamp NULL DEFAULT NULL,

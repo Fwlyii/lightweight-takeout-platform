@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth", "/api/register", "/v3/api-docs/**", "/swagger-ui/**",
                                 "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/images/**", "/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/maps/**").permitAll()
                         // Only public catalog reads are anonymous; never expose the whole
                         // businesses/foods namespace (it also contains management actions).
                         .requestMatchers(HttpMethod.GET, "/api/businesses/search",

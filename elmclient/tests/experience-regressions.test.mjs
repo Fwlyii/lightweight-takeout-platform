@@ -25,7 +25,7 @@ test('layout-container animations cannot replace fixed element positioning trans
 test('location dialog escapes the animated header and surfaces configuration errors', async () => {
   const source = await read('views/Index.vue');
   assert.match(source, /<Teleport to="body">[\s\S]*role="dialog"[\s\S]*locationError[\s\S]*<\/Teleport>/);
-  assert.match(source, /pendingLocation\.province/);
+  assert.match(source, /MapLocationPicker[\s\S]*@select="acceptMapLocation"/);
 });
 
 test('pickup is not incorrectly disabled by dine-in seating metadata', async () => {

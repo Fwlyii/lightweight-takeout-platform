@@ -33,6 +33,8 @@
             placeholder="收餐人的手机号"
         /></label>
         <label
+          >地图位置<button type="button" @click="selectLocation">{{ form.formattedAddress || '搜索或定位选择地址' }}</button></label>
+        <label
           >详细地址<input
             v-model.trim="form.address"
             required
@@ -55,6 +57,7 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { addressReturnLocation } from '../utils/checkout';
 import ProfilePage from "./ProfilePage.vue";
+import { pickMapLocation } from '../utils/pickMapLocation';
 import {
   getMyAddress,
   createMyAddress,
@@ -69,7 +72,12 @@ const form = reactive({
   contactSex: null,
   contactTel: "",
   address: "",
+  longitude: null, latitude: null, poiId: null, adcode: null, formattedAddress: null,
 });
+async function selectLocation() {
+  const point = await pickMapLocation(form);
+  if (point) { Object.assign(form, { longitude: point.longitude, latitude: point.latitude, poiId: point.poiId, adcode: point.adcode, formattedAddress: point.formattedAddress, address: point.formattedAddress }); }
+}
 const loading = ref(false),
   busy = ref(false),
   error = ref(""),
@@ -80,7 +88,7 @@ onMounted(async () => {
   try {
     const data = await getMyAddress(props.id);
     for (const key of Object.keys(form))
-      form[key] = data[key] ?? (key === "contactSex" ? null : "");
+      form[key] = data[key] ?? (['contactName','contactTel','address'].includes(key) ? '' : null);
     ready.value = true;
   } catch (e) {
     error.value = e.response?.data?.message || "地址不存在或无法访问";
@@ -93,11 +101,14 @@ async function save() {
   busy.value = true;
   error.value = "";
   try {
+    if (form.formattedAddress && !form.address.startsWith(form.formattedAddress)) {
+      throw new Error('地点变更请重新选择地图位置；楼栋门牌可补充在地址后');
+    }
     if (props.id) await updateMyAddress(props.id, { ...form });
     else await createMyAddress({ ...form });
     await router.replace(returnTo.value);
   } catch (e) {
-    error.value = e.response?.data?.message || "保存失败，请重试";
+    error.value = e.response?.data?.message || e.message || "保存失败，请重试";
   } finally {
     busy.value = false;
   }

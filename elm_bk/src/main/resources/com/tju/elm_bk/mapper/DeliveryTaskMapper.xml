@@ -4,7 +4,9 @@
 
     <sql id="taskViewColumns">
         dt.id, dt.order_id, dt.rider_user_id, dt.task_status, dt.version,
-        dt.distance_km, dt.rider_fee, dt.accepted_time, dt.arrived_store_time,
+        CASE WHEN da.latitude IS NULL OR da.longitude IS NULL OR b.latitude IS NULL OR b.longitude IS NULL THEN NULL ELSE ROUND(6371.0088 * 2 * ASIN(SQRT(LEAST(1,
+          POWER(SIN(RADIANS(da.latitude - b.latitude)/2),2) + COS(RADIANS(b.latitude))*COS(RADIANS(da.latitude))*POWER(SIN(RADIANS(da.longitude - b.longitude)/2),2)
+        ))),1) END AS distance_km, dt.rider_fee, dt.accepted_time, dt.arrived_store_time,
         dt.pickup_time, dt.delivered_time, dt.completed_time, dt.create_time,
         o.order_state, o.order_total,
         b.business_name, b.business_address,

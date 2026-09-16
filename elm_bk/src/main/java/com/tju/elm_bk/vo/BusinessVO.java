@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BusinessVO {
+public class BusinessVO extends com.tju.elm_bk.entity.GeoPoint {
 
     @Schema(description = "商铺ID")
     private Long id;

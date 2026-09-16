@@ -5,7 +5,7 @@ import lombok.Data;
 
 /** Editable address fields only. Ownership, default selection and audit fields are server-owned. */
 @Data
-public class AddressCreateDTO {
+public class AddressCreateDTO extends com.tju.elm_bk.entity.GeoPoint {
     @NotBlank @Size(max = 40)
     private String contactName;
     @Min(0) @Max(1)

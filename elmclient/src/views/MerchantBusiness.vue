@@ -71,6 +71,7 @@
 
 <script>
 import Swal from 'sweetalert2';
+import { pickMapLocation } from '../utils/pickMapLocation';
 import { ref, onMounted, computed } from 'vue';
 import request from '../utils/request';
 import { useRouter } from 'vue-router';
@@ -205,6 +206,8 @@ export default {
           return;
         }
 
+        const mapPoint = await pickMapLocation();
+        if (!mapPoint) return;
         let uploadedFile = null;
         let imageUrl = '';
         let selectedOrderType = null;
@@ -231,7 +234,7 @@ export default {
                 </div>
               </section>
               <section class="application-section"><h3><span>2</span>店铺地址</h3>
-                <label for="businessAddress" class="address-field"><b>*</b> 详细地址<input id="businessAddress" class="swal2-input modern-input" placeholder="请输入店铺地址（最多15字）" maxlength="15" required></label>
+                <label for="businessAddress" class="address-field"><b>*</b> 详细地址<input id="businessAddress" class="swal2-input modern-input" placeholder="地图地址，可补充楼栋门牌（最多255字）" maxlength="255" required></label>
               </section>
               <section class="application-section"><h3><span>3</span>店铺介绍</h3>
                 <label for="businessExplain" class="sr-only">店铺介绍</label><textarea id="businessExplain" class="swal2-textarea modern-textarea" placeholder="介绍店铺特色、主营菜品等（最多15字）" maxlength="15"></textarea>
@@ -260,6 +263,7 @@ export default {
             content: 'compact-content'
           },
           didOpen: () => {
+            document.getElementById("businessAddress").value = mapPoint.formattedAddress;
             const fileInput = document.getElementById('businessImg');
             const imagePreview = document.getElementById('image-preview');
             const uploadIcon = document.getElementById('upload-icon');
@@ -317,8 +321,8 @@ export default {
 
             // 商铺地址校验（最多15个字符）
             validateField('businessAddress', (value) => {
-              return value.length <= 15;
-            }, '商铺地址不能超过15个字符');
+              return value.length <= 255;
+            }, '商铺地址不能超过255个字符');
 
             // 商铺介绍校验（最多15个字符）
             validateField('businessExplain', (value) => {
@@ -366,14 +370,18 @@ export default {
           preConfirm: async () => {
             const businessName = document.getElementById('businessName').value.trim();
             const businessAddress = document.getElementById('businessAddress').value.trim();
+            if (!businessAddress.startsWith(mapPoint.formattedAddress)) {
+              Swal.showValidationMessage('请保留地图地址，楼栋门牌可补充在后面；更换地点请重新选址');
+              return false;
+            }
             const businessExplain = document.getElementById('businessExplain').value.trim();
             const deliveryPriceStr = document.getElementById('deliveryPrice').value.trim();
             const startPriceStr = document.getElementById('startPrice').value.trim();
             const dineInAvailable = document.getElementById('dineInAvailable').checked;
             const promotionValue = document.getElementById('promotionPreset').value;
 
-            if (businessName.length > 10 || businessAddress.length > 15 || businessExplain.length > 15) {
-              Swal.showValidationMessage('名称最多10字，地址和介绍最多15字');
+            if (businessName.length > 10 || businessAddress.length > 255 || businessExplain.length > 15) {
+              Swal.showValidationMessage('名称最多10字，地址最多255字，介绍最多15字');
               return false;
             }
             if (![deliveryPriceStr, startPriceStr].every(value => /^\d+(\.\d{1,2})?$/.test(value) && Number.isFinite(Number(value)))) {
@@ -425,6 +433,7 @@ export default {
             return {
               businessName,
               businessAddress,
+              longitude: mapPoint.longitude, latitude: mapPoint.latitude, poiId: mapPoint.poiId, adcode: mapPoint.adcode, formattedAddress: mapPoint.formattedAddress,
               businessExplain,
               deliveryPrice,
               startPrice,

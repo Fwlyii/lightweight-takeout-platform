@@ -142,6 +142,7 @@ public class PermissionApplicationServiceImpl implements PermissionApplicationSe
         businessPermissionDTO.setUpdater(currentUserId);
         businessPermissionDTO.setCreateTime(LocalDateTime.now());
         businessPermissionDTO.setUpdateTime(LocalDateTime.now());
+        businessPermissionDTO.requireCoordinates();
         businessMapper.insertBusinessPermission(businessPermissionDTO);
         sendShopApplyNotification(currentUserId, currentUser.getUsername());
         BusinessPermissionVO businessPermissionVO = new BusinessPermissionVO();

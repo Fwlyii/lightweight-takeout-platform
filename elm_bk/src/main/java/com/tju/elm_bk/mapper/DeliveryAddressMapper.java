@@ -10,7 +10,7 @@ public interface DeliveryAddressMapper {
     @Select("SELECT * FROM delivery_address WHERE id=#{id} AND user_id=#{userId} AND is_deleted=0")
     DeliveryAddress findOwned(@Param("id") Long id, @Param("userId") Long userId);
 
-    @Update("UPDATE delivery_address SET contact_name=#{a.contactName},contact_sex=#{a.contactSex},contact_tel=#{a.contactTel},address=#{a.address},updater=#{userId},update_time=NOW() WHERE id=#{id} AND user_id=#{userId} AND is_deleted=0")
+    @Update("UPDATE delivery_address SET contact_name=#{a.contactName},contact_sex=#{a.contactSex},contact_tel=#{a.contactTel},address=#{a.address},longitude=#{a.longitude},latitude=#{a.latitude},poi_id=#{a.poiId},adcode=#{a.adcode},formatted_address=#{a.formattedAddress},updater=#{userId},update_time=NOW() WHERE id=#{id} AND user_id=#{userId} AND is_deleted=0")
     int updateOwned(@Param("id") Long id, @Param("userId") Long userId, @Param("a") com.tju.elm_bk.dto.AddressCreateDTO address);
 
     @Update("UPDATE delivery_address SET is_deleted=1,is_default=0,updater=#{userId},update_time=NOW() WHERE id=#{id} AND user_id=#{userId} AND is_deleted=0")

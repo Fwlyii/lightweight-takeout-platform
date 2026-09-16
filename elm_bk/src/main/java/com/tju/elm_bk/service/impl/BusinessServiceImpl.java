@@ -151,6 +151,7 @@ public class BusinessServiceImpl implements BusinessService {
 
     @Override
     public BusinessVO addBusiness(BusinessDTO businessDTO) {
+        businessDTO.requireCoordinates();
         if (businessDTO == null || businessDTO.getBusinessOwner() == null
                 || businessDTO.getBusinessOwner().getUsername() == null
                 || businessDTO.getBusinessOwner().getUsername().isBlank()) {
@@ -251,6 +252,7 @@ public class BusinessServiceImpl implements BusinessService {
 
     @Override
     public Integer applyForAddBusiness(Business business) {
+        business.requireCoordinates();
         if (business == null || business.getBusinessName() == null || business.getBusinessName().isBlank()) {
             throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
         }
@@ -394,6 +396,7 @@ public class BusinessServiceImpl implements BusinessService {
         if (id == null || id <= 0 || updateDto == null) {
             throw new APIException(ResultCodeEnum.PARAM_NOT_MATCHED);
         }
+        updateDto.validateCoordinates();
         if (updateDto.getBusinessName() != null && updateDto.getBusinessName().trim().isEmpty()) {
             throw new APIException("店铺名称不能为空");
         }

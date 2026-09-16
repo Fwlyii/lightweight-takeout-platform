@@ -9,7 +9,8 @@ public record PublicBusinessVO(Long id, String businessName, String businessAddr
         String businessExplain, String businessImg, Integer orderTypeId,
         BigDecimal startPrice, BigDecimal deliveryPrice, String remarks,
         Boolean dineInAvailable, Integer status, Boolean operatingStatus,
-        BigDecimal promotionThreshold, BigDecimal promotionDiscount) {
+        BigDecimal promotionThreshold, BigDecimal promotionDiscount,
+        BigDecimal longitude, BigDecimal latitude, String poiId, String adcode, String formattedAddress) {
     public static PublicBusinessVO from(BusinessVO business) {
         if (business == null || !Integer.valueOf(1).equals(business.getStatus())) {
             throw new APIException(ResultCodeEnum.BUSINESS_MISSED);
@@ -18,6 +19,7 @@ public record PublicBusinessVO(Long id, String businessName, String businessAddr
                 business.getBusinessExplain(), business.getBusinessImg(), business.getOrderTypeId(),
                 business.getStartPrice(), business.getDeliveryPrice(), business.getRemarks(),
                 business.getDineInAvailable(), business.getStatus(), business.getOperatingStatus(),
-                business.getPromotionThreshold(), business.getPromotionDiscount());
+                business.getPromotionThreshold(), business.getPromotionDiscount(), business.getLongitude(), business.getLatitude(),
+                business.getPoiId(), business.getAdcode(), business.getFormattedAddress());
     }
 }

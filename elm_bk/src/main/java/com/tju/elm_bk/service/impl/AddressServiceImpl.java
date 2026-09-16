@@ -31,6 +31,7 @@ public class AddressServiceImpl implements AddressService {
     public AddressVO create(AddressCreateDTO request) {
         Long userId = writeLock.acquire();
         var address = new DeliveryAddress();
+        request.copyLocationTo(address);
         address.setUserId(userId);
         address.setContactName(request.getContactName().trim());
         address.setContactSex(request.getContactSex());
@@ -50,6 +51,7 @@ public class AddressServiceImpl implements AddressService {
     public AddressVO update(Long id, AddressCreateDTO request) {
         Long userId = writeLock.acquire();
         owned(id, userId);
+        request.validateCoordinates();
         request.setContactName(request.getContactName().trim());
         request.setAddress(request.getAddress().trim());
         addresses.updateOwned(id, userId, request);
@@ -82,6 +84,7 @@ public class AddressServiceImpl implements AddressService {
     }
     private AddressVO view(DeliveryAddress address) {
         var view = new AddressVO();
+        address.copyLocationTo(view);
         view.setId(address.getId());
         view.setContactName(address.getContactName());
         view.setContactSex(address.getContactSex());

@@ -1,5 +1,6 @@
 -- 测试专用表：默认在 H2 中快速回归，同一套测试也会连接独立 MySQL 验证。
 CREATE TABLE business (
+ longitude DECIMAL(10,6), latitude DECIMAL(10,6), poi_id VARCHAR(80), adcode VARCHAR(6), formatted_address VARCHAR(255),
  id BIGINT PRIMARY KEY, user_id BIGINT NOT NULL, business_name VARCHAR(255) NOT NULL,
  business_address VARCHAR(255), business_explain VARCHAR(255), business_img TEXT,
  start_price DECIMAL(10,2), delivery_price DECIMAL(10,2), order_type_id INT, remarks VARCHAR(255),
@@ -22,6 +23,7 @@ CREATE TABLE cart (
  creator BIGINT, updater BIGINT
 );
 CREATE TABLE delivery_address (
+ longitude DECIMAL(10,6), latitude DECIMAL(10,6), poi_id VARCHAR(80), adcode VARCHAR(6), formatted_address VARCHAR(255),
  id BIGINT PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id), address VARCHAR(255),
  contact_name VARCHAR(255), contact_sex INT, contact_tel VARCHAR(255), is_default TINYINT DEFAULT 0,
  is_deleted TINYINT DEFAULT 0, create_time TIMESTAMP, update_time TIMESTAMP, creator BIGINT, updater BIGINT

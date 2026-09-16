@@ -36,6 +36,7 @@
     <div class="edit-button-container">
       <button class="operating-button" :class="{ closed: business.operatingStatus === false }" @click="toggleOperatingStatus">{{ business.operatingStatus === false ? '开始营业' : '暂停营业' }}</button>
       <button class="edit-button" @click="showEditBusinessModal">编辑商家信息</button>
+      <button class="edit-button" @click="editLocation">店铺位置</button>
     </div>
 
     <ul class="food">
@@ -70,6 +71,7 @@
 
 <script>
 import PageHeader from '../components/PageHeader.vue';
+import { pickMapLocation } from '../utils/pickMapLocation';
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import Swal from 'sweetalert2';
@@ -84,6 +86,16 @@ export default {
     const route = useRoute();
     const businessId = ref();
     const business = ref({});
+    const editLocation = async () => {
+      const point = await pickMapLocation(business.value);
+      if (!point) return;
+      try {
+        const response = await request.patch(`/api/businesses/own/${businessId.value}`, { businessAddress: point.formattedAddress, longitude: point.longitude, latitude: point.latitude, poiId: point.poiId, adcode: point.adcode, formattedAddress: point.formattedAddress });
+        if (!response.success) throw new Error(response.message || '保存失败');
+        business.value = response.data;
+        Swal.fire({ icon: 'success', title: '店铺位置已更新', timer: 1200, showConfirmButton: false });
+      } catch(e) { Swal.fire('位置保存失败', e.response?.data?.message || e.message, 'error'); }
+    };
     const foodArr = ref([]);
     const favoriteCount = ref({});
     const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, character => ({
@@ -917,6 +929,7 @@ export default {
       favoriteCount,
       foodArr,
       showEditBusinessModal,
+      editLocation,
       showAddNewFoodModal,
       showEditFoodModal,
       shelveFood,

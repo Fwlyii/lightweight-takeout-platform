@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue';
 import { areaList } from '@vant/area-data';
+import { validCoordinates } from '../utils/businessDistance.js';
 
 const fields = ['province', 'city', 'district'];
 const emptyLocation = () => ({ province: '', city: '', district: '' });
@@ -33,7 +34,17 @@ export function useLocationPicker({ storage = browserStorage() } = {}) {
     const locationLevels = ['省份', '城市', '区 / 县'];
     const selectedLocation = ref(emptyLocation());
     const pendingLocation = ref(emptyLocation());
-    const displayLocation = computed(() => getDisplayText(selectedLocation.value) || '天津市津南区');
+    const displayLocation = computed(() => selectedLocation.value.name || selectedLocation.value.formattedAddress || getDisplayText(selectedLocation.value) || '选择送达位置');
+    function acceptMapLocation(point) {
+        if (!validCoordinates(point)) return;
+        selectedLocation.value = { ...point };
+        try {
+            storage?.setItem('userLocation', JSON.stringify(point));
+            storage?.setItem('userLocationSource', point.source || 'map');
+            storage?.setItem('userLocationVersion', '3');
+        } catch { /* The current choice still works without storage. */ }
+        hideLocationPicker();
+    }
     function showLocationPicker() {
         showPicker.value = true;
         error.value = '';
@@ -108,6 +119,11 @@ export function useLocationPicker({ storage = browserStorage() } = {}) {
     }
     function restoreSavedLocation() {
         try {
+            if (storage?.getItem('userLocationVersion') === '3') {
+                const saved = JSON.parse(storage.getItem('userLocation'));
+                selectedLocation.value = validCoordinates(saved) ? saved : emptyLocation();
+                return;
+            }
             if (storage?.getItem('userLocationSource') !== 'manual'
                 || storage?.getItem('userLocationVersion') !== '2') return;
             const saved = JSON.parse(storage.getItem('userLocation'));
@@ -121,6 +137,6 @@ export function useLocationPicker({ storage = browserStorage() } = {}) {
     return {
         displayLocation, showPicker, loading, error, locationData, currentLevel, locationLevels,
         selectedLocation, pendingLocation, showLocationPicker, hideLocationPicker, switchLevel, selectLocation,
-        isSelected, confirmLocation, getDisplayText, restoreSavedLocation
+        isSelected, confirmLocation, getDisplayText, restoreSavedLocation, acceptMapLocation
     };
 }

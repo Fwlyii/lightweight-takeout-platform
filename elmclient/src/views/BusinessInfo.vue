@@ -20,13 +20,13 @@
                     <span class="open-badge" :class="{ closed: !isBusinessOpen }">{{ business.status !== undefined && business.status !== 1 ? '暂未上线' : business.operatingStatus === false ? '休息中' : '营业中' }}</span>
                 </div>
                 <p class="business-meta">{{ deliveryMode === 'pickup' ? '到店自取 · 无起送门槛' : `起送 ¥${formatMoney(business.startPrice)} · 配送 ¥${formatMoney(business.deliveryPrice)}` }}</p>
-                <p class="business-address"><i class="fa fa-map-marker"></i>{{ business.businessAddress || '校园周边配送' }}</p>
+                <p class="business-address"><i class="fa fa-map-marker"></i><a v-if="shopNavigationUrl" :href="shopNavigationUrl" target="_blank" rel="noopener noreferrer">{{ business.businessAddress }} · 导航</a><span v-else>{{ business.businessAddress || '地址待完善' }}</span></p>
                 <div class="business-metrics">
                     <span class="metric-score"><i class="fa fa-star"></i>{{ businessScoreText }}</span>
                     <span class="metric-sep">|</span>
                     <span>月售 {{ businessSummary ? businessSummary.salesCount || 0 : 0 }}</span>
                     <span class="metric-sep">|</span>
-                    <span>{{ deliveryMode === 'pickup' ? '预计 15 分钟出餐' : `预计 ${deliveryEtaMinutes} 分钟送达` }}</span>
+                    <span>{{ deliveryMode === 'pickup' ? '预计 15 分钟出餐' : deliveryEtaMinutes == null ? '选择位置后估算送达时间' : `预计 ${deliveryEtaMinutes} 分钟送达` }}</span>
                 </div>
                 <div class="hero-reactions">
                     <button type="button" :class="{ active: isLiked }" @click.stop="toggleLike"><i class="fa fa-thumbs-up"></i><span>{{ isLiked ? '已赞' : '点赞' }}</span></button>
@@ -131,6 +131,8 @@
 </template>
 
 <script>
+import { withTianjinDelivery, validCoordinates } from '../utils/businessDistance';
+import { useLocationPicker } from '../composables/useLocationPicker';
 import { ref, onMounted, computed, watch, onErrorCaptured } from "vue";
 import { navigateBack } from '../utils/backNavigation';
 import { useRoute, useRouter } from "vue-router";
@@ -536,6 +538,7 @@ export default {
 
                 if (response.success === true) {
                     business.value = {
+                        ...response.data,
                         id: response.data.id,
                         businessName: response.data.businessName,
                         businessImg: response.data.businessImg,
@@ -683,7 +686,16 @@ export default {
             return Number.isFinite(score) && score > 0 ? score.toFixed(1) : '暂无评分';
         });
         /** 预计送达时长与首页、商家列表共用同一口径。 */
-        const deliveryEtaMinutes = computed(() => getBusinessDeliveryMinutes(business.value));
+        const { selectedLocation, restoreSavedLocation } = useLocationPicker();
+        restoreSavedLocation();
+        const deliveryEtaMinutes = computed(() => getBusinessDeliveryMinutes(withTianjinDelivery(business.value, selectedLocation.value)));
+        const shopNavigationUrl = computed(() => {
+            if (!validCoordinates(business.value)) return '';
+            const url = new URL('https://uri.amap.com/navigation');
+            url.searchParams.set('to', `${business.value.longitude},${business.value.latitude},${business.value.businessName}`);
+            url.searchParams.set('mode', 'walk'); url.searchParams.set('coordinate', 'gaode'); url.searchParams.set('callnative', '1');
+            return url.toString();
+        });
         const orderButtonText = computed(() => {
             if (!isBusinessOpen.value) return '休息中';
             if (totalQuantity.value === 0) return '请选择餐品';
@@ -742,6 +754,7 @@ export default {
             businessSummary,
             businessScoreText,
             deliveryEtaMinutes,
+            shopNavigationUrl,
             trimMoney,
             orderButtonText,
             isLiked,

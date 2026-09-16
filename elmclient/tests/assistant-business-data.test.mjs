@@ -2,14 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createAssistantBusinessLookup } from '../src/utils/assistantBusinessData.js';
 import { withTianjinDelivery } from '../src/utils/businessDistance.js';
-const breakfast = { id: 2, businessName: '海棠早餐铺', businessAddress: '天津大学卫津路校区', score: 4.5, salesCount: 3 };
-const rice = { id: 1, businessName: '北洋食堂·现炒', businessAddress: '天津大学北洋园校区', score: 4.9, salesCount: 7 };
+const origin = { longitude:117.315, latitude:39.001 };
+const breakfast = { id: 2, longitude:117.166, latitude:39.11, businessName: '海棠早餐铺', businessAddress: '天津大学卫津路校区', score: 4.5, salesCount: 3 };
+const rice = { id: 1, longitude:117.312, latitude:39, businessName: '北洋食堂·现炒', businessAddress: '天津大学北洋园校区', score: 4.9, salesCount: 7 };
 const food = { foodId: 4, businessId: 2, businessName: '海棠早餐铺', foodName: '热拿铁', price: 12 };
 const response = { success: true, data: [breakfast, rice] };
 function fixture(request = { get: async () => response }) {
-  const saved = new Map([['userLocationSource', 'manual'], ['userLocationVersion', '2']]);
+  const saved = new Map([['userLocationSource', 'map'], ['userLocationVersion', '3']]);
   const setRegion = province => saved.set('userLocation', JSON.stringify(province === '天津市'
-    ? { province, city: province, district: '津南区' } : { province, city: province, district: '黄浦区' }));
+    ? origin : { province, city: province, district: '黄浦区' }));
   setRegion('天津市');
   const lookup = createAssistantBusinessLookup(request, { storage: { getItem: key => saved.get(key) } });
   return { lookup, setRegion };
@@ -17,7 +18,7 @@ function fixture(request = { get: async () => response }) {
 test('breakfast recommendations join the real shop address, score and homepage distance', async () => {
   const { lookup } = fixture(); await lookup.load();
   const result = lookup.enrich(food);
-  assert.equal(result.distanceKm, withTianjinDelivery(breakfast, { province: '天津市', district: '津南区' }).distanceKm);
+  assert.equal(result.distanceKm, withTianjinDelivery(breakfast, origin).distanceKm);
   assert.ok(result.distanceKm > 15); assert.equal(result.businessScore, 4.5); assert.equal(result.businessSalesCount, 3);
   assert.equal(result.foodId, 4); assert.equal(result.price, 12); assert.equal(result.foodName, '热拿铁');
   assert.equal(food.distanceKm, undefined);
@@ -25,7 +26,7 @@ test('breakfast recommendations join the real shop address, score and homepage d
 test('AI campus recommendations reuse the per-shop points rather than the shared campus center', async () => {
   const { lookup } = fixture(); await lookup.load();
   const result = lookup.enrich({ foodId: 27, businessId: 1, businessName: rice.businessName });
-  assert.equal(result.distanceKm, withTianjinDelivery(rice, {}).distanceKm);
+  assert.equal(result.distanceKm, withTianjinDelivery(rice, origin).distanceKm);
   assert.ok(result.distanceKm < .4);
 });
 test('reopening AI after changing provinces clears both stale values', async () => {

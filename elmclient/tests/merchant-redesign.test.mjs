@@ -15,6 +15,7 @@ function mount(name, extra = {}) {
     createRealtimeConnection: () => ({ start() {}, stop() {} }),
     MERCHANT_ORDER_GROUPS, ORDER_STATUS, orderStatusClass, orderStatusText, formatDateTime: String,
     Swal: { fire: async () => ({}) }, listMyBusinesses: async () => [],
+    pickMapLocation: async () => ({ longitude: 117.3, latitude: 39, formattedAddress: '天津' }),
     request: { get: async () => ({ success: true, data: [] }) }, ...extra };
   const script = parse(sources[name]).descriptor.script.content.replace(/^import .*;\r?\n/gm, '').replace('export default', 'return');
   const view = new Function(...Object.keys(bindings), script)(...Object.values(bindings)).setup();

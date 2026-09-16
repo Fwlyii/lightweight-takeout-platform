@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "首页搜索与评分筛选所得商铺信息")
-public class BusinessSearchVO {
+public class BusinessSearchVO extends com.tju.elm_bk.entity.GeoPoint {
     @Schema(description = "商铺ID")
     private Long id;
     @Schema(description = "商铺名")

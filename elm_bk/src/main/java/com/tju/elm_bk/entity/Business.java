@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Business {
+public class Business extends com.tju.elm_bk.entity.GeoPoint {
     @Schema(description = "商铺ID")
     private Long id;
 

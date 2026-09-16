@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BusinessDTO {
+public class BusinessDTO extends com.tju.elm_bk.entity.GeoPoint {
     @Schema(description = "店铺ID")
     private Long id;
 

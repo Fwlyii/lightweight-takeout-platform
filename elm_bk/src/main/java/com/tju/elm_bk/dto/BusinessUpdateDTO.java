@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(name = "商家更新DTO")
-public class BusinessUpdateDTO {
+public class BusinessUpdateDTO extends com.tju.elm_bk.entity.GeoPoint {
     @Schema(description = "店铺ID")
     @NotNull(message = "店铺ID不能为空")
     private Long id;

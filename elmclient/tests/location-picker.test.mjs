@@ -15,9 +15,9 @@ function choose(picker, names = ['浙江省', '杭州市', '西湖区']) {
     picker.selectLocation(option);
   }
 }
-test('default is Tianjin Jinnan and all province entries are available without a map key', () => {
+test('default does not invent a user location and legacy region entries remain available', () => {
   const { picker } = fixture({ apiKey: '', http: { get() { assert.fail('must not request a map API'); } } });
-  assert.equal(picker.displayLocation.value, '天津市津南区');
+  assert.equal(picker.displayLocation.value, '选择送达位置');
   picker.showLocationPicker();
   assert.equal(picker.locationData.value.length, 34);
   assert.equal(picker.loading.value, false);
@@ -26,7 +26,7 @@ test('default is Tianjin Jinnan and all province entries are available without a
 test('selection only changes the header after confirmation and persists across reload', () => {
   const { picker, storage, values } = fixture();
   choose(picker);
-  assert.equal(picker.displayLocation.value, '天津市津南区');
+  assert.equal(picker.displayLocation.value, '选择送达位置');
   assert.equal(picker.confirmLocation(), true);
   assert.equal(picker.displayLocation.value, '浙江省杭州市西湖区');
   assert.equal(picker.showPicker.value, false);
@@ -45,7 +45,7 @@ test('cancel discards pending changes', () => {
   const { picker, values } = fixture();
   choose(picker);
   picker.hideLocationPicker();
-  assert.equal(picker.displayLocation.value, '天津市津南区');
+  assert.equal(picker.displayLocation.value, '选择送达位置');
   assert.equal(values.size, 0);
   assert.equal(picker.pendingLocation.value.province, '');
 });

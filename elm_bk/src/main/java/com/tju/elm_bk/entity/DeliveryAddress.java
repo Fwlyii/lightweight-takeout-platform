@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeliveryAddress {
+public class DeliveryAddress extends com.tju.elm_bk.entity.GeoPoint {
     @Schema(description = "地址ID")
     private Long id;
 

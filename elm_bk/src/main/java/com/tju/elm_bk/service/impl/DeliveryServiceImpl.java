@@ -104,8 +104,9 @@ public class DeliveryServiceImpl implements DeliveryService {
         if (address == null || address.isBlank()) {
             throw new APIException("当前任务缺少可用导航地址");
         }
+        GeoPoint point = "MERCHANT".equals(destinationType) ? deliveryTaskMapper.merchantPoint(task.getOrderId()) : deliveryTaskMapper.customerPoint(task.getOrderId());
         return new NavigationVO(taskId, destinationType, destinationName, address,
-                mapAdapter.navigationUrl(address), mapAdapter.provider());
+                point != null && point.hasCoordinates() ? mapAdapter.navigationUrl(address, point) : mapAdapter.navigationUrl(address), mapAdapter.provider());
     }
 
     @Override
@@ -469,8 +470,9 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     private BigDecimal estimateDistance(Long orderId) {
-        double distance = 1.8 + (orderId % 5) * 0.7;
-        return BigDecimal.valueOf(distance).setScale(1, RoundingMode.HALF_UP);
+        BigDecimal value = GeoPoint.distanceKm(deliveryTaskMapper.merchantPoint(orderId), deliveryTaskMapper.customerPoint(orderId));
+        // Legacy storage is NOT NULL; the read projection returns NULL for missing coordinates.
+        return value == null ? BigDecimal.ZERO : value;
     }
 
     private BigDecimal safe(BigDecimal value) {

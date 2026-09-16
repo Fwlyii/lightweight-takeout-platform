@@ -19,6 +19,11 @@ export function createProfileApiClient(request) {
     contactSex: value.contactSex ?? null,
     contactTel: clean(value.contactTel),
     address: clean(value.address),
+    ...(Object.hasOwn(value, 'longitude') ? {
+      longitude: value.longitude ?? null, latitude: value.latitude ?? null,
+      poiId: value.poiId || null, adcode: value.adcode || null,
+      formattedAddress: value.formattedAddress || null,
+    } : {}),
   });
   const profile = (value) =>
     Object.fromEntries(

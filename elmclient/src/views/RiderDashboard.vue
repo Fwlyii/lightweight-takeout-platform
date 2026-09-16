@@ -111,7 +111,7 @@
                             </div>
                         </div>
                         <div class="task-meta">
-                            <span><i class="fas fa-road"></i><div><b>{{ number(task.distanceKm, 1) }} km</b><small>配送距离</small></div></span>
+                            <span><i class="fas fa-road"></i><div><b>{{ task.distanceKm == null ? '暂无' : number(task.distanceKm, 1) + ' km' }}</b><small>直线距离</small></div></span>
                             <span><i class="fas fa-coins"></i><div><b>¥{{ number(task.riderFee, 2) }}</b><small>{{ activeTab === 'history' ? '配送费' : '预计收入' }}</small></div></span>
                             <span><i class="fas fa-receipt"></i><div><b>¥{{ number(task.orderTotal, 2) }}</b><small>订单金额</small></div></span>
                         </div>

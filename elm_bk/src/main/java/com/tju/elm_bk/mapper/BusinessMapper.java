@@ -100,7 +100,7 @@ public interface BusinessMapper {
     List<BusinessInfoDTO>getAllActiveBusinesses();
 
     @Select("<script>" +
-            "SELECT id, business_name, business_address, business_img, order_type_id, delivery_price, start_price, remarks, business_explain, dine_in_available, promotion_threshold, promotion_discount, status, operating_status " +
+            "SELECT id, business_name, business_address, longitude, latitude, poi_id, adcode, formatted_address, business_img, order_type_id, delivery_price, start_price, remarks, business_explain, dine_in_available, promotion_threshold, promotion_discount, status, operating_status " +
             "FROM business " +
             "WHERE is_deleted = 0 " +
             "<if test='userId != null'>" +
@@ -114,7 +114,7 @@ public interface BusinessMapper {
 
 
     @Select("<script>" +
-            "SELECT id, business_name, business_address, business_img, order_type_id, delivery_price, start_price, remarks, business_explain, dine_in_available, promotion_threshold, promotion_discount, status, operating_status " +
+            "SELECT id, business_name, business_address, longitude, latitude, poi_id, adcode, formatted_address, business_img, order_type_id, delivery_price, start_price, remarks, business_explain, dine_in_available, promotion_threshold, promotion_discount, status, operating_status " +
             "FROM business " +
             "WHERE is_deleted = 0 AND status = 1" +
             "<if test='type != null'>" +

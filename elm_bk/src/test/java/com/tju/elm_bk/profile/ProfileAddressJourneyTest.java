@@ -32,6 +32,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("auth-test")
 @WithMockUser(username = "owner", authorities = "USER")
 class ProfileAddressJourneyTest {
+ @Test
+ void mapCoordinatesRoundTripAndPartialCoordinatesCannotBeSaved() throws Exception {
+  var body = new LinkedHashMap<String,Object>(address());
+  body.put("longitude",117.30586); body.put("latitude",38.99688); body.put("poiId","B_TEST");
+  body.put("adcode","120112"); body.put("formattedAddress","天津大学北洋园校区");
+  var result=mvc.perform(post("/api/addresses/me").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(body)))
+   .andExpect(status().isOk()).andExpect(jsonPath("$.data.longitude").value(117.30586))
+   .andExpect(jsonPath("$.data.poiId").value("B_TEST")).andReturn();
+  long id=json.readTree(result.getResponse().getContentAsString()).path("data").path("id").asLong();
+  mvc.perform(get("/api/addresses/"+id)).andExpect(jsonPath("$.data.latitude").value(38.99688));
+  body.put("longitude",181);
+  mvc.perform(put("/api/addresses/"+id).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(body))).andExpect(status().is4xxClientError());
+  assertEquals(117.30586,jdbc.queryForObject("SELECT longitude FROM delivery_address WHERE id=?",Double.class,id));
+ }
  @Autowired com.tju.elm_bk.service.ImageStorageService images;
 
  @Test
