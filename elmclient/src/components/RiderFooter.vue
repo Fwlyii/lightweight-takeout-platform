@@ -1,5 +1,6 @@
 <template>
-  <nav class="role-footer" aria-label="骑手导航">
+  <nav ref="footer" class="role-footer rider-footer" aria-label="骑手导航">
+    <span class="rider-sliding-indicator" aria-hidden="true"></span>
     <router-link
       to="/rider/dashboard?tab=available"
       class="nav-item"
@@ -29,8 +30,12 @@
 
 <script setup>
 import { useRoute } from 'vue-router';
+import { ref } from 'vue';
+import { useRiderIndicator } from '@/composables/useRiderIndicator';
 
 const route = useRoute();
+const footer = ref(null);
+useRiderIndicator(footer);
 const isActive = (tab) => {
   if (route.path !== '/rider/dashboard') return false;
   const currentTab = route.query.tab || 'available';

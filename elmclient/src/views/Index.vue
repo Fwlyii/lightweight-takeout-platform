@@ -310,8 +310,8 @@
                         </div>
                     </div>
                     <div class="business-side">
-                        <span class="business-distance">{{ getBusinessDistanceKm(business) === null ? '距离暂无' : getBusinessDistanceKm(business).toFixed(1) + 'km' }}</span>
-                        <span class="business-eta">{{ getBusinessDeliveryMinutes(business) === null ? '送达时间暂无' : getBusinessDeliveryMinutes(business) + '分钟送达' }}</span>
+                        <span class="business-distance">{{ businessDistanceText(business) }}</span>
+                        <span class="business-eta">{{ getBusinessDeliveryMinutes(business) === null ? '送达时间暂无' : '约' + getBusinessDeliveryMinutes(business) + '分钟送达' }}</span>
                         <i class="fa fa-angle-right business-chevron" aria-hidden="true"></i>
                     </div>
                 </div>
@@ -332,6 +332,7 @@ import request from '../utils/request';
 import { formatMoney, formatRating } from '../utils/formatters';
 import { clearAuth, getStoredUser, getToken, updateStoredUser } from '../utils/auth';
 import { useLocationPicker } from '../composables/useLocationPicker';
+import { businessDistanceText, withTianjinDelivery } from '../utils/businessDistance';
 import {
     getBusinessAveragePrice,
     getBusinessDeliveryMinutes,
@@ -602,6 +603,7 @@ export default {
         });
 
         watch(visibleBusinessList, () => nextTick(observeBusinessItems), { flush: 'post' });
+        watch(selectedLocation, () => applyFiltersAndSort());
 
         const toBusinessList = (orderTypeId) => {
             router.push({ path: '/BusinessList', query: { orderTypeId } });
@@ -704,7 +706,7 @@ export default {
 
         // 应用筛选和排序的统一函数
         const applyFiltersAndSort = () => {
-            let filteredList = [...originalBusinessList.value];
+            let filteredList = originalBusinessList.value.map(business => withTianjinDelivery(business, selectedLocation.value));
 
             // 免配送费筛选
             if (filters.value.freeDelivery) {
@@ -799,6 +801,7 @@ export default {
         };
 
         return {
+            businessDistanceText,
             fixedBox,
             pageReady,
             businessListRef,

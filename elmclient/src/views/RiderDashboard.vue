@@ -36,7 +36,7 @@
                 </button>
             </section>
 
-            <section class="stat-grid">
+            <section class="stat-grid" :class="{ 'rider-stats-ready': statsEntered }" @animationend="finishStats">
                 <article><span class="stat-icon green"><i class="fas fa-route"></i></span>
                     <div><small>累计里程</small><strong>{{ number(profile.totalDistance, 1) }}<em> km</em></strong></div>
                 </article>
@@ -53,18 +53,26 @@
 
             <aside v-if="activeTab === 'available'" class="rider-notice"><i class="fas fa-bell"></i><b>骑行提醒</b><span>请注意行车安全，合理安排配送时间。</span></aside>
             <section class="workspace">
-                <nav class="tabs">
+                <nav ref="tabBar" class="tabs">
+                    <span class="rider-sliding-indicator" aria-hidden="true"></span>
                     <button v-for="tab in visibleTabs" :key="tab.key" :class="{ active: activeTab === tab.key }"
                         @click="selectTab(tab.key)">
                         <i :class="tab.icon"></i>{{ tab.label }}<b v-if="countFor(tab.key)">{{ countFor(tab.key) }}</b>
                     </button>
-                    <button class="refresh" @click="refreshAll"><i class="fas fa-sync-alt"
+                    <button class="refresh" :disabled="refreshing" :aria-busy="refreshing" @click="refreshAll"><i class="fas fa-sync-alt"
                             :class="{ spin: refreshing }"></i>
                         刷新</button>
                 </nav>
 
                 <div v-if="selectedTaskId" class="detail-toolbar"><button class="text-button" @click="selectedTaskId = null; successNotice = false"><i class="fas fa-chevron-left"></i> 返回订单列表</button><span>配送详情</span></div>
-                <aside v-if="successNotice && selectedTaskId" class="success-notice"><i class="fas fa-check-circle"></i><div><b>抢单成功，请安全前往商家</b><p>请尽快到达商家取餐，注意交通安全</p></div><button aria-label="关闭提示" @click="successNotice = false">×</button></aside>
+                <aside v-if="successNotice && selectedTaskId" class="success-notice" role="status"><i class="fas fa-check-circle"></i><div><b>抢单成功，请安全前往商家</b><p>请尽快到达商家取餐，注意交通安全</p></div><button aria-label="关闭提示" @click="successNotice = false">×</button></aside>
+                <Transition name="rider-feedback">
+                    <aside v-if="actionFeedback?.phase === 'success' && actionFeedback.action !== 'accept'" :key="actionFeedback.sequence" class="rider-state-feedback" :class="{ 'rider-completion': actionFeedback.action === 'deliver' }" role="status">
+                        <svg class="rider-success-check" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18"/><path d="m11 20 6 6 12-13" pathLength="1"/></svg>
+                        <div><b>{{ actionSuccessText[actionFeedback.action] }}</b><small v-if="actionFeedback.action === 'deliver'">已送达，等待顾客确认 · 配送费 <strong>¥{{ number(actionFeedback.fee, 2) }}</strong></small></div>
+                    </aside>
+                </Transition>
+                <Transition name="rider-feedback"><p v-if="actionError" class="rider-action-error" role="alert">{{ actionError }}</p></Transition>
                 <div v-if="activeTab === 'available' && !profile.online" class="empty">
                     <span><i class="fas fa-power-off"></i></span>
                     <h3>上线后接收附近订单</h3>
@@ -76,9 +84,9 @@
                     <p>配送网络会自动同步最新状态。</p>
                 </div>
 
-                <div v-else class="task-grid">
-                    <article v-for="task in displayedTasks" :key="task.id" class="task-card"
-                        :class="[task.taskStatus.toLowerCase(), { expanded: selectedTaskId === task.id }]">
+                <TransitionGroup name="rider-list" type="transition" tag="div" class="task-grid" :class="{ 'rider-grid-empty': !displayedTasks.length }" appear @before-leave="prepareCardLeave" @after-leave="resetCardLeave" @leave-cancelled="resetCardLeave">
+                    <article v-for="task in (activeTab === 'available' && !profile.online ? [] : displayedTasks)" :key="task.id" class="task-card"
+                        :class="[task.taskStatus.toLowerCase(), { expanded: selectedTaskId === task.id, 'rider-new-order': newOrderIds.has(task.id) }]" @animationend.self="finishNewOrder(task.id, $event)">
                         <div class="task-head">
                             <div><span class="task-id">{{ activeTab === 'available' ? '#' : 'DELIVERY #' }}{{ task.id }}</span>
                                 <h3><button class="task-title" :aria-expanded="selectedTaskId === task.id" @click="selectedTaskId = selectedTaskId === task.id ? null : task.id; successNotice = false">{{ task.businessName }}<i v-if="!selectedTaskId" class="fas fa-chevron-right" aria-hidden="true"></i></button></h3>
@@ -108,25 +116,25 @@
                             <span><i class="fas fa-receipt"></i><div><b>¥{{ number(task.orderTotal, 2) }}</b><small>订单金额</small></div></span>
                         </div>
                         <ol v-if="selectedTaskId && ['ACCEPTED', 'ARRIVED_STORE', 'DELIVERING', 'DELIVERED', 'COMPLETED'].includes(task.taskStatus)" class="delivery-progress" aria-label="配送进度">
-                            <li v-for="(step, index) in deliverySteps" :key="step.title" :class="{ reached: progressIndex(task) >= index, current: progressIndex(task) === index }"><span></span><b>{{ step.title }}</b><small>{{ step.note }}</small></li>
+                            <li v-for="(step, index) in deliverySteps" :key="step.title" :class="{ reached: progressIndex(task) >= index, current: progressIndex(task) === index, done: progressIndex(task) > index || ['DELIVERED', 'COMPLETED'].includes(task.taskStatus) }" :aria-current="progressIndex(task) === index ? 'step' : undefined"><span><i v-if="progressIndex(task) > index || ['DELIVERED', 'COMPLETED'].includes(task.taskStatus)" class="fa fa-check" aria-hidden="true"></i></span><b>{{ step.title }}</b><small>{{ step.note }}</small></li>
                         </ol>
                         <div class="task-actions">
                             <button v-if="task.taskStatus === 'WAITING_RIDER'" class="accept"
-                                :disabled="actingId !== null" @click="act(task, 'accept')">接取订单</button>
+                                :disabled="actingId !== null" :aria-busy="isActionPending(task)" @click="act(task, 'accept')"><RiderActionFeedback label="接取订单" pending="正在接单" success-label="接单成功" :busy="isActionPending(task)" :success="isActionSuccess(task, 'accept')" /></button>
                             <template v-else-if="task.taskStatus === 'ACCEPTED'">
                                 <button class="ghost" @click="navigate(task)"><i
                                         class="fas fa-location-arrow"></i>
                                     导航去商家</button><button class="accept"
-                                    :disabled="actingId !== null" @click="act(task, 'arrive-store')">我已到店</button>
+                                    :disabled="actingId !== null" :aria-busy="isActionPending(task)" @click="act(task, 'arrive-store')"><RiderActionFeedback label="我已到店" pending="正在确认" :busy="isActionPending(task)" :success="isActionSuccess(task, 'arrive-store')" /></button>
                             </template>
                             <template v-else-if="task.taskStatus === 'ARRIVED_STORE'">
                                 <button class="ghost danger" @click="openException(task)">上报异常</button><button
-                                    class="accept" :disabled="actingId !== null" @click="act(task, 'pickup')">确认取餐</button>
+                                    class="accept" :disabled="actingId !== null" :aria-busy="isActionPending(task)" @click="act(task, 'pickup')"><RiderActionFeedback label="确认取餐" pending="正在取餐" :busy="isActionPending(task)" :success="isActionSuccess(task, 'pickup')" /></button>
                             </template>
                             <template v-else-if="task.taskStatus === 'DELIVERING'">
                                 <button class="ghost" @click="navigate(task)"><i
                                         class="fas fa-location-arrow"></i>
-                                    导航去顾客</button><button class="accept" :disabled="actingId !== null" @click="act(task, 'deliver')">确认送达</button>
+                                    导航去顾客</button><button class="accept" :disabled="actingId !== null" :aria-busy="isActionPending(task)" @click="act(task, 'deliver')"><RiderActionFeedback label="确认送达" pending="正在送达" :busy="isActionPending(task)" :success="isActionSuccess(task, 'deliver')" /></button>
                                 <button class="exception-link" @click="openException(task)">遇到配送问题？</button>
                             </template>
                             <div v-else-if="task.taskStatus === 'DELIVERED'" class="waiting-confirm"><i
@@ -140,7 +148,7 @@
                             </div>
                         </div>
                     </article>
-                </div>
+                </TransitionGroup>
             </section>
             <aside class="safety-card"><span><i class="fas fa-shield-alt"></i><i class="fas fa-check safety-check"></i></span><div><b>安全第一　平安配送</b><p>遵守交通规则 · 佩戴头盔 · 安全送达每一单</p></div></aside>
         </template>
@@ -172,6 +180,8 @@ import { toast } from '@/utils/toast';
 import { createRealtimeConnection } from '@/services/realtimeService';
 import { taskStatusText } from '@/utils/orderPresentation';
 import { openDeliveryNavigation } from '@/utils/deliveryNavigation';
+import RiderActionFeedback from '@/components/RiderActionFeedback.vue';
+import { useRiderIndicator } from '@/composables/useRiderIndicator';
 
 const route = useRoute();
 const router = useRouter();
@@ -179,6 +189,35 @@ const profile = ref(null), availableTasks = ref([]), activeTasks = ref([]), hist
 const loading = ref(true), refreshing = ref(false), switching = ref(false), actingId = ref(null), activeTab = ref('available');
 const exceptionModal = ref(null);
 const selectedTaskId = ref(null), successNotice = ref(false);
+const tabBar = ref(null);
+useRiderIndicator(tabBar);
+const statsEntered = ref(false);
+const finishStats = event => {
+    if (event.animationName === 'rider-stat-in' && event.target === event.currentTarget.lastElementChild) statsEntered.value = true;
+};
+const actionFeedback = ref(null), actionError = ref('');
+const actionSuccessText = { 'arrive-store': '到店成功，请核对餐品', pickup: '取餐成功，请安全送往顾客', deliver: '送达成功，辛苦了' };
+let feedbackTimer, feedbackSequence = 0;
+const isActionPending = task => actingId.value === task.id && actionFeedback.value?.phase === 'pending';
+const isActionSuccess = (task, action) => actingId.value === task.id && actionFeedback.value?.phase === 'success' && actionFeedback.value.action === action;
+const seenOrderIds = new Set(), newOrderIds = ref(new Set());
+watch(availableTasks, tasks => {
+    const fresh = new Set([...newOrderIds.value].filter(id => tasks.some(task => task.id === id)));
+    for (const task of tasks) {
+        if (!seenOrderIds.has(task.id)) fresh.add(task.id);
+        seenOrderIds.add(task.id);
+    }
+    newOrderIds.value = fresh;
+});
+const finishNewOrder = (id, event) => {
+    if (event.animationName !== 'rider-order-glow') return;
+    const next = new Set(newOrderIds.value); next.delete(id); newOrderIds.value = next;
+};
+// Pin leaving cards to their measured position so TransitionGroup can move siblings.
+const prepareCardLeave = element => {
+    Object.assign(element.style, { left: `${element.offsetLeft}px`, top: `${element.offsetTop}px`, width: `${element.offsetWidth}px`, height: `${element.offsetHeight}px` });
+};
+const resetCardLeave = element => { for (const property of ['left', 'top', 'width', 'height']) element.style[property] = ''; };
 const deliverySteps = [{ title: '前往商家', note: '请尽快到店取餐' }, { title: '到店取餐', note: '核对餐品并取餐' }, { title: '送达顾客', note: '完成配送' }];
 const progressIndex = task => task.taskStatus === 'ACCEPTED' ? 0 : task.taskStatus === 'ARRIVED_STORE' ? 1 : 2;
 let realtimeConnection = null;
@@ -225,14 +264,34 @@ const loadTasks = async () => {
 };
 const refreshAll = async ({ silent = false } = {}) => { if (!silent) refreshing.value = true; try { await loadProfile(); if (profile.value?.auditStatus === 1) await loadTasks(); } catch (e) { if (!silent) toast.error(e.response?.data?.message || '数据同步失败'); } finally { if (!silent) refreshing.value = false; } };
 const toggleOnline = async () => { switching.value = true; try { const res = await request.patch('/api/v1/riders/me/online', { online: !profile.value.online }); profile.value = res.data; await loadTasks(); toast.success(profile.value.online ? '已上线，可以接单了' : '已安全下线'); } catch (e) { toast.error(e.response?.data?.message || '状态更新失败'); } finally { switching.value = false; } };
-const act = async (task, action) => { if (actingId.value !== null) return; actingId.value = task.id; try { await request.post(`/api/v1/delivery-tasks/${task.id}/${action}`); toast.success(action === 'accept' ? '抢单成功，请安全前往商家' : '配送状态已更新'); await refreshAll(); activeTab.value = 'active'; selectedTaskId.value = task.id; successNotice.value = action === 'accept'; await router.replace({ query: { ...route.query, tab: 'active' } }); } catch (e) { toast.error(e.response?.data?.message || '操作失败'); } finally { actingId.value = null; } };
+const act = async (task, action) => {
+    if (actingId.value !== null) return;
+    actingId.value = task.id;
+    clearTimeout(feedbackTimer);
+    actionError.value = '';
+    actionFeedback.value = { id: task.id, action, phase: 'pending', fee: task.riderFee, sequence: ++feedbackSequence };
+    try {
+        await request.post(`/api/v1/delivery-tasks/${task.id}/${action}`);
+        actionFeedback.value = { ...actionFeedback.value, phase: 'success' };
+        await refreshAll();
+        activeTab.value = 'active'; selectedTaskId.value = task.id; successNotice.value = action === 'accept';
+        await router.replace({ query: { ...route.query, tab: 'active' } });
+    } catch (e) {
+        actionFeedback.value = null;
+        actionError.value = e.response?.data?.message || '操作失败，请重试';
+    } finally {
+        actingId.value = null;
+        // Only dismiss presentation feedback; never delay a request or route change.
+        feedbackTimer = setTimeout(() => { actionFeedback.value = null; actionError.value = ''; }, 2600);
+    }
+};
 const navigate = task => openDeliveryNavigation(task.id, {
     request, openWindow: () => window.open('about:blank', '_blank'), notify: message => toast.error(message)
 });
 const openException = task => { exceptionModal.value = task; exceptionForm.exceptionType = 'STORE_DELAY'; exceptionForm.description = ''; };
 const submitException = async () => { if (!exceptionForm.description) return toast.warning('请填写情况说明'); try { await request.post(`/api/v1/delivery-tasks/${exceptionModal.value.id}/exceptions`, exceptionForm); toast.success('异常已上报，调度员将尽快处理'); exceptionModal.value = null; await refreshAll(); } catch (e) { toast.error(e.response?.data?.message || '上报失败'); } };
 onMounted(async () => { try { await loadProfile(); if (!profile.value) { router.replace('/rider/apply'); return; } if (profile.value.auditStatus === 1) { await loadTasks(); realtimeConnection = createRealtimeConnection({ onMessage: message => { if (message.type === 'delivery_update') refreshAll({ silent: true }); }, onFallbackRefresh: () => refreshAll({ silent: true }) }); realtimeConnection.start(); } } catch (e) { toast.error(e.response?.data?.message || '加载失败'); } finally { loading.value = false; } });
-onUnmounted(() => { realtimeConnection?.stop(); });
+onUnmounted(() => { realtimeConnection?.stop(); clearTimeout(feedbackTimer); });
 </script>
 
 <style scoped src="@/assets/styles/rider-dashboard.css"></style>

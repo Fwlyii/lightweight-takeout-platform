@@ -10,7 +10,7 @@ function dashboard() {
   const scope = effectScope(), route = reactive({ query: { tab: 'available' } });
   const calls = [], notices = [], state = { status: 'WAITING_RIDER', online: true };
   const task = { id: 2, taskStatus: 'WAITING_RIDER' };
-  let mounted, fail = false, release;
+  let mounted, unmounted, dismissFeedback, fail = false, release;
   const request = {
     async get(path) {
       if (path === '/api/v1/riders/me') return { data: { auditStatus: 1, online: state.online } };
@@ -27,14 +27,15 @@ function dashboard() {
     async patch(path, body) { calls.push(path); state.online = body.online; return { data: { auditStatus: 1, online: state.online } }; }
   };
   const bindings = {
-    ref, computed, reactive, watch, onMounted: fn => { mounted = fn; }, onUnmounted() {},
+    ref, computed, reactive, watch, onMounted: fn => { mounted = fn; }, onUnmounted: fn => { unmounted = fn; },
+    useRiderIndicator() {}, setTimeout: callback => { dismissFeedback = callback; return 1; }, clearTimeout: () => { dismissFeedback = null; },
     useRoute: () => route, useRouter: () => ({ replace: async value => { route.query = value.query || {}; } }),
     request, toast: Object.fromEntries(['error', 'success', 'warning'].map(key => [key, text => notices.push([key, text])])),
     createRealtimeConnection: () => ({ start() {}, stop() {} }),
     taskStatusText: value => value, openDeliveryNavigation() {}
   };
-  const view = scope.run(() => new Function(...Object.keys(bindings), script + ';return {act, selectTab, toggleOnline, activeTab, selectedTaskId, successNotice, visibleTasks, displayedTasks, actingId, profile, progressIndex, openException, submitException, exceptionForm, exceptionModal};')(...Object.values(bindings)));
-  return { view, route, calls, notices, state, mounted: () => mounted(), dispose: () => scope.stop(), setFailure: () => { fail = true; }, hold: () => { release = true; }, release: () => { const fn = release; release = null; fn(); } };
+  const view = scope.run(() => new Function(...Object.keys(bindings), script + ';return {act, selectTab, toggleOnline, activeTab, selectedTaskId, successNotice, visibleTasks, displayedTasks, actingId, profile, progressIndex, openException, submitException, exceptionForm, exceptionModal, actionFeedback, actionError, isActionPending, isActionSuccess, newOrderIds, finishNewOrder, loadTasks};')(...Object.values(bindings)));
+  return { view, route, calls, notices, state, mounted: () => mounted(), dispose: () => { unmounted?.(); scope.stop(); }, dismiss: () => dismissFeedback?.(), setFailure: () => { fail = true; }, hold: () => { release = true; }, release: () => { const fn = release; release = null; fn(); } };
 }
 test('accept opens the active task details and preserves the route through each delivery action', async () => {
   const d = dashboard(); await d.mounted();
@@ -53,13 +54,36 @@ test('failed acceptance retains the available list and never shows success detai
   await d.view.act({ id: 2 }, 'accept');
   assert.equal(d.view.activeTab.value, 'available'); assert.equal(d.view.selectedTaskId.value, null);
   assert.equal(d.view.successNotice.value, false); assert.equal(d.view.actingId.value, null);
-  assert.equal(d.notices.at(-1)[0], 'error'); d.dispose();
+  assert.match(d.view.actionError.value, /操作失败/);
+  assert.equal(d.view.actionFeedback.value, null); d.dispose();
 });
 test('pending delivery mutations are single-flight', async () => {
   const d = dashboard(); await d.mounted(); d.hold();
   const pending = d.view.act({ id: 2 }, 'accept');
+  assert.equal(d.view.isActionPending({ id: 2 }), true);
+  assert.equal(d.view.isActionPending({ id: 3 }), false);
+  assert.equal(d.view.isActionSuccess({ id: 2 }, 'accept'), false);
   await d.view.act({ id: 2 }, 'accept'); assert.equal(d.calls.length, 1);
   d.release(); await pending; assert.equal(d.view.actingId.value, null); d.dispose();
+});
+test('successful feedback never delays progression and dismissing it cannot mutate delivery state', async () => {
+  const d = dashboard(); await d.mounted();
+  await d.view.act({ id: 2, riderFee: 3 }, 'accept');
+  assert.equal(d.view.actionFeedback.value.phase, 'success');
+  assert.equal(d.view.activeTab.value, 'active');
+  assert.equal(d.view.actingId.value, null);
+  const before = [...d.calls];
+  d.dismiss();
+  assert.equal(d.view.actionFeedback.value, null);
+  assert.equal(d.state.status, 'ACCEPTED');
+  assert.deepEqual(d.calls, before); d.dispose();
+});
+test('new order attention runs once and repeated polling does not re-arm it', async () => {
+  const d = dashboard(); await d.mounted(); await nextTick();
+  assert.equal(d.view.newOrderIds.value.has(2), true);
+  d.view.finishNewOrder(2, { animationName: 'rider-order-glow' });
+  await d.view.loadTasks(); await nextTick();
+  assert.equal(d.view.newOrderIds.value.has(2), false); d.dispose();
 });
 test('footer query changes cannot strand a selected task from a different list', async () => {
   const d = dashboard(); await d.mounted(); await d.view.act({ id: 2 }, 'accept');
@@ -78,7 +102,7 @@ test('exception form keeps the existing delivery exception contract', async () =
   assert.equal(d.view.exceptionModal.value, null); assert.equal(d.state.status, 'EXCEPTION'); d.dispose();
 });
 test('rider profile and footer compile, and all illustration assets are shipped', async () => {
-  for (const file of ['views/MyInformation.vue', 'components/RiderFooter.vue']) {
+  for (const file of ['views/RiderDashboard.vue', 'views/MyInformation.vue', 'components/RiderFooter.vue', 'components/RiderActionFeedback.vue']) {
     const { descriptor } = parse(await readFile(new URL('../src/' + file, import.meta.url), 'utf8'));
     assert.deepEqual(compileTemplate({ source: descriptor.template.content, filename: file, id: 'rider-ui' }).errors, []);
   }

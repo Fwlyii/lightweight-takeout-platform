@@ -1,0 +1,65 @@
+/* Small, role-scoped feedback: never used to delay business operations. */
+.merchant-ui, .merchant-detail-page, .merchant-motion-footer, .merchant-order-modal-overlay {
+  --merchant-fast: 120ms;
+  --merchant-normal: 220ms;
+  --merchant-state: 400ms;
+  --merchant-ease: cubic-bezier(.2, 0, 0, 1);
+  --merchant-enter: cubic-bezier(.22, 1, .36, 1);
+}
+.merchant-ui button, .merchant-detail-page button, .merchant-order-dialog button { transition: transform var(--merchant-fast) var(--merchant-ease), background-color var(--merchant-normal) ease, color var(--merchant-normal) ease; }
+.merchant-ui button:active:not(:disabled), .merchant-detail-page button:active:not(:disabled), .merchant-order-dialog button:active:not(:disabled) { transform: scale(.985); }
+.merchant-action-label { display: grid; place-items: center; position: relative; width: 100%; }
+.merchant-label-hidden { visibility: hidden; }
+.merchant-action-pending { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; gap: 6px; white-space: nowrap; }
+.merchant-motion-spinner { display: inline-block; width: 14px; height: 14px; flex: 0 0 14px; border: 2px solid #ffffff66; border-top-color: currentColor; border-radius: 50%; animation: merchant-loading 800ms linear infinite; }
+#app .merchant-ui .merchant-tabs .merchant-refresh { margin-left: auto; flex-shrink: 0; display: flex; align-items: center; gap: 6px; color: var(--skin-brand); }
+.merchant-refreshing { animation: merchant-loading 900ms linear infinite; }
+#app .merchant-ui .order-list, #app .merchant-ui .business-list { position: relative; }
+#app .merchant-ui .order-list:empty { padding-block: 0; }
+#app .merchant-ui .merchant-list-enter-active { transition: opacity 260ms ease-out, transform 260ms var(--merchant-enter); }
+#app .merchant-ui .merchant-list-leave-active { position: absolute; pointer-events: none; transition: opacity var(--merchant-normal) ease, transform var(--merchant-normal) var(--merchant-ease); }
+#app .merchant-ui .merchant-list-move { transition: transform var(--merchant-state) var(--merchant-ease); }
+#app .merchant-ui .merchant-list-enter-from { opacity: 0; transform: translateY(8px) scale(.99); }
+#app .merchant-ui .merchant-list-leave-to { opacity: 0; transform: translateY(-5px); }
+#app .merchant-ui .merchant-new-order { animation: merchant-order-attention 650ms ease-out 260ms 1; }
+.merchant-ui .merchant-state-badge { animation: merchant-state-in var(--merchant-normal) var(--merchant-enter); transition: background-color var(--merchant-state) ease, color var(--merchant-state) ease; }
+.merchant-dialog-enter-active, .merchant-dialog-leave-active { transition: opacity 200ms ease; }
+.merchant-dialog-enter-active .merchant-order-dialog, .merchant-dialog-leave-active .merchant-order-dialog { transition: transform 200ms var(--merchant-enter); }
+.merchant-dialog-enter-from, .merchant-dialog-leave-to { opacity: 0; }
+.merchant-dialog-enter-from .merchant-order-dialog, .merchant-dialog-leave-to .merchant-order-dialog { transform: translateY(6px) scale(.99); }
+.merchant-order-dialog .dialog-icon { animation: merchant-state-in 260ms var(--merchant-enter); }
+
+/* Indicator follows measured existing tabs, including horizontally scrolled ones. */
+#app .merchant-ui .tabs::after, .merchant-motion-footer::after, #app .merchant-ui .status-tabs::before {
+  content: ''; position: absolute; left: 0; bottom: 0; width: var(--merchant-indicator-width, 0px); height: 4px;
+  transform: translateX(var(--merchant-indicator-x, 0px)); background: var(--skin-brand); border-radius: 4px; pointer-events: none;
+  transition: transform 200ms var(--merchant-ease), width 200ms var(--merchant-ease);
+}
+#app .merchant-ui .tabs button.active::after { display: none; }
+#app .merchant-ui .status-tabs::before { top: 7px; bottom: 7px; height: auto; border-radius: 13px; background: linear-gradient(110deg,var(--skin-brand),color-mix(in srgb,var(--skin-brand) 78%,white)); }
+#app .merchant-ui .status-tabs button { position: relative; z-index: 1; }
+#app .merchant-ui .status-tabs button.active { background: transparent; }
+.merchant-motion-footer::after { bottom: 3px; height: 3px; background: linear-gradient(to right, transparent calc(50% - 16px), var(--skin-brand) calc(50% - 16px), var(--skin-brand) calc(50% + 16px), transparent calc(50% + 16px)); }
+.merchant-motion-footer .nav-item i, .merchant-motion-footer .nav-item span { transform: scale(.96); opacity: .85; transition: transform 200ms var(--merchant-ease), opacity 200ms ease; }
+.merchant-motion-footer .nav-item.active i, .merchant-motion-footer .nav-item.active span { transform: scale(1); opacity: 1; }
+.merchant-ui .workbench-summary > button { animation: merchant-content-in 200ms var(--merchant-enter) both; }
+.merchant-ui .workbench-summary > button:nth-child(2) { animation-delay: 30ms; }
+.merchant-ui .workbench-summary > button:nth-child(3) { animation-delay: 60ms; }
+.merchant-profile-page .user-card, .merchant-profile-page .merchant-entry-card { animation: merchant-content-in 240ms var(--merchant-enter); }
+.merchant-ui .tool-grid i, .merchant-ui .reviews-link > i:last-child { transition: transform 150ms var(--merchant-ease); }
+.merchant-ui .tool-grid button:active i { transform: scale(.96); }
+.merchant-ui .reviews-link:active > i:last-child { transform: translateX(2px); }
+.merchant-detail-page .business-info-card { animation: merchant-content-in 240ms var(--merchant-enter); }
+.merchant-detail-page .shelve-button, .merchant-detail-page .operating-button { transition: transform var(--merchant-fast) var(--merchant-ease), color var(--merchant-normal) ease, background-color var(--merchant-normal) ease; }
+@keyframes merchant-loading { to { transform: rotate(360deg); } }
+@keyframes merchant-content-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@keyframes merchant-state-in { from { opacity: .4; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+@keyframes merchant-order-attention { 0%, 100% { box-shadow: 0 7px 21px color-mix(in srgb,var(--skin-brand) 5%,transparent); } 45% { box-shadow: 0 0 0 1px color-mix(in srgb,var(--skin-brand) 25%,transparent), 0 0 13px color-mix(in srgb,var(--skin-brand) 8%,transparent); } }
+@media (prefers-reduced-motion: reduce) {
+  .merchant-ui *, .merchant-ui *::before, .merchant-ui *::after, .merchant-detail-page *, .merchant-motion-footer *, .merchant-motion-footer::after, .merchant-order-modal-overlay, .merchant-order-modal-overlay * { animation: none !important; transition: none !important; }
+  #app .merchant-ui .merchant-list-enter-from, #app .merchant-ui .merchant-list-leave-to,
+  .merchant-ui button:active:not(:disabled), .merchant-detail-page button:active:not(:disabled), .merchant-order-dialog button:active:not(:disabled),
+  .merchant-dialog-enter-from .merchant-order-dialog, .merchant-dialog-leave-to .merchant-order-dialog { transform: none; }
+  .merchant-ui .tool-grid button:active i, .merchant-ui .reviews-link:active > i:last-child { transform: none; }
+  .merchant-motion-spinner, .merchant-refreshing { animation: merchant-loading 1200ms linear infinite !important; }
+}

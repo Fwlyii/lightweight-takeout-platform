@@ -10,7 +10,7 @@ function mount(name, extra = {}) {
   const mounts = [];
   const bindings = { ref, computed, onMounted: fn => mounts.push(fn), onUnmounted() {},
     useRouter: () => ({ push() {}, replace() {} }), useRoute: () => ({ query: {} }),
-    MerchantLogoutButton: {}, getToken: () => 'fixture', clearAuth() {}, DEFAULT_AVATAR_URL: '/avatar.png',
+    MerchantLogoutButton: {}, MerchantActionLabel: {}, merchantIndicator: {}, pinMerchantCard() {}, releaseMerchantCard() {}, getToken: () => 'fixture', clearAuth() {}, DEFAULT_AVATAR_URL: '/avatar.png',
     toast: { warning() {}, error() {}, success() {} },
     createRealtimeConnection: () => ({ start() {}, stop() {} }),
     MERCHANT_ORDER_GROUPS, ORDER_STATUS, orderStatusClass, orderStatusText, formatDateTime: String,
@@ -82,4 +82,24 @@ test('failed accept or reject releases controls; ready still uses its original c
   view.rejectOrder(4); await view.confirmReject(); assert.equal(view.showRejectModal.value, false);
   await view.readyOrder(5); assert.equal(view.submitting.value, false);
   assert.deepEqual(calls, ['/api/v1/orders/3/merchant-accept', '/api/v1/orders/4/merchant-reject', '/api/v1/orders/5/merchant-ready']);
+});
+test('ready button feedback follows the actual request and preserves single-flight behavior', async () => {
+  let release, count = 0;
+  const { view } = mount('MerchantOrders', { request: { post: async path => {
+    assert.equal(path, '/api/v1/orders/5/merchant-ready'); count++;
+    return new Promise(resolve => { release = resolve; });
+  } } });
+  const pending = view.readyOrder(5);
+  assert.equal(view.readyId.value, 5);
+  await view.readyOrder(6); assert.equal(count, 1);
+  release({ success: false, message: 'retry' }); await pending;
+  assert.equal(view.readyId.value, null); assert.equal(view.submitting.value, false);
+});
+test('new order highlight is limited to unseen pending orders, not every refresh', async () => {
+  const data = [{ id: 11, orderState: 1 }, { id: 12, orderState: 2 }];
+  const { view } = mount('MerchantOrders', { request: { get: async () => ({ success: true, data }) } });
+  view.selectMerchant(1); await view.fetchOrders();
+  assert.deepEqual([...view.freshOrderIds.value], [11]);
+  view.finishOrderAttention(11, { animationName: 'merchant-order-attention' });
+  await view.fetchOrders(); assert.equal(view.freshOrderIds.value.size, 0);
 });

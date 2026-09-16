@@ -12,7 +12,7 @@
       <router-view v-slot="{ Component, route: viewRoute }">
         <!-- 路由页面可包含弹窗等多个根节点，不能直接放入 out-in Transition。
              保留页面自身的入场动效，切页不等待不可靠的离场回调。 -->
-        <component :is="Component" :key="viewRoute.path === '/rider/dashboard' ? viewRoute.path : viewRoute.fullPath" />
+        <component :is="Component" :key="viewRoute.path === '/rider/dashboard' ? viewRoute.path : (viewRoute.path === '/ai-chat' || viewRoute.path.startsWith('/ai-chat/')) ? 'ai-assistant' : viewRoute.fullPath" />
       </router-view>
     </div>
     <Footer v-if="showFooter" />

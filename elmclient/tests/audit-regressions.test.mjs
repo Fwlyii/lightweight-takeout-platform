@@ -10,7 +10,7 @@ const strip = source => source.replace(/import\s+[\s\S]*?from\s+['"][^'"]+['"];?
 const tick = () => new Promise(setImmediate);
 function orders() {
   const pending = [], unmount = [];
-  const bindings = { MerchantLogoutButton: {}, ref, computed, onMounted() {}, onUnmounted: fn => unmount.push(fn),
+  const bindings = { MerchantLogoutButton: {}, MerchantActionLabel: {}, merchantIndicator: {}, pinMerchantCard() {}, releaseMerchantCard() {}, ref, computed, onMounted() {}, onUnmounted: fn => unmount.push(fn),
     useRouter: () => ({}), useRoute: () => ({ query: {} }), toast: { error() {}, success() {}, warning() {} },
     createRealtimeConnection: () => ({}), formatDateTime: String, ...presentation,
     request: { get: (url, config) => new Promise(resolve => pending.push({ resolve, id: config.params.businessId })) } };
@@ -48,7 +48,7 @@ test('missing or invalid distance and ETA remain unknown, while zero distance is
 });
 test('catalog pages label unavailable distance and delivery estimates honestly', () => {
   for (const name of ['Index', 'BusinessList']) {
-    assert.match(read(name), /距离暂无/);
+    assert.match(read(name), /businessDistanceText/);
     assert.match(read(name), /送达时间暂无/);
   }
 });

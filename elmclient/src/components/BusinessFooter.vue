@@ -1,5 +1,5 @@
 <template>
-  <nav class="role-footer" aria-label="商家导航">
+  <nav v-merchant-indicator class="role-footer merchant-motion-footer" aria-label="商家导航">
     <router-link to="/merchant/business" class="nav-item" :class="{ active: route.path === '/merchant/business' }">
       <i class="fas fa-chart-line"></i>
       <span>工作台</span>
@@ -17,6 +17,7 @@
 
 <script setup>
 import { useRoute } from 'vue-router';
+import { merchantIndicator as vMerchantIndicator } from '@/utils/merchantMotion';
 
 const route = useRoute();
 </script>

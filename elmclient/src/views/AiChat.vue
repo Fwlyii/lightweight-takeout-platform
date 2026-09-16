@@ -15,6 +15,7 @@
     </header>
 
     <div class="page-content">
+      <p v-if="activeTool !== 'chat' && toolFeedback" class="capability-note" role="status">{{ toolFeedback }}</p>
       <nav v-if="activeTool !== 'chat'" class="feature-switcher" aria-label="切换AI功能">
         <button type="button" @click="router.replace('/ai-chat')"><i class="fa fa-comments-o"></i><span>问答客服</span></button>
         <button v-for="tool in tools" :key="tool.key" type="button" :class="{ active: activeTool === tool.key }" @click="openTool(tool)">
@@ -26,13 +27,13 @@
       <div v-if="activeTool === 'recommend'" class="tool-content">
         <div class="tool-heading"><div><h2>按需求推荐</h2><p>结果来自当前上架且有库存的真实商品</p></div></div>
         <div class="query-row">
-          <label><span>想吃什么</span><input v-model.trim="smartQuery" maxlength="60" placeholder="例如：清淡牛肉面" @keyup.enter="findSmartFoods"></label>
-          <label class="budget-field"><span>预算</span><input v-model.number="smartBudget" type="number" min="1" max="999" placeholder="¥"></label>
+          <label><span>想吃什么</span><input v-model.trim="smartQuery" :disabled="smartLoading" maxlength="60" placeholder="例如：清淡牛肉面" @keyup.enter="findSmartFoods"></label>
+          <label class="budget-field"><span>预算</span><input v-model.number="smartBudget" :disabled="smartLoading" type="number" min="0.01" max="9999.99" step="0.01" placeholder="¥"></label>
           <button class="primary-button" type="button" :disabled="smartLoading" @click="findSmartFoods">
             <i :class="smartLoading ? 'fa fa-spinner fa-spin' : 'fa fa-search'"></i>{{ smartLoading ? '匹配中' : '查找' }}
           </button>
         </div>
-        <FoodCandidates :foods="smartFoods" :empty-text="smartEmptyText" @add="addFoodToCart" />
+        <FoodCandidates :foods="decorateFoods(smartFoods)" :pending="addingFoods" :empty-text="smartEmptyText" @add="addFoodToCart" />
       </div>
 
       <div v-else-if="activeTool === 'image'" class="tool-content media-layout">
@@ -54,7 +55,7 @@
             </div>
           </div>
         </div>
-        <FoodCandidates :foods="imageResult?.candidates || []" empty-text="识别出的真实商品会显示在这里" @add="addFoodToCart" />
+        <FoodCandidates :foods="decorateFoods(imageResult?.candidates || [])" :pending="addingFoods" empty-text="识别出的真实商品会显示在这里" @add="addFoodToCart" />
       </div>
 
       <div v-else class="tool-content media-layout">
@@ -62,11 +63,11 @@
           <div class="tool-heading"><div><h2>语音点单</h2><p>录音只用于本次转写，单段不超过 7 MB</p></div></div>
           <input ref="audioInput" class="hidden-input" type="file" accept="audio/*,video/webm,video/mp4" @change="handleAudioFile">
           <div class="voice-actions">
-            <button class="record-button" :class="{ recording: isRecording }" type="button" :disabled="voiceLoading || capabilitiesState !== 'ready' || !capabilities.speechRecognition" @click="toggleRecording">
+            <button class="record-button" :class="{ recording: isRecording }" type="button" :disabled="voiceLoading || voiceFinishing || requestingMicrophone || capabilitiesState !== 'ready' || !capabilities.speechRecognition" @click="toggleRecording">
               <i :class="isRecording ? 'fa fa-stop' : 'fa fa-microphone'"></i>
-              <span>{{ isRecording ? `停止录音 ${recordingSeconds}s` : '开始录音' }}</span>
+              <span>{{ isRecording ? `停止录音 ${recordingSeconds}s` : requestingMicrophone ? '等待麦克风权限' : '开始录音' }}</span>
             </button>
-            <button class="secondary-button" type="button" :disabled="voiceLoading || capabilitiesState !== 'ready' || !capabilities.speechRecognition" @click="audioInput?.click()"><i class="fa fa-folder-open"></i>选择音频</button>
+            <button class="secondary-button" type="button" :disabled="voiceLoading || voiceFinishing || isRecording || requestingMicrophone || capabilitiesState !== 'ready' || !capabilities.speechRecognition" @click="audioInput?.click()"><i class="fa fa-folder-open"></i>选择音频</button>
           </div>
           <p v-if="capabilitiesState === 'loading'" class="processing-note"><i class="fa fa-spinner fa-spin"></i>正在读取语音识别能力</p>
           <p v-else-if="capabilitiesState === 'error'" class="capability-note capability-error"><i class="fa fa-exclamation-circle"></i>能力状态读取失败，请检查连接后重试<button type="button" @click="loadCapabilities">重试</button></p>
@@ -75,15 +76,15 @@
           <div v-if="voiceDraft" class="voice-draft">
             <label><span>识别文本</span><textarea v-model.trim="voiceDraft.transcript" maxlength="300"></textarea></label>
             <div class="draft-row">
-              <label><span>商品关键词</span><input v-model.trim="voiceDraft.query" maxlength="60" @keyup.enter="refreshVoiceCandidates"></label>
-              <label class="quantity-field"><span>数量</span><input v-model.number="voiceDraft.quantity" type="number" min="1" max="99"></label>
+              <label><span>商品关键词</span><input v-model.trim="voiceDraft.query" :disabled="voiceLoading" maxlength="60" @keyup.enter="refreshVoiceCandidates"></label>
+              <label class="quantity-field"><span>数量</span><input v-model.number="voiceDraft.quantity" :disabled="voiceLoading" type="number" min="1" max="99"></label>
               <label><span>规格</span><input v-model.trim="voiceDraft.specification" maxlength="80" placeholder="如：大杯、少冰"></label>
-              <label class="budget-field"><span>预算</span><input v-model.number="voiceDraft.budget" type="number" min="1" max="9999" placeholder="¥"></label>
-              <button class="secondary-button" type="button" @click="refreshVoiceCandidates"><i class="fa fa-refresh"></i>重新匹配</button>
+              <label class="budget-field"><span>预算</span><input v-model.number="voiceDraft.budget" :disabled="voiceLoading" type="number" min="0.01" max="9999.99" step="0.01" placeholder="¥"></label>
+              <button class="secondary-button" type="button" :disabled="voiceLoading" @click="refreshVoiceCandidates"><i class="fa fa-refresh"></i>重新匹配</button>
             </div>
           </div>
         </div>
-        <FoodCandidates :foods="voiceDraft?.candidates || []" :quantity="voiceDraft?.quantity || 1" empty-text="语音转写后可编辑草稿并确认商品" @add="addFoodToCart" />
+        <FoodCandidates :foods="decorateFoods(voiceDraft?.candidates || [])" :pending="addingFoods" :quantity="voiceDraft?.quantity || 1" empty-text="语音转写后可编辑草稿并确认商品" @add="addFoodToCart" />
       </div>
     </section>
 
@@ -119,7 +120,7 @@
           <div class="recommendation-preview">
             <div class="preview-message"><div class="mini-robot"><i class="fa fa-robot"></i></div><p>好的！我为你找到了一些高性价比美食，离你近、配送快、评价也很不错：</p></div>
             <div class="landing-food-grid">
-              <article v-for="food in landingFoods" :key="food.foodId || food.foodName" class="landing-food-card">
+              <article v-for="food in displayLandingFoods" :key="food.foodId || food.foodName" class="landing-food-card">
                 <div class="landing-food-image">
                   <img :src="food.foodImg" :alt="food.foodName" @error="handleLandingImageError">
                   <span><i class="fa fa-map-marker"></i> {{ food.distance }}</span>
@@ -128,7 +129,7 @@
                   <h3>{{ food.foodName }}</h3>
                   <strong class="landing-food-price"><small>¥</small>{{ Number(food.price).toFixed(1) }}</strong>
                   <div class="landing-food-meta"><span><i class="fa fa-star"></i> {{ food.rating }}</span><em>店铺销量 {{ food.sales }}</em></div>
-                  <div class="landing-food-footer"><span>{{ food.businessName }}</span><button type="button" :aria-label="`加入${food.foodName}`" @click="addLandingFood(food)"><i class="fa fa-plus"></i></button></div>
+                  <div class="landing-food-footer"><span>{{ food.businessName }}</span><button type="button" :disabled="addingFoods.has(food.foodId)" :aria-label="`加入${food.foodName}`" @click="addLandingFood(food)"><i class="fa fa-plus"></i></button></div>
                 </div>
               </article>
             </div>
@@ -144,7 +145,7 @@
           <div class="message-avatar"><i :class="message.type === 'user' ? 'fa fa-user' : 'fa fa-robot'"></i></div>
           <div class="message-body">
             <div class="message-bubble" v-html="formatMessage(message.content)"></div>
-            <FoodCandidates v-if="message.candidates?.length" :foods="message.candidates" @add="addFoodToCart" />
+            <FoodCandidates v-if="message.candidates?.length" :foods="decorateFoods(message.candidates)" :pending="addingFoods" @add="addFoodToCart" />
             <time>{{ formatTime(message.timestamp) }}<span v-if="message.processingTime"> · {{ message.processingTime }}ms</span></time>
           </div>
         </article>
@@ -178,6 +179,7 @@
       <aside class="history-drawer">
         <header><h2>对话历史</h2><button class="icon-button" type="button" title="关闭" @click="showHistory = false"><i class="fa fa-times"></i></button></header>
         <button class="secondary-button history-refresh" type="button" :disabled="loadingHistory" @click="loadChatHistory"><i :class="loadingHistory ? 'fa fa-spinner fa-spin' : 'fa fa-refresh'"></i>刷新</button>
+        <p v-if="historyError" role="alert">{{ historyError }}</p>
         <div v-if="chatHistory.length" class="history-list">
           <button v-for="history in chatHistory" :key="history.id" type="button" @click="loadHistorySession(history.sessionId)">
             <span><b>{{ truncateText(history.userMessage, 42) }}</b><time>{{ formatTime(history.createTime) }}</time></span><i class="fa fa-chevron-right"></i>
@@ -197,28 +199,32 @@ import { addCartItem } from '../services/cartService'
 import request from '../utils/request'
 import { formatSafeMessage } from '../utils/safeMessage'
 import { navigateAssistantBack } from '../utils/backNavigation'
+import { assistantCandidates, assistantText, assistantKeywords, validAssistantId, assistantBudget, validAssistantBudget } from '../utils/assistantData'
+import { createAssistantBusinessLookup } from '../utils/assistantBusinessData'
+import { businessDistanceText } from '../utils/businessDistance'
 
 const FoodCandidates = defineComponent({
   name: 'FoodCandidates',
   props: {
     foods: { type: Array, default: () => [] },
+    pending: { type: Set, default: () => new Set() },
     quantity: { type: Number, default: 1 },
     emptyText: { type: String, default: '暂无候选' }
   },
   emits: ['add'],
   setup(props, { emit }) {
-    return () => h('div', { class: 'candidate-list' }, props.foods.length
-      ? props.foods.map(food => h('article', { class: 'candidate-item', key: food.foodId }, [
+    return () => h('div', { class: 'candidate-list' }, assistantCandidates(props.foods).length
+      ? assistantCandidates(props.foods).map(food => h('article', { class: 'candidate-item', key: food.foodId }, [
           food.foodImg
             ? h('img', { src: food.foodImg, alt: food.foodName })
             : h('span', { class: 'food-placeholder' }, [h('i', { class: 'fa fa-cutlery' })]),
           h('div', { class: 'candidate-copy' }, [
             h('b', food.foodName),
             h('span', `${food.businessName || '平台商家'} · ¥${Number(food.price || 0).toFixed(2)}`),
-            h('small', food.reason || '真实在售商品')
+            h('small', { title: food.reason || '' }, [businessDistanceText(food), food.deliveryMinutes == null ? '送达时间暂无' : `约${food.deliveryMinutes}分钟送达`, food.reason].filter(Boolean).join(' · '))
           ]),
-          h('button', { type: 'button', title: `加入${props.quantity}份`, onClick: () => emit('add', food, props.quantity) }, [
-            h('i', { class: 'fa fa-cart-plus' }), h('span', props.quantity > 1 ? `加入 ${props.quantity} 份` : '加入')
+          h('button', { type: 'button', disabled: props.pending.has(food.foodId), title: `加入${props.quantity}份`, onClick: () => emit('add', food, props.quantity) }, [
+            h('i', { class: props.pending.has(food.foodId) ? 'fa fa-spinner fa-spin' : 'fa fa-cart-plus' }), h('span', props.pending.has(food.foodId) ? '加入中' : props.quantity > 1 ? `加入 ${props.quantity} 份` : '加入')
           ])
         ]))
       : [h('div', { class: 'candidate-empty' }, [h('i', { class: 'fa fa-search' }), h('span', props.emptyText)])])
@@ -232,6 +238,8 @@ export default defineComponent({
   components: { FoodCandidates },
   setup() {
     const router = useRouter()
+    const businessLookup = createAssistantBusinessLookup(request)
+    const decorateFoods = foods => assistantCandidates(foods).map(businessLookup.enrich)
     const route = useRoute()
     const tools = [
       { key: 'recommend', label: '智能筛选', shortLabel: '智能筛选', description: '按口味和预算匹配在售餐品', icon: 'fa fa-sliders', path: '/ai-chat/recommend' },
@@ -264,6 +272,7 @@ export default defineComponent({
     const voiceDraft = ref(null)
     const voiceLoading = ref(false)
     const isRecording = ref(false)
+    const voiceFinishing = ref(false)
     const recordingSeconds = ref(0)
     const messages = ref([])
     const inputMessage = ref('')
@@ -274,6 +283,8 @@ export default defineComponent({
     const showHistory = ref(false)
     const chatHistory = ref([])
     const loadingHistory = ref(false)
+    const toolFeedback = ref(''), historyError = ref(''), addingFoods = ref(new Set())
+    let chatVersion = 0, imageVersion = 0, voiceVersion = 0, historyVersion = 0
     const quickQuestions = ['推荐一些在售菜品', '查看我的最近订单', '配送一般需要多久', '会员有哪些权益']
     const quickActions = [
       { label: '20元内吃什么', tone: 'budget', icon: 'fa fa-jpy', mode: 'recommend', query: '20元以内推荐附近高性价比美食' },
@@ -289,10 +300,14 @@ export default defineComponent({
     let recordingTimer = null
     let audioChunks = []
     let disposed = false
-    let requestingMicrophone = false
+    const requestingMicrophone = ref(false)
 
     const errorMessage = (error, fallback) => error?.response?.data?.message || error?.message || fallback
-    const appendAssistantMessage = content => messages.value.push({ type: 'ai', content, timestamp: new Date() })
+    const appendAssistantMessage = content => {
+      if (disposed) return
+      messages.value.push({ type: 'ai', content, timestamp: new Date() })
+      if (activeTool.value !== 'chat') toolFeedback.value = content
+    }
 
     const loadCapabilities = async () => {
       capabilitiesState.value = 'loading'
@@ -316,12 +331,17 @@ export default defineComponent({
     }
 
     const findSmartFoods = async () => {
-      if (smartLoading.value) return
+      if (disposed || smartLoading.value) return
+      const budget = assistantBudget(smartBudget.value)
+      if (!validAssistantBudget(budget)) { appendAssistantMessage('预算必须在 0.01 到 9999.99 元之间。'); return }
+      toolFeedback.value = ''
       smartLoading.value = true
       smartEmptyText.value = '正在匹配在售商品...'
       try {
-        const result = await request.post('/api/v1/recommendations', { query: smartQuery.value, budget: smartBudget.value || null, usePreferences: true })
-        smartFoods.value = result.success ? result.data || [] : []
+        const result = await request.post('/api/v1/recommendations', { query: smartQuery.value.slice(0, 60), budget, usePreferences: true })
+        if (disposed) return
+        if (!result?.success) throw new Error(result?.message || '智能推荐暂时不可用')
+        smartFoods.value = assistantCandidates(result.data)
         smartEmptyText.value = smartFoods.value.length
           ? '输入需求后获取商品候选'
           : '暂无符合条件的在售商品，请调整关键词或预算'
@@ -342,16 +362,18 @@ export default defineComponent({
         rating: score > 0 ? score.toFixed(1) : '暂无评分',
         sales: String(food.businessSalesCount ?? food.salesCount ?? '—'),
         businessName: food.businessName || '商家',
-        distance: food.distanceText || '校园周边',
+        distance: businessDistanceText(food),
         foodImg: food.foodImg || '/images/foods/04-noodles.jpg'
       }
     }
 
+    const displayLandingFoods = computed(() => decorateFoods(landingFoods.value).map(normalizeLandingFood))
+
     const loadLandingFoods = async () => {
       try {
         const result = await request.post('/api/v1/recommendations', { query: '附近高性价比美食', budget: 25, usePreferences: true })
-        if (result.success && Array.isArray(result.data) && result.data.length) {
-          landingFoods.value = result.data.slice(0, 3).map(normalizeLandingFood)
+        if (!disposed && result?.success) {
+          landingFoods.value = assistantCandidates(result.data).slice(0, 3).map(normalizeLandingFood)
         }
       } catch (_) {
         landingFoods.value = [];
@@ -392,24 +414,26 @@ export default defineComponent({
     }
 
     const addFoodToCart = async (food, quantity = 1) => {
+      if (disposed || !validAssistantId(food?.foodId) || addingFoods.value.has(food.foodId)) return
       const safeQuantity = Number(quantity)
       if (!Number.isInteger(safeQuantity) || safeQuantity < 1 || safeQuantity > 99) {
         appendAssistantMessage('数量必须是 1 到 99 之间的整数。')
         return
       }
+      addingFoods.value = new Set([...addingFoods.value, food.foodId])
       try {
         await addCartItem(food.foodId, safeQuantity)
         appendAssistantMessage(`已确认将 ${food.foodName} × ${safeQuantity} 加入购物车。`)
       } catch (error) {
         appendAssistantMessage(errorMessage(error, '加入购物车失败，请检查库存或登录状态。'))
-      }
+      } finally { const pending = new Set(addingFoods.value); pending.delete(food.foodId); addingFoods.value = pending }
       await scrollToBottom()
     }
 
     const handleImageChange = async event => {
       const file = event.target.files?.[0]
       event.target.value = ''
-      if (!file) return
+      if (!file || disposed || imageLoading.value) return
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
         appendAssistantMessage('请选择不超过 5 MB 的 JPG、PNG 或 WebP 图片。')
         return
@@ -418,15 +442,19 @@ export default defineComponent({
       imagePreview.value = URL.createObjectURL(file)
       imageResult.value = null
       imageLoading.value = true
+      const token = ++imageVersion
+      toolFeedback.value = ''
       try {
         const form = new FormData()
         form.append('image', file)
         const result = await request.post('/api/v1/dish-recognitions', form, { timeout: 15000 })
-        if (result.success) imageResult.value = result.data
+        if (disposed || token !== imageVersion) return
+        if (!result?.success || !result.data) throw new Error(result?.message || '图片识别失败')
+        imageResult.value = { ...result.data, summary: assistantText(result.data.summary), keywords: assistantKeywords(result.data.keywords), candidates: assistantCandidates(result.data.candidates) }
       } catch (error) {
-        appendAssistantMessage(errorMessage(error, '图片识别失败，可改用文字搜索。'))
+        if (token === imageVersion) appendAssistantMessage(errorMessage(error, '图片识别失败，可改用文字搜索。'))
       } finally {
-        imageLoading.value = false
+        if (token === imageVersion) imageLoading.value = false
       }
     }
 
@@ -443,16 +471,17 @@ export default defineComponent({
     }
 
     const toggleRecording = async () => {
-      if (disposed || requestingMicrophone || voiceLoading.value) return
+      if (disposed || requestingMicrophone.value || voiceLoading.value || voiceFinishing.value) return
       if (isRecording.value) return stopRecording()
       if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
         appendAssistantMessage('当前浏览器不支持录音，请选择已有音频文件。')
         return
       }
-      requestingMicrophone = true
+      requestingMicrophone.value = true
+      const token = voiceVersion
       try {
         mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true })
-        if (disposed) {
+        if (disposed || token !== voiceVersion) {
           stopMediaStream()
           return
         }
@@ -460,11 +489,12 @@ export default defineComponent({
         const recorder = mimeType ? new MediaRecorder(mediaStream, { mimeType }) : new MediaRecorder(mediaStream)
         mediaRecorder = recorder
         audioChunks = []
-        recorder.ondataavailable = event => { if (event.data.size) audioChunks.push(event.data) }
+        recorder.ondataavailable = event => { if (!disposed && token === voiceVersion && event.data.size) audioChunks.push(event.data) }
         recorder.onstop = async () => {
+          if (disposed || token !== voiceVersion) return
           const blob = new Blob(audioChunks, { type: recorder.mimeType || 'audio/webm' })
           stopMediaStream()
-          if (disposed) return
+          voiceFinishing.value = false
           await transcribeAudio(blob, `voice-${Date.now()}.${blob.type.includes('mp4') ? 'm4a' : 'webm'}`)
         }
         recorder.start()
@@ -478,12 +508,12 @@ export default defineComponent({
         stopMediaStream()
         if (!disposed) appendAssistantMessage(error?.name === 'NotAllowedError' ? '没有麦克风权限，请在浏览器设置中允许录音。' : '无法启动录音，请选择音频文件。')
       } finally {
-        requestingMicrophone = false
+        requestingMicrophone.value = false
       }
     }
 
     const stopRecording = () => {
-      if (mediaRecorder?.state === 'recording') mediaRecorder.stop()
+      if (mediaRecorder?.state === 'recording') { voiceFinishing.value = true; mediaRecorder.stop() }
       isRecording.value = false
       if (recordingTimer) window.clearInterval(recordingTimer)
       recordingTimer = null
@@ -497,47 +527,59 @@ export default defineComponent({
     const handleAudioFile = async event => {
       const file = event.target.files?.[0]
       event.target.value = ''
-      if (file) await transcribeAudio(file, file.name)
+      if (file && !isRecording.value && !voiceFinishing.value && !requestingMicrophone.value) await transcribeAudio(file, file.name)
     }
 
     const transcribeAudio = async (blob, filename) => {
-      if (disposed) return
+      if (disposed || voiceLoading.value) return
+      if (!blob.size) { appendAssistantMessage('录音为空，请重试或输入文字。'); return }
       if (blob.size > 7 * 1024 * 1024) {
         appendAssistantMessage('音频不能超过 7 MB。')
         return
       }
       voiceLoading.value = true
+      const token = ++voiceVersion
+      toolFeedback.value = ''
       voiceDraft.value = null
       try {
         const form = new FormData()
         form.append('audio', blob, filename)
         const result = await request.post('/api/v1/voice-order-drafts', form, { timeout: 15000 })
-        if (result.success) voiceDraft.value = result.data
+        if (disposed || token !== voiceVersion) return
+        if (!result?.success || !result.data || !assistantText(result.data.transcript).trim()) throw new Error(result?.message || '没有识别到有效语音，请重试')
+        voiceDraft.value = { ...result.data, transcript: assistantText(result.data.transcript), query: assistantText(result.data.query).slice(0, 60), specification: assistantText(result.data.specification), candidates: assistantCandidates(result.data.candidates) }
       } catch (error) {
-        appendAssistantMessage(errorMessage(error, '语音识别失败，可改用文字输入。'))
+        if (token === voiceVersion) appendAssistantMessage(errorMessage(error, '语音识别失败，可改用文字输入。'))
       } finally {
-        voiceLoading.value = false
+        if (token === voiceVersion) voiceLoading.value = false
       }
     }
 
     const refreshVoiceCandidates = async () => {
-      if (!voiceDraft.value?.query) return
+      if (disposed || voiceLoading.value || !voiceDraft.value?.query) return
       const quantity = Number(voiceDraft.value.quantity)
       if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
         appendAssistantMessage('数量必须是 1 到 99 之间的整数。')
         return
       }
+      const budget = assistantBudget(voiceDraft.value.budget)
+      if (!validAssistantBudget(budget)) { appendAssistantMessage('预算必须在 0.01 到 9999.99 元之间。'); return }
+      const token = ++voiceVersion
+      voiceLoading.value = true
       try {
-        const result = await request.post('/api/v1/recommendations', { query: voiceDraft.value.query, quantity, budget: voiceDraft.value.budget || null, usePreferences: false })
-        if (result.success) voiceDraft.value.candidates = result.data || []
+        const result = await request.post('/api/v1/recommendations', { query: voiceDraft.value.query.slice(0, 60), quantity, budget, usePreferences: false })
+        if (disposed || token !== voiceVersion) return
+        if (!result?.success) throw new Error(result?.message || '重新匹配失败')
+        if (voiceDraft.value) voiceDraft.value.candidates = assistantCandidates(result.data)
       } catch (error) {
-        appendAssistantMessage(errorMessage(error, '重新匹配失败。'))
-      }
+        if (token === voiceVersion) appendAssistantMessage(errorMessage(error, '重新匹配失败。'))
+      } finally { if (token === voiceVersion) voiceLoading.value = false }
     }
 
     const sendMessage = async () => {
       const text = inputMessage.value.trim()
-      if (!text || isTyping.value) return
+      if (disposed || !text || isTyping.value) return
+      const token = ++chatVersion
       const chatType = aiChatService.detectChatType(text)
       messages.value.push({ type: 'user', content: text, timestamp: new Date() })
       inputMessage.value = ''
@@ -546,20 +588,20 @@ export default defineComponent({
       await scrollToBottom()
       try {
         const result = await aiChatService.sendMessage(text, chatType, currentSessionId.value)
+        if (disposed || token !== chatVersion) return
         if (result.success) {
           currentSessionId.value = result.data.sessionId || currentSessionId.value
-          messages.value.push({ type: 'ai', content: result.data.message || '没有收到有效回复', timestamp: new Date(), processingTime: result.data.processingTime, candidates: result.data.candidates || [] })
+          messages.value.push({ type: 'ai', content: result.data.message || '没有收到有效回复', timestamp: new Date(), processingTime: result.data.processingTime, candidates: assistantCandidates(result.data.candidates) })
         } else appendAssistantMessage(result.error || '智能服务暂时不可用。')
       } catch (error) {
-        appendAssistantMessage(errorMessage(error, '智能服务暂时不可用，您仍可使用普通搜索。'))
+        if (token === chatVersion) appendAssistantMessage(errorMessage(error, '智能服务暂时不可用，您仍可使用普通搜索。'))
       } finally {
-        isTyping.value = false
-        await scrollToBottom()
+        if (token === chatVersion) { isTyping.value = false; await scrollToBottom() }
       }
     }
 
     const askQuickQuestion = question => { inputMessage.value = question; sendMessage() }
-    const handleKeyDown = event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage() } }
+    const handleKeyDown = event => { if (event.key === 'Enter' && !event.shiftKey && !event.isComposing && event.keyCode !== 229) { event.preventDefault(); sendMessage() } }
     const resizeComposer = () => nextTick(() => {
       if (messageInput.value) {
         messageInput.value.style.height = 'auto'
@@ -567,15 +609,21 @@ export default defineComponent({
       }
     })
     const scrollToBottom = () => nextTick(() => { if (messagesContainer.value) messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight })
-    const clearChat = () => { if (!messages.value.length || window.confirm('清空当前对话？')) { messages.value = []; currentSessionId.value = null } }
+    const clearChat = () => { if (!messages.value.length || window.confirm('清空当前对话？')) { chatVersion++; isTyping.value = false; messages.value = []; currentSessionId.value = null } }
 
     const loadChatHistory = async () => {
+      const token = ++historyVersion
       loadingHistory.value = true
+      historyError.value = ''
       try {
         const result = await aiChatService.getChatHistory(1, 30)
-        if (result.success) chatHistory.value = result.data || []
+        if (disposed || token !== historyVersion) return
+        if (!result?.success) throw new Error(result?.error || '历史记录加载失败，请重试')
+        chatHistory.value = Array.isArray(result.data) ? result.data.filter(item => item && typeof item.sessionId === 'string') : []
+      } catch (error) {
+        if (!disposed && token === historyVersion) historyError.value = errorMessage(error, '历史记录加载失败，请重试')
       } finally {
-        loadingHistory.value = false
+        if (token === historyVersion) loadingHistory.value = false
       }
     }
 
@@ -585,10 +633,15 @@ export default defineComponent({
     }
 
     const loadHistorySession = async sessionId => {
+      const token = ++chatVersion
+      isTyping.value = false
+      historyError.value = ''
       try {
         const result = await aiChatService.getChatHistoryBySession(sessionId)
+        if (disposed || token !== chatVersion) return
+        if (!result?.success) throw new Error(result?.error || '历史记录加载失败')
         if (result.success) {
-          messages.value = (result.data || []).flatMap(item => [
+          messages.value = (Array.isArray(result.data) ? result.data : []).filter(item => item && typeof item === 'object').flatMap(item => [
             { type: 'user', content: item.userMessage, timestamp: new Date(item.createTime) },
             { type: 'ai', content: item.aiResponse, timestamp: new Date(item.createTime), processingTime: item.processingTime }
           ])
@@ -597,7 +650,7 @@ export default defineComponent({
           await scrollToBottom()
         }
       } catch (error) {
-        appendAssistantMessage(errorMessage(error, '历史记录加载失败。'))
+        if (!disposed && token === chatVersion) historyError.value = errorMessage(error, '历史记录加载失败。')
       }
     }
 
@@ -606,11 +659,22 @@ export default defineComponent({
     const truncateText = (text, length) => String(text || '').length > length ? `${String(text).slice(0, length)}...` : String(text || '')
     const confidenceText = value => `${Math.round(Math.max(0, Math.min(1, Number(value) || 0)) * 100)}%`
 
+    watch(activeTool, (tool, previous) => {
+      toolFeedback.value = ''
+      if (previous === 'voice') {
+        voiceVersion++; voiceLoading.value = false
+        if (mediaRecorder) mediaRecorder.onstop = null
+        stopRecording(); stopMediaStream(); voiceFinishing.value = false
+      }
+      if (previous === 'image') { imageVersion++; imageLoading.value = false }
+    })
+
     onMounted(async () => {
-      await Promise.all([loadCapabilities(), checkAiStatus(), loadLandingFoods()])
+      await Promise.all([businessLookup.load(), loadCapabilities(), checkAiStatus(), loadLandingFoods()])
       messageInput.value?.focus()
     })
     onBeforeUnmount(() => {
+      businessLookup.dispose()
       disposed = true
       stopRecording()
       stopMediaStream()
@@ -618,7 +682,11 @@ export default defineComponent({
     })
 
     return {
+      decorateFoods, displayLandingFoods,
       router, route, tools, activeTool, currentToolLabel, openTool, goBack, capabilities, capabilitiesState, aiStatus, smartQuery, smartBudget, smartFoods, smartEmptyText, smartLoading,
+      toolFeedback, historyError, addingFoods,
+      requestingMicrophone,
+      voiceFinishing,
       imageInput, imagePreview, imageResult, imageLoading, audioInput, voiceDraft, voiceLoading, isRecording,
       recordingSeconds, messages, inputMessage, isTyping, messagesContainer, messageInput, showHistory,
       chatHistory, loadingHistory, quickQuestions, quickActions, landingFoods, findSmartFoods, runQuickAction, addLandingFood, handleLandingImageError, addFoodToCart, handleImageChange, searchKeyword,
@@ -838,7 +906,8 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .composer-main .send-button { width: 48px !important; min-width: 48px !important; height: 48px !important; padding: 0 !important; border-radius: 50% !important; font-size: 19px; }
 .composer-main .send-button span { display: none; }
 .composer-actions { min-height: 0 !important; padding: 0 !important; }
-.composer-actions > span, .composer-actions button[title="历史记录"], .composer-actions button[title="清空当前对话"] { display: none !important; }
+.composer-actions > span { display: inline !important; }
+.composer-actions button[title="历史记录"], .composer-actions button[title="清空当前对话"] { display: inline-flex !important; align-items: center; justify-content: center; }
 .composer-actions .image-shortcut { position: absolute; right: 62px; top: 17px; width: 34px !important; height: 34px !important; color: var(--fwl-brand-strong, #1d5c91) !important; background: transparent !important; border: 0 !important; font-size: 20px; }
 
 .ai-bottom-nav { position: fixed; left: 50%; bottom: 0; z-index: 40; width: min(100%, 600px); min-height: 70px; padding: 7px 10px max(7px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(4, 1fr); box-sizing: border-box; transform: translateX(-50%); background: rgba(255, 255, 255, .96); border-top: 1px solid rgba(var(--fwl-border-rgb, 213, 229, 240), 0.76); box-shadow: 0 -7px 22px rgba(var(--fwl-brand-strong-rgb, 46, 105, 145), 0.08); backdrop-filter: blur(14px); }

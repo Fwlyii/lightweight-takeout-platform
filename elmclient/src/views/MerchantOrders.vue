@@ -4,16 +4,17 @@
     <div class="merchant-selector"><div class="merchant-tabs" aria-label="选择店铺">
       <p v-if="merchantList.length === 0" class="merchant-no-business">{{ loadingMerchants ? '正在加载店铺…' : '您还没有商铺哦' }}</p>
       <button v-for="merchant in merchantList" :key="merchant.merchantId" :class="{ active: selectedMerchantId === merchant.merchantId }" @click="selectMerchant(merchant.merchantId)">{{ merchant.merchantName }}</button>
+      <button class="merchant-refresh" :disabled="loading || loadingMerchants || !selectedMerchantId" :aria-busy="loading" @click="fetchOrders()"><i class="fas fa-sync-alt" :class="{ 'merchant-refreshing': loading }" aria-hidden="true"></i>刷新</button>
     </div></div>
-    <nav class="tabs" aria-label="订单状态"><button v-for="(t, i) in statusTabs" :key="t" :class="{ active: activeStatusTab === i }" @click="changeStatusTab(i)">{{ t }}<span v-if="orderCounts[i] > 0">({{ orderCounts[i] }})</span></button></nav>
-    <div v-if="loading" class="loading"><p>正在加载订单…</p></div>
-    <div v-else-if="filteredOrders.length === 0" class="empty-state"><img src="../assets/empty-order.png" alt=""><p>暂无订单</p></div>
-    <ul v-else class="order-list">
-      <li v-for="order in filteredOrders" :key="order.id" class="order-item">
+    <nav v-merchant-indicator class="tabs" aria-label="订单状态"><button v-for="(t, i) in statusTabs" :key="t" :class="{ active: activeStatusTab === i }" @click="changeStatusTab(i)">{{ t }}<span v-if="orderCounts[i] > 0">({{ orderCounts[i] }})</span></button></nav>
+    <div v-if="loading && orders.length === 0" class="loading" role="status"><p>正在加载订单…</p></div>
+    <div v-else-if="!loading && filteredOrders.length === 0" class="empty-state"><img src="../assets/empty-order.png" alt=""><p>暂无订单</p></div>
+    <TransitionGroup name="merchant-list" type="transition" tag="ul" class="order-list" appear @before-leave="pinMerchantCard" @after-leave="releaseMerchantCard" @leave-cancelled="releaseMerchantCard">
+      <li v-for="order in filteredOrders" :key="`${selectedMerchantId}-${order.id}`" class="order-item" :class="{ 'merchant-new-order': freshOrderIds.has(order.id) }" @animationend.self="finishOrderAttention(order.id, $event)">
         <div class="order-header">
           <i class="fas fa-clipboard-list order-icon"></i>
           <div><h2 class="order-id">订单号 <strong>{{ order.id }}</strong></h2><span class="order-time">下单时间：{{ formatTime(order.orderDate) }}</span></div>
-          <span class="status-badge" :class="getStatusClass(order.orderState)">{{ getStatusText(order.orderState, order) }}</span>
+          <span :key="order.orderState" class="status-badge merchant-state-badge" :class="getStatusClass(order.orderState)">{{ getStatusText(order.orderState, order) }}</span>
         </div>
         <div class="order-content">
           <div class="customer-info">
@@ -37,12 +38,13 @@
         </div>
         <div class="actions">
           <template v-if="order.orderState === ORDER_STATUS.WAITING_MERCHANT_ACCEPT"><button class="cancel-btn" :disabled="submitting" @click.stop="rejectOrder(order.id)">拒单</button><button class="confirm-btn" :disabled="submitting" @click.stop="acceptOrder(order.id)">接单</button></template>
-          <button v-else-if="order.orderState === ORDER_STATUS.WAITING_DISPATCH" class="confirm-btn" :disabled="submitting" @click.stop="readyOrder(order.id)">确认出餐</button>
+          <button v-else-if="order.orderState === ORDER_STATUS.WAITING_DISPATCH" class="confirm-btn" :disabled="submitting" :aria-busy="readyId === order.id" @click.stop="readyOrder(order.id)"><MerchantActionLabel label="确认出餐" pending="正在出餐" :busy="readyId === order.id" /></button>
           <div v-else-if="![ORDER_STATUS.COMPLETED, ORDER_STATUS.CANCELLED].includes(order.orderState)" class="fulfillment-tip"><i class="fas fa-route"></i> {{ fulfillmentTip(order.orderState, order) }}</div>
         </div>
       </li>
-    </ul>
+    </TransitionGroup>
     <Teleport to="body">
+      <Transition name="merchant-dialog">
       <div v-if="showAcceptModal || showRejectModal" class="merchant-order-modal-overlay" @click.self="closeModal">
         <section class="merchant-order-dialog" role="dialog" aria-modal="true" aria-labelledby="merchant-confirm-title">
           <header class="dialog-heading"><span class="dialog-icon"><i class="fas fa-clipboard-list"></i><i class="fas fa-check-circle"></i></span><div><h2 id="merchant-confirm-title">{{ showAcceptModal ? '确认接单' : '确认拒单' }}</h2><p>{{ showAcceptModal ? '请确认订单信息，是否接单？' : '请确认订单信息，是否拒绝此订单？' }}</p></div><button class="dialog-close" :disabled="submitting" aria-label="关闭确认弹窗" @click="closeModal">×</button></header>
@@ -52,9 +54,10 @@
             <div><dt><i class="fas fa-file-alt"></i>顾客备注</dt><dd>{{ selectedOrder.remarks || '无备注' }}</dd></div>
           </dl>
           <p class="confirmation-note"><i class="fas fa-info-circle"></i>{{ showAcceptModal ? '请确认可正常备餐后接单' : '拒单后订单将取消，请谨慎确认' }}</p>
-          <div class="dialog-actions"><button class="cancel-btn" :disabled="submitting" @click="closeModal">{{ showAcceptModal ? '暂不接单' : '暂不拒单' }}</button><button class="confirm-btn" :class="{ 'reject-confirm': showRejectModal }" :disabled="submitting" @click="showAcceptModal ? confirmAccept() : confirmReject()">{{ submitting ? '提交中…' : showAcceptModal ? '确认接单' : '确认拒单' }}</button></div>
+          <div class="dialog-actions"><button class="cancel-btn" :disabled="submitting" @click="closeModal">{{ showAcceptModal ? '暂不接单' : '暂不拒单' }}</button><button class="confirm-btn" :class="{ 'reject-confirm': showRejectModal }" :disabled="submitting" :aria-busy="submitting" @click="showAcceptModal ? confirmAccept() : confirmReject()"><MerchantActionLabel :label="showAcceptModal ? '确认接单' : '确认拒单'" :pending="showAcceptModal ? '正在接单' : '正在拒单'" :busy="submitting" /></button></div>
         </section>
       </div>
+      </Transition>
     </Teleport>
   </div>
 </template>
@@ -67,10 +70,13 @@ import { createRealtimeConnection } from '../services/realtimeService';
 import { MERCHANT_ORDER_GROUPS, ORDER_STATUS, orderStatusClass, orderStatusText } from '../utils/orderPresentation';
 import { formatDateTime } from '../utils/formatters';
 import MerchantLogoutButton from '../components/MerchantLogoutButton.vue';
+import MerchantActionLabel from '../components/MerchantActionLabel.vue';
+import { merchantIndicator, pinMerchantCard, releaseMerchantCard } from '../utils/merchantMotion';
 
 export default {
   name: 'BusinessOrderManage',
-  components: { MerchantLogoutButton },
+  components: { MerchantLogoutButton, MerchantActionLabel },
+  directives: { merchantIndicator },
   setup() {
     const router = useRouter();
     const route = useRoute();
@@ -92,6 +98,13 @@ export default {
     const showRejectModal = ref(false);
     const selectId = ref(0);
     const submitting = ref(false);
+    const readyId = ref(null);
+    const freshOrderIds = ref(new Set());
+    const seenOrders = new Set();
+    const finishOrderAttention = (id, event) => {
+      if (event.animationName !== 'merchant-order-attention') return;
+      const remaining = new Set(freshOrderIds.value); remaining.delete(id); freshOrderIds.value = remaining;
+    };
     const selectedOrder = computed(() => orders.value.find(order => order.id === selectId.value));
 
     let realtimeConnection = null;
@@ -124,6 +137,7 @@ export default {
     const selectMerchant = (merchantId) => {
       if (submitting.value) return;
       orders.value = [];
+      freshOrderIds.value = new Set();
       closeModal();
       selectedMerchantId.value = merchantId;
       businessId.value = merchantId;
@@ -142,6 +156,14 @@ export default {
         });
         if (disposed || requestId !== orderRequest || requestedBusinessId !== businessId.value) return;
         if (response.success) {
+          const nextOrders = response.data || [];
+          const fresh = new Set([...freshOrderIds.value].filter(id => nextOrders.some(order => order.id === id)));
+          for (const order of nextOrders) {
+            const key = `${requestedBusinessId}-${order.id}`;
+            if (!seenOrders.has(key) && order.orderState === ORDER_STATUS.WAITING_MERCHANT_ACCEPT) fresh.add(order.id);
+            seenOrders.add(key);
+          }
+          freshOrderIds.value = fresh;
           orders.value = response.data || [];
         } else {
           if (!silent) toast.error("获取订单列表失败");
@@ -234,12 +256,13 @@ export default {
     const readyOrder = async (id) => {
       if (submitting.value) return;
       submitting.value = true;
+      readyId.value = id;
       try {
         const response = await request.post(`/api/v1/orders/${id}/merchant-ready`);
         if (response.success) { toast.success(orderById(id)?.serviceMode === 'PICKUP' ? '已确认出餐，等待顾客到店取餐' : '已确认出餐，配送任务已发布'); fetchOrders(); }
         else toast.error(response.message || '确认出餐失败');
       } catch (error) { toast.error(error.response?.data?.message || '确认出餐失败，请稍后重试'); }
-      finally { submitting.value = false; }
+      finally { submitting.value = false; readyId.value = null; }
     };
 
     // 拒单
@@ -321,6 +344,7 @@ export default {
     });
 
     return {
+      readyId, freshOrderIds, finishOrderAttention, pinMerchantCard, releaseMerchantCard,
       loading,
       loadingMerchants,
       selectedOrder,

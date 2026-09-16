@@ -1,0 +1,124 @@
+/* Rider-only motion. Existing layout, colors and API state remain the source of truth. */
+.rider-page, .rider-footer, .rider-information {
+  --rider-motion-fast: 120ms;
+  --rider-motion-normal: 220ms;
+  --rider-motion-state: 400ms;
+  --rider-motion-completion: 600ms;
+  --rider-motion-ease: cubic-bezier(.2, 0, 0, 1);
+  --rider-motion-enter: cubic-bezier(.22, 1, .36, 1);
+}
+.rider-page .hero-card { animation: rider-page-in var(--rider-motion-normal) var(--rider-motion-enter); }
+.rider-page .stat-grid:not(.rider-stats-ready) article {
+  animation: rider-stat-in 200ms var(--rider-motion-enter) both;
+}
+.rider-page .stat-grid article:nth-child(2) { animation-delay: 25ms; }
+.rider-page .stat-grid article:nth-child(3) { animation-delay: 50ms; }
+.rider-page .stat-grid article:nth-child(4) { animation-delay: 75ms; }
+.rider-page .accept, .rider-page .primary, .rider-page .ghost {
+  transition: transform 100ms var(--rider-motion-ease), background-color var(--rider-motion-fast) ease;
+}
+.rider-page .accept:active:not(:disabled), .rider-page .primary:active:not(:disabled), .rider-page .ghost:active:not(:disabled) { transform: scale(.985); }
+.rider-page .accept:disabled { cursor: wait; }
+.rider-page .rider-action-copy { position: relative; display: grid; place-items: center; width: 100%; }
+.rider-page .rider-label-hidden { visibility: hidden; }
+.rider-page .rider-action-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; }
+.rider-page .rider-action-spinner { width: 15px; height: 15px; flex: 0 0 15px; border: 2px solid #ffffff65; border-top-color: currentColor; border-radius: 50%; animation: rider-loading 800ms linear infinite; }
+.rider-page .rider-action-check { animation: rider-node-in var(--rider-motion-normal) var(--rider-motion-enter); }
+.rider-page .success-notice { animation: rider-banner-in 250ms var(--rider-motion-enter); }
+.rider-page .success-notice > i { animation: rider-check-in var(--rider-motion-state) var(--rider-motion-enter); }
+.rider-page .rider-state-feedback {
+  position: fixed; z-index: 1300; top: 16px; left: 50%; transform: translateX(-50%); width: min(560px, calc(100vw - 32px)); box-sizing: border-box; pointer-events: none;
+  display: flex; align-items: center; gap: 12px; margin: 0; padding: 14px 16px;
+  border-radius: 14px; border: 1px solid color-mix(in srgb, var(--skin-brand) 20%, white);
+  background: color-mix(in srgb, var(--skin-brand) 6%, white); color: var(--skin-brand-strong, #165c9f);
+}
+.rider-page .rider-state-feedback small { display: block; margin-top: 5px; color: var(--skin-muted, #788da7); line-height: 1.6; }
+.rider-page .rider-success-check { flex: 0 0 36px; width: 36px; height: 36px; color: var(--skin-brand, #0097ff); animation: rider-check-in var(--rider-motion-completion) var(--rider-motion-enter); }
+.rider-page .rider-success-check circle { fill: currentColor; }
+.rider-page .rider-success-check path { fill: none; stroke: white; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; animation: rider-check-draw var(--rider-motion-completion) var(--rider-motion-enter); }
+.rider-page .rider-completion strong { display: inline-block; color: var(--skin-brand); animation: rider-fee-in var(--rider-motion-completion) var(--rider-motion-ease); }
+.rider-page .rider-action-error { position: fixed; z-index: 1300; top: 16px; left: 50%; transform: translateX(-50%); width: min(560px, calc(100vw - 32px)); box-sizing: border-box; pointer-events: none; margin: 0; padding: 12px 16px; border-radius: 12px; background: #fff1ef; color: #ad4d37; line-height: 1.5; }
+.rider-page .rider-feedback-enter-active, .rider-page .rider-feedback-leave-active { transition: opacity var(--rider-motion-normal) ease, transform var(--rider-motion-normal) var(--rider-motion-enter); }
+.rider-page .rider-feedback-enter-from, .rider-page .rider-feedback-leave-to { opacity: 0; transform: translateY(-5px); }
+.rider-page .rider-state-feedback.rider-feedback-enter-from, .rider-page .rider-state-feedback.rider-feedback-leave-to,
+.rider-page .rider-action-error.rider-feedback-enter-from, .rider-page .rider-action-error.rider-feedback-leave-to { transform: translate(-50%, -5px); }
+
+/* Stable keyed cards animate only insertion/removal/reordering, not every polling response. */
+.rider-page .task-grid { position: relative; }
+.rider-page .workspace .task-grid.rider-grid-empty { padding-block: 0; }
+.rider-page .rider-list-move { transition: transform var(--rider-motion-state) var(--rider-motion-ease); }
+.rider-page .rider-list-enter-active { transition: opacity 260ms ease-out, transform 260ms var(--rider-motion-enter); }
+.rider-page .rider-list-leave-active { position: absolute; pointer-events: none; transition: opacity var(--rider-motion-normal) ease, transform var(--rider-motion-normal) var(--rider-motion-ease); }
+.rider-page .rider-list-enter-from { opacity: 0; transform: translateY(10px) scale(.985); }
+.rider-page .task-card:not(.waiting_rider).rider-list-enter-from { transform: translateY(4px); }
+.rider-page .rider-list-leave-to { opacity: 0; transform: translateY(-5px); }
+.rider-page .task-card.rider-new-order.waiting_rider { animation: rider-order-glow 650ms ease-out 260ms 1; }
+
+/* Fixed gray tracks with one growing blue segment per reached step. */
+.rider-page .task-card .delivery-progress li.reached::before { background: color-mix(in srgb, var(--skin-brand) 11%, white); }
+.rider-page .delivery-progress li::after { content: ''; position: absolute; top: 9px; left: -50%; width: 100%; height: 4px; background: var(--skin-brand, #0097ff); transform: scaleX(0); transform-origin: left; transition: transform var(--rider-motion-state) var(--rider-motion-ease); }
+.rider-page .delivery-progress li:first-child::after { display: none; }
+.rider-page .delivery-progress li.reached::after { transform: scaleX(1); }
+.rider-page .delivery-progress li > span { z-index: 1; display: grid; place-items: center; transition: background-color var(--rider-motion-state) ease, box-shadow var(--rider-motion-state) ease; }
+.rider-page .delivery-progress li.current > span { animation: rider-node-in var(--rider-motion-state) var(--rider-motion-enter); }
+.rider-page .delivery-progress li > span i { color: white; font-size: 9px; animation: rider-check-in var(--rider-motion-normal) var(--rider-motion-enter); }
+.rider-page .delivery-progress li b { color: var(--skin-muted, #8a9bb0); transition: color var(--rider-motion-state) ease; }
+.rider-page .delivery-progress li.reached b { color: var(--skin-brand, #0097ff); }
+.rider-page .status { transition: color var(--rider-motion-state) ease, background-color var(--rider-motion-state) ease; }
+
+.rider-page .online-pill > span.online, .rider-page .online-switch.online .switch-dot { position: relative; animation: rider-online-breathe 2400ms ease-in-out infinite; }
+.rider-page .online-pill > span.online::after, .rider-page .online-switch.online .switch-dot::after { content: ''; position: absolute; inset: -4px; border: 1px solid #10bc7133; border-radius: 50%; animation: rider-online-ring 2400ms ease-in-out infinite; }
+
+/* Measured indicators follow existing, variable-width tab buttons without changing them. */
+.rider-page .tabs { position: relative; }
+.rider-page .tabs .rider-sliding-indicator, .rider-footer .rider-sliding-indicator {
+  pointer-events: none; position: absolute; left: 0; bottom: 0; height: 4px; width: var(--indicator-width, 0px);
+  opacity: var(--indicator-visible, 0); transform: translateX(var(--indicator-x, 0px));
+  transition: transform 200ms var(--rider-motion-ease), width 200ms var(--rider-motion-ease);
+}
+.rider-page .tabs .rider-sliding-indicator::after, .rider-footer .rider-sliding-indicator::after { content: ''; position: absolute; inset: 0; border-radius: 4px; background: var(--skin-brand, #0097ff); }
+.rider-page .workspace .tabs button.active { box-shadow: none; }
+.rider-footer .nav-item.active::after { display: none; }
+.rider-footer .rider-sliding-indicator { bottom: calc(6px + env(safe-area-inset-bottom)); }
+.rider-footer .rider-sliding-indicator::after { inset-inline: calc(50% - 19px); }
+.rider-page .tabs button, .rider-footer .nav-item { transition: color var(--rider-motion-normal) ease; }
+.rider-page .tabs button > i, .rider-footer .nav-item > i, .rider-footer .nav-item > span { opacity: .85; transform: scale(.96); transition: transform var(--rider-motion-normal) var(--rider-motion-ease), opacity var(--rider-motion-normal) ease; }
+.rider-page .tabs button.active > i, .rider-footer .nav-item.active > i, .rider-footer .nav-item.active > span { opacity: 1; transform: scale(1); }
+.rider-page .tabs .refresh > i { opacity: 1; transform: none; }
+.rider-page .tabs .refresh > i.spin { animation: rider-loading 900ms linear infinite; }
+.rider-information .profile-head { animation: rider-profile-in var(--rider-motion-normal) var(--rider-motion-enter); }
+.rider-information .rider-return-banner { transition: transform var(--rider-motion-fast) var(--rider-motion-ease); }
+.rider-information .rider-return-banner:active { transform: scale(.99); }
+.rider-information .menu-icon, .rider-information .menu-arrow { transition: transform 150ms var(--rider-motion-ease); }
+.rider-information .menu-item:active .menu-icon { transform: scale(.96); }
+.rider-information .menu-item:active .menu-arrow, .rider-information .menu-item:focus-visible .menu-arrow { transform: translateX(2px); }
+
+@keyframes rider-loading { to { transform: rotate(360deg); } }
+@keyframes rider-page-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes rider-profile-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@keyframes rider-stat-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes rider-banner-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@keyframes rider-node-in { from { opacity: .6; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
+@keyframes rider-check-in { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: scale(1); } }
+@keyframes rider-check-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes rider-fee-in { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.05); } }
+@keyframes rider-order-glow { 0%, 100% { box-shadow: 0 5px 15px color-mix(in srgb, var(--skin-brand, #0097ff) 4%, transparent); } 45% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--skin-brand, #0097ff) 27%, transparent), 0 0 13px color-mix(in srgb, var(--skin-brand, #0097ff) 7%, transparent); } }
+@keyframes rider-online-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+@keyframes rider-online-ring { 0%, 100% { opacity: 0; } 50% { opacity: .6; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .rider-page *, .rider-page *::before, .rider-page *::after,
+  .rider-footer *, .rider-footer *::after, .rider-information *, .rider-information *::after {
+    animation: none !important; transition: none !important;
+  }
+  .rider-page .rider-list-enter-from, .rider-page .rider-list-leave-to,
+  .rider-page .rider-feedback-enter-from, .rider-page .rider-feedback-leave-to { transform: none; }
+  .rider-page .task-card:not(.waiting_rider).rider-list-enter-from { transform: none; }
+  .rider-page .rider-state-feedback.rider-feedback-enter-from, .rider-page .rider-state-feedback.rider-feedback-leave-to,
+  .rider-page .rider-action-error.rider-feedback-enter-from, .rider-page .rider-action-error.rider-feedback-leave-to { transform: translateX(-50%); }
+  .rider-page .accept:active:not(:disabled), .rider-page .primary:active:not(:disabled), .rider-page .ghost:active:not(:disabled),
+  .rider-information .rider-return-banner:active, .rider-information .menu-item:active .menu-icon,
+  .rider-information .menu-item:active .menu-arrow, .rider-information .menu-item:focus-visible .menu-arrow { transform: none; }
+  /* Essential loading still communicates a real outstanding request. */
+  .rider-page .rider-action-spinner, .rider-page .spinner, .rider-page .tabs .refresh > i.spin { animation: rider-loading 1200ms linear infinite !important; }
+}

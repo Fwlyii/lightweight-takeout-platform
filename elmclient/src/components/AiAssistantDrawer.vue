@@ -8,7 +8,7 @@
           <span class="ai-avatar" aria-hidden="true"><i class="fa fa-robot"></i></span>
           <div class="sheet-title">
             <strong>AI点餐助手</strong>
-            <small>{{ statusText }}</small>
+            <small>{{ statusText }}</small><button v-if="capabilitiesState === 'error'" type="button" @click="loadCapabilities">重新连接</button>
           </div>
           <button type="button" class="sheet-close" aria-label="关闭AI助手" @click="close">
             <i class="fa fa-times"></i>
@@ -17,7 +17,7 @@
 
         <div ref="bodyRef" class="sheet-body">
           <div class="quick-chips" role="group" aria-label="快捷需求">
-            <button v-for="chip in quickChips" :key="chip.label" type="button" :disabled="loading" @click="runChip(chip)">
+            <button v-for="chip in quickChips" :key="chip.label" type="button" :disabled="busy" @click="runChip(chip)">
               {{ chip.label }}
             </button>
           </div>
@@ -29,7 +29,7 @@
           </div>
 
           <div v-if="candidates.length" class="candidate-list">
-            <article v-for="candidate in candidates" :key="`${candidate.foodId}-${candidate.businessId}`" class="candidate-card">
+            <article v-for="candidate in displayCandidates" :key="`${candidate.foodId}-${candidate.businessId}`" class="candidate-card">
               <img :src="candidate.foodImg || require('@/assets/food-default.png')" :alt="candidate.foodName" @error="handleImageError">
               <div class="candidate-copy">
                 <strong>{{ candidate.foodName || '推荐菜品' }}</strong>
@@ -37,7 +37,7 @@
                 <div class="candidate-meta">
                   <b>★ {{ formatScore(candidate.businessScore) }}</b>
                   <em>¥{{ formatMoney(candidate.price) }}</em>
-                  <em>{{ distanceText(candidate) }}km</em>
+                  <em>{{ distanceText(candidate) }}</em>
                 </div>
               </div>
               <button type="button" class="candidate-action" @click="openBusiness(candidate)">立即查看</button>
@@ -74,7 +74,7 @@
             maxlength="60"
             placeholder="想吃什么？例如：清淡牛肉面"
             aria-label="AI点餐输入框"
-            @keyup.enter="send()">
+            @keydown.enter="handleEnter">
           <button
             type="button"
             class="icon-button"
@@ -112,6 +112,8 @@ import aiChatService from '@/services/aiChatService';
 import { formatMoney } from '@/utils/formatters';
 import { getBusinessDistanceKm } from '@/utils/businessPresentation';
 import { toast } from '@/utils/toast';
+import { assistantCandidates, assistantText, assistantKeywords, validAssistantId } from '@/utils/assistantData';
+import { createAssistantBusinessLookup } from '@/utils/assistantBusinessData';
 
 /** 首页 AI 入口的抽屉式助手：语音、图片、推荐都在抽屉内完成，不再跳整页。 */
 export default {
@@ -127,6 +129,8 @@ export default {
     const draft = ref('');
     const messages = ref([]);
     const candidates = ref([]);
+    const businessLookup = createAssistantBusinessLookup(request);
+    const displayCandidates = computed(() => candidates.value.map(businessLookup.enrich));
     const loading = ref(false);
     const sessionId = ref(null);
     const capabilities = ref({ textChat: true, imageRecognition: false, speechRecognition: false });
@@ -159,7 +163,7 @@ export default {
       return `支持${modes.join('、')}点餐`;
     });
 
-    const busy = computed(() => loading.value || recording.value || imageState.value === 'recognizing');
+    const busy = computed(() => loading.value || recording.value || requestingMicrophone.value || imageState.value === 'recognizing');
 
     // ---- 录音 ----
     const recording = ref(false);
@@ -170,8 +174,10 @@ export default {
     let audioChunks = [];
     let recordTimer = null;
     let disposed = false;
-    let requestingMicrophone = false;
+    const requestingMicrophone = ref(false);
     let recordingEpoch = 0;
+    let operation = 0, capabilityRequest = 0;
+    const current = token => !disposed && props.open && token === operation;
 
     // ---- 图片 ----
     const imageState = ref('idle');
@@ -194,11 +200,10 @@ export default {
       return Number.isFinite(value) && value > 0 ? value.toFixed(1) : '暂无';
     };
 
-    const distanceText = (candidate) => getBusinessDistanceKm({
-      id: candidate.businessId,
-      distanceKm: candidate.distanceKm,
-      distance: candidate.distance
-    }).toFixed(1);
+    const distanceText = (candidate) => {
+      const distance = getBusinessDistanceKm(candidate);
+      return distance === null ? '距离暂无' : `${distance.toFixed(1)}km`;
+    };
 
     const handleImageError = (event) => {
       const image = event?.target;
@@ -210,8 +215,10 @@ export default {
     const loadCapabilities = async () => {
       if (capabilitiesState.value === 'ready' || capabilitiesState.value === 'loading') return;
       capabilitiesState.value = 'loading';
+      const token = ++capabilityRequest;
       try {
         const result = await request.get('/api/v1/assistant/capabilities');
+        if (disposed || !props.open || token !== capabilityRequest) return;
         if (result?.success) {
           capabilities.value = { textChat: true, ...result.data };
           capabilitiesState.value = 'ready';
@@ -219,29 +226,34 @@ export default {
           capabilitiesState.value = 'error';
         }
       } catch (error) {
+        if (disposed || !props.open || token !== capabilityRequest) return;
         console.error('读取AI能力失败:', error);
         capabilitiesState.value = 'error';
       }
     };
 
-    const requestRecommendations = async (query, budget = null) => {
+    const requestRecommendations = async (query, budget = null, token = ++operation) => {
       loading.value = true;
       try {
         const result = await request.post('/api/v1/recommendations', { query, budget, usePreferences: true });
-        candidates.value = result?.success && Array.isArray(result.data) ? result.data.slice(0, 4) : [];
+        if (!current(token)) return [];
+        if (!result?.success) throw new Error(result?.message || '推荐服务暂时不可用，请稍后再试。');
+        candidates.value = assistantCandidates(result.data).slice(0, 4);
         if (!candidates.value.length) pushMessage('assistant', emptyHint);
         return candidates.value;
       } catch (error) {
+        if (!current(token)) return [];
         console.error('AI 推荐失败:', error);
         candidates.value = [];
         pushMessage('assistant', error?.response?.data?.message || '推荐服务暂时不可用，请稍后再试。');
         return [];
       } finally {
-        loading.value = false;
+        if (current(token)) loading.value = false;
       }
     };
 
     const runChip = async (chip) => {
+      if (disposed || !props.open || busy.value) return;
       if (chip.browse) {
         close();
         router.push({ path: '/businessList' });
@@ -253,30 +265,39 @@ export default {
 
     const send = async (text = draft.value) => {
       const content = String(text || '').trim();
-      if (!content || busy.value) return;
+      if (!content || busy.value || disposed || !props.open) return;
+      const token = ++operation;
       draft.value = '';
       pushMessage('user', content);
       loading.value = true;
       try {
         const result = await aiChatService.sendMessage(content, 'food', sessionId.value);
-        sessionId.value = result.data?.sessionId || sessionId.value;
-        pushMessage('assistant', result.data?.message || '我看看有没有合适的。');
-        const list = Array.isArray(result.data?.candidates) ? result.data.candidates : [];
+        if (!current(token)) return;
+        if (!result?.success) throw new Error(result?.error || '智能助手暂时不可用，请稍后重试。');
+        sessionId.value = assistantText(result.data?.sessionId) || sessionId.value;
+        pushMessage('assistant', assistantText(result.data?.message) || '我看看有没有合适的。');
+        const list = assistantCandidates(result.data?.candidates);
         candidates.value = list.slice(0, 4);
-        if (!list.length) {
+        if (!list.length && (result.data?.intent === 'RECOMMENDATION' || extractKeyword(content))) {
           const keyword = extractKeyword(content);
-          const found = await requestRecommendations(keyword || content, null);
-          if (!found.length && keyword) pushMessage('assistant', emptyHint);
+          await requestRecommendations((keyword || content).slice(0, 60), null, token);
         }
+      } catch (error) {
+        if (current(token)) pushMessage('assistant', error?.message || '智能助手暂时不可用，请稍后重试。');
       } finally {
-        loading.value = false;
+        if (current(token)) loading.value = false;
       }
     };
 
     const openBusiness = (candidate) => {
       const businessId = candidate?.businessId;
+      if (!validAssistantId(businessId)) { pushMessage('assistant', '商品暂时无法打开，请重新获取推荐。'); return; }
       close();
       if (businessId) router.push({ path: '/businessInfo', query: { businessId } });
+    };
+    const handleEnter = event => {
+      if (event.isComposing || event.keyCode === 229) return;
+      event.preventDefault(); send();
     };
 
     // ---- 语音：抽屉内录音 + 转写，不跳页面 ----
@@ -285,10 +306,11 @@ export default {
       mediaStream = null;
     };
 
-    const transcribeAudio = async (blob) => {
-      if (disposed || !props.open) return;
+    const transcribeAudio = async (blob, token) => {
+      if (!current(token)) return;
       if (blob.size > 7 * 1024 * 1024) {
         pushMessage('assistant', '录音太长了，请控制在 7 MB 以内。');
+        loading.value = false;
         return;
       }
       loading.value = true;
@@ -297,24 +319,28 @@ export default {
         const form = new FormData();
         form.append('audio', blob, blob.type.includes('mp4') ? 'voice.m4a' : 'voice.webm');
         const result = await request.post('/api/v1/voice-order-drafts', form, { timeout: 15000 });
-        const transcript = result?.data?.transcript?.trim();
+        if (!current(token)) return;
+        if (!result?.success) throw new Error(result?.message || '语音识别失败');
+        const transcript = assistantText(result?.data?.transcript).trim();
         if (transcript) {
-          draft.value = result.data.query || transcript;
+          draft.value = (assistantText(result.data.query) || transcript).slice(0, 60);
           pushMessage('user', `（语音）${draft.value}`);
-          await requestRecommendations(result.data.query || transcript, result.data.budget || null);
+          candidates.value = assistantCandidates(result.data.candidates).slice(0, 4);
+          if (!candidates.value.length) pushMessage('assistant', emptyHint);
         } else {
           pushMessage('assistant', '没听清，再说一次或直接打字告诉我。');
         }
       } catch (error) {
+        if (!current(token)) return;
         console.error('语音识别失败:', error);
         pushMessage('assistant', error?.response?.data?.message || '语音识别失败，可以改用文字输入。');
       } finally {
-        loading.value = false;
+        if (current(token)) loading.value = false;
       }
     };
 
     const startRecording = async () => {
-      if (disposed || requestingMicrophone || recording.value || !props.open) return;
+      if (disposed || busy.value || !props.open) return;
       if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
         pushMessage('assistant', '当前浏览器不支持录音，请使用文字或图片点餐。');
         return;
@@ -324,7 +350,8 @@ export default {
         return;
       }
       const epoch = recordingEpoch;
-      requestingMicrophone = true;
+      const token = ++operation;
+      requestingMicrophone.value = true;
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         if (disposed || !props.open || epoch !== recordingEpoch) {
@@ -332,24 +359,27 @@ export default {
           return;
         }
         mediaStream = stream;
+        audioChunks = [];
+        const recorder = new MediaRecorder(mediaStream);
+        mediaRecorder = recorder;
+        recorder.ondataavailable = event => { if (event.data?.size && current(token)) audioChunks.push(event.data); };
+        recorder.onstop = async () => {
+          if (!current(token)) return;
+          stopMediaStream();
+          const blob = new Blob(audioChunks, { type: recorder.mimeType || 'audio/webm' });
+          if (blob.size) await transcribeAudio(blob, token);
+          else { loading.value = false; pushMessage('assistant', '录音为空，请重试或输入文字。'); }
+        };
+        recorder.start();
+        recording.value = true;
+        recordingSeconds.value = 0;
+        recordTimer = window.setInterval(() => { recordingSeconds.value += 1; if (recordingSeconds.value >= 30) stopRecording(); }, 1000);
       } catch (error) {
-        pushMessage('assistant', error?.name === 'NotAllowedError' ? '需要麦克风权限才能语音点餐。' : '无法启动录音，请改用文字输入。');
+        if (current(token)) { stopMediaStream(); recording.value = false; pushMessage('assistant', error?.name === 'NotAllowedError' ? '需要麦克风权限才能语音点餐。' : '无法启动录音，请改用文字输入。'); }
         return;
       } finally {
-        requestingMicrophone = false;
+        if (epoch === recordingEpoch) requestingMicrophone.value = false;
       }
-      audioChunks = [];
-      mediaRecorder = new MediaRecorder(mediaStream);
-      mediaRecorder.ondataavailable = (event) => { if (event.data?.size) audioChunks.push(event.data); };
-      mediaRecorder.onstop = async () => {
-        stopMediaStream();
-        const blob = new Blob(audioChunks, { type: mediaRecorder?.mimeType || 'audio/webm' });
-        if (blob.size) await transcribeAudio(blob);
-      };
-      mediaRecorder.start();
-      recording.value = true;
-      recordingSeconds.value = 0;
-      recordTimer = window.setInterval(() => { recordingSeconds.value += 1; if (recordingSeconds.value >= 30) stopRecording(); }, 1000);
     };
 
     const clearRecordTimer = () => {
@@ -360,11 +390,12 @@ export default {
     const stopRecording = () => {
       clearRecordTimer();
       recording.value = false;
-      if (mediaRecorder?.state === 'recording') mediaRecorder.stop();
+      if (mediaRecorder?.state === 'recording') { loading.value = true; mediaRecorder.stop(); }
     };
 
     const cancelRecording = () => {
       recordingEpoch += 1;
+      requestingMicrophone.value = false;
       clearRecordTimer();
       recording.value = false;
       audioChunks = [];
@@ -377,6 +408,7 @@ export default {
 
     // ---- 图片：抽屉内上传识别，不跳页面 ----
     const resetImage = () => {
+      if (imageState.value === 'recognizing') { operation += 1; loading.value = false; }
       if (imagePreview.value) URL.revokeObjectURL(imagePreview.value);
       imagePreview.value = '';
       imageHint.value = '';
@@ -386,12 +418,13 @@ export default {
     const handleImageChange = async (event) => {
       const file = event.target.files?.[0];
       event.target.value = '';
-      if (!file) return;
+      if (!file || disposed || !props.open || busy.value) return;
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
         pushMessage('assistant', '请选择不超过 5 MB 的 JPG、PNG 或 WebP 图片。');
         return;
       }
       resetImage();
+      const token = ++operation;
       imagePreview.value = URL.createObjectURL(file);
       imageState.value = 'recognizing';
       imageHint.value = '正在识别图片…';
@@ -399,17 +432,21 @@ export default {
         const form = new FormData();
         form.append('image', file);
         const result = await request.post('/api/v1/dish-recognitions', form, { timeout: 15000 });
-        const keywords = Array.isArray(result?.data?.keywords) ? result.data.keywords.filter(Boolean) : [];
+        if (!current(token)) return;
+        if (!result?.success) throw new Error(result?.message || '图片识别失败');
+        const keywords = assistantKeywords(result?.data?.keywords);
         if (keywords.length) {
           imageState.value = 'done';
           imageHint.value = `识别到：${keywords.slice(0, 3).join('、')}`;
           pushMessage('user', `（图片）${keywords.slice(0, 3).join('、')}`);
-          await requestRecommendations(keywords.join(' '), null);
+          candidates.value = assistantCandidates(result.data.candidates).slice(0, 4);
+          if (!candidates.value.length) await requestRecommendations(keywords.join(' ').slice(0, 60), null, token);
         } else {
           resetImage();
           pushMessage('assistant', '这张图没认出菜品，换一张或直接告诉我菜名。');
         }
       } catch (error) {
+        if (!current(token)) return;
         console.error('图片识别失败:', error);
         resetImage();
         pushMessage('assistant', error?.response?.data?.message || '图片识别失败，可改用文字搜索。');
@@ -417,6 +454,8 @@ export default {
     };
 
     const close = () => {
+      operation += 1; capabilityRequest += 1; loading.value = false;
+      if (capabilitiesState.value === 'loading') capabilitiesState.value = 'idle';
       cancelRecording();
       resetImage();
       emit('close');
@@ -424,20 +463,26 @@ export default {
 
     watch(() => props.open, (value) => {
       if (value) {
+        businessLookup.load();
         loadCapabilities();
         scrollToBottom();
       } else {
+        operation += 1; capabilityRequest += 1; loading.value = false;
+        if (capabilitiesState.value === 'loading') capabilitiesState.value = 'idle';
         cancelRecording();
+        resetImage();
       }
     });
 
     onBeforeUnmount(() => {
+      businessLookup.dispose();
       disposed = true;
       cancelRecording();
       resetImage();
     });
 
     return {
+      displayCandidates,
       bodyRef,
       imageInput,
       draft,
@@ -445,6 +490,7 @@ export default {
       candidates,
       loading,
       capabilities,
+      capabilitiesState, loadCapabilities,
       statusText,
       greeting,
       quickChips,
@@ -460,6 +506,7 @@ export default {
       handleImageError,
       runChip,
       send,
+      handleEnter,
       openBusiness,
       startRecording,
       stopRecording,

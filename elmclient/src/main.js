@@ -11,6 +11,8 @@ import './assets/styles/interaction-motion.css';
 import './assets/styles/admin-motion.css';
 import './assets/styles/fwl-alignment.css';
 import './assets/styles/merchant-redesign.css';
+import './assets/styles/rider-motion.css';
+import './assets/styles/merchant-motion.css';
 
 // 在首屏挂载前恢复皮肤，避免刷新时先闪现默认蓝色。
 applyTheme(themeForRoute(window.location.pathname, getStoredTheme()), { persist: false });

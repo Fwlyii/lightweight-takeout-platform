@@ -5,7 +5,7 @@
       <MerchantLogoutButton />
     </div>
 
-    <div class="status-tabs">
+    <div v-merchant-indicator class="status-tabs">
       <button v-for="tab in tabs" :key="tab.status" :class="{ active: activeTab === tab.status }"
         @click="changeTab(tab.status)">
         {{ tab.label }}
@@ -27,7 +27,7 @@
         <button class="apply-button" @click="applyNewShop"><i class="fas fa-plus-circle"></i> 申请新店</button>
         <button v-if="activeTab !== 0" class="progress-link" @click="changeTab(0)"><i class="fas fa-file-alt"></i> 查看审核中的店铺</button>
       </section>
-      <ul class="business-list">
+      <TransitionGroup name="merchant-list" type="transition" tag="ul" class="business-list" appear @before-leave="pinMerchantCard" @after-leave="releaseMerchantCard" @leave-cancelled="releaseMerchantCard">
         <li v-for="(shop, index) in filteredShops" :key="shop?.id || index">
           <span class="shop-review-status" :class="getStatusClass(shop.status)">{{ getStatusText(shop.status) }}</span>
           <img :src="shop?.businessImg || require('@/assets/business-default.png')" :alt="shop?.businessName || '未命名商铺'"
@@ -56,7 +56,7 @@
             <button class="delete-btn" @click="deleteShop(shop?.id || index)">删除</button>
           </div>
         </li>
-      </ul>
+      </TransitionGroup>
     </div>
 
     <div v-if="filteredShops.length && !loading && !errorMessage" class="footer-button-container">
@@ -78,10 +78,12 @@ import { toast } from '../utils/toast';
 import { clearAuth, getToken } from '../utils/auth';
 import { listMyBusinesses } from '../services/businessService';
 import MerchantLogoutButton from '../components/MerchantLogoutButton.vue';
+import { merchantIndicator, pinMerchantCard, releaseMerchantCard } from '../utils/merchantMotion';
 
 export default {
   name: 'MyApplication',
   components: { MerchantLogoutButton },
+  directives: { merchantIndicator },
   setup() {
     const router = useRouter();
     const shops = ref([]);
@@ -459,7 +461,7 @@ export default {
 
     return {
       shops,
-      loading,
+      pinMerchantCard, releaseMerchantCard, loading,
       errorMessage,
       tabs,
       activeTab,
