@@ -8,7 +8,7 @@
         <version>3.4.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.tju.elm</groupId>
+    <groupId>elm</groupId>
     <artifactId>elm_bk</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>elm_bk</name>

@@ -1,0 +1,91 @@
+\chapter{项目设计}
+\section{总体架构与技术选择}
+系统采用浏览器、应用服务和数据库分层协作的架构。前端负责信息展示、用户输入和交互反馈；后端负责身份、权限、业务规则与状态转换；数据库保存持久化业务事实。AI 和地图通过服务端适配层接入，避免把外部凭证和不稳定依赖分散到各个页面。
+
+\begin{longtable}{L{.20\linewidth}L{.27\linewidth}L{.44\linewidth}}
+\caption{仓库技术栈及作用}\\\toprule 层次&技术&用途\\\midrule\endfirsthead\toprule 层次&技术&用途\\\midrule\endhead
+前端&Vue 3、Vue Router 4、Axios&页面组件、路由和接口访问；以仓库依赖声明为准。\\
+后端&Java 17 目标、Spring Boot 3.4.6&请求处理、依赖注入、业务服务与事务管理。\\
+持久化&MyBatis 3.0.4、MySQL 8&显式 SQL、条件更新、业务数据与历史记录。\\
+身份与接口&Spring Security、JWT、OpenAPI&认证授权、会话身份和接口说明。\\
+自动化测试&JUnit、Mockito、MockMvc、H2；Node 测试运行器&后端规则与集成测试、前端逻辑及源码契约检查。\\
+部署&Docker Compose、环境变量、部署脚本&统一演示环境、初始化数据库、隔离配置。\\\bottomrule
+\end{longtable}
+\section{前端设计}
+\subsection{四端信息架构}
+顾客端围绕“发现商品—购买—查看履约—个人管理”组织页面；商家端围绕“店铺—商品—订单—经营”组织；骑手端围绕“可接任务—当前任务—历史记录”组织；管理员围绕“审核—治理—统计”组织。各端共享基础设计语言，但不强行使用相同导航结构，因为角色任务不同。
+
+路由同时承担页面定位与访问引导。进入受保护页面前应判断登录和角色，退出登录或切换角色后清理上一身份的私有页面状态。前端路由守卫只能改善交互，最终权限仍由后端检查。
+\fullfig{15-page-information-architecture.png}{四端页面信息架构（引自仓库 SRS）}{fig:pageia}
+\subsection{页面与业务状态对应}
+关键按钮应区分可操作、禁用、处理中与失败。以支付为例，点击后先进入处理中；服务端返回成功才刷新支付状态；超时不能被当作支付失败而立即无条件重发，也不能被当作已支付。应先查询订单结果，再决定后续操作。
+
+列表加载时给出明确反馈，空列表说明原因，输入错误定位到具体字段，权限不足不展示敏感数据。状态不仅依赖颜色区分，还应保留文字说明。订单金额、库存和配送进度来自服务端返回，不通过页面局部修改“制造成功”。
+\subsection{公共组件与服务封装}
+仓库通过页面、公共组件、接口服务和工具函数组织前端内容。公共导航、身份相关逻辑、接口地址与响应解析应尽可能复用，避免每个端自行维护一套不兼容规则。对于购物车计价、返回导航和角色工作台等易受需求变更影响的内容，应把纯逻辑与视图分开，以便通过自动化测试验证。
+\section{后端设计}
+\subsection{职责划分}
+Controller 接收并校验参数，将请求交给业务服务，不承担复杂状态与资产计算。Service 组织具体用例，明确前置条件和事务边界。Mapper 负责 SQL 和行级条件更新，实体与传输对象区分持久化数据和对外响应。
+
+当前实现将订单提交、报价、结算与状态转换拆分为不同服务。这样，当优惠规则变化时，可以主要调整计价或结算环节；当增加自取时，可以沿履约方式扩展，而不必把价格、地址和配送判断复制到每一个 Controller 中。
+\subsection{接口设计与兼容边界}
+SRS 约定新接口采用 \code{/api/v1} 前缀，当前源码中仍存在 \code{/api/orders}、\code{/api/carts} 等兼容接口。因此，报告以真实映射为准，不将所有接口描述为已经完成统一迁移。
+\begin{longtable}{L{.10\linewidth}L{.51\linewidth}L{.30\linewidth}}
+\caption{代表性实际接口}\label{tab:apis}\\\toprule 方法&路径&主要用途\\\midrule\endfirsthead\toprule 方法&路径&主要用途\\\midrule\endhead
+GET&\code{/api/orders/{id}}&查询订单详情。\\
+POST&\code{/api/orders/submit}&提交购物车订单。\\
+POST&\code{/api/carts/items}&添加购物车商品。\\
+PUT&\code{/api/carts/{cartId}}&更新购物车条目。\\
+POST&\code{/api/v1/riders/applications}&提交骑手申请。\\
+PATCH&\code{/api/v1/riders/me/online}&更新骑手在线状态。\\
+POST&\code{/api/v1/delivery-tasks/{id}/accept}&领取配送任务。\\
+POST&\code{/api/v1/delivery-tasks/{id}/pickup}&取餐并进入配送。\\
+POST&\code{/api/v1/delivery-tasks/{id}/deliver}&确认送达。\\
+POST&\code{/api/v1/assistant/messages}&结构化智能助手对话。\\
+POST&\code{/api/v1/dish-recognitions}&提交图片识菜请求。\\
+GET&\code{/api/v1/assets/ledger}&读取本人资产流水。\\\bottomrule
+\end{longtable}
+接口契约除路径外还包括参数含义、响应结构、身份来源和失败行为。对具体订单、地址、优惠券和配送任务，后端必须检查是否属于当前身份可访问的范围。资源不存在与无权限的反馈也应避免泄露不必要信息。
+\section{数据库与领域对象设计}
+\Needspace{8\baselineskip}
+\subsection{主要数据表}
+\begin{longtable}{L{.34\linewidth}L{.57\linewidth}}
+\caption{核心表与数据责任}\\\toprule 表名&保存的业务事实\\\midrule\endfirsthead\toprule 表名&保存的业务事实\\\midrule\endhead
+\code{users}、\code{authority}、\code{user_authority}&用户与角色关系，支持按认证身份执行权限检查。\\
+\code{business}、\code{food}&店铺经营信息、商品价格、库存和限制。\\
+\code{cart}、\code{delivery_address}&用户待购内容与个人收货地址。\\
+\code{orders}、\code{orderdetailet}&订单主记录、商品明细及下单时快照；后者保留仓库原有拼写。\\
+\code{rider_profile}、\code{delivery_task}&骑手资格、在线情况与履约任务。\\
+\code{delivery_exception}、\code{order_status_history}&配送异常及订单状态变更记录。\\
+\code{user_asset}、\code{user_coupon}、\code{user_asset_ledger}&资产余额、优惠券和资产变更流水。\\
+\code{review}、\code{notification}、\code{user_preference}&评价、消息与用户偏好。\\
+\code{ai_chat_history}&对话会话与交互记录。\\\bottomrule
+\end{longtable}
+\subsection{历史快照与当前数据分离}
+商品表中的名称和价格表示当前销售配置，订单明细中的名称与价格表示某次交易发生时的事实。若历史订单每次显示都重新读取当前商品价格，商家调价就会改变过去的订单，这是数据语义错误，而不仅是显示错误。
+
+当前下单服务将商品名称、单价和地址信息复制到订单相关字段。订单详情与统计应遵循相应口径。对优惠、实付和退款，也应区分原始记录与后续变更，不能通过删除旧记录让账目表面一致。
+\fullfig{02-core-domain-class.png}{核心业务概念关系（SRS 领域模型，并非数据库物理表图）}{fig:domain}
+\section{状态机与事务设计}
+SRS 使用业务语言描述制作中、已取餐等阶段，而当前枚举中包含“待派单”和“已到店”等实现状态。为了避免将业务概念与存储值混为一谈，表\ref{tab:statecodes}明确列出当前订单状态编码。
+\begin{longtable}{L{.10\linewidth}L{.34\linewidth}L{.47\linewidth}}
+\caption{当前实现的订单状态及含义}\label{tab:statecodes}\\\toprule 编码&状态&主要说明\\\midrule\endfirsthead\toprule 编码&状态&主要说明\\\midrule\endhead
+0&待支付&订单已建立，等待合法支付。\\
+1&待商家接单&支付已完成，等待商家处理。\\
+2&待派单&商家已接单；与 SRS“制作中”的命名需统一。\\
+3&待骑手接单&外送出餐后等待骑手领取任务。\\
+4&待取餐&外送骑手已领取；自取订单也使用该阶段。\\
+5&配送中&外送订单已取餐，正在配送。\\
+6&已送达&等待顾客确认或超时完成。\\
+7&已完成&达到确认完成条件，可衔接积分和评价。\\
+8&已取消&终止履约，按原业务事实释放或返还资源。\\
+9&配送异常&等待处置并与配送任务状态同步。\\\bottomrule
+\end{longtable}
+订单状态转换采用“预期旧状态匹配才更新”的方式：如果另一个请求已改变状态，则本次更新失败并提示刷新。状态改变后记录操作人、前后状态和原因。下单事务将库存预占、订单写入、明细快照和已提交购物车清理放在同一用例中，失败时回滚，避免只有订单而没有明细等半完成结果。
+\section{AI 调用边界设计}
+\fullfig{18.png}{四端页面信息架构（引自仓库 SRS）}{fig:pageia}
+\begin{figure}[H]\centering
+\caption{AI 辅助点餐的交互约束（依据 SRS 与实现说明整理）}\label{fig:aisequence}\end{figure}
+AI 入口分为规则咨询、本人订单查询、商品推荐和一般问答。规则和能够直接由数据库回答的问题，应优先在本地完成；需要语言组织时，再将经过授权、最小化处理的数据送入外部模型。返回值区分答复文本与结构化候选商品，候选商品必须再次验证。
+
+外部调用不应持有数据库长事务。模型响应较慢时，若同时占用数据库锁，会把辅助点餐的延迟传播到下单与支付。设计上应先结束外部调用，再由业务服务保存对话记录，以隔离网络延迟。

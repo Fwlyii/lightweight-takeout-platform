@@ -1,0 +1,51 @@
+\chapter{项目部署与运行说明}
+\section{部署依据与适用环境}
+本章依据当前仓库 \code{docs/DEPLOYMENT.md} 和 \code{docker-compose.demo.yml} 整理，用于本地课程演示与复现，不把部署步骤描述为此次报告整理已完成的真实运行验收。推荐使用 Docker Compose 同时启动前端、后端和 MySQL，减少不同成员环境差异。
+
+环境需要 Git、运行中的 Docker 及 Compose v2。自动生成配置的脚本还需要 zsh 与 OpenSSL。首次构建需访问镜像、npm 与 Maven 依赖仓库；默认本机端口 18081、18080、13306 应保持空闲。手动开发模式对应 Node.js 20、JDK 17 和 MySQL 8。
+\section{获取代码与准备配置}
+\begin{lstlisting}
+git clone --branch main https://github.com/Fwlyii/lightweight-takeout-platform.git
+cd lightweight-takeout-platform
+zsh scripts/ensure-demo-env.sh
+\end{lstlisting}
+配置脚本在本地 \code{.env} 生成随机 \code{JWT_SECRET}，有效的已有密钥不被覆盖。若没有 zsh，可根据根目录 \code{.env.example} 手工配置，并通过 \code{openssl rand -hex 64} 生成本地密钥。密钥属于本地环境信息，不作为报告附件。
+
+外部能力按需要设置 \code{DEEPSEEK_API_KEY}、\code{DASHSCOPE_API_KEY} 及视觉/语音模型变量；高德前端选址使用 \code{VUE_APP_AMAP_KEY}，修改后需要重新构建前端。基础浏览和普通点餐流程不依赖外部模型密钥；相关可选入口未配置时，应验证失败反馈和替代路径。
+\section{构建、启动与检查}
+\begin{lstlisting}
+docker compose -f docker-compose.demo.yml up -d --build
+docker compose -f docker-compose.demo.yml ps -a
+docker compose -f docker-compose.demo.yml logs --tail=100 mysql migrate backend frontend
+\end{lstlisting}
+首次启动由 MySQL 创建 \code{elm_v2} 并导入结构和演示数据，再由迁移任务处理订单名称快照与购物车备注等更新。\code{migrate} 成功退出为 \code{Exited (0)}，不应误判为服务故障。后端使用 JDK 17；前端使用 Node.js 20 构建后由 Nginx 提供页面，并通过同源代理访问后端。
+\begin{longtable}{L{.25\linewidth}L{.66\linewidth}}
+\caption{默认本地访问入口}\\\toprule 服务&地址或用途\\\midrule
+前端&\url{http://localhost:18081/index}\\
+后端&\url{http://localhost:18080}，为接口根地址，不是独立网页首页。\\
+接口说明&\url{http://localhost:18080/swagger-ui/index.html}\\
+数据库调试&\code{127.0.0.1:13306}，数据库 \code{elm_v2}。\\\bottomrule
+\end{longtable}
+\section{演示角色与验收顺序}
+新建的本地演示数据库提供 \code{demo_user}、\code{demo_merchant}、\code{demo_rider}、\code{demo_rider_candidate} 和 \code{demo_admin} 等角色账号；演示初始密码见仓库部署文档。不同角色使用独立浏览器会话，以免账号切换影响验证。
+
+先检查顾客浏览、加购、选择外送或自取、提交订单和模拟支付，再检查商家接单备餐、外送骑手接单配送和顾客确认收货；之后验证取消、库存不足、未登录访问及外部服务不可用。跨商家商品分别结算。页面可打开只表示部署入口可用，数据库写入、角色权限和订单推进仍需逐项验证。
+\section{停止、恢复与数据维护}
+\begin{lstlisting}
+docker compose -f docker-compose.demo.yml stop
+docker compose -f docker-compose.demo.yml start
+\end{lstlisting}
+当前配置未声明固定名称的 MySQL 数据卷，重建容器前应确认数据持久化与备份方案，不把删除容器或清空卷作为日常更新方式。初始化 SQL 只在 MySQL 数据目录首次创建时运行，已有环境应按迁移脚本适用条件更新。上传文件位于 \code{runtime-uploads/}，需要与数据库一起考虑备份。
+\section{常见部署问题与排查}
+\begin{longtable}{L{.26\linewidth}L{.65\linewidth}}
+\caption{部署问题与检查路径}\\\toprule 现象&检查与处理\\\midrule\endfirsthead\toprule 现象&检查与处理\\\midrule\endhead
+缺少 JWT 配置&确认本地环境文件生成成功且示例值已替换，检查后端是否收到变量。\\
+Docker 无法连接&确认 Docker 服务运行，检查终端所连上下文。\\
+端口冲突&检查已有服务，停止冲突实例或明确调整映射。\\
+构建下载失败&区分网络、镜像仓库、npm 与 Maven 依赖问题，查看失败日志后重试。\\
+页面正常但接口失败&查看后端、MySQL 与迁移日志，确认数据库就绪、迁移成功和代理目标正确。\\
+登录失败&确认选择角色、种子数据导入状态及旧库账号差异。\\
+地图、图片或语音入口不可用&核对可选环境变量、浏览器授权、网络和服务额度，验证普通点餐仍可使用。\\\bottomrule
+\end{longtable}
+\section{不使用 Docker 的开发模式}
+准备 MySQL 8 后，在新库按部署文档导入表结构、演示种子及指定迁移，配置数据库连接、\code{JWT_SECRET} 与 \code{SERVER_PORT=18080}。Maven 不会自动读取 \code{.env}，应通过终端环境或 IDE 运行配置提供变量。后端执行 \code{./mvnw spring-boot:run}；前端在 \code{elmclient} 执行 \code{npm ci}、\code{npm run serve}，开发地址以终端输出为准。前端默认连接本机 18080 后端，修改时使用 \code{VUE_APP_API_BASE_URL}。

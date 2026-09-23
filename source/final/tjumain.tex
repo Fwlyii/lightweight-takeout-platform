@@ -1,0 +1,65 @@
+\def\usewhat{xelatex}
+\documentclass[12pt,openany,oneside,fontset=none]{ctexbook}
+\IfFontExistsTF{STHeiti}{
+  \setCJKmainfont[BoldFont=STHeiti]{STSong}
+  \setCJKsansfont[AutoFakeBold=2.5]{STHeiti}
+  \setCJKmonofont{STFangsong}
+  \setCJKfamilyfont{zhsong}[BoldFont=STHeiti]{STSong}
+  \setCJKfamilyfont{zhhei}[AutoFakeBold=2.5]{STHeiti}
+  \setCJKfamilyfont{zhkai}{STKaiti}
+  \setCJKfamilyfont{zhfs}{STFangsong}
+}{
+  \setCJKmainfont[BoldFont=FandolSong-Bold.otf]{FandolSong-Regular.otf}
+  \setCJKsansfont[BoldFont=FandolHei-Bold.otf]{FandolHei-Regular.otf}
+  \setCJKmonofont{FandolFang-Regular.otf}
+  \setCJKfamilyfont{zhsong}[BoldFont=FandolSong-Bold.otf]{FandolSong-Regular.otf}
+  \setCJKfamilyfont{zhhei}[BoldFont=FandolHei-Bold.otf]{FandolHei-Regular.otf}
+  \setCJKfamilyfont{zhkai}{FandolKai-Regular.otf}
+  \setCJKfamilyfont{zhfs}{FandolFang-Regular.otf}
+}
+\input{setup/package}
+\input{setup/commands}
+\graphicspath{{figures/}{figures/srs/}}
+\begin{document}
+	\input{setup/format}
+	\input{setup/info}
+	\frontmatter
+	\hypersetup{pageanchor=false}
+	\fancypagestyle{plain}{
+		\fancyhf{}
+		\renewcommand{\headrulewidth}{0 pt}
+		\fancyfoot[C]{\song\xiaowu~\thepage~}
+	}
+
+	\makecover
+
+	\input{setup/toc}
+
+	\mainmatter\hypersetup{pageanchor=true}\defaultfont\sloppy\raggedbottom
+	\makeatletter
+	\fancypagestyle{plain}{
+		\fancyhf{}
+		\fancyhead[C]{\song\wuhao \@cheading}
+		\fancyfoot[C]{\song\xiaowu ~\thepage~}
+		\renewcommand{\headrulewidth}{0.5pt}
+		\renewcommand{\footrulewidth}{0pt}
+	}
+	\makeatother
+	\setcounter{page}{1}
+	\titleformat{\chapter}{\centering\xiaosan\hei}{\chaptername}{2em}{}
+
+	\input{body/srs/index}
+
+% 原 SRS 与原模板文件保持原样；以下均为新增章节。
+\clearpage
+\input{body/report/07-development}
+\input{body/report/02-design}
+\input{body/report/03-implementation}
+\input{body/report/04-testing}
+\input{body/report/06-deployment}
+\input{body/report/08-ai-usage}
+\input{body/report/09-features}
+\input{body/report/05-reflection}
+\input{body/report/10-cross-testing}
+\input{body/report/06-acknowledgements}
+\end{document}

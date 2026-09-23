@@ -18,4 +18,4 @@ logging:
   level:
     root: WARN
     org.springframework.jdbc.support.JdbcTransactionManager: WARN
-    com.tju.elm_bk.exception.GlobalExceptionHandler: OFF
+    elm_bk.exception.GlobalExceptionHandler: OFF

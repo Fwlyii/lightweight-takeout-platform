@@ -1,0 +1,82 @@
+%  Authors: 张井   Jing Zhang: prayever@gmail.com     天津大学2010级管理与经济学部信息管理与信息系统专业硕士生
+%           余蓝涛 Lantao Yu: lantaoyu1991@gmail.com  天津大学2008级精密仪器与光电子工程学院测控技术与仪器专业本科生
+
+\usepackage{graphicx}
+\usepackage[a4paper,top=25.4mm, bottom=25.4mm, left=31.7mm, right=31.7mm, head=6true mm,headsep=6.5true mm,foot=17.5mm]{geometry}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[below]{placeins}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage[sort&compress,numbers]{natbib}
+\usepackage{enumitem}
+\usepackage{calc}
+\usepackage{bm}
+\usepackage{indentfirst}
+
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{float}
+\usepackage{ifthen}
+\newcommand{\PreserveBackslash}[1]{\let\temp=\\#1\let\\=\temp}
+\newcolumntype{C}[1]{>{\PreserveBackslash\centering}p{#1}}
+\newcolumntype{R}[1]{>{\PreserveBackslash\raggedleft}p{#1}}
+\newcolumntype{L}[1]{>{\PreserveBackslash\raggedright}p{#1}}
+\setlength{\tabcolsep}{3pt}
+
+\newcommand{\srsfigure}[5][0.90\linewidth]{%
+  \begin{figure}[H]
+    \centering
+    \IfFileExists{#2}{%
+      \includegraphics[width=#1,height=0.72\textheight,keepaspectratio]{#2}%
+    }{%
+      \fbox{\parbox[c][4.2cm][c]{0.86\linewidth}{%
+        \centering\hei 待补图：#3\\[0.6em]
+        \song\small 图类型：#4\\[0.3em]
+        预期文件：\texttt{#2}%
+      }}%
+    }
+    \caption{#3}
+    \label{#5}
+  \end{figure}%
+}
+
+\newcommand{\srsfigurelarge}[5][0.98\linewidth]{%
+  \begin{figure}[H]
+    \centering
+    \IfFileExists{#2}{%
+      \includegraphics[width=#1,height=0.88\textheight,keepaspectratio]{#2}%
+    }{%
+      \fbox{\parbox[c][4.2cm][c]{0.86\linewidth}{%
+        \centering\hei 待补图：#3\\[0.6em]
+        \song\small 图类型：#4\\[0.3em]
+        预期文件：\texttt{#2}%
+      }}%
+    }
+    \caption{#3}
+    \label{#5}
+  \end{figure}%
+}
+
+\newenvironment{srsusecase}[5]{%
+  \begin{longtable}{|L{0.16\linewidth}|L{0.29\linewidth}|L{0.16\linewidth}|L{0.29\linewidth}|}
+  \caption{#2用例说明}\label{#5}\\
+  \hline
+  \textbf{编号} & #1 & \textbf{名称} & #2 \\ \hline
+  \textbf{执行者} & #3 & \textbf{优先级} & #4（\ifthenelse{\equal{#4}{P2}}{可选增强}{基线范围}） \\ \hline
+}{%
+  \end{longtable}
+}
+\newcommand{\ucrow}[2]{\textbf{#1} & \multicolumn{3}{L{0.78\linewidth}|}{#2} \\ \hline}
+
+\usepackage{hyperref}
+\hypersetup{
+    unicode,
+    pdfborder={0 0 0},
+}

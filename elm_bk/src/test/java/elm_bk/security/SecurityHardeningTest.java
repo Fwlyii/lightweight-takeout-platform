@@ -1,0 +1,183 @@
+package elm_bk.security;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import elm_bk.controller.AdminController;
+import elm_bk.controller.BusinessController;
+import elm_bk.controller.FileUploadController;
+import elm_bk.controller.PermissionApplicationController;
+import elm_bk.controller.ReviewController;
+import elm_bk.controller.RiderController;
+import elm_bk.controller.UserRestController;
+import elm_bk.dto.FoodCreateDTO;
+import elm_bk.dto.ReviewCreateDTO;
+import elm_bk.dto.RiderApplicationDTO;
+import elm_bk.entity.Authority;
+import elm_bk.entity.User;
+import elm_bk.exception.APIException;
+import elm_bk.mapper.AssetMapper;
+import elm_bk.service.CurrentUserService;
+import elm_bk.service.ImageStorageService;
+import elm_bk.service.impl.AssetServiceImpl;
+import elm_bk.websocket.WebSocketServer;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.Session;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class SecurityHardeningTest {
+
+    @Test
+    void adminAndAccountStatusEndpointsRequireAdminAuthority() throws Exception {
+        PreAuthorize adminGuard = AdminController.class.getAnnotation(PreAuthorize.class);
+        assertNotNull(adminGuard);
+        assertEquals("hasAuthority('ADMIN')", adminGuard.value());
+
+    }
+
+    @Test
+    void portalSpecificEndpointsRequireTheirSessionAuthority() throws Exception {
+        assertGuard(RiderController.class, "apply", "hasAuthority('RIDER_APPLICANT')",
+                RiderApplicationDTO.class);
+        assertGuard(RiderController.class, "me", "hasAnyAuthority('RIDER_APPLICANT','RIDER')");
+        assertGuard(PermissionApplicationController.class, "applyMerchant",
+                "hasAuthority('BUSINESS_APPLICANT')");
+        assertGuard(ReviewController.class, "create", "hasAuthority('USER')", ReviewCreateDTO.class);
+        assertGuard(ReviewController.class, "getByOrder", "hasAuthority('USER')", Long.class);
+        assertGuard(ReviewController.class, "reply", "hasAuthority('BUSINESS')", Long.class, Map.class);
+        assertGuard(BusinessController.class, "getMerchantBusinesses",
+                "hasAnyAuthority('BUSINESS','ADMIN')", Long.class, Integer.class);
+    }
+
+    @Test
+    void uploadRejectsSpoofedMimeTypeUsingActualFileSignature(@TempDir Path tempDir) {
+        FileUploadController controller = new FileUploadController(new ImageStorageService(tempDir.toString()));
+        MockMultipartFile fakeImage = new MockMultipartFile(
+                "file", "payload.png", "image/png", "<script>alert(1)</script>".getBytes());
+
+        assertThrows(APIException.class, () -> controller.uploadFile(fakeImage));
+    }
+
+    @Test
+    void websocketRejectsConnectionWithoutAuthenticationToken() throws Exception {
+        Session session = mock(Session.class);
+        when(session.getRequestParameterMap()).thenReturn(Collections.emptyMap());
+
+        new WebSocketServer().onOpen(session, "1");
+
+        verify(session).close(org.mockito.ArgumentMatchers.any(CloseReason.class));
+    }
+
+    @Test
+    void demoMoneyCreationIsDisabledByDefault() {
+        AssetServiceImpl service = new AssetServiceImpl(
+                mock(AssetMapper.class), mock(CurrentUserService.class));
+        ReflectionTestUtils.setField(service, "demoEnabled", false);
+
+        assertThrows(APIException.class, () -> service.recharge(BigDecimal.TEN));
+        assertThrows(APIException.class, service::activateMembership);
+    }
+
+    @Test
+    void unreasonableFoodValuesAreRejected() {
+        FoodCreateDTO dto = new FoodCreateDTO();
+        dto.setBusinessId(1L);
+        dto.setFoodName("测试商品");
+        dto.setFoodPrice(new BigDecimal("10.00"));
+        dto.setStock(1_000_001);
+        assertFalse(dto.verify());
+
+        dto.setStock(10);
+        dto.setFoodPrice(BigDecimal.ZERO);
+        assertFalse(dto.verify());
+    }
+
+    private void assertGuard(Class<?> controller, String methodName, String expression,
+            Class<?>... parameterTypes) throws Exception {
+        PreAuthorize guard = controller.getMethod(methodName, parameterTypes).getAnnotation(PreAuthorize.class);
+        assertNotNull(guard, controller.getSimpleName() + "." + methodName + " 缺少端权限约束");
+        assertEquals(expression, guard.value());
+    }
+
+    @Test
+    void accountChangeInvalidatesPreviouslyIssuedToken() {
+        TokenProvider provider = new TokenProvider("a".repeat(128), 3600, 7200);
+        var authentication = new UsernamePasswordAuthenticationToken(
+                "demo_user", "unused", List.of(new SimpleGrantedAuthority("USER")));
+        Instant beforeIssue = Instant.now();
+        String token = provider.createRoleBoundToken(authentication, false, "user");
+        Instant afterIssue = Instant.now();
+        ZoneId zone = ZoneId.systemDefault();
+
+        assertTrue(provider.isCurrentForAccount(token,
+                LocalDateTime.ofInstant(beforeIssue.minusSeconds(1), zone)));
+        assertFalse(provider.isCurrentForAccount(token,
+                LocalDateTime.ofInstant(afterIssue.plusSeconds(1), zone)));
+    }
+
+    @Test
+    void roleBoundTokenCarriesOnlyTheSelectedPortalAuthority() {
+        TokenProvider provider = new TokenProvider("a".repeat(128), 3600, 7200);
+        var authentication = new UsernamePasswordAuthenticationToken(
+                "demo_rider", "unused", List.of(new SimpleGrantedAuthority("RIDER")));
+        String token = provider.createRoleBoundToken(authentication, false, "rider");
+        User account = new User();
+        account.setUsername("demo_rider");
+        account.setActivated(true);
+        account.setIsDeleted(false);
+        Authority user = new Authority();
+        user.setName("USER");
+        Authority rider = new Authority();
+        rider.setName("RIDER");
+        account.setAuthorities(List.of(user, rider));
+
+        assertEquals(List.of("RIDER"), provider.getAuthentication(token).getAuthorities().stream()
+                .map(authority -> authority.getAuthority()).toList());
+        assertTrue(provider.isRoleBoundAndCurrentForAccount(token, account));
+
+        account.setAuthorities(List.of(user));
+        assertFalse(provider.isRoleBoundAndCurrentForAccount(token, account));
+    }
+
+    @Test
+    void securityHandlersKeepUnauthorizedAndForbiddenDistinct() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse unauthenticated = new MockHttpServletResponse();
+        new JwtAuthenticationEntryPoint(objectMapper).commence(
+                request, unauthenticated, new InsufficientAuthenticationException("missing"));
+        assertEquals(401, unauthenticated.getStatus());
+
+        MockHttpServletResponse forbidden = new MockHttpServletResponse();
+        new JwtAccessDeniedHandler(objectMapper).handle(
+                request, forbidden, new AccessDeniedException("denied"));
+        assertEquals(403, forbidden.getStatus());
+    }
+}

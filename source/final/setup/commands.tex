@@ -1,0 +1,14 @@
+% 仅提供新增正文所需的命令；不覆盖原模板排版设置。
+\usepackage{listings,tikz,needspace}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\definecolor{tjublue}{HTML}{00558C}
+\definecolor{lightblue}{HTML}{F1F5F8}
+\newcommand{\code}[1]{{\small\def\UrlBreaks{\do a\do b\do c\do d\do e\do f\do g\do h\do i\do j\do k\do l\do m\do n\do o\do p\do q\do r\do s\do t\do u\do v\do w\do x\do y\do z\do A\do B\do C\do D\do E\do F\do G\do H\do I\do J\do K\do L\do M\do N\do O\do P\do Q\do R\do S\do T\do U\do V\do W\do X\do Y\do Z\do 0\do 1\do 2\do 3\do 4\do 5\do 6\do 7\do 8\do 9\do\/\do\.\do\-\do\_}\nolinkurl{#1}}}
+\newcommand{\note}[1]{\begin{quote}\wuhao #1\end{quote}}
+\newcommand{\fullfig}[3]{\begin{figure}[H]\centering\includegraphics[width=\linewidth,height=.56\textheight,keepaspectratio]{figures/srs/#1}\caption{#2}\label{#3}\end{figure}}
+\lstset{basicstyle=\ttfamily\small,breaklines=true,frame=single,rulecolor=\color{black!20},columns=fullflexible,keepspaces=true,showstringspaces=false}
+
+% 交叉测试原稿的图片容器；保持原模板标题、字号和页面设置。
+\newcommand{\pandocbounded}[1]{\begin{figure}[H]\centering
+\resizebox{.90\linewidth}{!}{#1}\end{figure}}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}

@@ -1,0 +1,111 @@
+\chapter{小组成员与项目开发过程}
+\section{仓库与成员职责}
+ \url{https://github.com/Fwlyii/lightweight-takeout-platform.git}为Git项目仓库地址。
+\input{body/report/team-division-process}
+课程提供的初始工程是小组继续分析和开发的起点。小组在此基础上建立自己的协作仓库、需求文档、功能分支和测试材料，因此报告在描述成果时区分“课程提供的基础代码”和“小组后续完成的需求、实现与验证”，不把初始工程作为小组原创成果。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.86\linewidth]{figures/report/process/course-repository.png}
+  \caption{课程初始工程与仓库起点}
+  \label{fig:process-course-repository}
+\end{figure}
+\section{开发阶段与可核对的产物}
+项目过程不是先完成所有页面再集中拼接，而是在需求、基础框架、业务模块、整合验证和体验完善之间迭代。下表依据提交日期和提交内容整理阶段；阶段名称用于概括，不表示小组当时存在同名会议或正式里程碑审批。
+\begin{longtable}{L{.19\linewidth}L{.28\linewidth}L{.44\linewidth}}
+\caption{开发阶段与仓库证据}\\\toprule 时间&工作主题&可核对产物\\\midrule\endfirsthead\toprule 时间&工作主题&可核对产物\\\midrule\endhead
+9 月 1--3 日&仓库建立与需求分析&\code{4fcbf00} 初始提交、\code{6e39d85} SRS 初版、\code{4d071aa} 需求修订，随后补充参与者、用例和页面结构图。\\
+9 月 5--9 日&基础能力与业务模块并行&前后端基础、账号与权限、下单支付、商家商品、骑手配送等分支相继整合；\code{7c898f4} 合并 SRS 2.0，\code{39c5469} 合并骑手配送。\\
+9 月 9 日&过程记录与回归&\code{21f7ec1} 补充测试输出，\code{d80eaba} 补充开发记录；保留结构契约检查和模块测试的不同证据口径。\\
+9 月 11--14 日&AI 入口与界面完善&AI 点餐页面、分类商家列表、登录、订单页及交互动效逐步调整，多个界面分支通过合并提交整合。\\
+9 月 15--16 日&全链路整合与交付整理&\code{e06d806} 合并 AI 界面并保留鉴权与结算保护；\code{06780ac}、\code{12c3d6e}、\code{d319c5e} 对返回导航补充测试、修复与重构；最终完善四端体验、部署和高德选址。\\\bottomrule
+\end{longtable}
+需求阶段的关键变化，是把“要做哪些功能”转化为“谁在什么条件下完成什么任务，失败时如何处理”。实现阶段则需要把订单金额、库存、身份与状态规则落实到服务端。最终阶段的界面完善不能替代回归检查：一个按钮或导航入口的修改，也可能影响登录态、订单确认和页面返回路径。
+
+表中的日期来自仓库提交和产物形成时间，可以早于正式组会日期。以下叙述按照课程规定的关键节点补充开发过程，用于说明产物如何从需求分析逐步进入联调、验收和报告整理，不改变上表原有的仓库证据口径。
+
+\subsection{分组与协作环境建立}
+9月2日前后，小组完成成员确认、仓库访问检查和本地环境准备，并确定腾讯会议、微信群、飞书共享文档及 GitHub 的用途。成员先阅读课程要求和初始工程，再根据基础技术方向确定前端、后端、数据库和测试主责。此时形成的分工并不是后续工作的固定边界，而是用于保证每个关键方向都有明确责任人。
+
+\subsection{需求分析与系统建模}
+9月4日至8日，小组围绕四类角色、主要业务模块和完整履约流程撰写《软件需求规格说明书》。总体架构图用于说明系统参与者、前后端、数据库和外部服务之间的关系；UML 总用例图用于检查顾客、商家、骑手和管理员的职责是否覆盖。两类图共同把文字需求转换成可供开发和验收核对的结构。
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[t]{.54\linewidth}
+    \centering\includegraphics[width=\linewidth]{figures/report/process/architecture.png}\\[-2pt]
+    \small（a）系统总体架构图
+  \end{minipage}\hfill
+  \begin{minipage}[t]{.40\linewidth}
+    \centering\includegraphics[width=\linewidth,height=.30\textheight,keepaspectratio]{figures/report/process/use-case.png}\\[-2pt]
+    \small（b）UML 总用例图
+  \end{minipage}
+  \caption{需求分析阶段形成的系统模型}
+  \label{fig:process-models}
+\end{figure}
+
+\subsection{阶段一开发与中期检查}
+9月9日前后，小组按课程要求检查用户、商家、店铺、商品和订单等基础模块。检查不只关注页面是否存在，还核对请求参数、权限、状态变化和数据库支持。对未完成或前后端理解不一致的内容，小组重新形成任务清单；需求变化先确认业务规则及影响范围，再同步修改页面、接口、数据结构和测试检查项。
+
+\subsection{分支开发与功能整合}
+中期检查后，四名成员按照基础责任范围并行推进，同时围绕跨层业务开展联调。阶段性任务在独立分支完成，经过自测和 Pull Request 检查后进入主分支；出现冲突时，由涉及模块的成员共同核对，而不是仅以最后执行合并的人作为该功能的唯一贡献者。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.94\linewidth]{figures/report/process/pull-requests.png}
+  \caption{功能分支通过 Pull Request 合并的记录}
+  \label{fig:process-pull-requests}
+\end{figure}
+
+9月15日前后，小组将顾客端、商家端、骑手端和管理端整合到同一测试版本，检查角色入口、权限、路由及主要业务链路。四端界面合并图用于说明阶段成果已经从单独页面进入统一运行环境；它只表示界面与入口的整合情况，具体业务正确性仍由接口测试和回归测试确认。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.88\linewidth]{figures/report/process/four-roles.jpg}
+  \caption{顾客端、商家端、骑手端和管理端的整合结果}
+  \label{fig:process-four-roles}
+\end{figure}
+
+\subsection{交叉验收、课程验收与报告整理}
+在交叉验收前，小组已经通过自动化测试和人工功能筛查检查本组项目，并使用统一缺陷表记录人工发现的问题，具体方法见项目测试章节。9月16日的交叉验收是本组依据其他小组提交的需求文档和可运行版本，对其他小组的成果进行检查；这一过程与本组内部缺陷筛查是两类不同活动，不能使用本组缺陷登记表代替交叉验收记录。
+
+9月18日由教师对本组项目进行课程验收。9月19日以后，小组结合课程验收意见继续修正本组问题，并开始收集需求、设计、实现、测试和协作证据。报告整理不是重新构造开发过程，而是把仓库、共享文档、会议记录、缺陷表和运行截图相互核对，使文字结论能够追溯到相应产物。
+\section{组会与协作方式}
+\input{body/report/meeting-record}
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[t]{.36\linewidth}
+    \centering\includegraphics[width=\linewidth]{figures/report/process/meeting-history.png}\\[-2pt]
+    \small（a）腾讯会议历史页面
+  \end{minipage}\hfill
+  \begin{minipage}[t]{.60\linewidth}
+    \centering\includegraphics[width=\linewidth]{figures/report/process/feishu-workspace.png}\\[-2pt]
+    \small（b）飞书共享文档空间
+  \end{minipage}
+  \caption{线上会议与共享文档协作工具}
+  \label{fig:process-collaboration-tools}
+\end{figure}
+
+飞书讨论中还记录了阶段任务使用独立分支、完成后合并到主分支以及及时清理无用分支等协作约定。这类即时讨论用于补充正式会议后的执行细节，但聊天中提出的设想只有在仓库或运行结果中得到验证后，才作为已实现事实写入报告。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.90\linewidth]{figures/report/process/branch-discussion.png}
+  \caption{飞书中关于分支开发与合并方式的讨论记录}
+  \label{fig:process-branch-discussion}
+\end{figure}
+\section{CheckIn 与 CheckOut 的统计口径}
+本报告将 CheckIn 具体统计为 Git 提交：所有远端分支可达提交去重后共 265 条，包含 38 条合并提交，普通提交 227 条；其中 \code{main} 可达 258 条。统计按提交对象去重，不把同一提交在多个分支出现重复计数；日期使用作者日期。两个不同邮箱的 Chengwen，以及同邮箱的 mao/iStarrySummer、Zhong Yutong/Zita 分别按作者身份组归并。个人实名与账号关系以成员确认表为准。
+
+CheckOut 通常指本地切换或检出分支。远端提交历史不保存每位成员的 checkout、fetch、pull 或 clone 次数，因此不能给出这些行为的实际频率，也不能把某天没有提交等同于当天没有工作。提交次数不是贡献度评分：文档、测试、界面细分提交、合并提交和一次集中导入所代表的工作量并不相同。
+\begin{longtable}{L{.30\linewidth}C{.12\linewidth}C{.14\linewidth}C{.12\linewidth}C{.18\linewidth}}
+\caption{按作者身份归并的提交活跃情况}\\\toprule 作者身份&总提交&普通提交&活跃天数&每活跃日均值\\\midrule\endfirsthead\toprule 作者身份&总提交&普通提交&活跃天数&每活跃日均值\\\midrule\endhead
+Fwlyii&89&70&11&8.09\\
+Chengwen&63&52&8&7.88\\
+mao / iStarrySummer&94&88&7&13.43\\
+Zhong Yutong / Zita&19&17&5&3.80\\\bottomrule
+\end{longtable}
+“活跃天数”仅指至少有一条提交的日期数。全体记录覆盖 9 月 1 日至 9 月 16 日，在 13 个日期上有提交。9 月 3 日共有 60 条、9 月 7 日 35 条、9 月 15 日 28 条；需求图与界面细分提交会提高单日数量，不能据此推断对应日的组会次数或开发时长。
+\begin{figure}[H]\centering\includegraphics[width=.98\linewidth]{figures/report/git-daily.pdf}\caption{全分支去重后的每日提交数量}\end{figure}
+GitHub Insights 页面提供了 Pull Request、作者和分支活动的界面化概览，但平台显示会受到统计范围、默认分支和账号身份的影响。因此，图中数字只作为平台快照，与本节按全部远端分支去重、归并作者身份后的统计结果并列说明，不用来替代前述统计口径。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.94\linewidth]{figures/report/process/github-summary.png}
+  \caption{GitHub Insights 中的协作活动概览}
+  \label{fig:process-github-summary}
+\end{figure}

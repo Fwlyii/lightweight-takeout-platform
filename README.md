@@ -53,7 +53,7 @@ docker-compose.demo.yml       本地运行配置
 
 ### 从哪里开始读代码
 
-如果想了解点餐流程，可以先看前端的 [BusinessInfo.vue](elmclient/src/views/BusinessInfo.vue)、[Cart.vue](elmclient/src/views/Cart.vue) 和 [Payment.vue](elmclient/src/views/Payment.vue)，再看后端的 [OrderController.java](elm_bk/src/main/java/com/tju/elm_bk/controller/OrderController.java) 和 [OrderSubmissionService.java](elm_bk/src/main/java/com/tju/elm_bk/service/OrderSubmissionService.java)。
+如果想了解点餐流程，可以先看前端的 [BusinessInfo.vue](elmclient/src/views/BusinessInfo.vue)、[Cart.vue](elmclient/src/views/Cart.vue) 和 [Payment.vue](elmclient/src/views/Payment.vue)，再看后端的 [OrderController.java](elm_bk/src/main/java/elm_bk/controller/OrderController.java) 和 [OrderSubmissionService.java](elm_bk/src/main/java/elm_bk/service/OrderSubmissionService.java)。
 
 前端的 `src/views/` 按页面组织，公共组件在 `src/components/`，接口封装在 `src/services/`，路由和登录访问控制在 `src/router/`。`auth-preview` 和 `profile-preview` 是登录、资料功能的独立联调入口，正常启动不用进入这些目录。
 
