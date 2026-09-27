@@ -2,26 +2,26 @@
 \section{仓库与成员职责}
  \url{https://github.com/Fwlyii/lightweight-takeout-platform.git}为Git项目仓库地址。
 \input{body/report/team-division-process}
-课程提供的初始工程是项目的共同起点。小组随后建立协作仓库，补写需求文档，拆分功能分支，并用测试材料记录实现结果。图\ref{fig:process-course-repository}展示了这段起点关系。后文把课程代码、新增规则和实际验证结果分别写出，读者可以沿仓库记录查看。
+课程提供的初始工程是项目的共同起点。小组随后建立协作仓库，补写需求文档，拆分功能分支，并用测试材料记录实现结果。图\ref{fig:process-course-repository}展示了这段起点关系。后文分别说明课程代码、新增规则和实际验证结果。
 \begin{figure}[H]
   \centering
   \includegraphics[width=.86\linewidth]{figures/report/process/course-repository.png}
   \caption{课程初始工程与仓库起点}\label{fig:process-course-repository}
   
 \end{figure}
-\section{开发阶段与可核对的产物}
+\section{开发阶段与项目产物}
 项目的开发顺序大致经历了需求和建模、基础框架、业务模块、整合验证和体验调整几个阶段。图\ref{fig:process-models}和图\ref{fig:process-pull-requests}展示建模与分支整合的记录，表\ref{tab:dev-stages}按提交日期和产物内容整理阶段变化。
 \begin{longtable}{L{.19\linewidth}L{.28\linewidth}L{.44\linewidth}}
-\caption{开发阶段与仓库证据}\label{tab:dev-stages}\\\toprule 时间&工作主题&可核对产物\\\midrule\endfirsthead\toprule 时间&工作主题&可核对产物\\\midrule\endhead
+\caption{开发阶段与仓库产物}\label{tab:dev-stages}\\\toprule 时间&工作主题&主要产物\\\midrule\endfirsthead\toprule 时间&工作主题&主要产物\\\midrule\endhead
 9 月 1--3 日&仓库建立与需求分析&\code{4fcbf00} 初始提交、\code{6e39d85} SRS 初版、\code{4d071aa} 需求修订，随后补充参与者、用例和页面结构图。\\
 9 月 5--9 日&基础能力与业务模块并行&前后端基础、账号与权限、下单支付、商家商品、骑手配送等分支相继整合；\code{7c898f4} 合并 SRS 2.0，\code{39c5469} 合并骑手配送。\\
-9 月 9 日&过程记录与回归&\code{21f7ec1} 补充测试输出，\code{d80eaba} 补充开发记录；保留结构契约检查和模块测试的不同证据口径。\\
+9 月 9 日&过程记录与回归&\code{21f7ec1} 补充测试输出，\code{d80eaba} 补充开发记录；同时保留结构契约检查和模块测试结果。\\
 9 月 11--14 日&AI 入口与界面完善&AI 点餐页面、分类商家列表、登录、订单页及交互动效逐步调整，多个界面分支通过合并提交整合。\\
 9 月 15--16 日&全链路整合与交付整理&\code{e06d806} 合并 AI 界面并保留鉴权与结算保护；\code{06780ac}、\code{12c3d6e}、\code{d319c5e} 对返回导航补充测试、修复与重构；最终完善四端体验、部署和高德选址。\\\bottomrule
 \end{longtable}
 需求讨论逐渐从功能清单转向具体业务场景：谁在什么前提下操作，成功后得到什么结果，失败时保留什么状态。实现阶段再把金额、库存、身份和状态规则落到服务端。界面调整后，成员会重新走登录、订单确认和返回路径，检查入口变化是否影响后续流程。
 
-表中的日期取自提交和产物形成时间，可能和正式组会日期不同。下面按课程节点补充从需求分析到联调、验收和报告整理的过程，表中的仓库统计保持原有记录。
+表中的日期按提交和产物形成时间整理，组会过程见下文。下面按课程节点补充从需求分析到联调、验收和报告整理的过程。
 
 \subsection{分组与协作环境建立}
 9月2日前后，成员完成仓库访问和本地环境检查，约定腾讯会议、微信群、飞书文档和 GitHub 各自存放的内容。大家先通读课程要求和初始工程，再结合熟悉程度安排前端、后端、数据库和测试主责。跨端问题由相关成员一起处理。
@@ -65,7 +65,7 @@
 \subsection{交叉验收、课程验收与报告整理}
 交叉验收前，小组先用自动化测试和人工功能筛查检查自己的版本，并在缺陷表中记录复现条件和修复结果，方法见项目测试章节。9月16日的交叉验收面向其他小组，按对方提交的 SRS 和可运行版本逐项检查。内部缺陷表与交叉验收记录对应不同测试对象。
 
-9月18日教师对本组项目进行课程验收。9月19日以后，成员根据反馈修正问题，并把需求、设计、实现、测试和协作材料放在一起检查。报告整理把仓库、共享文档、会议记录、缺陷表和运行截图串联起来，每个结论都对应相应产物。
+9月18日教师对本组项目进行课程验收。9月19日以后，成员根据反馈修正问题，并把需求、设计、实现、测试和协作材料放在一起检查。报告整理把仓库、共享文档、会议记录、缺陷表和运行截图串联起来，按需求、实现和测试材料展开。
 \section{组会与协作方式}
 \input{body/report/meeting-record}
 \begin{figure}[H]
