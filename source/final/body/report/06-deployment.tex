@@ -1,44 +1,44 @@
 \chapter{项目部署与运行说明}
 \section{部署依据与适用环境}
-本章依据当前仓库 \code{docs/DEPLOYMENT.md} 和 \code{docker-compose.demo.yml} 整理，用于本地课程演示与复现，不把部署步骤描述为此次报告整理已完成的真实运行验收。推荐使用 Docker Compose 同时启动前端、后端和 MySQL，减少不同成员环境差异。
+本章根据当前仓库的 \code{docs/DEPLOYMENT.md} 和 \code{docker-compose.demo.yml} 整理本地演示步骤。Docker Compose 会同时启动前端、后端和 MySQL，并集中管理版本和网络配置。启动过程中按日志检查服务状态。
 
-环境需要 Git、运行中的 Docker 及 Compose v2。自动生成配置的脚本还需要 zsh 与 OpenSSL。首次构建需访问镜像、npm 与 Maven 依赖仓库；默认本机端口 18081、18080、13306 应保持空闲。手动开发模式对应 Node.js 20、JDK 17 和 MySQL 8。
+表\ref{tab:deploy-troubles}列出常见排查路径。环境需要 Git、运行中的 Docker 和 Compose v2，自动生成配置还需要 zsh 与 OpenSSL。首次构建会下载镜像、npm 和 Maven 依赖，启动前检查 18081、18080、13306 三个端口。手动开发模式使用 Node.js 20、JDK 17 和 MySQL 8。
 \section{获取代码与准备配置}
 \begin{lstlisting}
 git clone --branch main https://github.com/Fwlyii/lightweight-takeout-platform.git
 cd lightweight-takeout-platform
 zsh scripts/ensure-demo-env.sh
 \end{lstlisting}
-配置脚本在本地 \code{.env} 生成随机 \code{JWT_SECRET}，有效的已有密钥不被覆盖。若没有 zsh，可根据根目录 \code{.env.example} 手工配置，并通过 \code{openssl rand -hex 64} 生成本地密钥。密钥属于本地环境信息，不作为报告附件。
+配置脚本在本地 \code{.env} 中生成随机 \code{JWT_SECRET}，已有有效密钥会保留。使用其他 shell 时，可参照根目录 \code{.env.example} 手工填写，并使用 \code{openssl rand -hex 64} 生成本地密钥。密钥只用于本地运行，报告记录配置方式，不写入密钥内容。
 
-外部能力按需要设置 \code{DEEPSEEK_API_KEY}、\code{DASHSCOPE_API_KEY} 及视觉/语音模型变量；高德前端选址使用 \code{VUE_APP_AMAP_KEY}，修改后需要重新构建前端。基础浏览和普通点餐流程不依赖外部模型密钥；相关可选入口未配置时，应验证失败反馈和替代路径。
+外部能力按需设置 \code{DEEPSEEK_API_KEY}、\code{DASHSCOPE_API_KEY} 以及视觉和语音模型变量；高德选址使用 \code{VUE_APP_AMAP_KEY}，改动后需重新构建前端。浏览和普通点餐不依赖这些密钥；可选入口未配置时，应同时检查提示和普通搜索等替代路径。
 \section{构建、启动与检查}
 \begin{lstlisting}
 docker compose -f docker-compose.demo.yml up -d --build
 docker compose -f docker-compose.demo.yml ps -a
 docker compose -f docker-compose.demo.yml logs --tail=100 mysql migrate backend frontend
 \end{lstlisting}
-首次启动由 MySQL 创建 \code{elm_v2} 并导入结构和演示数据，再由迁移任务处理订单名称快照与购物车备注等更新。\code{migrate} 成功退出为 \code{Exited (0)}，不应误判为服务故障。后端使用 JDK 17；前端使用 Node.js 20 构建后由 Nginx 提供页面，并通过同源代理访问后端。
+表\ref{tab:local-endpoints}列出启动后可访问的入口。首次启动时 MySQL 创建 \code{elm_v2} 并导入结构和演示数据，迁移任务随后处理订单名称快照、购物车备注等更新。\code{migrate} 正常完成后显示 \code{Exited (0)}，这是一次性任务的预期结果。后端以 JDK 17 运行，前端用 Node.js 20 构建后由 Nginx 提供页面，并通过同源代理访问后端。
 \begin{longtable}{L{.25\linewidth}L{.66\linewidth}}
-\caption{默认本地访问入口}\\\toprule 服务&地址或用途\\\midrule
+\caption{默认本地访问入口}\label{tab:local-endpoints}\\\toprule 服务&地址或用途\\\midrule
 前端&\url{http://localhost:18081/index}\\
-后端&\url{http://localhost:18080}，为接口根地址，不是独立网页首页。\\
+后端&\url{http://localhost:18080}，接口根地址。\\
 接口说明&\url{http://localhost:18080/swagger-ui/index.html}\\
 数据库调试&\code{127.0.0.1:13306}，数据库 \code{elm_v2}。\\\bottomrule
 \end{longtable}
 \section{演示角色与验收顺序}
-新建的本地演示数据库提供 \code{demo_user}、\code{demo_merchant}、\code{demo_rider}、\code{demo_rider_candidate} 和 \code{demo_admin} 等角色账号；演示初始密码见仓库部署文档。不同角色使用独立浏览器会话，以免账号切换影响验证。
+本地演示数据库提供 \code{demo_user}、\code{demo_merchant}、\code{demo_rider}、\code{demo_rider_candidate} 和 \code{demo_admin} 等账号，初始密码记录在部署文档中。验证不同角色时分别使用浏览器会话，切换身份不会带入上一账号的缓存和登录状态。
 
-先检查顾客浏览、加购、选择外送或自取、提交订单和模拟支付，再检查商家接单备餐、外送骑手接单配送和顾客确认收货；之后验证取消、库存不足、未登录访问及外部服务不可用。跨商家商品分别结算。页面可打开只表示部署入口可用，数据库写入、角色权限和订单推进仍需逐项验证。
+验收可以从顾客浏览、加购、选择外送或自取、提交和模拟支付开始，再沿商家接单备餐、骑手配送、顾客确认收货继续。随后补测取消、库存不足、未登录访问和外部服务不可用，跨商家商品分别结算。页面打开后，还需逐项确认数据库写入、角色权限和订单推进。
 \section{停止、恢复与数据维护}
 \begin{lstlisting}
 docker compose -f docker-compose.demo.yml stop
 docker compose -f docker-compose.demo.yml start
 \end{lstlisting}
-当前配置未声明固定名称的 MySQL 数据卷，重建容器前应确认数据持久化与备份方案，不把删除容器或清空卷作为日常更新方式。初始化 SQL 只在 MySQL 数据目录首次创建时运行，已有环境应按迁移脚本适用条件更新。上传文件位于 \code{runtime-uploads/}，需要与数据库一起考虑备份。
+当前配置由 Compose 管理 MySQL 数据卷名称。重建容器前先确认数据持久化和备份方案，日常更新应保留容器数据并按备份方案操作。初始化 SQL 只在数据目录首次创建时执行，已有环境按迁移脚本的适用条件更新；\code{runtime-uploads/} 也需要和数据库一起纳入备份。
 \section{常见部署问题与排查}
 \begin{longtable}{L{.26\linewidth}L{.65\linewidth}}
-\caption{部署问题与检查路径}\\\toprule 现象&检查与处理\\\midrule\endfirsthead\toprule 现象&检查与处理\\\midrule\endhead
+\caption{部署问题与检查路径}\label{tab:deploy-troubles}\\\toprule 现象&检查与处理\\\midrule\endfirsthead\toprule 现象&检查与处理\\\midrule\endhead
 缺少 JWT 配置&确认本地环境文件生成成功且示例值已替换，检查后端是否收到变量。\\
 Docker 无法连接&确认 Docker 服务运行，检查终端所连上下文。\\
 端口冲突&检查已有服务，停止冲突实例或明确调整映射。\\
